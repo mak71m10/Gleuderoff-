@@ -1,0 +1,488 @@
+import { useMemo, useState, type ReactNode } from 'react'
+import { useStore, applyTemporal } from '../store'
+import { existsAt, resolve } from '../temporal'
+import { KINDS } from '../constants'
+import { formatDate, toParts, formatYear } from '../calendar'
+import { newEntry, newState, randomColor } from '../model'
+import { Button, DateField, EditModeSwitch, ImageField, RefField, TextField, assetUrl } from './ui'
+import { HistoryList } from './Inspector'
+import { Icon } from './Icon'
+import { Flag, defaultHeraldry } from './Heraldry'
+import type { Entry, EntryFields, EntryKind, WorldData } from '../types'
+
+export function StatesView() {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
+  const mutate = useStore((s) => s.mutate)
+  const openCard = useStore((s) => s.openStateCard)
+  const [q, setQ] = useState('')
+  const [showDead, setShowDead] = useState(false)
+  const list = world.states
+    .map((s) => ({ s, f: resolve(s, date), alive: existsAt(s, date) }))
+    .filter((x) => (showDead || x.alive) && x.f.name.toLowerCase().includes(q.toLowerCase()))
+    .sort((a, b) => a.f.name.localeCompare(b.f.name, 'ru'))
+
+  return (
+    <div className="page">
+      <header className="page-head">
+        <h1>Государства</h1>
+        <div className="search">
+          <Icon name="search" size={16} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск..." />
+        </div>
+        <label className="check">
+          <input type="checkbox" checked={showDead} onChange={(e) => setShowDead(e.target.checked)} /> показывать несуществующие на эту дату
+        </label>
+        <Button
+          icon="plus"
+          variant="primary"
+          onClick={() => {
+            const st = newState('Новое государство', randomColor())
+            mutate((w) => {
+              w.states.push(st)
+            })
+            openCard(st.id)
+          }}
+        >
+          Государство
+        </Button>
+      </header>
+      <div className="state-grid">
+        {list.map(({ s, f, alive }) => {
+          const ruler = world.entries.find((e) => e.id === f.rulerId)
+          return (
+            <button key={s.id} className={`state-tile ${alive ? '' : 'dead'}`} onClick={() => openCard(s.id)} style={{ ['--state' as string]: f.color }}>
+              <div className="st-flag">{f.flag ? <img src={assetUrl(f.flag)} alt="" /> : <Flag heraldry={f.heraldry ?? defaultHeraldry(s, f.color)} width={66} />}</div>
+              <div className="st-text">
+                <div className="st-name">{f.name}</div>
+                <div className="st-sub">{f.government || 'строй не указан'}</div>
+                <div className="st-sub">
+                  {f.rulerTitle || 'Правитель'}: {ruler ? resolve(ruler, date).name : f.ruler || '—'}
+                </div>
+              </div>
+            </button>
+          )
+        })}
+        {!list.length && <p className="muted">Нет государств. Нажмите «+ Государство».</p>}
+      </div>
+    </div>
+  )
+}
+
+export function CodexView({ kind }: { kind: EntryKind }) {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
+  const mutate = useStore((s) => s.mutate)
+  const selection = useStore((s) => s.selection)
+  const select = useStore((s) => s.select)
+  const meta = KINDS[kind]
+  const [q, setQ] = useState('')
+  const list = world.entries
+    .filter((e) => e.kind === kind)
+    .map((e) => ({ e, f: resolve(e, date) }))
+    .filter(({ f }) => (f.name + ' ' + f.title + ' ' + f.tags.join(' ')).toLowerCase().includes(q.toLowerCase()))
+    .sort((a, b) => (kind === 'event' ? (a.e.from ?? 0) - (b.e.from ?? 0) : a.f.name.localeCompare(b.f.name, 'ru')))
+  const selectedId = selection?.type === 'entry' && world.entries.find((e) => e.id === selection.id)?.kind === kind ? selection.id : list[0]?.e.id
+
+  return (
+    <div className="codex">
+      <aside className="codex-list">
+        <header>
+          <h1>
+            <Icon name={meta.icon} /> {meta.plural}
+          </h1>
+          <button
+            className="add-btn"
+            title={`Добавить: ${meta.label.toLowerCase()}`}
+            onClick={() => {
+              const e = newEntry(kind, `${meta.label} без имени`)
+              if (kind === 'event') e.from = date
+              mutate((w) => {
+                w.entries.push(e)
+              })
+              select({ type: 'entry', id: e.id })
+            }}
+          >
+            <Icon name="plus" />
+          </button>
+        </header>
+        <div className="search">
+          <Icon name="search" size={16} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Поиск..." />
+        </div>
+        <div className="codex-items">
+          {grouped(kind, list, world).map(({ e, f, group, sub }) => (
+            <div key={e.id}>
+            {group && <div className="codex-group">{group}</div>}
+            <button className={`codex-item ${sub ? 'sub' : ''} ${e.id === selectedId ? 'active' : ''} ${existsAt(e, date) ? '' : 'dead'}`} onClick={() => select({ type: 'entry', id: e.id })}>
+              <span className="ci-thumb">{f.image ? <img src={assetUrl(f.image)} alt="" /> : <Icon name={meta.icon} size={16} />}</span>
+              <span className="ci-text">
+                <span className="ci-name">{f.name}</span>
+                <span className="ci-sub">{kind === 'event' ? formatDate(world.calendar, e.from) : f.title}</span>
+              </span>
+            </button>
+            </div>
+          ))}
+          {!list.length && <p className="muted pad">Пусто. Нажмите «+», чтобы добавить.</p>}
+        </div>
+      </aside>
+      <main className="codex-detail">{selectedId ? <EntryEditor key={selectedId} id={selectedId} /> : <EmptyCodex kind={kind} />}</main>
+    </div>
+  )
+}
+
+const GOD_RANK = ['первозданн', 'верховн', 'божество', 'низш', 'дух', 'полу']
+const rankIndex = (r: string): number => {
+  const i = GOD_RANK.findIndex((k) => r.toLowerCase().includes(k))
+  return i < 0 ? 9 : i
+}
+
+/** Боги — по Домам и статусу, народы — ветви под родительским народом. */
+function grouped(kind: EntryKind, list: { e: Entry; f: EntryFields }[], world: WorldData) {
+  type Row = { e: Entry; f: EntryFields; group?: string; sub?: boolean }
+  if (kind === 'god') {
+    const houseName = (id: string): string => world.entries.find((x) => x.id === id)?.base.name ?? 'Вне Домов'
+    const sorted = [...list].sort(
+      (a, b) =>
+        houseName(a.f.links.religion ?? '').localeCompare(houseName(b.f.links.religion ?? ''), 'ru') ||
+        rankIndex(a.f.props.rank ?? '') - rankIndex(b.f.props.rank ?? '') ||
+        a.f.name.localeCompare(b.f.name, 'ru')
+    )
+    let last = ''
+    return sorted.map((r): Row => {
+      const g = houseName(r.f.links.religion ?? '')
+      const row: Row = { ...r, group: g !== last ? g : undefined }
+      last = g
+      return row
+    })
+  }
+  if (kind === 'people') {
+    const ids = new Set(list.map((r) => r.e.id))
+    const roots = list.filter((r) => !r.f.links.parent || !ids.has(r.f.links.parent))
+    const out: Row[] = []
+    for (const r of roots) {
+      out.push(r)
+      for (const c of list.filter((x) => x.f.links.parent === r.e.id)) out.push({ ...c, sub: true })
+    }
+    return out
+  }
+  return list as Row[]
+}
+
+function EmptyCodex({ kind }: { kind: EntryKind }) {
+  return (
+    <div className="empty">
+      <Icon name={KINDS[kind].icon} size={48} />
+      <p>Здесь будут {KINDS[kind].plural.toLowerCase()} вашего мира.</p>
+    </div>
+  )
+}
+
+function refItems(world: WorldData, date: number, target: EntryKind | 'state' | 'place') {
+  if (target === 'state') return world.states.map((s) => ({ id: s.id, name: resolve(s, date).name }))
+  if (target === 'place') return world.places.map((p) => ({ id: p.id, name: resolve(p, date).name }))
+  return world.entries.filter((e) => e.kind === target).map((e) => ({ id: e.id, name: resolve(e, date).name }))
+}
+
+function EntryEditor({ id }: { id: string }) {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
+  const mode = useStore((s) => s.editMode)
+  const mutate = useStore((s) => s.mutate)
+  const select = useStore((s) => s.select)
+  const setView = useStore((s) => s.setView)
+  const entry = world.entries.find((e) => e.id === id)
+  const [preview, setPreview] = useState(() => Boolean(entry?.base.body))
+  const masterMode = useStore((s) => s.masterMode)
+  if (!entry) return null
+  const meta = KINDS[entry.kind]
+  const f = resolve(entry, date)
+  const cal = world.calendar
+
+  const set = (patch: Partial<EntryFields>): void =>
+    mutate((w) => {
+      const e = w.entries.find((x) => x.id === id)
+      if (e) applyTemporal(e, patch, date, mode)
+    })
+  const setRaw = (patch: Partial<Pick<Entry, 'from' | 'to'>>): void =>
+    mutate((w) => {
+      const e = w.entries.find((x) => x.id === id)
+      if (e) Object.assign(e, patch)
+    })
+
+  const backlinks = world.entries.filter((e) => e.id !== id && Object.values(resolve(e, date).links).includes(id))
+  const age =
+    entry.kind === 'character' && entry.from != null
+      ? Math.floor(((entry.to != null && entry.to < date ? entry.to : date) - entry.from) / cal.months.reduce((s, m) => s + m.days, 0))
+      : null
+
+  const goto = (eid: string): void => {
+    const target = world.entries.find((e) => e.id === eid)
+    if (!target) return
+    setView(target.kind)
+    select({ type: 'entry', id: eid })
+  }
+
+  return (
+    <article className={`entry entry-${entry.kind}`}>
+      <header className="entry-head">
+        <ImageField value={f.image} folder={entry.kind} shape={entry.kind === 'character' || entry.kind === 'god' ? 'round' : 'rect'} onChange={(image) => set({ image })} />
+        <div className="entry-titles">
+          <div className="entry-kicker">
+            {meta.label}
+            {!existsAt(entry, date) && <span className="badge danger">не существует на {formatDate(cal, date)}</span>}
+            {age !== null && age >= 0 && <span className="badge">{age} лет</span>}
+            {f.tags.includes('черновик') && <span className="badge draft" title="Придумано составителем — проверьте">черновик</span>}
+          </div>
+          <TextField value={f.name} onChange={(name) => set({ name })} className="entry-name" />
+          <TextField value={f.title} placeholder="Титул / подзаголовок" onChange={(title) => set({ title })} className="entry-title" />
+          <TextField value={f.summary} placeholder="Кратко в одну строку" onChange={(summary) => set({ summary })} className="entry-summary" />
+        </div>
+        <EditModeSwitch />
+      </header>
+
+      <div className="entry-grid">
+        <div className="entry-main">
+          <div className="body-head">
+            <span className="field-label">Описание и история</span>
+            <button className="link-btn" onClick={() => setPreview(!preview)}>
+              {preview ? 'Редактировать' : 'Просмотр'}
+            </button>
+          </div>
+          {preview || !masterMode ? (
+            <div className="parchment prose">{renderBody(f.body, world, goto)}</div>
+          ) : (
+            <TextField
+              multiline
+              rows={22}
+              value={f.body}
+              onChange={(body) => set({ body })}
+              placeholder="Пишите свободно. [[Имя]] — ссылка на другую запись. Пустая строка — новый абзац. # Заголовок"
+              className="parchment-input"
+            />
+          )}
+          {meta.props
+            .filter((p) => p.multiline)
+            .map((p) => (
+              <TextField
+                key={p.key}
+                label={p.label}
+                multiline
+                rows={Math.min(14, Math.max(3, Math.ceil((f.props[p.key] ?? '').length / 110) + 1))}
+                value={f.props[p.key] ?? ''}
+                onChange={(v) => set({ props: { ...f.props, [p.key]: v } })}
+                className="long-prop"
+              />
+            ))}
+          {masterMode && (
+            <div className="secret-box">
+              <TextField label="Тайное — знание мастера (не видно в режиме игрока)" multiline rows={4} value={f.secret ?? ''} onChange={(secret) => set({ secret })} />
+            </div>
+          )}
+          {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
+        </div>
+
+        <aside className="entry-side">
+          <div className="grid-2">
+            <DateField label={meta.fromLabel} value={entry.from} onChange={(from) => setRaw({ from })} />
+            <DateField label={meta.toLabel} value={entry.to} onChange={(to) => setRaw({ to })} />
+          </div>
+          {meta.props.filter((p) => !p.multiline).map((p) => (
+            <TextField
+              key={p.key}
+              label={p.label}
+              multiline={p.multiline}
+              rows={3}
+              value={f.props[p.key] ?? ''}
+              onChange={(v) => set({ props: { ...f.props, [p.key]: v } })}
+            />
+          ))}
+          {meta.links.map((l) => (
+            <div key={l.key} className="link-field">
+              <RefField label={l.label} value={f.links[l.key] ?? ''} items={refItems(world, date, l.target).filter((i) => i.id !== id)} onChange={(v) => set({ links: { ...f.links, [l.key]: v } })} />
+              {f.links[l.key] && l.target !== 'state' && l.target !== 'place' && (
+                <button className="icon-btn" onClick={() => goto(f.links[l.key])} title="Открыть">
+                  <Icon name="next" size={14} />
+                </button>
+              )}
+            </div>
+          ))}
+          <TextField
+            label="Теги (через запятую)"
+            value={f.tags.join(', ')}
+            onChange={(v) => set({ tags: v.split(',').map((t) => t.trim()).filter(Boolean) })}
+          />
+          {backlinks.length > 0 && (
+            <div className="inspector-block">
+              <div className="field-label">Упоминается в</div>
+              <div className="chip-list">
+                {backlinks.map((b) => (
+                  <button key={b.id} className="chip" onClick={() => goto(b.id)}>
+                    {KINDS[b.kind].label}: {resolve(b, date).name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <HistoryList
+            items={entry.history.map((c) => ({ id: c.id, date: c.date, text: Object.keys(c.patch).join(', ') }))}
+            onDelete={(cid) =>
+              mutate((w) => {
+                const e = w.entries.find((x) => x.id === id)
+                if (e) e.history = e.history.filter((c) => c.id !== cid)
+              })
+            }
+          />
+          <Button
+            icon="trash"
+            variant="danger"
+            onClick={() => {
+              if (!confirm(`Удалить «${f.name}»?`)) return
+              mutate((w) => {
+                w.entries = w.entries.filter((e) => e.id !== id)
+              })
+              select(null)
+            }}
+          >
+            Удалить
+          </Button>
+        </aside>
+      </div>
+    </article>
+  )
+}
+
+/** Простая разметка: # и ## заголовки, абзацы, списки «- », **жирный**, [[ссылка]] и [[ссылка|текст]] */
+function renderBody(body: string, world: WorldData, goto: (id: string) => void): ReactNode {
+  const byName = new Map(world.entries.map((e) => [e.base.name.toLowerCase(), e.id]))
+  const inline = (text: string, key: string): ReactNode[] =>
+    text.split(/(\[\[[^\]]+\]\]|\*\*[^*]+\*\*)/g).map((part, i) => {
+      if (part.startsWith('[[')) {
+        const [target, label] = part.slice(2, -2).split('|')
+        const eid = byName.get(target.trim().toLowerCase())
+        return eid ? (
+          <button key={key + i} className="wiki-link" onClick={() => goto(eid)}>
+            {label ?? target}
+          </button>
+        ) : (
+          <span key={key + i} className="wiki-link missing" title="Запись не найдена">
+            {label ?? target}
+          </span>
+        )
+      }
+      if (part.startsWith('**')) return <b key={key + i}>{part.slice(2, -2)}</b>
+      return part
+    })
+  return body.split(/\n\s*\n/).flatMap((block, i) => {
+    const lines = block.trim().split('\n')
+    const out: ReactNode[] = []
+    let list: string[] = []
+    const flush = (k: string): void => {
+      if (list.length) out.push(<ul key={k}>{list.map((l, j) => <li key={j}>{inline(l, `${k}-${j}`)}</li>)}</ul>)
+      list = []
+    }
+    let para: string[] = []
+    const flushPara = (k: string): void => {
+      if (para.length) out.push(<p key={k}>{inline(para.join(' '), k)}</p>)
+      para = []
+    }
+    lines.forEach((raw, j) => {
+      const t = raw.trim()
+      const k = `${i}-${j}`
+      if (t.startsWith('- ')) {
+        flushPara(`p${k}`)
+        list.push(t.slice(2))
+        return
+      }
+      flush(`l${k}`)
+      if (t.startsWith('## ')) {
+        flushPara(`p${k}`)
+        out.push(<h3 key={k}>{inline(t.slice(3), k)}</h3>)
+      } else if (t.startsWith('# ')) {
+        flushPara(`p${k}`)
+        out.push(<h2 key={k}>{inline(t.slice(2), k)}</h2>)
+      } else if (t) para.push(t)
+    })
+    flush(`l${i}-end`)
+    flushPara(`p${i}-end`)
+    return out
+  })
+}
+
+export function DynastyTree({ dynastyId, onOpen }: { dynastyId: string; onOpen: (id: string) => void }) {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
+  const cal = world.calendar
+  const { roots, children, byId } = useMemo(() => {
+    const members = world.entries.filter((e) => e.kind === 'character' && e.base.links.dynasty === dynastyId)
+    const byId = new Map(members.map((m) => [m.id, m]))
+    const children = new Map<string, Entry[]>()
+    for (const m of members) {
+      const parent = [m.base.links.father, m.base.links.mother].find((p) => p && byId.has(p))
+      if (parent) children.set(parent, [...(children.get(parent) ?? []), m])
+    }
+    for (const list of children.values()) list.sort((a, b) => (a.from ?? 0) - (b.from ?? 0))
+    const isRoot = (m: Entry): boolean => ![m.base.links.father, m.base.links.mother].some((p) => p && byId.has(p))
+    const allRoots = members.filter(isRoot)
+    // супруг-корень из той же династии рисуется в паре, а не отдельным древом
+    const roots = allRoots.filter((m, i) => {
+      const sp = m.base.links.spouse
+      const j = allRoots.findIndex((r) => r.id === sp)
+      return !(j >= 0 && j < i)
+    })
+    return { roots, children, byId }
+  }, [world.entries, dynastyId])
+
+  const years = (e: Entry): string => {
+    const a = e.from != null ? formatYear(cal, toParts(cal, e.from).year) : '?'
+    const b = e.to != null ? formatYear(cal, toParts(cal, e.to).year) : ''
+    return b ? `${a} — ${b}` : `р. ${a}`
+  }
+
+  const node = (e: Entry, seen: Set<string>): ReactNode => {
+    if (seen.has(e.id)) return null
+    seen.add(e.id)
+    const f = resolve(e, date)
+    const spouse = world.entries.find((x) => x.id === f.links.spouse)
+    const kids = children.get(e.id) ?? []
+    return (
+      <li key={e.id}>
+        <div className="tree-couple">
+          <button className={`tree-node ${existsAt(e, date) ? '' : 'dead'}`} onClick={() => onOpen(e.id)}>
+            <span className="tn-portrait">{f.image ? <img src={assetUrl(f.image)} alt="" /> : <Icon name="user" size={18} />}</span>
+            <span className="tn-name">{f.name}</span>
+            <span className="tn-years">{years(e)}</span>
+            {f.title && <span className="tn-title">{f.title}</span>}
+          </button>
+          {spouse && !seen.has(spouse.id) && (seen.add(spouse.id), true) && (
+            <>
+              <span className="tree-ring">⚭</span>
+              <button className={`tree-node spouse ${byId.has(spouse.id) ? 'same-house' : ''}`} onClick={() => onOpen(spouse.id)}>
+                <span className="tn-portrait">
+                  {resolve(spouse, date).image ? <img src={assetUrl(resolve(spouse, date).image)} alt="" /> : <Icon name="user" size={18} />}
+                </span>
+                <span className="tn-name">{resolve(spouse, date).name}</span>
+                <span className="tn-years">{years(spouse)}</span>
+              </button>
+            </>
+          )}
+        </div>
+        {kids.length > 0 && <ul>{kids.map((k) => node(k, seen))}</ul>}
+      </li>
+    )
+  }
+
+  const seen = new Set<string>()
+  return (
+    <div className="dynasty-tree">
+      <div className="field-label">Родословное древо</div>
+      {roots.length ? (
+        <div className="tree-scroll">
+          <ul className="tree">{roots.map((r) => node(r, seen))}</ul>
+        </div>
+      ) : (
+        <p className="hint">Укажите у персонажей эту династию, а также отца и мать, и древо построится само.</p>
+      )}
+    </div>
+  )
+}

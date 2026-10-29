@@ -1,0 +1,46 @@
+{
+  "dependencies": {
+    "@fontsource/alegreya-sans": "^5.1.0",
+    "@fontsource/cormorant-garamond": "^5.1.0",
+    "@fontsource/cormorant-sc": "^5.1.0",
+    "immer": "^10.1.1",
+    "leaflet": "^1.9.4",
+    "nanoid": "^5.0.7",
+    "polylabel": "^1.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.169.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.14",
+    "@types/node": "^22.10.1",
+    "@types/polylabel": "^1.1.3",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "^0.169.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "ag-psd": "^20.2.1",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "sharp": "^0.33.5",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  },
+  "name": "gleuderoff",
+  "productName": "Gleuderoff",
+  "version": "0.8.0",
+  "description": "Gleuderoff вЂ” СЂРµРґР°РєС‚РѕСЂ РјРёСЂР°",
+  "main": "out/main/index.js",
+  "author": "Gleuderoff",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "dist": "electron-vite build && electron-builder --win",
+    "upscale": "node scripts/upscale-map.mjs",
+    "web": "vite --config vite.web.config.ts",
+    "build:web": "vite build --config vite.web.config.ts && node scripts/prune-web.mjs"
+  }
+}

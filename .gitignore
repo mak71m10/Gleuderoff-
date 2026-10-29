@@ -1,0 +1,11 @@
+node_modules/
+out/
+release/
+tools/
+source-maps/base-render.*
+source-maps/world-before-smooth.json
+out-web/
+# тяжёлые пересобираемые файлы карты
+source-maps/base-16384.png
+source-maps/provinces-raw.png
+source-maps/pub*.txt

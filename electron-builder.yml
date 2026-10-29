@@ -1,0 +1,21 @@
+appId: com.gleuderoff.editor
+productName: Gleuderoff
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**
+  - package.json
+extraResources:
+  - from: resources/default-world
+    to: default-world
+asar: true
+win:
+  target: nsis
+  icon: build/icon.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: Gleuderoff
+  artifactName: Gleuderoff-Setup-${version}.exe

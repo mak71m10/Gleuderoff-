@@ -1,0 +1,20 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "vite.web.config.ts"
+      ],
+      "port": 5199
+    },
+    {
+      "name": "web-build",
+      "url": "http://localhost:5200",
+      "port": 5200
+    }
+  ]
+}
