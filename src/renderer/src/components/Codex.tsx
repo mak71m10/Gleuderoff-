@@ -7,7 +7,7 @@ import { newEntry, newState, randomColor } from '../model'
 import { Button, DateField, EditModeSwitch, ImageField, RefField, TextField, assetUrl } from './ui'
 import { HistoryList } from './Inspector'
 import { Icon } from './Icon'
-import { Flag, defaultHeraldry } from './Heraldry'
+import { CoatOfArms, Flag, defaultHeraldry } from './Heraldry'
 import type { Entry, EntryFields, EntryKind, WorldData } from '../types'
 
 export function StatesView() {
@@ -226,7 +226,10 @@ function EntryEditor({ id }: { id: string }) {
   return (
     <article className={`entry entry-${entry.kind}`}>
       <header className="entry-head">
-        <ImageField value={f.image} folder={entry.kind} shape={entry.kind === 'character' || entry.kind === 'god' ? 'round' : 'rect'} onChange={(image) => set({ image })} />
+        <div className="entry-media">
+          <ImageField value={f.image} folder={entry.kind} shape={entry.kind === 'character' || entry.kind === 'god' ? 'round' : 'rect'} onChange={(image) => set({ image })} />
+          {f.heraldry && <CoatOfArms heraldry={f.heraldry} size={96} />}
+        </div>
         <div className="entry-titles">
           <div className="entry-kicker">
             {meta.label}

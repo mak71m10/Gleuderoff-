@@ -23,7 +23,7 @@ export const PLACE_TYPES: Record<PlaceType, PlaceTypeMeta> = {
   ruins: { label: 'Руины', minZoom: 0, group: 'poi', size: 16, glyph: 'M4 20h16M6 20v-9h3v9M15 20v-6h3v6M10 8l3-3 2 2' },
   dungeon: { label: 'Подземелье', minZoom: 0, group: 'poi', size: 16, glyph: 'M4 20c0-8 4-14 8-14s8 6 8 14zM9 20v-5a3 3 0 016 0v5' },
   landmark: { label: 'Достопримечательность', minZoom: 0, group: 'poi', size: 16, glyph: 'M12 2l3 7h7l-6 4 2 8-6-5-6 5 2-8-6-4h7z' },
-  battle: { label: 'Место битвы', minZoom: -0.5, group: 'poi', size: 16, glyph: 'M5 5l14 14M19 5L5 19M5 5v4M5 5h4M19 5v4M19 5h-4' }
+  battle: { label: 'Место битвы', minZoom: -2.6, group: 'poi', size: 20, glyph: 'M5 5l14 14M19 5L5 19M5 5v4M5 5h4M19 5v4M19 5h-4' }
 }
 
 export const PLACE_TYPE_OPTIONS = (Object.keys(PLACE_TYPES) as PlaceType[]).map((t) => ({

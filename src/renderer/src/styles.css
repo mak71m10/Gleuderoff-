@@ -630,3 +630,25 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; letter-spac
   .modal, .modal-wide { width: 100vw; max-height: 100vh; height: 100vh; border-radius: 0; }
   .prov-tip { display: none; }
 }
+
+/* место битвы: тревожный красный значок с пульсом, пока битва «свежая» на таймлайне */
+.pm-battle .pm-icon { background: radial-gradient(circle, #5a1410, #2a0a08); border-color: #e05a3a; color: #ffd2b0; box-shadow: 0 0 0 2px rgba(0,0,0,.6), 0 0 14px rgba(224, 90, 58, .7); animation: battle-pulse 1.6s ease-in-out infinite; }
+.pm-battle .pm-name { color: #ffd2b0; font-style: italic; }
+@keyframes battle-pulse { 50% { box-shadow: 0 0 0 2px rgba(0,0,0,.6), 0 0 22px rgba(224, 90, 58, 1); } }
+@media (prefers-reduced-motion: reduce) { .pm-battle .pm-icon { animation: none; } }
+
+.entry-media { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+/* справочник на узком экране: список сверху, карточка в одну колонку */
+@media (max-width: 1100px) {
+  .entry-grid { grid-template-columns: minmax(0, 1fr); }
+  .entry { padding: 20px 18px 32px; }
+  .entry-head { flex-wrap: wrap; }
+  .entry-titles { flex: 1 1 260px; }
+}
+@media (max-width: 760px) {
+  .codex { grid-template-columns: minmax(0, 1fr); grid-template-rows: 38vh minmax(0, 1fr); }
+  .codex-list { border-right: none; border-bottom: 1px solid var(--line); }
+  .codex-list header { padding-left: 62px; }
+  .entry-head { flex-wrap: wrap; gap: 14px; }
+}

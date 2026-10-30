@@ -144,7 +144,7 @@ for (const p of world.provinces) {
   const rc = regionCap.get(r)
   if (!rc || p.px > rc.px) regionCap.set(r, p)
 }
-const userPlaces = world.places.filter((pl) => pl.mapId === 'world')
+const userPlaces = world.places.filter((pl) => pl.mapId === 'world' && pl.base.type !== 'battle' && !pl.id.startsWith('lore-emp-'))
 const counts = {}
 for (const p of world.provinces) {
   const isRegionCap = regionCap.get(areaParent.get(p.areaId)) === p

@@ -188,6 +188,8 @@ export interface Place extends Temporal<PlaceFields> {
   y: number
   /** Карта этого города/подземелья */
   innerMapId?: string
+  /** Своя объёмная модель вместо модели по типу (например, «grandport») */
+  model?: string
 }
 
 export type EntryKind =
@@ -214,6 +216,8 @@ export interface EntryFields {
   links: Record<string, string>
   /** Тайное знание мастера — видно только в режиме мастера */
   secret?: string
+  /** Герб (у династий и домов) */
+  heraldry?: Heraldry
 }
 
 export interface Entry extends Temporal<EntryFields> {
@@ -265,6 +269,10 @@ export interface Province {
   coastal?: boolean
   /** Поселение-столица провинции (объёмная модель на карте) */
   settlement?: { type: 'village' | 'fishing' | 'town' | 'city' | 'capital' | 'castle' | 'port' | 'temple' | 'ruins' | 'tower'; x: number; y: number } | null
+  /** Описание поселения/провинции */
+  description?: string
+  /** Особое место (например, «aurhafen» — поселение заменено местом автора) */
+  landmark?: string
   /** Владельцы по датам: [дата | null, id страны | null] */
   owners: [number | null, string | null][]
 }
@@ -276,6 +284,10 @@ export interface AdminRegion {
   name: string
   parentId: string | null
   culture?: string
+  /** Великий дом, держащий регион (id записи династии) */
+  houseId?: string
+  description?: string
+  descAuto?: boolean
 }
 
 export interface WorldData {

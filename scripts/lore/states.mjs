@@ -40,7 +40,7 @@ export default function states({ world, Y, reigns }) {
     empire.history = reigns.map((r, i) => ({
       id: `lore-reign-${i}`,
       date: Y(r.year),
-      patch: { rulerId: `lore-${r.rulerId}`, rulerTitle: r.title, ...(r.year === 121 ? { name: 'Королевство Дагерфорд', government: 'Абсолютная монархия' } : {}), ...(r.year === 150 ? { name: 'Империя', government: 'Империя (абсолютная монархия)' } : {}) }
+      patch: { rulerId: `lore-${r.rulerId}`, rulerTitle: r.title, ...(r.year === 130 ? { name: 'Королевство Дагерфорд', government: 'Абсолютная монархия' } : {}), ...(r.year === 122 ? { government: 'Регентство' } : {}), ...(r.year === 150 ? { name: 'Империя', government: 'Империя (абсолютная монархия)' } : {}) }
     }))
     // до переворота Тейбера — одно из княжеств центра Лоры
     empire.history.unshift({ id: 'lore-reign-princedom', date: Y(-10000), patch: { name: 'Княжество Дагерфорд', government: 'Военизированное княжество', heraldry: H('bicolor-h', ['#5a1a1a', '#1a1a1a'], 'sword', '#c9a45c') } })

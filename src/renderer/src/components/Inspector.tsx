@@ -273,6 +273,14 @@ function ProvinceInspector({ id }: { id: number }) {
     const s = world.states.find((x) => x.id === sid)
     return s ? resolve(s, date).name : 'Ничья земля'
   }
+  const setView = useStore((s) => s.setView)
+  const house = (hid: string): string | undefined => world.entries.find((e) => e.id === hid)?.base.name
+  const openEntry = (eid: string): void => {
+    const e = world.entries.find((x) => x.id === eid)
+    if (!e) return
+    setView(e.kind)
+    select({ type: 'entry', id: eid })
+  }
   const renameAdmin = (aid: string, name: string): void =>
     mutate((w) => {
       const a = w.adminRegions?.find((x) => x.id === aid)
@@ -313,6 +321,13 @@ function ProvinceInspector({ id }: { id: number }) {
           <div>
             <b>{p.name}</b> <span className="muted">· {SETTLEMENT_NAMES[p.settlement.type] ?? p.settlement.type}</span>
           </div>
+          <TextField
+            value={p.description ?? ''}
+            multiline
+            rows={5}
+            placeholder="Описание поселения"
+            onChange={(description) => mutate((w) => void (w.provinces!.find((x) => x.id === id)!.description = description))}
+          />
           <Button
             icon="pin"
             onClick={() => {
@@ -331,6 +346,36 @@ function ProvinceInspector({ id }: { id: number }) {
             Сделать точкой интереса
           </Button>
         </div>
+      )}
+      {!p.settlement && p.description && <p className="muted">{p.description}</p>}
+      {[area, region].map(
+        (a) =>
+          a &&
+          (a.description || a.houseId) && (
+            <div key={a.id} className="inspector-block">
+              <div className="field-label">{a.level === 'area' ? 'Округ' : 'Регион'} · {a.name}</div>
+              {a.houseId && house(a.houseId) && (
+                <button className="link-btn" onClick={() => openEntry(a.houseId!)}>
+                  {house(a.houseId)}
+                </button>
+              )}
+              <TextField
+                value={a.description ?? ''}
+                multiline
+                rows={3}
+                placeholder="Описание"
+                onChange={(description) =>
+                  mutate((w) => {
+                    const x = w.adminRegions?.find((y) => y.id === a.id)
+                    if (x) {
+                      x.description = description
+                      x.descAuto = false
+                    }
+                  })
+                }
+              />
+            </div>
+          )
       )}
       <div className="inspector-block">
         <div className="field-label">История владения</div>

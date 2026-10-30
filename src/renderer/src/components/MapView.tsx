@@ -584,7 +584,7 @@ export function MapView() {
     const byId = new Map((provinces ?? []).map((p) => [p.id, p]))
     for (const pl of world.places) {
       if (pl.mapId !== mapDef.id || !existsAt(pl, date)) continue
-      const type = PLACE_MODEL[resolve(pl, date).type]
+      const type = (pl.model as SettlementType | undefined) ?? PLACE_MODEL[resolve(pl, date).type]
       if (!type) continue
       const pid = raster ? provinceAt(raster, mapDef.width, mapDef.height, pl.x, pl.y) : 0
       items.push({ x: pl.x, y: pl.y, type, culture: byId.get(pid)?.culture ?? 'imperial', variant: pl.id.length * 7 + pl.id.charCodeAt(0), key: `place:${pl.id}` })

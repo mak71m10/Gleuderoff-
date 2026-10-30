@@ -22,8 +22,9 @@ npm run dist       # собрать установщик в release/
 2. `node scripts/seed-lore.mjs` — лор из `scripts/lore/*.mjs` и `source-lore/*.md` (боги, расы, Монстарги, государства, география);
 3. `node --max-old-space-size=8192 scripts/provinces.mjs` — тысячи провинций: местность, иерархия (континент → регион → область → провинция), культуры, имена;
 4. `node --max-old-space-size=8192 scripts/smooth-provinces.mjs` — плавные границы провинций, закрытие щелей от линий PSD, соседи;
-5. `node scripts/history-provinces.mjs` — постепенная история владения провинциями и даты существования стран;
-6. `node --max-old-space-size=8192 scripts/terrain.mjs` — маска рек и поселения провинций (деревни, города, порты, замки…);
+5. `node --max-old-space-size=8192 scripts/terrain.mjs` — маска рек и поселения провинций (деревни, города, порты, замки…);
+6. `node scripts/history-provinces.mjs` — постепенная история владения: завоевания Тейбера, восстания, Лесная война, распад 975–980; великие дома за регионами; места битв;
+6а. `node scripts/empire-detail.mjs` — описания поселений Империи, низшая знать округов, гнёзда домов, кастры легионов, Аурхафен;
 7. `node --max-old-space-size=8192 scripts/roads.mjs` — дороги между поселениями: мощёные тракты, грунтовки, горные тропы (`source-maps/roads.json`);
 8. `node --max-old-space-size=14000 scripts/render-map.mjs` — новая подложка 32768×18688: рельеф со светотенью и тенями гор, кроны деревьев, пашни, дороги, скалы и снега, барханы, реки, мелководье (≈3 мин);
 9. `node --max-old-space-size=12000 scripts/make-tiles.mjs` — плитки 1024 px, уровни z −4…2.

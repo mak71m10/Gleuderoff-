@@ -6,7 +6,7 @@ import * as THREE from 'three'
  * Облик зависит от культуры, вариант (раскладка домов) — от номера поселения.
  */
 
-export type SettlementType = 'village' | 'fishing' | 'town' | 'city' | 'capital' | 'castle' | 'port' | 'temple' | 'ruins' | 'tower'
+export type SettlementType = 'village' | 'fishing' | 'town' | 'city' | 'capital' | 'castle' | 'port' | 'temple' | 'ruins' | 'tower' | 'grandport'
 
 type Shape = 'gable' | 'flat' | 'hut' | 'pagoda' | 'spire'
 interface Style {
@@ -274,6 +274,30 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
       g.add(tower(st, -3.5, 4.5, 0.55, 4.2, false))
       break
     }
+    case 'grandport': {
+      // Аурхафен: город на берегу (сзади), полукруглый волнолом с маяком, три бассейна, верфи и корабли (спереди — море)
+      addHouses(46, 7.5, 1.35, 1.0, 1, [[0, 6, 6]])
+      for (const [x, z] of [[-6.5, -3], [6.5, -3], [0, -7.5]]) g.add(tower(st, x, z, 0.55, 3.2))
+      // набережная и склады
+      g.add(mesh(new THREE.BoxGeometry(17, 0.25, 1.2), mat(st.stone), 0, 0.12, 2.6))
+      for (let i = 0; i < 6; i++) g.add(mesh(new THREE.BoxGeometry(2, 1.1, 1.3), mat(st.wall, -0.06), -6.2 + i * 2.5, 0.55, 1.4))
+      // волнолом дугой и маяк Сандры
+      for (let i = 0; i <= 14; i++) {
+        const a = Math.PI * (0.08 + (0.84 * i) / 14)
+        g.add(mesh(new THREE.BoxGeometry(1.25, 0.45, 0.75), mat(st.stone, -0.04), Math.cos(a) * 9.2, 0.22, 3 + Math.sin(a) * 7.2, -a))
+      }
+      const lh = tower(st, 0, 0, 0.6, 6.5, false)
+      lh.position.set(0, 0, 10.2)
+      g.add(lh)
+      g.add(mesh(new THREE.SphereGeometry(0.5, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffd27a }), 0, 7.0, 10.2))
+      // причалы-пирсы, делящие гавань на бассейны
+      for (const x of [-3.2, 3.2]) g.add(mesh(new THREE.BoxGeometry(0.7, 0.18, 5.5), mat(0x6b4a2e), x, 0.15, 5.6))
+      // стапель с недостроенным кораблём
+      g.add(mesh(new THREE.BoxGeometry(1.6, 0.4, 3.6), mat(0x8a6a44), -7.6, 0.2, 4.2, 0.3))
+      // корабли в бассейнах
+      for (const [x, z, r, sc] of [[-5.2, 5, 0.2, 1], [-1.6, 6.4, -0.3, 0.9], [1.4, 4.6, 0.4, 1.1], [5, 6, -0.1, 1], [6.8, 3.8, 0.6, 0.8], [-0.2, 8.4, 1.5, 0.85]]) g.add(boat(x, z, r, sc))
+      break
+    }
     case 'temple': {
       g.add(mesh(new THREE.BoxGeometry(5, 0.5, 6.5), mat(st.stone), 0, 0.25, 0))
       g.add(mesh(new THREE.BoxGeometry(4.2, 0.4, 5.7), mat(st.stone, 0.05), 0, 0.7, 0))
@@ -423,7 +447,8 @@ export const SETTLEMENT_SCALE: Record<SettlementType, number> = {
   port: 1.1,
   temple: 0.9,
   ruins: 0.9,
-  tower: 0.95
+  tower: 0.95,
+  grandport: 1.6
 }
 /** С какого экранного размера спрайта поселение видно */
 export const SETTLEMENT_MIN_PX: Record<SettlementType, number> = {
@@ -436,5 +461,6 @@ export const SETTLEMENT_MIN_PX: Record<SettlementType, number> = {
   port: 56,
   temple: 72,
   ruins: 72,
-  tower: 64
+  tower: 64,
+  grandport: 16
 }
