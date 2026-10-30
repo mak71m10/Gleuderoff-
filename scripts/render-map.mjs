@@ -59,6 +59,28 @@ if (isMainThread) {
     for (let i = 0; i < N; i++) RV[i] = Math.round(b[i] * 255)
   }
 
+  // пашни вокруг поселений: чем крупнее поселение, тем шире круг наделов
+  const FM = new Uint8Array(shared(N))
+  {
+    const { readFileSync } = await import('fs')
+    const world = JSON.parse(readFileSync('resources/default-world/world.json', 'utf8'))
+    const R = { village: 15, fishing: 10, town: 22, city: 32, capital: 42, castle: 12, port: 20, temple: 9, ruins: 0, tower: 6 }
+    const pts = []
+    for (const p of world.provinces ?? []) if (p.settlement) pts.push([p.settlement.x / 2, p.settlement.y / 2, R[p.settlement.type] ?? 8])
+    for (const pl of world.places ?? []) if (pl.mapId === 'world') pts.push([pl.x / 2, pl.y / 2, R[pl.base?.type] ?? 10])
+    const tmp = new Float32Array(N)
+    for (const [cx, cy, rad] of pts) {
+      if (!rad) continue
+      for (let y = Math.max(0, Math.floor(cy - rad)); y <= Math.min(SH - 1, cy + rad); y++)
+        for (let x = Math.max(0, Math.floor(cx - rad)); x <= Math.min(SW - 1, cx + rad); x++) {
+          const d = Math.hypot(x - cx, y - cy) / rad
+          if (d < 1) tmp[y * SW + x] = Math.max(tmp[y * SW + x], 1 - d * d)
+        }
+    }
+    const b = blur(tmp, SW, SH, 2)
+    for (let i = 0; i < N; i++) FM[i] = Math.round(Math.min(1, b[i] * 1.6) * 255)
+  }
+
   // знаковое расстояние до берега (в пикселях исходника): + суша, − вода
   const dIn = edt(land, 0) // для суши — до ближайшей воды
   const dOut = edt(land, 1) // для воды — до ближайшей суши
@@ -146,7 +168,7 @@ if (isMainThread) {
   await Promise.all(
     Array.from({ length: nWorkers }, () =>
       new Promise((res, rej) => {
-        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RV: RV.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
+        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { FM: FM.buffer, RV: RV.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
         w.on('message', (m) => process.stdout.write(`\r  полос: ${m}/${Math.ceil(OH / STRIP)}   `))
         w.on('error', rej)
         w.on('exit', res)
@@ -239,6 +261,7 @@ if (!isMainThread) {
   const CW = new Uint8Array(workerData.CW)
   const DB = new Uint8Array(workerData.DB)
   const RV = new Uint8Array(workerData.RV)
+  const FM = new Uint8Array(workerData.FM)
   const coarse = new Float32Array(workerData.coarse)
   const lumHP = new Float32Array(workerData.lumHP)
   const tint = new Uint8Array(workerData.tint)
@@ -340,7 +363,9 @@ if (!isMainThread) {
     hillA: hex('#8b8157'), hillB: hex('#76734c'),
     rockA: hex('#7a746c'), rockB: hex('#58534d'), rockC: hex('#86735c'), snow: hex('#eef2f6'),
     sandA: hex('#d8b97f'), sandB: hex('#c39b63'), sandC: hex('#e2c895'), stone: hex('#a37f5b'),
-    steppeA: hex('#b2a56c'), steppeB: hex('#9c9660'), tundraA: hex('#bdb9a2'), tundraB: hex('#a4a38b'), beach: hex('#d3c08f')
+    steppeA: hex('#b2a56c'), steppeB: hex('#9c9660'), tundraA: hex('#bdb9a2'), tundraB: hex('#a4a38b'), beach: hex('#d6c494'), wetSand: hex('#a3936c'),
+    cropA: hex('#bdaa66'), cropB: hex('#8a9450'), cropC: hex('#9c8662'), cropD: hex('#aca76b'), hedge: hex('#55663a'),
+    gap: hex('#17231a'), autumn: hex('#7d7a38')
   }
   const col = [0, 0, 0]
   const mix3 = (a, b, t) => {
@@ -361,7 +386,7 @@ if (!isMainThread) {
   const tmpA = [0, 0, 0]
 
   // --- кроны деревьев: ячейки в 2 логические единицы, в каждой — дерево с шансом по густоте леса ---
-  const CELL = K
+  const CELL = K * 1.3
   const crown = { h: -1, nx: 0, ny: 0, pine: 0 }
   const crownAt = (X, Y, dens, pine) => {
     const cx = Math.floor(X / CELL), cy = Math.floor(Y / CELL)
@@ -385,6 +410,30 @@ if (!isMainThread) {
         }
       }
     return crown.h > 0
+  }
+
+  // --- наделы полей: вытянутые многоугольники (ячейки Вороного), между ними — межи и живые изгороди ---
+  const parcel = { id: 0, edge: 9 }
+  const parcelAt = (lx, ly) => {
+    // свой постоянный угол наделов в каждом квадрате земли 90×90; координаты — от его угла
+    // (поворот по абсолютным координатам при крошечной смене угла разворачивал сетку в круги)
+    const bx = Math.floor(lx / 90), by = Math.floor(ly / 90)
+    const ang = hash(bx + 4001, by + 9007) * Math.PI
+    const ca = Math.cos(ang), sa = Math.sin(ang)
+    const rx = lx - bx * 90, ry = ly - by * 90
+    const u = (rx * ca + ry * sa) / 13 + bx * 37, v = (-rx * sa + ry * ca) / 4.5 + by * 53
+    const cu = Math.floor(u), cv = Math.floor(v)
+    let d1 = 9, d2 = 9, best = 0
+    for (let j = -1; j <= 1; j++)
+      for (let i = -1; i <= 1; i++) {
+        const gx = cu + i, gy = cv + j
+        const pu = gx + hash(gx * 3 + 1, gy * 7 + 2), pv = gy + hash(gx * 5 + 3, gy * 11 + 4)
+        const d = Math.hypot((u - pu) * 13, (v - pv) * 4.5)
+        if (d < d1) { d2 = d1; d1 = d; best = hash(gx + 913, gy + 377) }
+        else if (d < d2) d2 = d
+      }
+    parcel.id = best
+    parcel.edge = d2 - d1 // в логических единицах
   }
 
   const H = new Float32Array((STRIP + 2) * OW)
@@ -502,6 +551,13 @@ if (!isMainThread) {
           const h = H[i]
           const nB = fbm(lx * 0.035, ly * 0.035, 4)
           const nF = noise(lx * 0.14, ly * 0.14)
+          // вокруг поселений лес вырублен под луга и пашни; край вырубки неровный
+          const fmW = bil(FM, sx + WX[i] * 2.2 + fbm(lx * 0.03 + 7, ly * 0.03, 3) * 5, sy + WY[i] * 2.2 + fbm(lx * 0.03, ly * 0.03 + 7, 3) * 5) / 255
+          const clear = sstep(0.78, 0.98, fmW + fbm(lx * 0.06, ly * 0.06, 3) * 0.4) * 0.95
+          if (clear > 0 && wts[2] > 0) {
+            wts[1] += wts[2] * clear
+            wts[2] *= 1 - clear
+          }
           acc[0] = acc[1] = acc[2] = 0
           // равнины: поля и луга
           if (wts[1] > 0.01) {
@@ -566,12 +622,34 @@ if (!isMainThread) {
           r *= fine
           g *= fine
           b *= fine
-          // песчаный берег
-          if (s < 1.2 && wts[4] + wts[5] < 0.5) {
-            const bt = (1 - sstep(0.2, 1.2, s)) * 0.6
-            r += (P.beach[0] - r) * bt
-            g += (P.beach[1] - g) * bt
-            b += (P.beach[2] - b) * bt
+          // пашни у поселений: наделы разных культур, межи и изгороди
+          const farm = sstep(0.12, 0.55, fmW + nF * 0.12) * Math.min(1, (wts[1] + wts[3] * 0.5 + wts[6] * 0.3 * (1 - north)) / wl * 1.2)
+          if (farm > 0.02) {
+            parcelAt(lx, ly)
+            const id = parcel.id
+            const crop = id < 0.3 ? P.cropA : id < 0.55 ? P.cropB : id < 0.75 ? P.cropC : P.cropD
+            const furrow = 1 + noise(lx * 0.9 + id * 50, ly * 0.9 - id * 30) * 0.05
+            const k = farm * 0.5
+            r += (crop[0] * furrow - r) * k
+            g += (crop[1] * furrow - g) * k
+            b += (crop[2] * furrow - b) * k
+            if (parcel.edge < 0.35) {
+              const e = (1 - parcel.edge / 0.35) * farm * (id > 0.6 ? 0.5 : 0.28)
+              r += (P.hedge[0] - r) * e
+              g += (P.hedge[1] - g) * e
+              b += (P.hedge[2] - b) * e
+            }
+          }
+          // берег: сухой песок, у самой воды — мокрый
+          if (s < 2 && wts[4] + wts[5] < 0.5) {
+            const bt = (1 - sstep(0.4, 2, s)) * 0.75
+            const wet = 1 - sstep(0.05, 0.45, s)
+            const sand0 = P.beach[0] + (P.wetSand[0] - P.beach[0]) * wet
+            const sand1 = P.beach[1] + (P.wetSand[1] - P.beach[1]) * wet
+            const sand2 = P.beach[2] + (P.wetSand[2] - P.beach[2]) * wet
+            r += (sand0 - r) * bt
+            g += (sand1 - g) * bt
+            b += (sand2 - b) * bt
           }
           // река: вода с тёмными мокрыми берегами
           const rv = bil(RV, sx + WX[i] * 0.12, sy + WY[i] * 0.12) / 255 + noise(lx * 0.4, ly * 0.4) * 0.06
@@ -605,14 +683,33 @@ if (!isMainThread) {
               const lit = sstep(-0.2, 1.1, cd)
               const v = hash(Math.floor(X / CELL), Math.floor(Y / CELL))
               mix3(pine ? P.pineD : P.crownD, pine ? P.pineL : P.crownL, lit)
-              const tv = 0.9 + v * 0.2
+              // у лиственных — редкие желтеющие кроны
+              if (!pine && v > 0.8) {
+                const au = (v - 0.8) * 2.5 * lit
+                col[0] += (P.autumn[0] - col[0]) * au
+                col[1] += (P.autumn[1] - col[1]) * au
+                col[2] += (P.autumn[2] - col[2]) * au
+              }
+              const tv = 0.88 + v * 0.22
               r = col[0] * tv
               g = col[1] * tv
               b = col[2] * tv
               shade = 0.75 + shade * 0.25
-            } else if (crownAt(X - 0.4 * K, Y - 0.4 * K, dens, pine)) {
-              shade *= 0.62 // тень от соседнего дерева
+            } else {
+              // просвет между кронами — тёмная глубина леса
+              if (dens > 0.5) {
+                const gk = (dens - 0.5) * 1.4
+                r += (P.gap[0] - r) * gk
+                g += (P.gap[1] - g) * gk
+                b += (P.gap[2] - b) * gk
+              }
+              if (crownAt(X - 0.55 * CELL, Y - 0.55 * CELL, dens, pine)) shade *= 0.55 // тень от соседнего дерева
             }
+          } else {
+            // опушка отбрасывает тень на поле (солнце с северо-запада)
+            bilW(sx - 0.7 + WX[i], sy - 0.7 + WY[i])
+            const edgeF = wts[2]
+            if (edgeF > 0.35) shade *= 1 - sstep(0.35, 0.8, edgeF) * 0.22
           }
           // ложбины темнее
           r *= shade

@@ -262,7 +262,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; letter-spac
 .pm-name {
   position: absolute; left: 50%; top: calc(var(--s) + 1px); transform: translateX(-50%);
   white-space: nowrap; font-family: var(--serif); font-weight: 700; font-size: 14px; color: #fbf3df;
-  text-shadow: 0 0 3px #000, 0 0 6px #000, 0 1px 1px #000; pointer-events: none;
+  text-shadow: 0 0 3px #000, 0 0 6px #000, 0 1px 1px #000; pointer-events: auto; cursor: pointer;
 }
 .pm-capital .pm-name { font-size: 16px; color: var(--gold-2); }
 .pm-compact .pm-name { display: none; }
@@ -584,7 +584,8 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; letter-spac
 
 /* место с объёмной моделью: значок прозрачный (клик работает), подпись под моделью */
 .pm-model .pm-icon { opacity: 0; }
-.pm-model .pm-name { top: calc(var(--s) * 1.6); font-size: 15px; }
+.pm-model .pm-name { top: calc(var(--s) * 1.6); font-size: 17px; }
+.pm-model.pm-capital .pm-name { font-size: 20px; }
 .pm-model.pm-selected .pm-icon { opacity: 0.9; }
 .terrain-canvas, .settlement-canvas { position: absolute; }
 

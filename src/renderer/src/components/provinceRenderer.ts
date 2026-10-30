@@ -388,6 +388,10 @@ export interface SettlementItem {
   type: SettlementType
   culture: string
   variant: number
+  /** 'prov:<id>' или 'place:<id>' — что выбрать по клику */
+  key?: string
+  /** множитель размера (в горах селения мельче) */
+  scale?: number
 }
 
 export const SettlementRenderer = L.Renderer.extend({
@@ -412,6 +416,18 @@ export const SettlementRenderer = L.Renderer.extend({
   },
   redraw(this: any) {
     this._draw()
+  },
+  /** Какое видимое поселение под точкой (логические координаты) — ближние перекрывают дальние */
+  hit(this: any, x: number, y: number): SettlementItem | null {
+    const scale = Math.pow(2, this._map?.getZoom() ?? 0)
+    const items = this._items as SettlementItem[]
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i]
+      const logical = SPRITE_LOGICAL * SETTLEMENT_SCALE[it.type] * (it.scale ?? 1)
+      if (logical * scale < SETTLEMENT_MIN_PX[it.type]) continue
+      if (Math.abs(x - it.x) < logical * 0.28 && y - it.y > -logical * 0.3 && y - it.y < logical * 0.16) return it
+    }
+    return null
   },
   _update(this: any) {
     if (this._map._animatingZoom && this._bounds) return
@@ -440,7 +456,7 @@ export const SettlementRenderer = L.Renderer.extend({
     ctx.imageSmoothingQuality = 'high'
     const W = ctx.canvas.width, H = ctx.canvas.height
     for (const it of this._items as SettlementItem[]) {
-      const size = SPRITE_LOGICAL * SETTLEMENT_SCALE[it.type] * scale
+      const size = SPRITE_LOGICAL * SETTLEMENT_SCALE[it.type] * (it.scale ?? 1) * scale
       if (size < SETTLEMENT_MIN_PX[it.type] || size > 1400) continue
       const pt = map.latLngToLayerPoint(L.latLng(-it.y, it.x))
       const x = (pt.x - b.min!.x) * dpr
@@ -455,4 +471,8 @@ export const SettlementRenderer = L.Renderer.extend({
     }
     ctx.globalAlpha = 1
   }
-}) as unknown as new (options?: L.RendererOptions) => L.Renderer & { setItems: (i: SettlementItem[]) => void; redraw: () => void }
+}) as unknown as new (options?: L.RendererOptions) => L.Renderer & {
+  setItems: (i: SettlementItem[]) => void
+  redraw: () => void
+  hit: (x: number, y: number) => SettlementItem | null
+}

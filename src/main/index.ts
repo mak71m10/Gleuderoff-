@@ -130,6 +130,7 @@ async function migrateWorld(dir: string): Promise<void> {
       p.coastal = dp.coastal
     }
   }
+  // v11: перерисована подложка (пашни, лес, берега) — новые плитки уже скопированы вместе с maps выше
   const ids = new Set(user.entries.map((e: Json) => e.id))
   user.entries = [...user.entries, ...def.entries.filter((e: Json) => !ids.has(e.id))]
   const placeIds = new Set(user.places.map((p: Json) => p.id))

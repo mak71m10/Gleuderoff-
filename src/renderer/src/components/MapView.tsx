@@ -171,6 +171,7 @@ export function MapView() {
       renderer: new GlowRenderer({ padding: 0.6, tolerance: 2 })
     })
     mapRef.current = map
+    if ((import.meta as unknown as { env: { DEV: boolean } }).env.DEV) Object.assign(window, { __map: map, __store: useStore }) // для отладки в браузере
     g.current = {
       regions: L.layerGroup().addTo(map),
       labels: L.layerGroup().addTo(map),
@@ -201,8 +202,10 @@ export function MapView() {
     g.current.tiles = undefined
     g.current.ref?.remove()
     const b = boundsOf(mapDef)
-    // превью всей карты — мгновенно; поверх него плитки высокого разрешения
-    g.current.base = L.imageOverlay(assetUrl(mapDef.image), b, { className: 'map-base' }).addTo(map)
+    // превью всей карты — мгновенно, ПОД плитками высокого разрешения (своя панель ниже tilePane);
+    // если оно лежит сверху, растянутые 4096 px размывают всю карту в кашу
+    if (!map.getPane('basePreview')) map.createPane('basePreview').style.zIndex = '150'
+    g.current.base = L.imageOverlay(assetUrl(mapDef.image), b, { className: 'map-base', pane: 'basePreview' }).addTo(map)
     if (mapDef.tiles) {
       const t = mapDef.tiles
       g.current.tiles = L.tileLayer(`${window.api.assetBase}${t.path}/{z}/{x}_{y}.webp`, {
@@ -274,6 +277,16 @@ export function MapView() {
       s.select({ type: 'label', id })
       s.setTool({ kind: 'select' })
     } else if (t.kind === 'select') {
+      // клик по объёмному поселению: место автора или поселение провинции
+      const hit = settleLayer.current?.hit(x, y)
+      if (hit?.key?.startsWith('place:')) {
+        s.select({ type: 'place', id: hit.key.slice(6) })
+        return
+      }
+      if (hit?.key?.startsWith('prov:')) {
+        s.select({ type: 'province', id: Number(hit.key.slice(5)) })
+        return
+      }
       const raster = rasterRef.current
       const pid = raster && md.provinceMap ? provinceAt(raster, md.width, md.height, x, y) : 0
       if (pid && !regionId) s.select({ type: 'province', id: pid })
@@ -471,8 +484,11 @@ export function MapView() {
         // подпись с исходной карты — пока её точка на земле этой страны
         const lb = st.label
         const own = lb && raster && owners[provinceAt(raster, mapDef.width, mapDef.height, lb.x, lb.y)] === st.id ? lb : null
-        if (own) add(st.id, own.x, own.y, own.size, own.angle)
-        else add(st.id, spot.x, spot.y, Math.min(spot.size / (name.length * 0.95 + 2), spot.size * 0.12), spot.angle)
+        // размер — по нынешней территории: подпись с исходной карты рассчитана на страну в полной силе
+        // (в ранние годы Империя — маленькое Княжество Дагерфорд, и её надпись была бы на полкарты)
+        const auto = Math.min(spot.size / (name.length * 0.95 + 2), spot.size * 0.12, 120)
+        if (own && own.size <= auto * 1.5) add(st.id, own.x, own.y, own.size, own.angle)
+        else add(st.id, spot.x, spot.y, auto, spot.angle)
       }
     } else {
       for (const [stateId, info] of computeStateLabels(world, mapDef.id, date)) {
@@ -552,7 +568,18 @@ export function MapView() {
       return
     }
     const items: SettlementItem[] = []
-    for (const p of provinces ?? []) if (p.settlement) items.push({ x: p.settlement.x, y: p.settlement.y, type: p.settlement.type, culture: p.culture, variant: p.id })
+    for (const p of provinces ?? [])
+      if (p.settlement)
+        items.push({
+          x: p.settlement.x,
+          y: p.settlement.y,
+          type: p.settlement.type,
+          culture: p.culture,
+          variant: p.id,
+          key: `prov:${p.id}`,
+          // в горах и снегах — маленькие хутора
+          scale: p.terrain === 4 || p.terrain === 5 ? 0.72 : 1
+        })
     const raster = rasterRef.current
     const byId = new Map((provinces ?? []).map((p) => [p.id, p]))
     for (const pl of world.places) {
@@ -560,7 +587,7 @@ export function MapView() {
       const type = PLACE_MODEL[resolve(pl, date).type]
       if (!type) continue
       const pid = raster ? provinceAt(raster, mapDef.width, mapDef.height, pl.x, pl.y) : 0
-      items.push({ x: pl.x, y: pl.y, type, culture: byId.get(pid)?.culture ?? 'imperial', variant: pl.id.length * 7 + pl.id.charCodeAt(0) })
+      items.push({ x: pl.x, y: pl.y, type, culture: byId.get(pid)?.culture ?? 'imperial', variant: pl.id.length * 7 + pl.id.charCodeAt(0), key: `place:${pl.id}` })
     }
     layer.setItems(items)
   }, [rasterTick, provinces, world.places, date, layers.models, mapDef.id])
@@ -587,7 +614,8 @@ export function MapView() {
   useEffect(() => {
     provLayer.current?.setView({
       // вблизи политические цвета тают, чтобы были видны горы, леса и реки
-      opacity: (mapMode === 'political' ? (layers.political ? layers.politicalOpacity : 0) : 0.62) * (zoom <= -1 ? 1 : zoom >= 1 ? 0.35 : 1 - 0.65 * ((zoom + 1) / 2)),
+      // вблизи заливка почти исчезает (как у Paradox): остаются границы и лёгкое свечение, видна сама земля
+      opacity: (mapMode === 'political' ? (layers.political ? layers.politicalOpacity : 0) : 0.62) * (zoom <= -1 ? 1 : zoom >= 0.8 ? 0.12 : 1 - 0.88 * ((zoom + 1) / 1.8)),
       borders: layers.borders || mapMode !== 'political',
       provLines: mapMode === 'provinces' ? 0.8 : zoom >= 0.5 ? Math.min(0.7, zoom - 0.5) : 0,
       glowPx: mapMode === 'political' ? 8 + 10 * Math.min(1, Math.max(0, zoom + 2) / 3) : 4
@@ -626,13 +654,17 @@ export function MapView() {
         labels.push({ ...at(a.id), text: a.name, size: 30, color: '#fff4dc', italic: true, minPx: 9 })
       }
     }
+    // места автора (города, крепости) подписаны сами — название провинции рядом с ними не дублируем
+    const own = world.places.filter((pl) => pl.mapId === mapDef.id)
     for (const p of provinces) {
       const st = p.settlement
-      const y = st ? st.y + SPRITE_LOGICAL * SETTLEMENT_SCALE[st.type] * 0.2 : p.y
-      labels.push({ x: st?.x ?? p.x, y, text: p.name, size: 11, color: '#f3ead2', minPx: 11 })
+      const x = st?.x ?? p.x
+      const y = st ? st.y + SPRITE_LOGICAL * SETTLEMENT_SCALE[st.type] * 0.22 : p.y
+      if (own.some((pl) => Math.abs(pl.x - x) < 40 && Math.abs(pl.y - y) < 30)) continue
+      labels.push({ x, y, text: p.name, size: 11, color: '#f3ead2', minPx: 11 })
     }
     textLayer.current.setLabels(labels)
-  }, [rasterTick, provinces, world.adminRegions, mapMode])
+  }, [rasterTick, provinces, world.adminRegions, world.places, mapMode])
 
   // наведение, выбор и кисть по провинциям
   useEffect(() => {

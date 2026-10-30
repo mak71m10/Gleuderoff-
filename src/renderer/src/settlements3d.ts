@@ -34,7 +34,7 @@ const STYLES: Record<string, Style> = {
 }
 
 /** Сколько логических единиц карты занимает спрайт по ширине */
-export const SPRITE_LOGICAL = 64
+export const SPRITE_LOGICAL = 46
 const SIZE = 256
 const VIEW = 11 // половина ширины кадра в единицах модели
 
@@ -226,11 +226,14 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
     case 'capital': {
       const big = type === 'capital'
       const R = big ? 10 : 8.6
-      const corners = big ? 10 : 8
-      for (let i = 0; i < corners; i++) {
-        const a1 = (i / corners) * Math.PI * 2, a2 = ((i + 1) / corners) * Math.PI * 2
-        g.add(wall(st, Math.cos(a1) * R, Math.sin(a1) * R, Math.cos(a2) * R, Math.sin(a2) * R, 1.0))
-        if (i % 2 === 0) g.add(tower(st, Math.cos(a1) * R, Math.sin(a1) * R, 0.5, 1.9, false))
+      // низкая стена — только у столицы; обычный город — плотная россыпь крыш вокруг цитадели
+      if (big) {
+        const corners = 11
+        for (let i = 0; i < corners; i++) {
+          const a1 = (i / corners) * Math.PI * 2, a2 = ((i + 1) / corners) * Math.PI * 2
+          const r1 = R * (0.92 + r() * 0.12), r2 = R * (0.92 + r() * 0.12)
+          g.add(wall(st, Math.cos(a1) * r1, Math.sin(a1) * r1, Math.cos(a2) * r2, Math.sin(a2) * r2, 0.6))
+        }
       }
       // цитадель / собор в центре
       const keep = new THREE.Group()
@@ -242,21 +245,20 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
       break
     }
     case 'castle': {
-      g.add(mesh(new THREE.CylinderGeometry(5, 6.2, 0.8, 14), mat(0x6f6450), 0, 0.4, 0))
-      const y0 = 0.8
+      const y0 = 0
       const k = new THREE.Group()
       k.add(mesh(new THREE.BoxGeometry(2.8, 4.6, 2.8), mat(st.stone), 0, 2.3, 0))
       k.add(mesh(new THREE.ConeGeometry(2.2, 1.8, 4), mat(st.roof), 0, 5.5, 0, Math.PI / 4))
       k.position.y = y0
       g.add(k)
-      const c = 3.4
-      for (const [x, z] of [[-c, -c], [c, -c], [c, c], [-c, c]]) {
-        const t = tower(st, x, z, 0.7, 3.0, false)
+      const c = 2.8
+      for (const [x, z] of [[-c, -c], [c, c]]) {
+        const t = tower(st, x, z, 0.6, 2.6, false)
         t.position.y = y0
         g.add(t)
       }
       for (const [a, b] of [[[-c, -c], [c, -c]], [[c, -c], [c, c]], [[c, c], [-c, c]], [[-c, c], [-c, -c]]] as [number, number][][]) {
-        const w = wall(st, a[0], a[1], b[0], b[1], 2)
+        const w = wall(st, a[0] * 0.82, a[1] * 0.82, b[0] * 0.82, b[1] * 0.82, 1.2)
         w.position.y += y0
         g.add(w)
       }
@@ -341,6 +343,9 @@ function setup(): void {
   shadowPlane.rotation.x = -Math.PI / 2
   shadowPlane.receiveShadow = true
   scene.add(shadowPlane)
+  // матрицы камеры обновляются только при рендере — без этого точка привязки уезжала на пол-спрайта вверх
+  camera.updateMatrixWorld()
+  camera.updateProjectionMatrix()
   const p = new THREE.Vector3(0, 0, 0).project(camera)
   anchor = { x: (p.x + 1) / 2, y: (1 - p.y) / 2 }
 }

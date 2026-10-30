@@ -6,6 +6,7 @@ import { Icon } from './Icon'
 import { formatDate } from '../calendar'
 import { CULTURE_INFO, TERRAIN_INFO, ownerAt } from '../provinces'
 import type { PlaceFields, PlaceType } from '../types'
+import { newPlace } from '../model'
 
 export function Inspector() {
   const selection = useStore((s) => s.selection)
@@ -226,6 +227,31 @@ function RegionInspector({ id }: { id: string }) {
   )
 }
 
+const SETTLEMENT_NAMES: Record<string, string> = {
+  village: 'деревня',
+  fishing: 'рыбацкая деревня',
+  town: 'городок',
+  city: 'город',
+  capital: 'столица',
+  castle: 'замок',
+  port: 'порт',
+  temple: 'храм',
+  ruins: 'руины',
+  tower: 'башня'
+}
+const SETTLEMENT_PLACE: Record<string, PlaceType> = {
+  village: 'village',
+  fishing: 'village',
+  town: 'town',
+  city: 'city',
+  capital: 'capital',
+  castle: 'castle',
+  port: 'port',
+  temple: 'temple',
+  ruins: 'ruins',
+  tower: 'tower'
+}
+
 function ProvinceInspector({ id }: { id: number }) {
   const world = useStore((s) => s.world!)
   const date = useStore((s) => s.date)
@@ -281,6 +307,31 @@ function ProvinceInspector({ id }: { id: number }) {
           <span>{TERRAIN_INFO[p.terrain]?.name}</span>
         </div>
       </div>
+      {p.settlement && (
+        <div className="inspector-block">
+          <div className="field-label">Поселение</div>
+          <div>
+            <b>{p.name}</b> <span className="muted">· {SETTLEMENT_NAMES[p.settlement.type] ?? p.settlement.type}</span>
+          </div>
+          <Button
+            icon="pin"
+            onClick={() => {
+              // поселение становится полноценным местом: своя статья, правитель, население, своя карта
+              const sp = p.settlement!
+              const place = newPlace('world', sp.x, sp.y, SETTLEMENT_PLACE[sp.type] ?? 'village')
+              place.base.name = p.name
+              place.base.stateId = owner ?? ''
+              mutate((w) => {
+                w.places.push(place)
+                w.provinces!.find((x) => x.id === id)!.settlement = null
+              })
+              select({ type: 'place', id: place.id })
+            }}
+          >
+            Сделать точкой интереса
+          </Button>
+        </div>
+      )}
       <div className="inspector-block">
         <div className="field-label">История владения</div>
         <div className="owner-hist">
