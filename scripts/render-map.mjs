@@ -64,17 +64,19 @@ if (isMainThread) {
   {
     const { readFileSync } = await import('fs')
     const world = JSON.parse(readFileSync('resources/default-world/world.json', 'utf8'))
-    const R = { village: 15, fishing: 10, town: 22, city: 32, capital: 42, castle: 12, port: 20, temple: 9, ruins: 0, tower: 6 }
+    const R = { village: 11, fishing: 8, town: 22, city: 32, capital: 42, castle: 10, port: 20, temple: 8, ruins: 0, tower: 5 }
     const pts = []
-    for (const p of world.provinces ?? []) if (p.settlement) pts.push([p.settlement.x / 2, p.settlement.y / 2, R[p.settlement.type] ?? 8])
-    for (const pl of world.places ?? []) if (pl.mapId === 'world') pts.push([pl.x / 2, pl.y / 2, R[pl.base?.type] ?? 10])
+    // деревни дают пашни, но не вырубают лес (сила 0.5 < порога вырубки)
+    const AMP = { village: 0.5, fishing: 0.5 }
+    for (const p of world.provinces ?? []) if (p.settlement) pts.push([p.settlement.x / 2, p.settlement.y / 2, R[p.settlement.type] ?? 8, AMP[p.settlement.type] ?? 1])
+    for (const pl of world.places ?? []) if (pl.mapId === 'world') pts.push([pl.x / 2, pl.y / 2, R[pl.base?.type] ?? 10, 1])
     const tmp = new Float32Array(N)
-    for (const [cx, cy, rad] of pts) {
+    for (const [cx, cy, rad, amp] of pts) {
       if (!rad) continue
       for (let y = Math.max(0, Math.floor(cy - rad)); y <= Math.min(SH - 1, cy + rad); y++)
         for (let x = Math.max(0, Math.floor(cx - rad)); x <= Math.min(SW - 1, cx + rad); x++) {
           const d = Math.hypot(x - cx, y - cy) / rad
-          if (d < 1) tmp[y * SW + x] = Math.max(tmp[y * SW + x], 1 - d * d)
+          if (d < 1) tmp[y * SW + x] = Math.max(tmp[y * SW + x], (1 - d * d) * amp)
         }
     }
     const b = blur(tmp, SW, SH, 2)
@@ -162,13 +164,67 @@ if (isMainThread) {
   }
   log('рельеф и оттенки')
 
+  // ---------- дороги: расстояние до осевой линии на логической сетке 8192×4672 (в 1/32 единицы) ----------
+  const LW = SW * 2, LH = SH * 2, LN = LW * LH
+  const roadField = (type) => {
+    const field = new Uint8Array(shared(LN)).fill(255)
+    if (!existsSync('source-maps/roads.json')) return field
+    const mask = new Uint8Array(LN)
+    for (const r of roadsJson) {
+      if (r.type !== type) continue
+      for (let k = 0; k < r.pts.length - 1; k++) {
+        const [ax, ay] = r.pts[k], [bx, by] = r.pts[k + 1]
+        const n = Math.ceil(Math.hypot(bx - ax, by - ay) * 3) + 1
+        for (let t = 0; t <= n; t++) {
+          const x = Math.round(ax + ((bx - ax) * t) / n), y = Math.round(ay + ((by - ay) * t) / n)
+          if (x >= 0 && y >= 0 && x < LW && y < LH) mask[y * LW + x] = 1
+        }
+      }
+    }
+    const d = edt(mask, 1, LW, LH)
+    for (let i = 0; i < LN; i++) field[i] = Math.min(255, Math.round(d[i] * 32))
+    return field
+  }
+  const { existsSync, readFileSync: rf } = await import('fs')
+  const roadsJson = existsSync('source-maps/roads.json') ? JSON.parse(rf('source-maps/roads.json', 'utf8')) : []
+  const RP = roadField('paved'), RDT = roadField('dirt'), RT = roadField('trail')
+  log(`дороги: ${roadsJson.length}`)
+
+  // ---------- тени гор: луч к солнцу (северо-запад) по крупному рельефу ----------
+  const SHD = new Uint8Array(shared(N))
+  {
+    const hs = new Float32Array(N)
+    for (let i = 0; i < N; i++) {
+      const mtn = (CW[i * 7 + 4] + CW[i * 7 + 5]) / 255, hill = CW[i * 7 + 3] / 255
+      hs[i] = coarse[i] + lumHP[i] * (mtn * 0.9 + hill * 0.45 + 0.12) * 0.3
+    }
+    const GAIN = 0.011 // подъём луча на пиксель исходника: высота 0.3 даёт тень ≈ 27 px
+    const raw = new Float32Array(N)
+    for (let y = 0; y < SH; y++)
+      for (let x = 0; x < SW; x++) {
+        const i = y * SW + x
+        const h0 = hs[i]
+        let ex = 0
+        for (let t = 1; t <= 48; t++) {
+          const xx = x - t * 0.7071, yy = y - t * 0.7071
+          if (xx < 0 || yy < 0) break
+          const e = hs[(yy | 0) * SW + (xx | 0)] - (h0 + t * GAIN)
+          if (e > ex) ex = e
+        }
+        raw[i] = Math.min(1, ex / 0.05)
+      }
+    const b = blur(raw, SW, SH, 1)
+    for (let i = 0; i < N; i++) SHD[i] = Math.round(b[i] * 255)
+  }
+  log('тени гор')
+
   const out = new Uint8Array(shared(OW * OH * 3))
   const counter = new Int32Array(shared(4))
   const nWorkers = Math.max(1, cpus().length)
   await Promise.all(
     Array.from({ length: nWorkers }, () =>
       new Promise((res, rej) => {
-        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { FM: FM.buffer, RV: RV.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
+        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RP: RP.buffer, RDT: RDT.buffer, RT: RT.buffer, SHD: SHD.buffer, FM: FM.buffer, RV: RV.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
         w.on('message', (m) => process.stdout.write(`\r  полос: ${m}/${Math.ceil(OH / STRIP)}   `))
         w.on('error', rej)
         w.on('exit', res)
@@ -185,7 +241,7 @@ if (isMainThread) {
 }
 
 // ---------- общие помощники ----------
-function edt(mask, target) {
+function edt(mask, target, SW = 4096, SH = 2336) {
   // расстояние до ближайшего пикселя, где mask === target (Felzenszwalb)
   const INF = 1e12
   const f = new Float64Array(Math.max(SW, SH))
@@ -262,6 +318,20 @@ if (!isMainThread) {
   const DB = new Uint8Array(workerData.DB)
   const RV = new Uint8Array(workerData.RV)
   const FM = new Uint8Array(workerData.FM)
+  const RP = new Uint8Array(workerData.RP)
+  const RDT = new Uint8Array(workerData.RDT)
+  const RT = new Uint8Array(workerData.RT)
+  const SHD = new Uint8Array(workerData.SHD)
+  // расстояние до дороги (логические единицы) — билинейно по сетке 8192×4672
+  const LW = SW * 2, LH = SH * 2
+  const roadD = (arr, lx, ly) => {
+    const x = Math.min(LW - 1.001, Math.max(0, lx - 0.5)), y = Math.min(LH - 1.001, Math.max(0, ly - 0.5))
+    const x0 = x | 0, y0 = y | 0, fx = x - x0, fy = y - y0
+    const i = y0 * LW + x0
+    const a = arr[i] + (arr[i + 1] - arr[i]) * fx
+    const b = arr[i + LW] + (arr[i + LW + 1] - arr[i + LW]) * fx
+    return (a + (b - a) * fy) / 32
+  }
   const coarse = new Float32Array(workerData.coarse)
   const lumHP = new Float32Array(workerData.lumHP)
   const tint = new Uint8Array(workerData.tint)
@@ -363,7 +433,7 @@ if (!isMainThread) {
     hillA: hex('#8b8157'), hillB: hex('#76734c'),
     rockA: hex('#7a746c'), rockB: hex('#58534d'), rockC: hex('#86735c'), snow: hex('#eef2f6'),
     sandA: hex('#d8b97f'), sandB: hex('#c39b63'), sandC: hex('#e2c895'), stone: hex('#a37f5b'),
-    steppeA: hex('#b2a56c'), steppeB: hex('#9c9660'), tundraA: hex('#bdb9a2'), tundraB: hex('#a4a38b'), beach: hex('#d6c494'), wetSand: hex('#a3936c'),
+    steppeA: hex('#b2a56c'), steppeB: hex('#9c9660'), tundraA: hex('#bdb9a2'), stoneRoad: hex('#b0aa9c'), kerb: hex('#6b665c'), dirtRoad: hex('#7a6040'), trailC: hex('#c2ad84'), plank: hex('#7a5a3a'), tundraB: hex('#a4a38b'), beach: hex('#d6c494'), wetSand: hex('#a3936c'),
     cropA: hex('#bdaa66'), cropB: hex('#8a9450'), cropC: hex('#9c8662'), cropD: hex('#aca76b'), hedge: hex('#55663a'),
     gap: hex('#17231a'), autumn: hex('#7d7a38')
   }
@@ -553,7 +623,7 @@ if (!isMainThread) {
           const nF = noise(lx * 0.14, ly * 0.14)
           // вокруг поселений лес вырублен под луга и пашни; край вырубки неровный
           const fmW = bil(FM, sx + WX[i] * 2.2 + fbm(lx * 0.03 + 7, ly * 0.03, 3) * 5, sy + WY[i] * 2.2 + fbm(lx * 0.03, ly * 0.03 + 7, 3) * 5) / 255
-          const clear = sstep(0.78, 0.98, fmW + fbm(lx * 0.06, ly * 0.06, 3) * 0.4) * 0.95
+          const clear = sstep(0.86, 1.0, fmW + fbm(lx * 0.06, ly * 0.06, 3) * 0.35) * 0.95
           if (clear > 0 && wts[2] > 0) {
             wts[1] += wts[2] * clear
             wts[2] *= 1 - clear
@@ -665,15 +735,46 @@ if (!isMainThread) {
             g += (P.river[1] * ripple - g) * water
             b += (P.river[2] * ripple - b) * water
           }
+          // дороги: тракт из серого камня с бордюром, грунтовка, тропа; над рекой — мост
+          const dP = roadD(RP, lx, ly), dD = roadD(RDT, lx, ly), dT = roadD(RT, lx, ly)
+          const onRiver = rv > 0.5
+          if (dT < 0.7) {
+            const k = (1 - sstep(0.22, 0.4, dT)) * (onRiver ? 0.9 : 0.75)
+            const c = onRiver ? P.plank : P.trailC
+            r += (c[0] - r) * k
+            g += (c[1] - g) * k
+            b += (c[2] - b) * k
+          }
+          if (dD < 1) {
+            const k = (1 - sstep(0.45, 0.65, dD)) * 0.9
+            const c = onRiver ? P.plank : P.dirtRoad
+            const rut = 1 - (1 - sstep(0.05, 0.16, Math.abs(dD - 0.22))) * 0.12 // колеи
+            r += (c[0] * rut - r) * k
+            g += (c[1] * rut - g) * k
+            b += (c[2] * rut - b) * k
+          }
+          if (dP < 1.1) {
+            const edge = 1 - sstep(0.75, 0.92, dP)
+            const kerb = sstep(0.55, 0.75, dP) * edge * 0.6
+            const cob = 1 + noise(lx * 3.2, ly * 3.2) * 0.07 + noise(lx * 7, ly * 7) * 0.05
+            r += (P.stoneRoad[0] * cob - r) * edge
+            g += (P.stoneRoad[1] * cob - g) * edge
+            b += (P.stoneRoad[2] * cob - b) * edge
+            r += (P.kerb[0] - r) * kerb * 0.7
+            g += (P.kerb[1] - g) * kerb * 0.7
+            b += (P.kerb[2] - b) * kerb * 0.7
+          }
           // свет от рельефа
-          const EX = (55 * K) / 4
+          const EX = (68 * K) / 4
           const dzx = (H[i + 1] - H[i - 1]) * 0.5 * EX
           const dzy = (H[i + OW] - H[i - OW]) * 0.5 * EX
           const inv = 1 / Math.sqrt(dzx * dzx + dzy * dzy + 1)
           let dot = (-dzx * LX - dzy * LY + LZ) * inv
-          let shade = (0.6 + Math.max(0, dot)) / (0.6 + flatDot)
+          let shade = (0.52 + Math.max(0, dot)) / (0.52 + flatDot)
+          // тень от гор, заслоняющих солнце
+          shade *= 1 - (bil(SHD, sx, sy) / 255) * 0.38
           // деревья
-          const forestD = Math.min(1, (wts[2] / wl) * 1.25 + (wts[4] / wl) * 0.12 * (h < 0.5 ? 1 : 0) + (wts[1] / wl) * 0.03) * (1 - sstep(0.18, 0.34, rv))
+          const forestD = Math.min(1, (wts[2] / wl) * 1.25 + (wts[4] / wl) * 0.12 * (h < 0.5 ? 1 : 0) + (wts[1] / wl) * 0.03) * (1 - sstep(0.18, 0.34, rv)) * sstep(0.7, 1.6, Math.min(dP, dD)) * sstep(0.25, 0.6, dT)
           if (forestD > 0.04) {
             const dens = sstep(0.04, 0.9, forestD + nF * 0.2) * 0.97
             const pine = (h > 0.32 || ly < 1200) ? 1 : 0
