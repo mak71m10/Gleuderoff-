@@ -27,6 +27,7 @@ export interface Layers {
   borders: boolean
   stateLabels: boolean
   geoLabels: boolean
+  armies: boolean
   models: boolean
   cities: boolean
   settlements: boolean
@@ -87,6 +88,7 @@ const defaultLayers: Layers = {
   borders: true,
   stateLabels: true,
   geoLabels: true,
+  armies: true,
   models: true,
   cities: true,
   settlements: true,

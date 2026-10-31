@@ -14,7 +14,7 @@
 // Запуск после provinces.mjs, smooth-provinces.mjs и seed-lore.mjs: node scripts/history-provinces.mjs
 import { readFileSync, writeFileSync } from 'fs'
 import { HOUSES } from './lore/empire.mjs'
-import { BATTLES } from './lore/battles.mjs'
+import { ARMIES, BATTLES } from './lore/battles.mjs'
 
 const WORLD = 'resources/default-world/world.json'
 const world = JSON.parse(readFileSync(WORLD, 'utf8'))
@@ -420,7 +420,8 @@ for (const [name, start] of Object.entries(VASSAL_START)) {
   for (const list of far.values()) sweep(list, 976.4 + rnd() * 3.0, 0.5, list[0].state, centroid(list))
 }
 // Чёрная комната: земли Пакта и лоялистов снова одна Империя
-sweep(pactProvs, 980.1, 0.08, empire, haussler)
+// возвращаются только земли нынешней Империи — государства, отколовшиеся от Республики, остаются независимыми
+sweep(pactProvs.filter((p) => p.state === empire), 980.1, 0.08, empire, haussler)
 empireEv.history = empireEv.history.filter((h) => !String(h.id).startsWith('lore-fall'))
 empireEv.history.push(
   { id: 'lore-fall-loyal', date: D(975.45), patch: { name: 'Империя (лоялисты Короны)', government: 'Монархия (лоялисты Тейбера II)' } },
@@ -497,16 +498,30 @@ const LOC = {
   capital: () => ({ x: haussler.x + 60, y: haussler.y - 40 }),
   'seed:north': () => settlementPt(SEEDS.north),
   'border:pact': () => borderPoint(loyalProvs, pactProvs),
-  'center:republic': () => settlementPt(SEEDS.republic)
+  'center:republic': () => settlementPt(SEEDS.republic),
+  'city:wave:1': () => settlementPt(biggest(principalities[wave[0]].provinces)),
+  'castersfeld-camp': () => {
+    const a = LOC['city:wave:3'](), b = LOC['border:last']()
+    return { x: a.x * 0.4 + b.x * 0.6, y: a.y * 0.4 + b.y * 0.6 }
+  },
+  'center:desertcore': () => centroid(sheikhdoms.reduce((a, b) => (a.provinces.length > b.provinces.length ? a : b)).provinces),
+  palace: () => ({ x: haussler.x - 30, y: haussler.y - 60 }),
+  'center:loyal': () => settlementPt(nearest(loyalProvs, centroid(loyalProvs), 1)[0]),
+  'center:pact': () => settlementPt(nearest(pactProvs, pactC, 1)[0]),
+  'center:west': () => centroid(centerLands.filter((p) => p.x < repC.x)),
+  'center:far': () => settlementPt(centerLands.reduce((a, b) => (dist(a, repC) > dist(b, repC) ? a : b))),
+  'center:exiles': () => centroid(provs.filter((p) => nameOf(p) === 'Имперские Изгнанники'))
 }
 world.places = world.places.filter((p) => !p.id.startsWith('lore-battle-'))
 world.entries = world.entries.filter((e) => !e.id.startsWith('lore-battle-'))
 const used = []
+const battlePt = new Map()
 for (const b of BATTLES) {
   let pt = LOC[b.loc]()
   // битвы в одном месте раздвигаем
   while (used.some((u) => Math.hypot(u.x - pt.x, u.y - pt.y) < 40)) pt = { x: pt.x + 45, y: pt.y + 20 }
   used.push(pt)
+  battlePt.set(b.id, { ...pt, year: b.year })
   const eid = `lore-battle-${b.id}`
   world.entries.push({
     id: eid,
@@ -536,8 +551,32 @@ for (const b of BATTLES) {
   })
 }
 
+// ---------- походы армий ----------
+const sideState = (side) => {
+  if (side === 'empire') return empire
+  if (side.startsWith('hist-')) return side
+  if (side === 'n1') return princIds[order[0]]
+  if (side === 'n2') return princIds[order[1]]
+  if (side === 'w1') return princIds[wave[0]]
+  if (side === 'last') return princIds[lastK]
+  if (side === 'desert') return desert
+  return stateByName.get(side)?.id ?? empire
+}
+world.armies = ARMIES.map((a) => {
+  const waypoints = []
+  for (const [key, year] of a.route) {
+    let pt
+    if (key.startsWith('loc:')) pt = { ...LOC[key.slice(4)](), year }
+    else if (battlePt.has(key)) pt = { ...battlePt.get(key), ...(year != null ? { year } : {}) }
+    else pt = { ...LOC[key](), year }
+    waypoints.push({ x: Math.round(pt.x), y: Math.round(pt.y), date: D(pt.year) })
+  }
+  const st = stateById.get(sideState(a.side))
+  return { id: `lore-army-${a.id}`, name: a.name, mapId: 'world', stateId: st?.id ?? '', color: st?.base.color ?? '#888888', waypoints }
+})
+
 // векторные участки карты мира больше не нужны — их заменили провинции
 world.regions = world.regions.filter((r) => r.mapId !== 'world')
 writeFileSync(WORLD, JSON.stringify(world, null, 1))
 const changes = provs.reduce((s, p) => s + p.owners.length - 1, 0)
-console.log(`Провинций: ${provs.length}, смен владельцев: ${changes}, государств прошлого: ${world.states.filter((s) => s.id.startsWith('hist-')).length}, битв: ${BATTLES.length}, домов за регионами: ${regionHouse.size}`)
+console.log(`Провинций: ${provs.length}, смен владельцев: ${changes}, государств прошлого: ${world.states.filter((s) => s.id.startsWith('hist-')).length}, битв: ${BATTLES.length}, походов: ${world.armies.length}, домов за регионами: ${regionHouse.size}`)

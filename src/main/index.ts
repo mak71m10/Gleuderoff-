@@ -44,6 +44,8 @@ async function migrateWorld(dir: string): Promise<void> {
 
   await fs.copyFile(file, join(dir, `world-before-v${def.version}.json`))
   await fs.cp(join(defaultWorldSource(), 'maps'), join(dir, 'maps'), { recursive: true, force: true })
+  // портреты персонажей (если есть) — копируются, не затирая картинки автора
+  await fs.cp(join(defaultWorldSource(), 'portraits'), join(dir, 'portraits'), { recursive: true, force: false }).catch(() => undefined)
 
   if ((user.version ?? 1) < 2) {
     const oldMap = user.maps.find((m: Json) => m.id === 'world')
@@ -171,7 +173,27 @@ async function migrateWorld(dir: string): Promise<void> {
     const defPlaceIds = new Set(defPlaces.map((p: Json) => p.id))
     user.places = [...user.places.filter((p: Json) => !defPlaceIds.has(p.id) && !String(p.id).startsWith('lore-battle-')), ...structuredClone(defPlaces)]
   }
+  if ((user.version ?? 1) < 14) {
+    // v14: отколовшиеся от Республики государства больше не возвращаются Империи в 980 г.; походы армий
+    const defProv = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProv.get(p.id)
+      if (!dp) continue
+      p.owners = structuredClone(dp.owners)
+      p.settlement = structuredClone(dp.settlement ?? null)
+      if (dp.description) p.description = dp.description
+      if (dp.landmark) p.landmark = dp.landmark
+      else delete p.landmark
+    }
+    const lorePlaces = def.places.filter((p: Json) => String(p.id).startsWith('lore-'))
+    const ids = new Set(lorePlaces.map((p: Json) => p.id))
+    user.places = [...user.places.filter((p: Json) => !ids.has(p.id)), ...structuredClone(lorePlaces)]
+    user.armies = [...(user.armies ?? []).filter((a: Json) => !String(a.id).startsWith('lore-')), ...structuredClone(def.armies ?? [])]
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
+  // портреты из стартового мира — тем записям лора, у которых своей картинки нет
+  const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))
+  for (const e of user.entries) if (!e.base.image && defImages.has(e.id)) e.base.image = defImages.get(e.id)
   const ids = new Set(user.entries.map((e: Json) => e.id))
   user.entries = [...user.entries, ...def.entries.filter((e: Json) => !ids.has(e.id))]
   const placeIds = new Set(user.places.map((p: Json) => p.id))

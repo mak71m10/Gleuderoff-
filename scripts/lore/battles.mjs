@@ -163,3 +163,29 @@ export const BATTLES = [
     body: 'Последний большой бой гражданской войны. X Легион Последней клятвы шёл в атаку с портретами Люция Кровавого на знамёнах. Ставка дала ему пройти до середины поля и ударила с трёх сторон. После этой битвы Тейбер II согласился на переговоры.'
   }
 ]
+
+// Походы армий: знамя идёт по маршруту между датами (точки — битвы из BATTLES или места loc).
+// side — чьё знамя: 'empire' (Дагерфорд/Империя), 'hist-…' (государство прошлого) или имя государства.
+export const ARMIES = [
+  { id: 'teyber-two', name: 'Армия Дагерфорда — генерал Тейбер', side: 'empire', route: [['loc:capital', 119.4], ['magpie-ford'], ['roivenburg'], ['eschengrad'], ['three-hills'], ['loc:capital', 121.45]] },
+  { id: 'livenholm', name: 'Ополчение Ливенхольма', side: 'n1', route: [['loc:city:n1', 119.45], ['magpie-ford']] },
+  { id: 'zigmark', name: 'Армия Зигмарка и наёмники', side: 'n2', route: [['loc:city:n2', 120.85], ['three-hills']] },
+  { id: 'alliance', name: 'Армия союза трёх соседей', side: 'w1', route: [['loc:city:wave:1', 124.35], ['talfields']] },
+  { id: 'regent', name: 'Армия регента Тейбера', side: 'empire', route: [['loc:capital', 124.3], ['talfields'], ['ashwood-night'], ['castersfeld'], ['loc:castersfeld-camp', 127.95], ['steingard-siege'], ['loc:capital', 130.1]] },
+  { id: 'brandt', name: 'Авангард полковника Ремига Брандта', side: 'empire', route: [['loc:castersfeld-camp', 127.25], ['wolf-gorge']] },
+  { id: 'ragnwald', name: 'Войско князя Рагнвальда Штайнгардского', side: 'last', route: [['loc:city:last', 127.55], ['wolf-gorge'], ['loc:city:last', 128.3]] },
+  { id: 'north-march', name: 'Королевская армия — поход на север', side: 'empire', route: [['loc:capital', 137.5], ['nord-duel'], ['loc:capital', 138.9]] },
+  { id: 'south-war', name: 'Армия Дагерфорда — Великая южная война', side: 'empire', route: [['loc:capital', 140.3], ['alkasra-wells'], ['karatepe-sands'], ['nalla-cathedral'], ['loc:capital', 150.0]] },
+  { id: 'jakasta', name: 'Войско Джакасты I', side: 'desert', route: [['loc:center:desertcore', 140.5], ['alkasra-wells'], ['loc:center:desertcore', 142.5], ['karatepe-sands'], ['loc:center:desertcore', 147], ['nalla-cathedral']] },
+  { id: 'kaspar', name: 'Войско наместника Каспара', side: 'empire', route: [['loc:capital', 233.9], ['prophet-oasis'], ['loc:capital', 235.6]] },
+  { id: 'copper-legion', name: 'IV Северный легион', side: 'empire', route: [['loc:capital', 411.25], ['copper-gates'], ['loc:capital', 413.6]] },
+  { id: 'adrian', name: 'Флот и легионы Адриана I', side: 'empire', route: [['loc:capital', 451.0], ['grey-cape'], ['misty-thicket'], ['silver-tree'], ['grey-cape', 476.0]] },
+  { id: 'deep-legion', name: 'Легионы Ставки — Глубинные шахты', side: 'empire', route: [['loc:capital', 513.2], ['deep-mines']] },
+  { id: 'izolda', name: 'V Южный легион — Изольда I', side: 'empire', route: [['loc:capital', 611.8], ['red-dunes'], ['loc:capital', 614.6]] },
+  { id: 'konrad', name: 'Армия Конрада I', side: 'empire', route: [['loc:capital', 863.7], ['black-sands']] },
+  { id: 'imperial-legion', name: 'I Императорский легион', side: 'empire', route: [['loc:palace', 975.55], ['crown-bridge']] },
+  { id: 'loyal', name: 'Армия Короны — Бернхард Райнхольд', side: 'empire', route: [['loc:center:loyal', 976.35], ['loyal-pact-field'], ['loc:center:loyal', 977.1], ['loc:center:loyal', 979.2], ['last-crown']] },
+  { id: 'pact', name: 'IV Северный легион Штайнера (Пакт)', side: 'hist-pact', route: [['loc:center:pact', 976.3], ['loyal-pact-field'], ['loc:center:pact', 977.1], ['loc:center:pact', 979.2], ['last-crown'], ['loc:capital', 980.1]] },
+  { id: 'republic', name: 'Армия Республики', side: 'Республика', route: [['loc:center:republic', 977.0], ['loc:center:west', 977.6], ['loc:center:far', 977.95]] },
+  { id: 'exiles', name: 'Исход Имперских изгнанников', side: 'Имперские Изгнанники', route: [['loc:capital', 980.1], ['loc:center:exiles', 980.45]] }
+]

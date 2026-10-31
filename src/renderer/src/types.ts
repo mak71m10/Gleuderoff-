@@ -290,11 +290,22 @@ export interface AdminRegion {
   descAuto?: boolean
 }
 
+export interface Army {
+  id: string
+  name: string
+  mapId: string
+  stateId: string
+  color: string
+  waypoints: { x: number; y: number; date: WorldDate }[]
+}
+
 export interface WorldData {
   version: number
   provinces?: Province[]
   adminRegions?: AdminRegion[]
   mapLabels?: MapLabel[]
+  /** Походы армий: знамя движется по точкам маршрута между датами */
+  armies?: Army[]
   name: string
   calendar: Calendar
   maps: MapDef[]

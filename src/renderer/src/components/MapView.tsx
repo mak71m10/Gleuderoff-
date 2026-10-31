@@ -543,6 +543,55 @@ export function MapView() {
     }
   }, [mapDef.id, mapDef.provinceMap])
 
+  // --- походы армий: маршрут, пройденный путь и знамя армии на нужную дату ---
+  const armyLayer = useRef<L.LayerGroup | null>(null)
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    if (!map.getPane('armies')) map.createPane('armies').style.zIndex = '640'
+    armyLayer.current = L.layerGroup([], { pane: 'armies' }).addTo(map)
+    return () => {
+      armyLayer.current?.remove()
+      armyLayer.current = null
+    }
+  }, [mapDef.id])
+  useEffect(() => {
+    const layer = armyLayer.current
+    if (!layer) return
+    layer.clearLayers()
+    if (!layers.armies) return
+    const ll = (p: { x: number; y: number }): L.LatLngExpression => [-p.y, p.x]
+    for (const a of world.armies ?? []) {
+      if (a.mapId !== mapDef.id || a.waypoints.length < 2) continue
+      const wp = a.waypoints
+      const first = wp[0].date, last = wp[wp.length - 1].date
+      // знамя видно от выступления до месяца после прихода
+      if (date < first || date > last + 60) continue
+      let i = 0
+      while (i < wp.length - 2 && date >= wp[i + 1].date) i++
+      const t = Math.max(0, Math.min(1, (date - wp[i].date) / Math.max(1, wp[i + 1].date - wp[i].date)))
+      const pos = { x: wp[i].x + (wp[i + 1].x - wp[i].x) * t, y: wp[i].y + (wp[i + 1].y - wp[i].y) * t }
+      const done = [...wp.slice(0, i + 1), pos]
+      L.polyline(wp.map(ll), { pane: 'armies', color: a.color, weight: 2, opacity: 0.55, dashArray: '6 7', interactive: false }).addTo(layer)
+      L.polyline(done.map(ll), { pane: 'armies', color: '#120d08', weight: 7, opacity: 0.45, interactive: false }).addTo(layer)
+      L.polyline(done.map(ll), { pane: 'armies', color: a.color, weight: 4, opacity: 0.95, interactive: false }).addTo(layer)
+      // направление движения — к следующей точке
+      const nx = date > last ? wp[wp.length - 1] : wp[i + 1]
+      const prev = date > last ? wp[wp.length - 2] : wp[i]
+      const ang = (Math.atan2(nx.y - prev.y, nx.x - prev.x) * 180) / Math.PI
+      const marching = date <= last
+      L.marker(ll(pos), {
+        pane: 'armies',
+        interactive: false,
+        icon: L.divIcon({
+          className: 'army-wrap',
+          iconSize: [0, 0],
+          html: `<div class="army ${marching ? 'army-marching' : ''}" style="--c:${a.color}"><div class="army-arrow" style="transform:rotate(${ang}deg)"></div><div class="army-banner"></div><div class="army-name">${escapeHtml(a.name)}</div></div>`
+        })
+      }).addTo(layer)
+    }
+  }, [world.armies, date, layers.armies, mapDef.id])
+
   // --- объёмные поселения ---
   const settleLayer = useRef<InstanceType<typeof SettlementRenderer> | null>(null)
   useEffect(() => {

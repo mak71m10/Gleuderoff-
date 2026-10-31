@@ -111,6 +111,7 @@ export function MapModeBar() {
 const LAYER_ROWS: { key: keyof Layers; label: string }[] = [
   { key: 'base', label: 'Подложка карты' },
   { key: 'models', label: 'Объёмные поселения' },
+  { key: 'armies', label: 'Походы армий' },
   { key: 'political', label: 'Политическая заливка' },
   { key: 'borders', label: 'Границы' },
   { key: 'stateLabels', label: 'Названия государств' },

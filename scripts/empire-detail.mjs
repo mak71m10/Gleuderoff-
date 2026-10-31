@@ -163,8 +163,7 @@ const water = (x, y) => {
   return pm[(py * pi.width + px) * 4 + 3] === 0
 }
 const openSea = (q) => [[0, 40], [0, 80], [0, 140], [-60, 110], [60, 110], [0, 220]].every(([dx, dy]) => water(q.x + dx, q.y + dy))
-for (const p of provs) if (p.landmark === 'aurhafen') delete p.landmark
-const portProv = coastal
+const portProv = provs.find((p) => p.landmark === 'aurhafen') ?? coastal
   .filter((p) => p.settlement && openSea(p.settlement))
   .sort((a, b) => dist(a, haussler) - dist(b, haussler))[0]
 special.set(portProv.id, { kind: 'grandport' })

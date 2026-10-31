@@ -652,3 +652,23 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; letter-spac
   .codex-list header { padding-left: 62px; }
   .entry-head { flex-wrap: wrap; gap: 14px; }
 }
+
+/* походы армий */
+.army-wrap { pointer-events: none; }
+.army { position: relative; width: 0; height: 0; }
+.army-arrow { position: absolute; left: -20px; top: -20px; width: 40px; height: 40px; }
+.army-arrow::after { content: ''; position: absolute; left: 30px; top: 13px; border: 7px solid transparent; border-left: 12px solid var(--c); filter: drop-shadow(0 0 2px #000); }
+.army-banner {
+  position: absolute; left: -11px; top: -34px; width: 22px; height: 28px;
+  background: linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 60%, #000));
+  border: 2px solid #e8d9a8; clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+  box-shadow: 0 0 8px rgba(0,0,0,.8);
+}
+.army-banner::before { content: ''; position: absolute; left: 50%; top: -10px; width: 2px; height: 40px; background: #3a2a18; transform: translateX(-50%); z-index: -1; }
+.army-marching .army-banner { animation: army-sway 1.2s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes army-sway { 50% { transform: rotate(-6deg); } }
+.army-name {
+  position: absolute; left: 14px; top: -30px; white-space: nowrap; font-family: var(--serif); font-weight: 700; font-size: 13px;
+  color: #f6ecd2; text-shadow: 0 0 3px #000, 0 0 6px #000;
+}
+@media (prefers-reduced-motion: reduce) { .army-marching .army-banner { animation: none; } }
