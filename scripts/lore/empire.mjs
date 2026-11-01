@@ -178,7 +178,8 @@ export const HOUSES = [
 
 export default function empire({ E, Y, world }) {
   const DRAFT = 'черновик'
-  for (const h of HOUSES) {
+  // Дом Аргус, его люди и Корона — в scripts/lore/argus.mjs
+  for (const h of HOUSES.filter((h) => h.id !== 'house-argus')) {
     E(h.id, 'dynasty', h.name, {
       title: h.title,
       summary: h.vassal ? `Правители: ${h.vassal}.` : `Девиз: ${h.motto}`,

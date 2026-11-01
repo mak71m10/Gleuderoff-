@@ -8,6 +8,11 @@ import { Button, DateField, EditModeSwitch, ImageField, RefField, TextField, ass
 import { HistoryList } from './Inspector'
 import { Icon } from './Icon'
 import { CoatOfArms, Flag, defaultHeraldry } from './Heraldry'
+import { SuccessionCouncilView } from './Council'
+import { Fullscreen, PanZoom } from './PanZoom'
+import { BookReader } from './BookReader'
+import { PowerView } from './PowerView'
+import { bookTheme } from '../books'
 import type { Entry, EntryFields, EntryKind, WorldData } from '../types'
 
 export function StatesView() {
@@ -193,6 +198,8 @@ function EntryEditor({ id }: { id: string }) {
   const setView = useStore((s) => s.setView)
   const entry = world.entries.find((e) => e.id === id)
   const [preview, setPreview] = useState(() => Boolean(entry?.base.body))
+  const [reading, setReading] = useState(false)
+  const [powerOpen, setPowerOpen] = useState(false)
   const masterMode = useStore((s) => s.masterMode)
   if (!entry) return null
   const meta = KINDS[entry.kind]
@@ -246,6 +253,28 @@ function EntryEditor({ id }: { id: string }) {
 
       <div className="entry-grid">
         <div className="entry-main">
+          {entry.kind === 'note' && f.body && (
+            <button className="book-open" onClick={() => setReading(true)}>
+              <span className="book-open-cover" style={{ background: `linear-gradient(135deg, ${bookTheme(entry).cover[0]}, ${bookTheme(entry).cover[1]})`, color: bookTheme(entry).coverInk }}>
+                {bookTheme(entry).ornament}
+              </span>
+              <span>
+                <b>Открыть книгу</b>
+                <span>{bookTheme(entry).kind} — листайте страницы мышью</span>
+              </span>
+            </button>
+          )}
+          {reading && <BookReader entry={entry} onClose={() => setReading(false)} />}
+          {world.legislatures?.some((l) => l.entryId === entry.id) && (
+            <button className="power-open" onClick={() => setPowerOpen(true)}>
+              <Icon name="balance" size={26} />
+              <span>
+                <b>Открыть зал — состав, законы и голоса по годам</b>
+                <span>На весь экран: каждый член собрания, его взгляды и голосования</span>
+              </span>
+            </button>
+          )}
+          {powerOpen && <PowerView legislature={world.legislatures!.find((l) => l.entryId === entry.id)!} onClose={() => setPowerOpen(false)} />}
           <div className="body-head">
             <span className="field-label">Описание и история</span>
             <button className="link-btn" onClick={() => setPreview(!preview)}>
@@ -283,6 +312,7 @@ function EntryEditor({ id }: { id: string }) {
             </div>
           )}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
+          {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}
         </div>
 
         <aside className="entry-side">
@@ -475,14 +505,34 @@ export function DynastyTree({ dynastyId, onOpen }: { dynastyId: string; onOpen: 
     )
   }
 
-  const seen = new Set<string>()
+  const [full, setFull] = useState(false)
+  const tree = (): ReactNode => {
+    const seen = new Set<string>()
+    return <ul className="tree">{roots.map((r) => node(r, seen))}</ul>
+  }
+  const dynName = world.entries.find((e) => e.id === dynastyId)?.base.name ?? ''
   return (
     <div className="dynasty-tree">
-      <div className="field-label">Родословное древо</div>
+      <div className="tree-head">
+        <div className="field-label">Родословное древо</div>
+        {roots.length > 0 && (
+          <Button icon="tree" variant="ghost" onClick={() => setFull(true)}>
+            На весь экран
+          </Button>
+        )}
+      </div>
       {roots.length ? (
-        <div className="tree-scroll">
-          <ul className="tree">{roots.map((r) => node(r, seen))}</ul>
-        </div>
+        <>
+          <p className="hint">Тяните мышью, приближайте колесом с Ctrl или кнопками справа.</p>
+          <PanZoom inline resetKey={dynastyId}>
+            {tree()}
+          </PanZoom>
+          {full && (
+            <Fullscreen title={`Родословное древо — ${dynName}`} onClose={() => setFull(false)}>
+              <PanZoom resetKey={dynastyId}>{tree()}</PanZoom>
+            </Fullscreen>
+          )}
+        </>
       ) : (
         <p className="hint">Укажите у персонажей эту династию, а также отца и мать, и древо построится само.</p>
       )}

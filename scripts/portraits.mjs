@@ -68,8 +68,33 @@ const CUSTOM = {
   'styria-now': 'pale nocturnal grand duke, gaunt, dark purple and black velvet, moonlight, unsettling eyes',
   'ulrike-brandt': 'fierce woman commander in snowy north, fur cloak over black armor, flame emblem',
   'matthias-essenwald': 'young army captain, steel breastplate, defiant eyes',
-  'bernhard-rheinhold': 'old veteran legate with an eyepatch, missing leg, crutch, worn crimson coat'
+  'bernhard-rheinhold': 'old veteran legate with an eyepatch, missing leg, crutch, worn crimson coat',
+  // Корона Аргус
+  'argus-now': 'pious cunning mountain king in his late forties, thin clean-shaven face, calm hooded eyes, faint humble smile, simple silver crown, navy blue robes with silver mountains, prayer beads in his fingers, gold ring with a large ruby',
+  'argus-heir': 'stern pious young crown princess, pale ascetic face, dark hair in a tight braid, cold clever eyes, navy blue cloak with a silver mountain clasp over light mail, small silver circlet, a prayer book in her hand',
+  'ag-argus-1': '(bareheaded, no crown:1.4), shrewd lowborn middle-aged steward of an old principality, plain dark wool coat, many keys and a ledger, sharp watchful eyes, early medieval',
+  'ag-irmfrid': 'cautious diplomat lord, early medieval, holding a gold ring with a ruby, silver crown on a cushion beside him, navy and silver',
+  'ag-ortrun': 'stern widow ruler, grey hair under a white wimple, navy blue gown, gold ring with a ruby, iron will',
+  'ag-tankred': 'cruel stern lord in red-stained steel armor, crosses on a road in the background, navy cloak',
+  'ag-wolfram': 'blind old lord with milky white eyes, long white hair, navy velvet, listening intently',
+  'ag-eberhard': 'patient grey-bearded first king, weary eyes, silver crown of mountains, navy blue mantle, ruby ring',
+  'ag-gottfried': 'bitter proud older prince, grey hair, severe face, navy and black doublet',
+  'ag-kassian': 'charming dissolute young prince, playing cards and wine cup, smug smile, navy and silver doublet',
+  'ag-dietmar': 'hot-tempered young swordsman prince, silver gorget, navy surcoat, sword hilt',
+  'ag-joachim': '(teenage boy of fifteen:1.4), (no crown:1.3), gentle novice monk with a tonsure, plain grey wool habit with a rope belt, holding a candle, pale thoughtful face',
+  'matilda-argus': 'quiet pious queen, pale face, dark eyes, white veil and navy gown, silver crown, rosary',
+  'klemens-grisbach': 'stern archbishop in white and gold vestments, mitre, navy cope, golden chalice',
+  'vignand-ulfengard': 'old fanatical knight-monk grand master, white surcoat with a red ruby ring emblem, hair shirt collar visible, grey beard',
+  'ag-asher': 'proud dark-skinned freedman colonel from the southern desert peoples, shaved head, scarred, half-riveted iron ring on a chain around his neck, navy uniform, steady fierce eyes',
+  'hildegunde-waldeck': '(very old wrinkled woman of eighty:1.4), stern abbess-princess in black and white habit with a golden crozier and a cross',
+  'bonifaz-waldeck': 'abbot-prince in brown monastic habit with a golden crozier',
+  'leodegar-waldeck': 'builder abbot-prince in white habit with a stone mason square and crozier',
+  'fredegar-waldeck': 'scholarly abbot-prince in white habit surrounded by books',
+  'roswitha-morwen': 'fierce countess in mail armor holding a long spear, purple and silver cloak, crescent moon emblem',
+  'morwena': 'warrior countess founder with braided hair, spear and purple cloak'
 }
+// без короны: незнатные и монахи (корону подсказывает герб рода на знамени)
+const NO_CROWN = new Set(['ag-argus-1', 'ag-joachim'])
 const word = (e) => {
   const p = e.base.props ?? {}
   // роль — только по титулу и занятию: в биографиях упоминаются императоры, это не делает героя императором
@@ -83,14 +108,18 @@ const word = (e) => {
   const ageW = age < 6 ? 'small child' : age < 14 ? `child of ${age}` : age < 22 ? 'young' : age < 35 ? 'youthful adult' : age < 50 ? 'middle-aged' : age < 65 ? 'aging, grey-haired' : 'elderly, white-haired'
   const who = female ? 'woman' : 'man'
   let role = 'noble'
-  if (/императриц/.test(t) && !/консорт/.test(t)) role = 'reigning empress wearing a golden imperial crown and crimson gown with black dragon embroidery'
+  if (/наместни/.test(t)) role = female ? 'lady governor in a silver mountain coronet and dark blue gown, gold ring with a ruby' : 'lord governor in a silver mountain coronet and dark blue robes, gold ring with a ruby'
+  else if (/глава рода аргус/.test(t)) role = 'early medieval wealthy landowner lord in dark wool and fur, silver chain'
+  else if (/аббат/.test(t)) role = female ? 'abbess-princess in a monastic habit with a golden crozier' : 'abbot-prince in a monastic habit with a golden crozier'
+  else if (/императриц/.test(t) && !/консорт/.test(t)) role = 'reigning empress wearing a golden imperial crown and crimson gown with black dragon embroidery'
   else if (/император/.test(t)) role = 'emperor wearing a golden imperial crown and crimson robes with black dragon embroidery'
   else if (/консорт/.test(t)) role = female ? 'empress consort with a jeweled tiara and crimson gown' : 'prince consort in rich crimson doublet'
   else if (/кронпринц|принц/.test(t)) role = female ? 'imperial princess with a small tiara, crimson dress' : 'imperial prince with a gold circlet, crimson doublet'
   else if (/княгин|князь/.test(t)) role = female ? 'medieval princess of a small realm, silver circlet, black and silver dress' : 'medieval prince of a small realm, silver circlet, black fur mantle'
   else if (/претендент/.test(t)) role = 'scheming medieval nobleman, black fur, silver chain'
   else if (/король/.test(t)) role = 'king with a silver crown over mountains'
-  else if (/граф/.test(t)) role = 'countess in rich velvet with a coronet'
+  else if (/граф/.test(t)) role = female ? 'countess in rich velvet with a coronet' : 'count in rich velvet with a coronet'
+  else if (/барон|бургграф|кастелян/.test(t)) role = female ? 'baroness in velvet with a pearl coronet' : 'baron in velvet and fur with a silver chain'
   else if (/архиеп|настоятель|священ/.test(t)) role = female ? 'abbess in white and gold habit' : 'archbishop in white and gold vestments with a sun-and-eye pendant'
   else if (/легат|капитан|генерал|маршал|командир|стражи/.test(t)) role = 'military officer in polished steel armor'
   else if (/магес|магистр|архимаг/.test(t)) role = 'mage scholar in robes with glowing runes'
@@ -98,7 +127,8 @@ const word = (e) => {
   else if (/рудник|литейн/.test(t)) role = 'mining noble with iron jewelry'
   else role = female ? 'noblewoman in velvet gown' : 'nobleman in velvet doublet'
   const hid = houseOf.get(e.base.links?.dynasty)
-  const colors = hid ? `, clothes in ${HOUSE_COLORS[hid]} colors` : ''
+  const dynH = world.entries.find((x) => x.id === e.base.links?.dynasty)?.base.heraldry
+  const colors = hid ? `, clothes in ${HOUSE_COLORS[hid]} colors` : dynH ? `, clothes in ${[...new Set(dynH.colors)].map(colorName).join(' and ')} colors` : ''
   const pers = p.personality ?? e.base.summary ?? ''
   const mood = /жесток|безум|тиран|кровав/.test(pers.toLowerCase()) ? ', cruel menacing expression' : /добр|мягк|тих/.test(pers.toLowerCase()) ? ', gentle expression' : /горд|холод|строг/.test(pers.toLowerCase()) ? ', proud cold expression' : ''
   return `${ageW} ${who}, ${role}${colors}${mood}`
@@ -160,7 +190,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -171,8 +201,11 @@ for (const e of chars) {
     continue
   }
   const subject = CUSTOM[id] ?? word(e)
-  const imperial = !['jakasta', 'durin-kald'].includes(id)
-  const flag = bannerFor(e)
+  // европейская внешность — людям-гладрам; южанам, дварфам и прочим — нет
+  const race = e.base.props?.race ?? ''
+  const imperial = !['jakasta', 'durin-kald'].includes(id) && (!race || /гладр|имперец|^Человек$/.test(race))
+  // у незнатных и монахов — знамя рода без эмблемы, иначе нейросеть надевает им корону с герба
+  const flag = NO_CROWN.has(id) ? bannerFor(e).replace(/ with .*$/, '') : bannerFor(e)
   const banner = flag ? `(${flag} hanging on the wall behind:1.35), ` : ''
   const prompt = `${STYLE}, ${banner}portrait of a ${imperial ? (id === 'oktavian-2' ? '(pale european baby:1.2), ' : '(northern european, germanic features, pale skin, deep-set eyes, strong brow ridge, prominent straight nose:1.3), ') : ''}${subject}`
   if (process.env.DRY) {
@@ -181,7 +214,7 @@ for (const e of chars) {
   }
   const tmp = `tools/sd/out-${id}.png`
   const t0 = Date.now()
-  execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', prompt, '-n', NEG, '-W', '512', '-H', '640', '--steps', '22', '--cfg-scale', '6.5', '--sampling-method', 'dpm++2m', '--scheduler', 'karras', '-s', String(seedOf(id) + Number(process.env.SEED_OFFSET ?? 0)), '-o', tmp], { stdio: 'ignore' })
+  execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', prompt, '-n', NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG, '-W', '512', '-H', '640', '--steps', '22', '--cfg-scale', '6.5', '--sampling-method', 'dpm++2m', '--scheduler', 'karras', '-s', String(seedOf(id) + Number(process.env.SEED_OFFSET ?? 0)), '-o', tmp], { stdio: 'ignore' })
   await sharp(tmp).webp({ quality: 86 }).toFile(file)
   rmSync(tmp, { force: true })
   e.base.image = `portraits/${id}.webp`

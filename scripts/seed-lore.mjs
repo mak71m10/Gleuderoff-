@@ -1,12 +1,13 @@
 // Наполняет стартовый мир лором из статей (source-lore/*.md) и связанными карточками справочника.
 // Повторный запуск безопасен: записи с id «lore-…» заменяются, остальные не трогаются.
 // Использование: node scripts/seed-lore.mjs
-import { readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import gods from './lore/gods.mjs'
 import races from './lore/races.mjs'
 import monstargs from './lore/monstargs.mjs'
 import states from './lore/states.mjs'
 import empireLore from './lore/empire.mjs'
+import argusLore from './lore/argus.mjs'
 import geo from './lore/geo.mjs'
 
 const WORLD = 'resources/default-world/world.json'
@@ -24,14 +25,16 @@ const E = (id, kind, name, f = {}) => {
     base: {
       name,
       title: f.title ?? '',
-      image: '',
+      // портрет, если уже написан (scripts/portraits.mjs)
+      image: existsSync(`resources/default-world/portraits/${id}.webp`) ? `portraits/${id}.webp` : '',
       summary: f.summary ?? '',
       body: f.body ?? '',
       tags: f.tags ?? [],
       props: f.props ?? {},
       links: Object.fromEntries(Object.entries(f.links ?? {}).map(([k, v]) => [k, v.startsWith('lore-') || !v ? v : `lore-${v}`])),
       ...(f.secret ? { secret: f.secret } : {}),
-      ...(f.heraldry ? { heraldry: f.heraldry } : {})
+      ...(f.heraldry ? { heraldry: f.heraldry } : {}),
+      ...(f.council ? { council: f.council } : {})
     },
     history: [],
     from: f.from ?? null,
@@ -134,9 +137,10 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 15
+world.version = 16
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
+argusLore({ E, Y, world })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })
 

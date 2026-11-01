@@ -222,8 +222,8 @@ export default function monstargs({ E, Y, entries }) {
     from: Y(279),
     to: Y(371),
     props: { race: 'Человек (гладр)', ...M },
-    links: { dynasty: 'lore-house-argus' },
-    body: 'Сын великого Дома Аргус. Брак с Сандрой II — первый союз Монстаргов с великим домом; дети носили имя матери.',
+    links: { dynasty: 'lore-house-argus', father: 'lore-ag-baldwin' },
+    body: 'Младший сын Бальдуина Сватовщика из великого Дома Аргус. Брак с Сандрой II — первый союз Монстаргов с великим домом; дети носили имя матери.',
     tags: [DRAFT]
   })
 

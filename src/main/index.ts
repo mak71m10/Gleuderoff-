@@ -46,6 +46,8 @@ async function migrateWorld(dir: string): Promise<void> {
   await fs.cp(join(defaultWorldSource(), 'maps'), join(dir, 'maps'), { recursive: true, force: true })
   // портреты персонажей (если есть) — копируются, не затирая картинки автора
   await fs.cp(join(defaultWorldSource(), 'portraits'), join(dir, 'portraits'), { recursive: true, force: false }).catch(() => undefined)
+  // иллюстрации книг
+  await fs.cp(join(defaultWorldSource(), 'books'), join(dir, 'books'), { recursive: true, force: true }).catch(() => undefined)
 
   if ((user.version ?? 1) < 2) {
     const oldMap = user.maps.find((m: Json) => m.id === 'world')
@@ -189,6 +191,44 @@ async function migrateWorld(dir: string): Promise<void> {
     const ids = new Set(lorePlaces.map((p: Json) => p.id))
     user.places = [...user.places.filter((p: Json) => !ids.has(p.id)), ...structuredClone(lorePlaces)]
     user.armies = [...(user.armies ?? []).filter((a: Json) => !String(a.id).startsWith('lore-')), ...structuredClone(def.armies ?? [])]
+  }
+  if ((user.version ?? 1) < 16) {
+    // v16: Корона Аргус — пять княжеств, Дом Аргус и Совет Крови, системы власти по годам, младшие дома, Сенат, армия, мятежи 976–977,
+    // столица Норерштадт, описания поселений. Лор («lore-…») и история провинций — из стартового мира
+    const defIds = new Set(def.entries.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !String(e.id).startsWith('lore-') || !defIds.has(e.id)), ...structuredClone(def.entries.filter((e: Json) => String(e.id).startsWith('lore-')))]
+    user.states = [...user.states.filter((s: Json) => !String(s.id).startsWith('hist-')), ...structuredClone(def.states.filter((s: Json) => String(s.id).startsWith('hist-')))]
+    const ds = def.states.find((s: Json) => s.base.name === 'Корона Аргус')
+    const us = user.states.find((s: Json) => s.id === ds?.id)
+    if (ds && us) {
+      us.base = { ...us.base, ...structuredClone(ds.base) }
+      us.history = structuredClone(ds.history)
+      us.factions = structuredClone(ds.factions)
+    }
+    const defProv = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProv.get(p.id)
+      if (!dp) continue
+      p.owners = structuredClone(dp.owners)
+      p.settlement = structuredClone(dp.settlement ?? null)
+      if (dp.description) p.description = dp.description
+    }
+    const defAdmin = new Map<string, Json>((def.adminRegions ?? []).map((a: Json) => [a.id, a]))
+    for (const a of user.adminRegions ?? []) {
+      const da = defAdmin.get(a.id)
+      if (!da) continue
+      if (da.houseId) a.houseId = da.houseId
+      if (da.description && (!a.description || a.descAuto !== false)) {
+        a.description = da.description
+        a.descAuto = true
+      }
+    }
+    const lorePlaces = def.places.filter((p: Json) => String(p.id).startsWith('lore-'))
+    const ids = new Set(lorePlaces.map((p: Json) => p.id))
+    user.places = [...user.places.filter((p: Json) => !ids.has(p.id) && !String(p.id).startsWith('lore-battle-')), ...structuredClone(lorePlaces)]
+    user.armies = [...(user.armies ?? []).filter((a: Json) => !String(a.id).startsWith('lore-')), ...structuredClone(def.armies ?? [])]
+    // Верховный совет и Сенат Короны: составы, законы и голоса по годам
+    user.legislatures = structuredClone(def.legislatures ?? [])
   }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет

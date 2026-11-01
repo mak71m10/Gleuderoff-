@@ -14,8 +14,11 @@
 // Запуск после provinces.mjs, smooth-provinces.mjs и seed-lore.mjs: node scripts/history-provinces.mjs
 import { readFileSync, writeFileSync } from 'fs'
 import { HOUSES } from './lore/empire.mjs'
-import { ARMIES, BATTLES } from './lore/battles.mjs'
+import { ARMIES as EMPIRE_ARMIES, BATTLES as EMPIRE_BATTLES } from './lore/battles.mjs'
+import { ARGUS_ARMIES, ARGUS_BATTLES, ARGUS_REBELS, PRINCIPALITIES } from './lore/argus.mjs'
 
+const BATTLES = [...EMPIRE_BATTLES, ...ARGUS_BATTLES]
+const ARMIES = [...EMPIRE_ARMIES, ...ARGUS_ARMIES]
 const WORLD = 'resources/default-world/world.json'
 const world = JSON.parse(readFileSync(WORLD, 'utf8'))
 const YEAR = world.calendar.months.reduce((s, m) => s + m.days, 0)
@@ -142,6 +145,12 @@ const princIds = principalities.map((g, k) => {
           : 'Одно из множества княжеств центра Лоры в эпоху раздробленности. Присоединено войной регентом Тейбером (124–129) — ни одно княжество не сдалось без боя (черновик).'
   })
 })
+// княжества, ставшие Короной Аргус: свои династии, устройство и гербы (scripts/lore/argus.mjs)
+for (const pr of PRINCIPALITIES) {
+  const st = world.states.find((x) => x.id.startsWith('hist-p') && x.base.name === pr.state)
+  if (!st) continue
+  Object.assign(st.base, { government: pr.government, rulerTitle: pr.rulerTitle, dynastyId: `lore-${pr.house}`, heraldry: pr.heraldry, motto: pr.motto, description: pr.description })
+}
 const sheikhIds = sheikhdoms.map((g, k) =>
   hist(`s${k}`, SHEIKHS[k][0], SHEIKHS[k][1], { government: 'Шейхство', religionId: 'lore-house-dark', culture: 'Нарги, дукулиты', description: 'Пустынное шейхство, присоединённое Джакастой I к Королевству пустынь (черновик).' })
 )
@@ -408,6 +417,19 @@ for (const [name, start] of Object.entries(VASSAL_START)) {
   st.history = (st.history ?? []).filter((h) => !String(h.id).startsWith('lore-vassal'))
   st.history.push({ id: 'lore-vassal-free', date: D(start), patch: { overlordId: '' } }, { id: 'lore-vassal-980', date: D(980.1), patch: { overlordId: empire } })
 }
+// мятежи младших домов Короны Аргус (976–977): мятежники берут свой округ и быстро проигрывают
+{
+  const argusSt = stateByName.get('Корона Аргус').id
+  for (const [key, name, color, area, start, end, description] of ARGUS_REBELS) {
+    const rebel = hist(key, name, color, { government: 'Мятеж младшего дома', culture: 'Зиггауцы', description })
+    const list = provs.filter((p) => admin.get(p.areaId)?.name === area && p.state === argusSt)
+    for (const p of list) {
+      ev.set(p.id, ev.get(p.id).filter(([d]) => d < D(start) || d > D(end)))
+      at(p, start, rebel)
+      at(p, end, argusSt)
+    }
+  }
+}
 // дальние земли уходят в хаосе
 {
   const far = new Map()
@@ -512,12 +534,19 @@ const LOC = {
   'center:far': () => settlementPt(centerLands.reduce((a, b) => (dist(a, repC) > dist(b, repC) ? a : b))),
   'center:exiles': () => centroid(provs.filter((p) => nameOf(p) === 'Имперские Изгнанники'))
 }
+// «prov:Имя» — у поселения провинции с этим именем
+const locOf = (key) => {
+  if (!key.startsWith('prov:')) return LOC[key]()
+  const p = provs.find((q) => q.name === key.slice(5))
+  if (!p) throw new Error(`Нет провинции ${key}`)
+  return settlementPt(p)
+}
 world.places = world.places.filter((p) => !p.id.startsWith('lore-battle-'))
 world.entries = world.entries.filter((e) => !e.id.startsWith('lore-battle-'))
 const used = []
 const battlePt = new Map()
 for (const b of BATTLES) {
-  let pt = LOC[b.loc]()
+  let pt = locOf(b.loc)
   // битвы в одном месте раздвигаем
   while (used.some((u) => Math.hypot(u.x - pt.x, u.y - pt.y) < 40)) pt = { x: pt.x + 45, y: pt.y + 20 }
   used.push(pt)
@@ -566,9 +595,9 @@ world.armies = ARMIES.map((a) => {
   const waypoints = []
   for (const [key, year] of a.route) {
     let pt
-    if (key.startsWith('loc:')) pt = { ...LOC[key.slice(4)](), year }
+    if (key.startsWith('loc:')) pt = { ...locOf(key.slice(4)), year }
     else if (battlePt.has(key)) pt = { ...battlePt.get(key), ...(year != null ? { year } : {}) }
-    else pt = { ...LOC[key](), year }
+    else pt = { ...locOf(key), year }
     waypoints.push({ x: Math.round(pt.x), y: Math.round(pt.y), date: D(pt.year) })
   }
   const st = stateById.get(sideState(a.side))

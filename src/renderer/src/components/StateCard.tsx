@@ -8,6 +8,8 @@ import { ownerAt } from '../provinces'
 import { Button, ColorField, DateField, EditModeSwitch, ImageField, Modal, RefField, TextField, assetUrl } from './ui'
 import { HistoryList } from './Inspector'
 import { DynastyTree } from './Codex'
+import { SuccessionCouncilView } from './Council'
+import { PowerView } from './PowerView'
 import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
 import { Icon, type IconName } from './Icon'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
@@ -44,6 +46,7 @@ function StateCardBody({ id }: { id: string }) {
   const setView = useStore((s) => s.setView)
   const [tab, setTab] = useState<Tab>('overview')
   const [heraldryOpen, setHeraldryOpen] = useState(false)
+  const [powerOpen, setPowerOpen] = useState(false)
   const masterMode = useStore((s) => s.masterMode)
   const st = world.states.find((s) => s.id === id)
   if (!st) return null
@@ -64,6 +67,9 @@ function StateCardBody({ id }: { id: string }) {
 
   const chars = world.entries.filter((e) => e.kind === 'character').map((e) => ({ id: e.id, name: e.base.name }))
   const dynasties = world.entries.filter((e) => e.kind === 'dynasty').map((e) => ({ id: e.id, name: e.base.name }))
+  const legislature = world.legislatures?.find((l) => l.stateId === id)
+  const dynastyEntry = world.entries.find((e) => e.id === f.dynastyId)
+  const dynastyCouncil = dynastyEntry ? resolve(dynastyEntry, date).council : undefined
   const religions = world.entries.filter((e) => e.kind === 'religion').map((e) => ({ id: e.id, name: e.base.name }))
   const otherStates = world.states.filter((s) => s.id !== id).map((s) => ({ id: s.id, name: resolve(s, date).name }))
   const places = world.places.filter((p) => existsAt(p, date) && resolve(p, date).stateId === id)
@@ -226,6 +232,18 @@ function StateCardBody({ id }: { id: string }) {
           </div>
         )}
 
+        {tab === 'power' && legislature && (
+          <button className="power-open" onClick={() => setPowerOpen(true)}>
+            <Icon name="balance" size={26} />
+            <span>
+              <b>{legislature.name} — зал, законы, голоса по годам</b>
+              <span>
+                {legislature.seats} мест · {legislature.bills.length} законов · можно выбрать любого члена и проследить, за что он голосовал
+              </span>
+            </span>
+          </button>
+        )}
+        {powerOpen && legislature && <PowerView legislature={legislature} onClose={() => setPowerOpen(false)} />}
         {tab === 'power' && (
           <div className="sc-cols">
             <div className="sc-side">
@@ -283,6 +301,17 @@ function StateCardBody({ id }: { id: string }) {
               )}
             </div>
           </div>
+        )}
+        {tab === 'power' && dynastyCouncil && (
+          <SuccessionCouncilView
+            council={dynastyCouncil}
+            onOpen={(id) => {
+              const e = world.entries.find((x) => x.id === id)
+              select({ type: 'entry', id })
+              setView(e?.kind ?? 'character')
+              close(null)
+            }}
+          />
         )}
 
         {tab === 'military' && (

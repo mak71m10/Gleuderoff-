@@ -218,6 +218,40 @@ export interface EntryFields {
   secret?: string
   /** Герб (у династий и домов) */
   heraldry?: Heraldry
+  /** Совет, выбирающий правителя из рода (у династий с выборной властью) */
+  council?: SuccessionCouncil
+}
+
+/** Кресло в совете рода: кто сидит, сколько голосов, за кого голосует и кто его второй выбор */
+export interface CouncilSeat {
+  id: string
+  role: string
+  holderId: string
+  weight: number
+  vote: string
+  second: string
+}
+
+export interface CouncilCandidate {
+  id: string
+  note: string
+  /** Избирается только всеми голосами (например, дочь по Оговорке Ортрун) */
+  unanimous?: boolean
+  /** false — сейчас не может быть избран (послушник и т.п.) */
+  eligible?: boolean
+}
+
+export interface SuccessionCouncil {
+  name: string
+  /** Доля голосов для победы, например 2/3 */
+  threshold: number
+  rounds: number
+  /** Если никто не набрал: старший из оставшихся или никто */
+  fallback: 'eldest' | 'none'
+  fallbackLabel: string
+  rules: string
+  seats: CouncilSeat[]
+  candidates: CouncilCandidate[]
 }
 
 export interface Entry extends Temporal<EntryFields> {
@@ -299,7 +333,68 @@ export interface Army {
   waypoints: { x: number; y: number; date: WorldDate }[]
 }
 
+/** Законодательное собрание (Верховный совет, Сенат): состав по годам, законы и поимённые голоса */
+export interface Legislature {
+  id: string
+  stateId: string
+  name: string
+  entryId: string
+  chairTitle: string
+  seats: number
+  from: WorldDate
+  description: string
+  groups: string[]
+  seatOrder: string[]
+  issues: { id: string; name: string; minus: string; plus: string }[]
+  factions: { id: string; name: string; group: string; color: string; ideology: string; leader: string; stance: number[] }[]
+  convocations: { date: WorldDate; name: string; note: string; seats: Record<string, number> }[]
+  members: LegislatureMember[]
+  bills: Bill[]
+  chronicle: { year: number; text: string; auto: string; convocation: string }[]
+  archive: { date: WorldDate; title: string; text: string }[]
+}
+
+export interface LegislatureMember {
+  id: string
+  name: string
+  /** карточка персонажа, если есть */
+  entryId: string
+  faction: string
+  group: string
+  title: string
+  origin: string
+  born: number
+  from: WorldDate
+  to: WorldDate | null
+  /** взгляды по вопросам собрания, −2…+2 */
+  stance: number[]
+  bio: string
+  left: string
+  gender: string
+}
+
+export interface Bill {
+  id: string
+  date: WorldDate
+  title: string
+  kind: string
+  /** направление закона по вопросам собрания */
+  w: number[]
+  sponsor: string
+  sponsorEntry: string
+  sponsorFaction: string
+  summary: string
+  /** ключевой закон эпохи (из лора), а не рядовой */
+  key?: boolean
+  outcome: 'принят' | 'отклонён' | 'отложен'
+  /** голос каждого члена (по порядку members): y за, n против, a воздержался, - отсутствовал, пробел — не член */
+  votes: string
+  tally: { y: number; n: number; a: number; abs: number } | null
+}
+
 export interface WorldData {
+  /** Верховный совет, Сенат и другие собрания */
+  legislatures?: Legislature[]
   version: number
   provinces?: Province[]
   adminRegions?: AdminRegion[]
