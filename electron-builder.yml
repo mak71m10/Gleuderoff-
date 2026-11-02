@@ -10,6 +10,10 @@ extraResources:
   - from: resources/default-world
     to: default-world
 asar: true
+# только нужные переводы Chromium: −38 МБ; иначе 32-битный упаковщик NSIS не может открыть архив целиком
+electronLanguages:
+  - ru
+  - en-US
 win:
   target: nsis
   icon: build/icon.png

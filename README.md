@@ -14,7 +14,7 @@
 ```
 npm install
 npm run dev        # запуск в режиме разработки
-npm run dist       # собрать установщик в release/
+npm run dist       # собрать установщик в release/ (упаковщику NSIS нужно ~250 МБ во временной папке: если на C: мало места — TEMP=E:… TMP=E:… npm run dist)
 ```
 
 Сборка стартового мира (resources/default-world) — по порядку:
