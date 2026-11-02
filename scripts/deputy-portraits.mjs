@@ -2,16 +2,12 @@
 // меньше и быстрее, чем портреты персонажей. Файл называется по устойчивому ключу (собрание, имя, год рождения),
 // чтобы портрет не уехал к другому человеку при пересборке. world.json не трогает: поле image проставляет
 // scripts/legislatures.mjs, если файл есть. Запуск: node scripts/deputy-portraits.mjs [только-текущие]
-import { execFileSync } from 'child_process'
-import { existsSync, mkdirSync, readFileSync, rmSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync } from 'fs'
 import sharp from 'sharp'
+import { startSd, stopSd, txt2img } from './sd.mjs'
 
 const WORLD = 'resources/default-world/world.json'
 const OUT = 'resources/default-world/portraits/dep'
-const SD = 'tools/sd/bin/sd-cli.exe'
-const MODEL = 'tools/sd/models/dreamshaper8.safetensors'
-// LCM-LoRA (tools/sd/lora), вшитая в веса сразу (иначе каждый шаг в 4 раза медленнее): 5 шагов; VAE — на той же AMD (на встроенной Intel он в 10 раз медленнее)
-const BACKEND = ['--backend', process.env.SD_BACKEND ?? 'diffusion=vulkan0,te=cpu,vae=vulkan0', '--lora-model-dir', 'tools/sd/lora', '--lora-apply-mode', 'immediately', '--batched-cfg', 'off']
 mkdirSync(OUT, { recursive: true })
 
 export const depKey = (legId, m) => {
@@ -22,7 +18,7 @@ export const depKey = (legId, m) => {
 }
 
 const STYLE = 'oil painting, dutch golden age style, renaissance old master style, chiaroscuro lighting, plain dark background, visible brush strokes, detailed face, head and shoulders portrait'
-const NEG = '(asian:1.4), (east asian:1.3), crown, tiara, coronet, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame, blurry, lowres, deformed, cartoon, anime, nsfw, nude'
+export const NEG = '(asian:1.4), (east asian:1.3), crown, tiara, coronet, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame, blurry, lowres, deformed, cartoon, anime, nsfw, nude'
 const CLOTHES = {
   noble: (f) => (f ? 'noblewoman in dark velvet gown with a lace collar and pearls' : 'nobleman in dark velvet doublet with a lace collar and a gold chain'),
   money: (f) => (f ? 'rich merchant woman in black silk with a white ruff collar' : 'rich merchant banker in black doublet with a white ruff collar, gold rings'),
@@ -40,7 +36,7 @@ const RACE = {
   'Полуорк': 'half-orc with greenish grey skin and small lower tusks, ',
   'Человек (беглец из Короны Аргус)': 'dark-skinned southern freedman, '
 }
-const prompt = (m, leg) => {
+export const prompt = (m, leg) => {
   const f = m.gender === 'Женский'
   const end = m.to ? Math.floor(m.to / 500) + 1 : 1010
   const age = end - m.born
@@ -61,7 +57,7 @@ const colorWord = (hex) => {
   if (g > 100 && b > 100) return 'teal'
   return 'purple'
 }
-const seedOf = (s) => [...s].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7) % 1000000
+export const seedOf = (s) => [...s].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7) % 1000000
 
 if (process.argv[1].endsWith('deputy-portraits.mjs')) {
   const world = JSON.parse(readFileSync(WORLD, 'utf8'))
@@ -84,12 +80,12 @@ if (process.argv[1].endsWith('deputy-portraits.mjs')) {
     const key = depKey(leg.id, m)
     const p = prompt(m, leg)
     if (process.env.DRY) { console.log(`${m.name}: ${p.slice(STYLE.length + 2)}`); continue }
-    const tmp = `tools/sd/out-${key}.png`
+    await startSd()
     const t0 = Date.now()
-    execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', `${p}<lora:lcm-sd15:1>`, '-n', NEG, '-W', '384', '-H', '448', '--steps', '5', '--cfg-scale', '1.5', '--sampling-method', 'lcm', '-s', String(seedOf(key)), '-o', tmp], { stdio: 'ignore' })
+    const png = await txt2img({ prompt: p, negative: NEG, width: 384, height: 448, steps: 5, cfg: 1.5, seed: seedOf(key), fast: true })
     // LCM любит рисовать раму и подпись по краю — обрезаем
-    await sharp(tmp).extract({ left: 26, top: 24, width: 332, height: 396 }).webp({ quality: 82 }).toFile(`${OUT}/${key}.webp`)
-    rmSync(tmp, { force: true })
+    await sharp(png).extract({ left: 26, top: 24, width: 332, height: 396 }).webp({ quality: 82 }).toFile(`${OUT}/${key}.webp`)
     console.log(`[${++done}/${left.length}] ${leg.name}: ${m.name} — ${((Date.now() - t0) / 1000).toFixed(0)} с`)
   }
+  stopSd()
 }

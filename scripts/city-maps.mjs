@@ -1,10 +1,10 @@
-// Карты городов. Шаг 1 (node scripts/city-maps.mjs urls): по карте рельефа смотрит, где у города вода,
-// и печатает ссылки «мастерской» (scripts/city-receiver.mjs) — генератор Watabou строит план и кладёт его
-// в source-maps/cities/<slug>.json. Шаг 2 (node scripts/city-maps.mjs): план → наша карта в стиле
+// Карты городов. Одной командой: node scripts/city-maps.mjs gen [slug …] — по карте рельефа смотрит, где у
+// города вода, генератор Watabou в скрытом окне (scripts/city-gen.cjs) строит план и кладёт его
+// в source-maps/cities/<slug>.json; затем план → наша карта в стиле
 // Gleuderoff (maps/cities/<slug>.webp), контуры зданий для приложения (maps/cities/<slug>.plan.json),
 // карта города в world.maps, примечательные здания — метками на ней. Параметры городов — lore/cities.mjs.
 import sharp from 'sharp'
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs'
 import { CITY_MAPS } from './lore/cities.mjs'
 
 const WORLD = 'resources/default-world/world.json'
@@ -44,18 +44,27 @@ async function seaOf(x, y) {
 
 export async function genUrls() {
   const out = []
-  for (const c of CITY_MAPS) {
+  for (const c of CITY_MAPS.filter((c) => !c.custom)) {
     const a = anchor(c)
     const sea = c.gen.coast ? (c.sea ?? (await seaOf(a.x, a.y)) ?? 0) : 0
-    const q = new URLSearchParams({ name: c.slug, seed: String(c.seed ?? seedOf(c.slug)), ...Object.fromEntries(Object.entries(c.gen).map(([k, v]) => [k, String(v)])), sea: String(sea), export: 'json' })
-    out.push(`http://127.0.0.1:5310/gen?${q}`)
+    const q = new URLSearchParams({ seed: String(c.seed ?? seedOf(c.slug)), ...Object.fromEntries(Object.entries(c.gen).map(([k, v]) => [k, String(v)])), sea: String(sea), export: 'json' })
+    out.push({ slug: c.slug, query: String(q) })
   }
   return out
 }
 
 if (process.argv[2] === 'urls') {
-  for (const u of await genUrls()) console.log(u)
+  for (const u of await genUrls()) console.log(`http://127.0.0.1:5310/gen?name=${u.slug}&${u.query}`)
   process.exit(0)
+}
+
+// gen [slug …]: планы от генератора Watabou в скрытом окне Electron (scripts/city-gen.cjs), затем отрисовка
+if (process.argv[2] === 'gen') {
+  const want = process.argv.slice(3).filter((a) => a !== 'force')
+  const jobs = (await genUrls()).filter((u) => !want.length || want.includes(u.slug))
+  const { execFileSync } = await import('child_process')
+  const electron = (await import('electron')).default
+  execFileSync(electron, ['scripts/city-gen.cjs', ...jobs.map((u) => `${u.slug}=${u.query}`)], { stdio: 'inherit' })
 }
 
 // ================= рендер плана =================
@@ -107,7 +116,8 @@ function renderCity(c, J) {
   const roads = geoms('roads').map((g) => ({ r: P(flip(g.coordinates)), w: (g.width ?? vals.roadWidth) * s }))
   const rivers = geoms('rivers').map((g) => ({ r: P(flip(g.coordinates)), w: (g.width ?? vals.riverWidth) * s }))
   const planks = geoms('planks').map((g) => ({ r: P(flip(g.coordinates)), w: (g.width ?? 4) * s }))
-  const districts = geoms('districts').map((g) => ({ r: P(flip(g.coordinates[0])), en: g.name }))
+  // у своих планов (Хауссер) кварталы приходят уже с русским именем, цветом крыш и подложки
+  const districts = geoms('districts').map((g) => ({ r: P(flip(g.coordinates[0])), en: g.name, name: g.ru, roof: g.roof, fill: g.fill }))
   // какая стена что значит: из двух меньшая — цитадель; если одна — по параметрам города
   const wallSorted = [...walls].sort((a, b) => area(b.r) - area(a.r))
   const citadel = c.gen.citadel ? (c.gen.walls ? wallSorted[1] : wallSorted[0]) : null
@@ -117,11 +127,11 @@ function renderCity(c, J) {
   const wet = [...water, ...rivers.map((q) => q.r)]
   const wdist = (q) => (wet.length ? Math.min(...q.r.flatMap((p) => wet.flatMap((r) => r.map((w) => Math.hypot(w[0] - p[0], w[1] - p[1]))))) : 1e9)
   const open = districts.filter((q) => !(citadel && inside(centroid(q.r), citadel.r)))
-  districts.filter((q) => !open.includes(q)).forEach((q) => (q.name = c.citadelName ?? 'Цитадель'))
+  districts.filter((q) => !open.includes(q)).forEach((q) => (q.name ??= c.citadelName ?? 'Цитадель'))
   const wetNames = c.districts.filter((n) => n.startsWith('~')).map((n) => n.slice(1))
   const dryNames = c.districts.filter((n) => !n.startsWith('~'))
   const byWet = [...open].sort((a, b) => wdist(a) - wdist(b))
-  for (const q of byWet.slice(0, wet.length ? wetNames.length : 0)) q.name = wetNames.shift()
+  for (const q of byWet.filter((q) => !q.name).slice(0, wet.length ? wetNames.length : 0)) q.name = wetNames.shift()
   let k = 0
   for (const q of open) if (!q.name) q.name = dryNames.shift() ?? wetNames.shift() ?? `Слобода ${++k}`
 
@@ -167,7 +177,14 @@ function renderCity(c, J) {
   }
 
   const roof = ['#8f5e48', '#9a6a4f', '#865640', '#a07258', '#7d5a46']
-  const bAttr = (b, i) => (b.special ? 'fill="#7b3b33" stroke="#e8cd8e" stroke-width="1.6"' : `fill="${roof[(i * 7) % roof.length]}" stroke="#3a2a20" stroke-width="0.8"`)
+  // крыши — по цвету квартала, если он задан (Хауссер), иначе общие
+  const dOf = (b) => { const ce = centroid(b.r); return districts.findIndex((q) => inside(ce, q.r)) }
+  B.forEach((b) => (b.d = dOf(b)))
+  const bAttr = (b, i) => {
+    if (b.special) return 'fill="#7b3b33" stroke="#e8cd8e" stroke-width="1.6"'
+    const pal = districts[b.d]?.roof ?? roof
+    return `fill="${pal[(i * 7) % pal.length]}" stroke="#3a2a20" stroke-width="0.8"`
+  }
   const towers = (w) => w.r.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${(vals.towerRadius * s).toFixed(1)}" fill="#3b342d" stroke="#1c1814" stroke-width="1"/>`).join('')
   const text = (x, y, t, size, fill = '#2e2318', extra = '') =>
     `<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" stroke="#efe4c6" stroke-width="${(size / 5).toFixed(1)}" paint-order="stroke" stroke-linejoin="round" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" ${extra}>${esc(t)}</text>`
@@ -186,7 +203,7 @@ ${greens.map((r) => `<path d="${d(r)}" fill="${c.slug === 'erin' ? 'url(#vines)'
 ${rocks.map(([x, y, r]) => `<path d="M${(x - r).toFixed(1)} ${(y + r * 0.5).toFixed(1)}L${x.toFixed(1)} ${(y - r * 0.7).toFixed(1)}L${(x + r).toFixed(1)} ${(y + r * 0.5).toFixed(1)}Z" fill="#8f877a" stroke="#5a544c" stroke-width="1"/>`).join('')}
 ${rivers.map((q) => `<path d="${d(q.r, false)}" fill="none" stroke="#9fc2cc" stroke-width="${(q.w + 6).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/><path d="${d(q.r, false)}" fill="none" stroke="#3f6f86" stroke-width="${q.w.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
 ${roads.map((q) => `<path d="${d(q.r, false)}" fill="none" stroke="#8a7a58" stroke-width="${(q.w + 3).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d(q.r, false)}" fill="none" stroke="#ddd2b0" stroke-width="${q.w.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
-${districts.map((q) => `<path d="${d(q.r)}" fill="#d6c9a2" fill-opacity="0.55"/>`).join('')}
+${districts.map((q) => `<path d="${d(q.r)}" fill="${q.fill ?? '#d6c9a2'}" fill-opacity="${q.fill ? 0.85 : 0.55}"/>`).join('')}
 ${squares.map((r) => `<path d="${d(r)}" fill="#e6dcbc" stroke="#a8966c" stroke-width="1.4"/>`).join('')}
 ${rivers.map((q) => `<path d="${d(q.r, false)}" fill="none" stroke="#3f6f86" stroke-width="${q.w.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
 ${planks.map((q) => `<path d="${d(q.r, false)}" fill="none" stroke="#6b4f33" stroke-width="${Math.max(3, q.w).toFixed(1)}" stroke-linecap="butt"/>`).join('')}
@@ -200,21 +217,23 @@ ${text(W / 2, 64, c.name, 58, '#2a1d12', 'font-weight="bold" letter-spacing="6"'
 </svg>`
 
   // здания для приложения: [квартал, особое, x,y,x,y…]
-  const dIdx = (b) => { const ce = centroid(b.r); return districts.findIndex((q) => inside(ce, q.r)) }
   const plan = {
     w: W, h: H,
     districts: districts.map((q) => { const [x, y] = centroid(q.r); return { name: q.name, x: +x.toFixed(1), y: +y.toFixed(1) } }),
-    buildings: B.map((b) => [dIdx(b), b.special ? 1 : 0, ...b.r.flat().map((v) => Math.round(v))])
+    buildings: B.map((b) => [b.d, b.special ? 1 : 0, ...b.r.flat().map((v) => Math.round(v))])
   }
 
   // примечательные здания по правилам из lore/cities.mjs
   const used = new Set()
   const ce = centroid(B.flatMap((b) => b.r))
-  const info = B.map((b, i) => ({ i, c: centroid(b.r), a: area(b.r), special: b.special }))
+  const info = B.map((b, i) => ({ i, c: centroid(b.r), a: area(b.r), special: b.special, d: districts[b.d]?.name }))
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1])
   const biggest = (list) => list.reduce((a, b) => (b.a > a.a ? b : a), list[0])
   const minDist = (pt, rings) => Math.min(...rings.flatMap((r) => r.map((q) => dist(q, pt))))
   const pick = (rule) => {
+    // in:Квартал — самое большое обычное здание квартала; castle:Квартал — самое большое особое
+    const [kind, dn] = rule.split(':')
+    if (dn) return biggest(info.filter((b) => !used.has(b.i) && b.d === dn && b.special === (kind === 'castle')))
     const pool = info.filter((b) => !used.has(b.i) && !b.special)
     const by = (fn, n) => [...pool].sort((a, b) => fn(a) - fn(b)).slice(0, n)
     if (rule === 'temple') return info.find((b) => b.special && !used.has(b.i)) ?? biggest(by((b) => dist(b.c, ce), 10))
@@ -245,44 +264,63 @@ ${text(W / 2, 64, c.name, 58, '#2a1d12', 'font-weight="bold" letter-spacing="6"'
 
 mkdirSync(OUT, { recursive: true })
 const made = []
-const only = process.argv[2] && process.argv[2] !== 'force' ? process.argv[2] : null
+const toRender = []
+// без аргументов — все города; slug … — только эти; force или gen — перерисовать картинку заново
+const only = process.argv.slice(2).filter((a) => !['gen', 'force'].includes(a))
+const FORCE = process.argv.includes('force') || process.argv[2] === 'gen'
 for (const c of CITY_MAPS) {
-  if (only && only !== c.slug) continue
+  if (only.length && !only.includes(c.slug)) continue
   const src = `source-maps/cities/${c.slug}.json`
+  // свой план вместо генератора Watabou (Хауссер): собирается скриптом из c.custom при каждом запуске
+  if (c.custom) {
+    const a = anchor(c)
+    const J = (await import(`./${c.custom}`)).default(c, c.sea ?? (await seaOf(a.x, a.y)))
+    const old = existsSync(src) ? readFileSync(src, 'utf8') : ''
+    if (JSON.stringify(J) !== old) writeFileSync(src, JSON.stringify(J))
+  }
   if (!existsSync(src)) {
     console.log(`${c.name}: нет плана ${src} — сначала сгенерируйте (urls)`)
     continue
   }
   const { svg, plan, H, marks } = renderCity(c, JSON.parse(readFileSync(src, 'utf8')))
   writeFileSync(`source-maps/cities/${c.slug}.svg`, svg)
-  // картинку перерисовываем, только если план новее неё (или просили явно) — отрисовка долгая
+  // картинку перерисовываем, только если план новее неё (или просили явно)
   const img = `${OUT}/${c.slug}.webp`
   const fresh = existsSync(img) && statSync(img).size > 0 && statSync(img).mtimeMs > statSync(src).mtimeMs && statSync(img).mtimeMs > statSync('scripts/city-maps.mjs').mtimeMs
-  if (fresh && !process.argv.includes('force')) {
+  if (fresh && !FORCE) {
     plan.landmarks = marks.filter((m) => m.b >= 0).map((m) => ({ b: m.b, name: m.name }))
     writeFileSync(`${OUT}/${c.slug}.plan.json`, JSON.stringify(plan))
     made.push({ c, H, marks })
     console.log(`${c.name}: картинка свежая, только план и метки`)
     continue
   }
-  // бумажная фактура: мелкий шум, растянутый на всю карту и наложенный умножением (фильтры SVG здесь слишком медленные)
-  const nw = 256, nh = Math.round((256 * H) / W)
-  const R2 = rnd(seedOf(c.slug) + 5)
-  const noise = Buffer.alloc(nw * nh * 3)
-  for (let i = 0; i < nw * nh; i++) { const v = 215 + Math.round(R2() * 40); noise[i * 3] = v; noise[i * 3 + 1] = v - 6; noise[i * 3 + 2] = v - 18 }
-  const paper = await sharp(noise, { raw: { width: nw, height: nh, channels: 3 } }).resize(W * PX, H * PX, { kernel: 'cubic' }).blur(3).png().toBuffer()
-  const t0 = Date.now()
-  await sharp(Buffer.from(svg), { limitInputPixels: false }).composite([{ input: paper, blend: 'multiply' }]).webp({ quality: 84 }).toFile(`${OUT}/${c.slug}.webp`)
-  console.log(`  отрисовка ${((Date.now() - t0) / 1000).toFixed(0)} с`)
+  toRender.push({ c, H })
   plan.landmarks = marks.filter((m) => m.b >= 0).map((m) => ({ b: m.b, name: m.name }))
   writeFileSync(`${OUT}/${c.slug}.plan.json`, JSON.stringify(plan))
   made.push({ c, H, marks })
   console.log(`${c.name}: ${plan.buildings.length} зданий, ${plan.districts.length} кварталов, ${marks.length} примечательных мест`)
 }
 
+// SVG → PNG движком Chromium (scripts/city-gen.cjs; librsvg в sharp рисовал одну карту до 2,5 минут), затем
+// бумажная фактура: мелкий шум, растянутый на всю карту и наложенный умножением
+if (toRender.length) {
+  const { execFileSync } = await import('child_process')
+  const electron = (await import('electron')).default
+  execFileSync(electron, ['scripts/city-gen.cjs', ...toRender.map(({ c }) => `--render=source-maps/cities/${c.slug}.svg`)], { stdio: 'inherit' })
+  for (const { c, H } of toRender) {
+    const nw = 256, nh = Math.round((256 * H) / W)
+    const R2 = rnd(seedOf(c.slug) + 5)
+    const noise = Buffer.alloc(nw * nh * 3)
+    for (let i = 0; i < nw * nh; i++) { const v = 215 + Math.round(R2() * 40); noise[i * 3] = v; noise[i * 3 + 1] = v - 6; noise[i * 3 + 2] = v - 18 }
+    const paper = await sharp(noise, { raw: { width: nw, height: nh, channels: 3 } }).resize(W * PX, H * PX, { kernel: 'cubic' }).blur(3).png().toBuffer()
+    await sharp(`source-maps/cities/${c.slug}.png`, { limitInputPixels: false }).composite([{ input: paper, blend: 'multiply' }]).webp({ quality: 84 }).toFile(`${OUT}/${c.slug}.webp`)
+    rmSync(`source-maps/cities/${c.slug}.png`)
+  }
+}
+
 // ---- в мир: карта города, метки примечательных зданий, ссылка из места или провинции ----
-const state = world.states.find((s) => s.base.name === 'Республика')
 for (const { c, H, marks } of made) {
+  const state = world.states.find((s) => s.base.name === (c.state ?? 'Республика'))
   const id = `map-city-${c.slug}`
   const a = anchor(c)
   const def = { id, name: `${c.name} — план города`, kind: 'city', image: `maps/cities/${c.slug}.webp`, width: W, height: H, plan: `maps/cities/${c.slug}.plan.json` }
@@ -301,5 +339,5 @@ for (const { c, H, marks } of made) {
     })
   )
 }
-writeFileSync(WORLD, JSON.stringify(world))
+writeFileSync(WORLD, JSON.stringify(world, null, 1))
 console.log('Карты городов в мире:', made.map((m) => m.c.name).join(', '))

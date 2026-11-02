@@ -1,21 +1,15 @@
 // Портреты персонажей Империи в духе средневековой фэнтези-живописи (масло, придворный портрет).
-// Рисует локальная нейросеть: stable-diffusion.cpp (Vulkan) + модель DreamShaper 8 в tools/sd (не в git).
+// Рисует локальная нейросеть: stable-diffusion.cpp (Vulkan) + модель DreamShaper 8 в tools/sd (не в git), через scripts/sd.mjs.
 // Описание картины собирается из записи: пол, возраст, титул, характер, цвета великого дома; у ключевых
 // персонажей — своё описание. Готовые портреты не перерисовываются (удалите файл, чтобы перерисовать).
 // Запуск: node scripts/portraits.mjs [id …]  → resources/default-world/portraits/<id>.webp и поле image в записи
-import { execFileSync } from 'child_process'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import sharp from 'sharp'
 import { HOUSES } from './lore/empire.mjs'
+import { startSd, stopSd, txt2img } from './sd.mjs'
 
 const WORLD = 'resources/default-world/world.json'
 const OUT = 'resources/default-world/portraits'
-const SD = 'tools/sd/bin/sd-cli.exe'
-const MODEL = 'tools/sd/models/dreamshaper8.safetensors'
-// на этом компьютере: денойзинг и VAE — на AMD R9 380 (VAE на встроенной Intel в 10 раз медленнее), текст — на процессоре.
-// Без явного выбора sd.cpp считает всё на Intel — в 4–5 раз медленнее. SD_BACKEND в окружении переопределяет.
-// LCM-LoRA (tools/sd/lora), вшитая в веса сразу: 7 шагов вместо 22; VAE по частям, чтобы влезть в 4 ГБ видеопамяти
-const BACKEND = ['--backend', process.env.SD_BACKEND ?? 'diffusion=vulkan0,te=cpu,vae=vulkan0', '--vae-tiling', '--lora-model-dir', 'tools/sd/lora', '--lora-apply-mode', 'immediately', '--batched-cfg', 'off']
 const world = JSON.parse(readFileSync(WORLD, 'utf8'))
 const YEAR = world.calendar.months.reduce((s, m) => s + m.days, 0)
 const yearOf = (d) => (d == null ? null : Math.floor(d / YEAR) + 1)
@@ -242,15 +236,17 @@ for (const e of chars) {
     console.log(`${e.base.name}: ${prompt.slice(STYLE.length + 2)}`)
     continue
   }
-  const tmp = `tools/sd/out-${id}.png`
+  await startSd()
   const t0 = Date.now()
-  execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', `${prompt}<lora:lcm-sd15:1>`, '-n', rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5), (picture frame, gilded frame, border:1.4)` : NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG, '-W', '512', '-H', '640', '--steps', '7', '--cfg-scale', '1.8', '--sampling-method', 'lcm', '-s', String(seedOf(id) + Number(process.env.SEED_OFFSET ?? 0)), '-o', tmp], { stdio: 'ignore' })
-  // республиканцев LCM любит рисовать в раме — обрезаем края
-  await (rp ? sharp(tmp).extract({ left: 28, top: 32, width: 456, height: 576 }) : sharp(tmp)).webp({ quality: 86 }).toFile(file)
-  rmSync(tmp, { force: true })
+  const negative = rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5), (picture frame, gilded frame, border:1.4)` : NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG
+  // 448×560, а не 512×640: на 512×640 модель не влезает в 4 ГБ видеопамяти и шаг в 5 раз медленнее; потом увеличиваем
+  const png = await txt2img({ prompt, negative, width: 448, height: 560, steps: 7, cfg: 1.8, seed: seedOf(id) + Number(process.env.SEED_OFFSET ?? 0) })
+  // республиканцев любит рисовать в раме — обрезаем края
+  await (rp ? sharp(png).extract({ left: 24, top: 28, width: 400, height: 504 }).resize(456, 576, { kernel: 'lanczos3' }) : sharp(png).resize(512, 640, { kernel: 'lanczos3' })).webp({ quality: 86 }).toFile(file)
   e.base.image = `portraits/${id}.webp`
   if (!process.env.NOWRITE) writeFileSync(WORLD, JSON.stringify(world, null, 1)) // сохраняем после каждого — можно прервать и продолжить
   console.log(`[${++done}/${chars.length}] ${e.base.name} — ${((Date.now() - t0) / 1000).toFixed(0)} с`)
 }
+stopSd()
 if (!process.env.NOWRITE) writeFileSync(WORLD, JSON.stringify(world, null, 1))
 console.log(`Готово: портретов ${chars.filter((e) => e.base.image).length} из ${chars.length}`)

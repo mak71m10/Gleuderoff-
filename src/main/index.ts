@@ -273,6 +273,16 @@ async function migrateWorld(dir: string): Promise<void> {
     user.armies = [...(user.armies ?? []).filter((a: Json) => !String(a.id).startsWith('lore-')), ...structuredClone(def.armies ?? [])]
     user.legislatures = structuredClone(def.legislatures ?? [])
   }
+  if ((user.version ?? 1) < 18) {
+    // v18: план Хауссера по эскизу автора (scripts/hausser-plan.mjs): карта, вход из столицы, метки зданий города
+    const cityMaps = (def.maps ?? []).filter((m: Json) => String(m.id).startsWith('map-city-'))
+    const cityIds = new Set(cityMaps.map((m: Json) => m.id))
+    user.maps = [...user.maps.filter((m: Json) => !cityIds.has(m.id)), ...structuredClone(cityMaps)]
+    for (const m of cityMaps) {
+      const up = m.placeId && user.places.find((p: Json) => p.id === m.placeId)
+      if (up && !up.innerMapId) up.innerMapId = m.id
+    }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

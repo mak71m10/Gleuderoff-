@@ -1,5 +1,5 @@
 {
- "version": 17,
+ "version": 18,
  "name": "Gleuderoff",
  "calendar": {
   "name": "Реквием (Имперский календарь)",
@@ -139,6 +139,16 @@
    "width": 2048,
    "height": 1609,
    "plan": "maps/cities/hagau.plan.json"
+  },
+  {
+   "id": "map-city-hausser",
+   "name": "Хауссер — план города",
+   "kind": "city",
+   "image": "maps/cities/hausser.webp",
+   "width": 2048,
+   "height": 2048,
+   "plan": "maps/cities/hausser.plan.json",
+   "placeId": "lore-haussler"
   }
  ],
  "states": [
@@ -6599,7 +6609,8 @@
    },
    "history": [],
    "from": null,
-   "to": null
+   "to": null,
+   "innerMapId": "map-city-hausser"
   },
   {
    "id": "lore-battle-magpie-ford",
@@ -8557,6 +8568,234 @@
     "population": "",
     "ruler": "",
     "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-0",
+   "mapId": "map-city-hausser",
+   "x": 1020.4,
+   "y": 1021.9,
+   "building": 9137,
+   "base": {
+    "name": "Замок Монстаргов",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Сердце города и последний оплот Империи. Замок так огромен, что в иные его залы сто лет не ступала нога человека; ныне — скорее золотая тюрьма для императорской семьи.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-1",
+   "mapId": "map-city-hausser",
+   "x": 940,
+   "y": 1109.3,
+   "building": 9138,
+   "base": {
+    "name": "Амфитеатр Альфы",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Гигантский амфитеатр для придворных представлений.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-2",
+   "mapId": "map-city-hausser",
+   "x": 881.2,
+   "y": 957.2,
+   "building": 8721,
+   "base": {
+    "name": "Казармы Императорских стражей",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Императорские стражи — элита среди элит, из поколения в поколение охраняющая Монстаргов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-3",
+   "mapId": "map-city-hausser",
+   "x": 1163,
+   "y": 1207.9,
+   "building": 9121,
+   "base": {
+    "name": "Замок Верховного совета",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Прямо на границе с Альфой; в народе его земли зовут Дистриктом Власти. Здесь заседают 250 членов Верховного совета.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-4",
+   "mapId": "map-city-hausser",
+   "x": 1297.3,
+   "y": 1492.1,
+   "building": 9130,
+   "base": {
+    "name": "Министерства",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Управленческие министерства и органы Империи.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-5",
+   "mapId": "map-city-hausser",
+   "x": 837.7,
+   "y": 1477,
+   "building": 9132,
+   "base": {
+    "name": "Верховная ставка",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Военная ставка всей Империи. Генералы ставки — одни из немногих, кто входит в замок Верховного совета, не живя в Дельте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-6",
+   "mapId": "map-city-hausser",
+   "x": 941.9,
+   "y": 1315.8,
+   "building": 9133,
+   "base": {
+    "name": "Военная академия",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Академия генералитета; по праздникам у её стен начинаются парады.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-7",
+   "mapId": "map-city-hausser",
+   "x": 638.7,
+   "y": 762.7,
+   "building": 9135,
+   "base": {
+    "name": "Дом Сообщества рабочих",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь заседают Сообщество рабочих и старшины гильдий.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-8",
+   "mapId": "map-city-hausser",
+   "x": 460.1,
+   "y": 743.2,
+   "building": 8348,
+   "base": {
+    "name": "Большие цеха",
+    "type": "strike",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Самые передовые цеха континента, если не считать северных гномов и дварфов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-9",
+   "mapId": "map-city-hausser",
+   "x": 1424.1,
+   "y": 1053,
+   "building": 9126,
+   "base": {
+    "name": "Городская библиотека",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Крупнейшая из многочисленных библиотек Матры.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-10",
+   "mapId": "map-city-hausser",
+   "x": 1213.7,
+   "y": 861.1,
+   "building": 9125,
+   "base": {
+    "name": "Управа городской стражи",
+    "type": "tower",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Хорошо обученная городская стража Матры.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hausser-11",
+   "mapId": "map-city-hausser",
+   "x": 1112.4,
+   "y": 539.4,
+   "building": 9123,
+   "base": {
+    "name": "Крысиный двор",
+    "type": "gallows",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "По слухам — главная база имперских преступных группировок.\n\n_черновик_",
     "image": ""
    },
    "history": [],

@@ -28,14 +28,14 @@ npm run dist       # собрать установщик в release/
 6б. `node scripts/argus-detail.mjs` — Корона Аргус: столица Норерштадт, младшие дома округов, описания поселений;
 6в. `node scripts/legislatures.mjs` — собрания по годам: Верховный совет, Сенат Короны, Народное собрание Республики с выборами по весу голоса и кабинетами, семь городских парламентов, Совет рабочих;
 6г. `node scripts/republic-detail.mjs` — Республика: столица Тиррит, округа и губернаторы, описания поселений, «Освобождение 977» у каждого взятого города, особые места, казни Охоты и стачки на карте;
-6д. `node scripts/city-maps.mjs` — планы городов: генератор Watabou (план в `source-maps/cities/*.json`) → карта в стиле мира, контуры зданий для выбора, примечательные здания метками. Новый город: добавить в `scripts/lore/cities.mjs`, запустить `node scripts/city-receiver.mjs`, открыть ссылки из `node scripts/city-maps.mjs urls` в браузере — план сохранится сам;
+6д. `node scripts/city-maps.mjs` — планы городов: генератор Watabou (план в `source-maps/cities/*.json`) → карта в стиле мира, контуры зданий для выбора, примечательные здания метками; SVG рисует Chromium (секунда на город). Новый город: добавить в `scripts/lore/cities.mjs` и запустить `node scripts/city-maps.mjs gen <slug>` — генератор Watabou откроется в скрытом окне Electron (`scripts/city-gen.cjs`), план и карта готовы за ~10 с. Город особой планировки (Хауссер) строит свой скрипт (`custom` в cities.mjs, `scripts/hausser-plan.mjs`);
 7. `node --max-old-space-size=8192 scripts/roads.mjs` — дороги между поселениями: мощёные тракты, грунтовки, горные тропы (`source-maps/roads.json`);
 8. `node --max-old-space-size=14000 scripts/render-map.mjs` — новая подложка 32768×18688: рельеф со светотенью и тенями гор, кроны деревьев, пашни, дороги, скалы и снега, барханы, реки, мелководье (≈3 мин);
 9. `node --max-old-space-size=12000 scripts/make-tiles.mjs` — плитки 1024 px, уровни z −4…2.
 
 Версия для телефона: `npm run build:web` → папка `out-web` (плитки до z=1), публикуется закрытой страницей на claude.ai.
 
-Портреты: `node scripts/portraits.mjs` (персонажи) и `node scripts/deputy-portraits.mjs` (члены собраний Республики) — stable-diffusion.cpp с DreamShaper 8 и LCM-LoRA (`tools/sd`, не в git): 7 и 5 шагов, LoRA вшивается в веса сразу (`--lora-apply-mode immediately`), CFG без пакетирования, VAE на той же видеокарте по частям — 35 с на персонажа и ~15 с на депутата вместо 2 минут.
+Портреты: `node scripts/portraits.mjs` (персонажи) и `node scripts/deputy-portraits.mjs` (члены собраний Республики) — stable-diffusion.cpp с DreamShaper 8 (`tools/sd`, не в git) через `scripts/sd.mjs`: модель один раз грузится в `sd-server` и держится в памяти, декодер TAESD. Персонажи — LCM-LoRA, 7 шагов, 448×560 (на 512×640 не хватает 4 ГБ видеопамяти и шаг в 5 раз медленнее) с увеличением — ~20 с; депутаты — Hyper-SD (2-step LoRA на силе 0,6, сэмплер TCD, 3 шага) — ~5,5 с. `SD_FAST=1` включает быстрый режим и для персонажей (~7 с, но без отрицательного запроса).
 
 Подробный план карты — [MAP_PLAN.md](MAP_PLAN.md).
 
