@@ -1,3 +1,4 @@
+import { PowerButton } from './PowerView'
 import { useStore, applyTemporal, uid } from '../store'
 import { existsAt, regionOwner, resolve } from '../temporal'
 import { PLACE_TYPE_OPTIONS } from '../constants'
@@ -75,6 +76,7 @@ function PlaceInspector({ id }: { id: string }) {
       <TextField value={f.name} onChange={(name) => set({ name })} className="title-input" />
       {f.image && <img className="inspector-hero" src={assetUrl(f.image)} alt="" />}
       <EditModeSwitch />
+      {world.legislatures?.filter((l) => l.town === f.name && l.stateId === f.stateId).map((l) => <PowerButton key={l.id} legislature={l} title={`${l.name} — городской парламент`} />)}
       <div className="grid-2">
         <SelectField label="Тип" value={f.type} options={PLACE_TYPE_OPTIONS} onChange={(type) => set({ type: type as PlaceType })} />
         <RefField label="Принадлежит" value={f.stateId} items={states} onChange={(stateId) => set({ stateId })} />
@@ -315,6 +317,7 @@ function ProvinceInspector({ id }: { id: number }) {
           <span>{TERRAIN_INFO[p.terrain]?.name}</span>
         </div>
       </div>
+      {world.legislatures?.filter((l) => l.provinceId === p.id).map((l) => <PowerButton key={l.id} legislature={l} title={`${l.name} — городской парламент`} />)}
       {p.settlement && (
         <div className="inspector-block">
           <div className="field-label">Поселение</div>

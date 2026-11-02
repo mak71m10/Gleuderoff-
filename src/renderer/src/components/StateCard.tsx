@@ -9,7 +9,7 @@ import { Button, ColorField, DateField, EditModeSwitch, ImageField, Modal, RefFi
 import { HistoryList } from './Inspector'
 import { DynastyTree } from './Codex'
 import { SuccessionCouncilView } from './Council'
-import { PowerView } from './PowerView'
+import { PowerButton } from './PowerView'
 import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
 import { Icon, type IconName } from './Icon'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
@@ -46,7 +46,6 @@ function StateCardBody({ id }: { id: string }) {
   const setView = useStore((s) => s.setView)
   const [tab, setTab] = useState<Tab>('overview')
   const [heraldryOpen, setHeraldryOpen] = useState(false)
-  const [powerOpen, setPowerOpen] = useState(false)
   const masterMode = useStore((s) => s.masterMode)
   const st = world.states.find((s) => s.id === id)
   if (!st) return null
@@ -67,7 +66,7 @@ function StateCardBody({ id }: { id: string }) {
 
   const chars = world.entries.filter((e) => e.kind === 'character').map((e) => ({ id: e.id, name: e.base.name }))
   const dynasties = world.entries.filter((e) => e.kind === 'dynasty').map((e) => ({ id: e.id, name: e.base.name }))
-  const legislature = world.legislatures?.find((l) => l.stateId === id)
+  const legislatures = world.legislatures?.filter((l) => l.stateId === id) ?? []
   const dynastyEntry = world.entries.find((e) => e.id === f.dynastyId)
   const dynastyCouncil = dynastyEntry ? resolve(dynastyEntry, date).council : undefined
   const religions = world.entries.filter((e) => e.kind === 'religion').map((e) => ({ id: e.id, name: e.base.name }))
@@ -232,18 +231,7 @@ function StateCardBody({ id }: { id: string }) {
           </div>
         )}
 
-        {tab === 'power' && legislature && (
-          <button className="power-open" onClick={() => setPowerOpen(true)}>
-            <Icon name="balance" size={26} />
-            <span>
-              <b>{legislature.name} — зал, законы, голоса по годам</b>
-              <span>
-                {legislature.seats} мест · {legislature.bills.length} законов · можно выбрать любого члена и проследить, за что он голосовал
-              </span>
-            </span>
-          </button>
-        )}
-        {powerOpen && legislature && <PowerView legislature={legislature} onClose={() => setPowerOpen(false)} />}
+        {tab === 'power' && legislatures.map((l) => <PowerButton key={l.id} legislature={l} title={l.town ? `${l.name} (${l.town})` : undefined} />)}
         {tab === 'power' && (
           <div className="sc-cols">
             <div className="sc-side">

@@ -16,9 +16,10 @@ import { readFileSync, writeFileSync } from 'fs'
 import { HOUSES } from './lore/empire.mjs'
 import { ARMIES as EMPIRE_ARMIES, BATTLES as EMPIRE_BATTLES } from './lore/battles.mjs'
 import { ARGUS_ARMIES, ARGUS_BATTLES, ARGUS_REBELS, PRINCIPALITIES } from './lore/argus.mjs'
+import { REPUBLIC_ARMIES, REPUBLIC_BATTLES, UPRISINGS, liberation } from './lore/republic.mjs'
 
-const BATTLES = [...EMPIRE_BATTLES, ...ARGUS_BATTLES]
-const ARMIES = [...EMPIRE_ARMIES, ...ARGUS_ARMIES]
+const BATTLES = [...EMPIRE_BATTLES, ...ARGUS_BATTLES, ...REPUBLIC_BATTLES]
+const ARMIES = [...EMPIRE_ARMIES, ...ARGUS_ARMIES, ...REPUBLIC_ARMIES]
 const WORLD = 'resources/default-world/world.json'
 const world = JSON.parse(readFileSync(WORLD, 'utf8'))
 const YEAR = world.calendar.months.reduce((s, m) => s + m.days, 0)
@@ -394,7 +395,19 @@ const centerLands = imperialHeart.filter((p) => p.state !== empire && !VASSALS.h
 const repProvs = centerLands.filter((p) => p.state === republic)
 const repC = centroid(repProvs)
 SEEDS.republic = nearest(repProvs, repC, 1)[0]
-sweep(centerLands, 977.0, 0.9, republic, repC)
+// Освобождение: Тирритское восстание, пять восстаний с актами о единении, походы легионов и ополчения (scripts/lore/republic.mjs)
+{
+  const lib = liberation(provs, (p) => admin.get(regionOf(p))?.name)
+  const rebels = new Map(UPRISINGS.map(([key, name, color, region, town, start, merge, description]) => [key, hist(key, name, color, { government: 'Восстание, вошедшее в Республику', culture: 'Имперцы', description: description + ' (черновик)' })]))
+  for (const p of centerLands) {
+    const c = lib(p)
+    if (!c) { at(p, 977.5, republic); continue }
+    if (c.merge) {
+      at(p, c.date, rebels.get(c.key))
+      at(p, c.merge, republic)
+    } else at(p, c.date, republic)
+  }
+}
 {
   const byState = new Map()
   for (const p of centerLands) {
@@ -404,7 +417,8 @@ sweep(centerLands, 977.0, 0.9, republic, repC)
   }
   for (const list of byState.values()) {
     const n = nameOf(list[0])
-    const start = CHURCH_LANDS(n) ? 978.6 + rnd() * 0.3 : 978.2 + rnd() * 1.4
+    const SOUTH = ['Кальтранская Республика', 'Тоскана', 'Вуфинская Республика', 'Республика Шеша']
+    const start = CHURCH_LANDS(n) ? 978.6 + rnd() * 0.3 : SOUTH.includes(n) ? 978.35 + rnd() * 0.04 : 978.2 + rnd() * 1.4
     sweep(list, start, 0.25, list[0].state, centroid(list))
   }
 }

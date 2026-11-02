@@ -6,8 +6,9 @@ import { formatDate, toParts } from '../calendar'
 import { assetUrl } from './ui'
 import { Icon } from './Icon'
 import type { Bill, Legislature, LegislatureMember } from '../types'
+import { CabinetView, ElectionsView } from './Elections'
 
-type Tab = 'hall' | 'bills' | 'chronicle' | 'factions'
+type Tab = 'hall' | 'bills' | 'chronicle' | 'factions' | 'elections' | 'cabinet'
 const VOTE = { y: { label: 'За', color: '#5f9a4f' }, n: { label: 'Против', color: '#b8433a' }, a: { label: 'Воздержался', color: '#a99c80' }, '-': { label: 'Отсутствовал', color: '#3a3f4a' } } as const
 type V = keyof typeof VOTE
 
@@ -88,7 +89,7 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
   }
   const portrait = (m: LegislatureMember, size = 56): ReactNode => {
     const e = m.entryId ? entry(m.entryId) : null
-    const img = e ? resolve(e, date).image : ''
+    const img = e ? resolve(e, date).image : m.image ?? ''
     const color = fac.get(m.faction)?.color ?? '#888'
     return (
       <span className="pw-portrait" style={{ width: size, height: size, borderColor: color }}>
@@ -153,7 +154,7 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
             <h2>{m.name}</h2>
             <div className="pw-sub">{m.title}{m.origin ? ` · ${m.origin}` : ''}</div>
             <div className="pw-chip" style={{ borderColor: f.color }}>
-              <i style={{ background: f.color }} /> {f.name} · {m.group}
+              <i style={{ background: f.color }} /> {f.name}{m.group ? ` · ${m.group}` : ''}{m.race ? ` · ${m.race}` : ''}
             </div>
             <div className="pw-sub">
               В собрании: {formatDate(cal, m.from, false)} — {m.to ? `${formatDate(cal, m.to, false)}${m.left ? ` (${m.left})` : ''}` : 'по сей день'} · род. {m.born} г.
@@ -267,6 +268,11 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
         {c?.convocation && <div className="pw-conv">{c.convocation}</div>}
         {c?.text && <p className="pw-bio">{c.text}</p>}
         {c?.auto && <p className="pw-sub">{c.auto}</p>}
+        {L.strikes?.filter((x) => yearOf(x.from) === year).map((x) => (
+          <div key={x.title} className="el-incident">
+            <b>{x.title}</b> ({x.town}). {x.text}
+          </div>
+        ))}
         <div className="field-label">Состав — {sitting.length} мест</div>
         <div className="pw-seatbar">
           {L.seatOrder.map((fid) => (counts.get(fid) ? <i key={fid} style={{ flex: counts.get(fid), background: fac.get(fid)!.color }} title={`${fac.get(fid)!.name}: ${counts.get(fid)}`} /> : null))}
@@ -358,7 +364,11 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
     <div className="power">
       <header className="pw-head">
         <div className="pw-title">
-          <span>{world.states.find((s) => s.id === L.stateId)?.base.name}</span>
+          <span>
+            {world.states.find((s) => s.id === L.stateId)?.base.name}
+            {L.town ? ` · ${L.town}` : ''}
+            {L.unofficial ? ' · неофициальный орган' : ''}
+          </span>
           <b>{L.name}</b>
         </div>
         <div className="pw-year">
@@ -373,7 +383,9 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
               ['hall', 'Зал'],
               ['bills', 'Законы'],
               ['chronicle', 'Хроника'],
-              ['factions', 'Скамьи']
+              ['factions', 'Скамьи'],
+              ...(L.elections ? [['elections', 'Выборы']] : []),
+              ...(L.cabinets ? [['cabinet', 'Кабинет']] : [])
             ] as [Tab, string][]
           ).map(([k, label]) => (
             <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>
@@ -484,6 +496,18 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
         </div>
       )}
 
+      {tab === 'elections' && (
+        <div className="pw-body pw-body-one">
+          <ElectionsView L={L} year={year} onYear={setYear} onMember={(id) => (setMember(id), setBillId(null), setTab('hall'))} />
+        </div>
+      )}
+
+      {tab === 'cabinet' && (
+        <div className="pw-body pw-body-one">
+          <CabinetView L={L} year={year} onYear={setYear} onMember={(id) => (setMember(id), setBillId(null), setTab('hall'))} onEntry={openEntry} portrait={portrait} />
+        </div>
+      )}
+
       {tab === 'factions' && (
         <div className="pw-body pw-body-one">
           <div className="pw-factions">
@@ -535,5 +559,26 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
       )}
     </div>,
     document.body
+  )
+}
+
+/** Кнопка «открыть зал» для любого собрания (страна, город, Совет) */
+export function PowerButton({ legislature: L, title }: { legislature: Legislature; title?: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button className="power-open" onClick={() => setOpen(true)}>
+        <Icon name="balance" size={26} />
+        <span>
+          <b>{title ?? `${L.name} — зал, законы, голоса по годам`}</b>
+          <span>
+            {L.seats} мест · {L.bills.length} законов{L.elections ? ` · ${L.elections.length} выборов` : ''}
+            {L.cabinets ? ` · ${L.cabinets.length} кабинетов` : ''}
+            {L.unofficial ? ' · неофициальный орган' : ''}
+          </span>
+        </span>
+      </button>
+      {open && <PowerView legislature={L} onClose={() => setOpen(false)} />}
+    </>
   )
 }

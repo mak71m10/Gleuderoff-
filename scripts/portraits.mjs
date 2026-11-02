@@ -12,9 +12,10 @@ const WORLD = 'resources/default-world/world.json'
 const OUT = 'resources/default-world/portraits'
 const SD = 'tools/sd/bin/sd-cli.exe'
 const MODEL = 'tools/sd/models/dreamshaper8.safetensors'
-// на этом компьютере: денойзинг — на AMD R9 380 (веса в ОЗУ), текст — на процессоре, VAE — на встроенной Intel.
+// на этом компьютере: денойзинг и VAE — на AMD R9 380 (VAE на встроенной Intel в 10 раз медленнее), текст — на процессоре.
 // Без явного выбора sd.cpp считает всё на Intel — в 4–5 раз медленнее. SD_BACKEND в окружении переопределяет.
-const BACKEND = ['--backend', process.env.SD_BACKEND ?? 'diffusion=vulkan0,te=cpu,vae=vulkan1']
+// LCM-LoRA (tools/sd/lora), вшитая в веса сразу: 7 шагов вместо 22; VAE по частям, чтобы влезть в 4 ГБ видеопамяти
+const BACKEND = ['--backend', process.env.SD_BACKEND ?? 'diffusion=vulkan0,te=cpu,vae=vulkan0', '--vae-tiling', '--lora-model-dir', 'tools/sd/lora', '--lora-apply-mode', 'immediately', '--batched-cfg', 'off']
 const world = JSON.parse(readFileSync(WORLD, 'utf8'))
 const YEAR = world.calendar.months.reduce((s, m) => s + m.days, 0)
 const yearOf = (d) => (d == null ? null : Math.floor(d / YEAR) + 1)
@@ -91,7 +92,28 @@ const CUSTOM = {
   'leodegar-waldeck': 'builder abbot-prince in white habit with a stone mason square and crozier',
   'fredegar-waldeck': 'scholarly abbot-prince in white habit surrounded by books',
   'roswitha-morwen': 'fierce countess in mail armor holding a long spear, purple and silver cloak, crescent moon emblem',
-  'morwena': 'warrior countess founder with braided hair, spear and purple cloak'
+  'morwena': 'warrior countess founder with braided hair, spear and purple cloak',
+  // Республика: голландско-ренессансный облик, без корон
+  'rp-chancellor': 'cunning cold statesman in his sixties, thin clean-shaven face, thin lips, heavy-lidded calculating eyes, grey hair combed back, plain black doublet with a white ruff collar, small silver scissors on a chain around his neck, blue banner with a white chain behind',
+  'rp-flamm': 'gaunt pale fanatical young revolutionary orator with burning eyes and hollow cheeks, unkempt dark hair, red sash over a shabby black coat, hand raised, consumptive look',
+  'rp-hammer': 'sharp-faced prosecutor with a cruel thin smile, black lawyer gown, sheaf of papers',
+  'rp-grauberg': 'old grizzled legate general, square jaw, short grey hair, grey steel breastplate over a blue coat, grey stone emblem',
+  'rp-moewe': 'weathered sea legate woman in her seventies, grey hair tied back, blue naval coat with a seagull badge, steel gorget, sea behind',
+  'rp-jan-kosar': 'rough old peasant militia leader with a big grey moustache, scarred face, red neckerchief, scythe blade straightened into a pike on his shoulder',
+  'rp-strahl': 'calm polite secret police chief woman in her fifties, neat grey hair in a bun, high-collared black dress, attentive cold eyes, holding a card index file',
+  'rp-boettcher': 'big calm dockworker leader in his forties, broad shoulders, short beard, rough wool jacket and cap, honest tired eyes, harbor cranes behind',
+  'rp-marta-lind': 'young fierce weaver woman around thirty, red hair under a headscarf, rough linen dress, determined eyes, looms behind',
+  'rp-kalb': 'mild tired grey notary statesman in his sixties, spectacles, black doublet with a white collar, ledger',
+  'rp-ida-merz': 'shrewd confident woman prime minister in her late forties, brown hair, black silk dress with a white ruff collar, faint smile',
+  'rp-viktor-feder': 'old newspaper publisher with ink-stained fingers, spectacles on his forehead, rolled-up sleeves, printing press behind',
+  'rp-ansgar-wolt': 'ambitious young hawkish politician around forty, sharp features, dark blue coat with a sash, map of lands behind',
+  'rp-ruta-wedel': 'brave young woman militia captain with braided hair, soot-stained face, simple armor, burning fortress tower behind',
+  'rp-ludger-goldach': 'thin smiling banker in his late fifties, black broadcloth without jewelry, coins and scales on the table',
+  'rp-gov-korel-3': 'smug corpulent city governor with a chain of office, black doublet with a ruff, canal bridges behind',
+  'rp-adalbert-tirnau': 'kind old count with white hair and beard, green velvet coat, sad gentle eyes',
+  'rp-bertold-sonnelgard': 'tall stern old bishop in white and gold vestments with a mitre, standing in a church doorway',
+  'rp-agnes-erlach': 'cold precise young woman treasurer around thirty, dark hair, black dress with a white ruff collar, ledger and keys',
+  'rp-wilma-tirnau': 'serious woman in her late thirties, publisher of a memorial journal, dark green dress, holding a book of names'
 }
 // без короны: незнатные и монахи (корону подсказывает герб рода на знамени)
 const NO_CROWN = new Set(['ag-argus-1', 'ag-joachim'])
@@ -126,6 +148,8 @@ const word = (e) => {
   else if (/наездник|конев|ловч|охот/.test(t)) role = 'huntsman noble in leather and fur'
   else if (/рудник|литейн/.test(t)) role = 'mining noble with iron jewelry'
   else role = female ? 'noblewoman in velvet gown' : 'nobleman in velvet doublet'
+  // республиканцы: без корон и венцов, голландский облик
+  if (e.base.tags.includes('Республика') && !/military|archbishop|abbess/.test(role)) role = female ? 'republican stateswoman in black silk dress with a white ruff collar' : 'republican statesman in black doublet with a white ruff collar and a chain of office'
   const hid = houseOf.get(e.base.links?.dynasty)
   const dynH = world.entries.find((x) => x.id === e.base.links?.dynasty)?.base.heraldry
   const colors = hid ? `, clothes in ${HOUSE_COLORS[hid]} colors` : dynH ? `, clothes in ${[...new Set(dynH.colors)].map(colorName).join(' and ')} colors` : ''
@@ -190,12 +214,13 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
   const id = e.id.slice(5)
   const file = `${OUT}/${id}.webp`
+  const rp = e.base.tags.includes('Республика')
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -214,12 +239,12 @@ for (const e of chars) {
   }
   const tmp = `tools/sd/out-${id}.png`
   const t0 = Date.now()
-  execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', prompt, '-n', NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG, '-W', '512', '-H', '640', '--steps', '22', '--cfg-scale', '6.5', '--sampling-method', 'dpm++2m', '--scheduler', 'karras', '-s', String(seedOf(id) + Number(process.env.SEED_OFFSET ?? 0)), '-o', tmp], { stdio: 'ignore' })
+  execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', `${prompt}<lora:lcm-sd15:1>`, '-n', NO_CROWN.has(id) || rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG, '-W', '512', '-H', '640', '--steps', '7', '--cfg-scale', '1.8', '--sampling-method', 'lcm', '-s', String(seedOf(id) + Number(process.env.SEED_OFFSET ?? 0)), '-o', tmp], { stdio: 'ignore' })
   await sharp(tmp).webp({ quality: 86 }).toFile(file)
   rmSync(tmp, { force: true })
   e.base.image = `portraits/${id}.webp`
-  writeFileSync(WORLD, JSON.stringify(world, null, 1)) // сохраняем после каждого — можно прервать и продолжить
+  if (!process.env.NOWRITE) writeFileSync(WORLD, JSON.stringify(world, null, 1)) // сохраняем после каждого — можно прервать и продолжить
   console.log(`[${++done}/${chars.length}] ${e.base.name} — ${((Date.now() - t0) / 1000).toFixed(0)} с`)
 }
-writeFileSync(WORLD, JSON.stringify(world, null, 1))
+if (!process.env.NOWRITE) writeFileSync(WORLD, JSON.stringify(world, null, 1))
 console.log(`Готово: портретов ${chars.filter((e) => e.base.image).length} из ${chars.length}`)

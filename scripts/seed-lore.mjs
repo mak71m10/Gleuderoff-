@@ -8,6 +8,7 @@ import monstargs from './lore/monstargs.mjs'
 import states from './lore/states.mjs'
 import empireLore from './lore/empire.mjs'
 import argusLore from './lore/argus.mjs'
+import republicLore from './lore/republic.mjs'
 import geo from './lore/geo.mjs'
 
 const WORLD = 'resources/default-world/world.json'
@@ -137,10 +138,11 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 16
+world.version = 17
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })
+republicLore({ E, Y, world })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })
 

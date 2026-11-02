@@ -23,7 +23,12 @@ export const PLACE_TYPES: Record<PlaceType, PlaceTypeMeta> = {
   ruins: { label: 'Руины', minZoom: 0, group: 'poi', size: 16, glyph: 'M4 20h16M6 20v-9h3v9M15 20v-6h3v6M10 8l3-3 2 2' },
   dungeon: { label: 'Подземелье', minZoom: 0, group: 'poi', size: 16, glyph: 'M4 20c0-8 4-14 8-14s8 6 8 14zM9 20v-5a3 3 0 016 0v5' },
   landmark: { label: 'Достопримечательность', minZoom: 0, group: 'poi', size: 16, glyph: 'M12 2l3 7h7l-6 4 2 8-6-5-6 5 2-8-6-4h7z' },
-  battle: { label: 'Место битвы', minZoom: -2.6, group: 'poi', size: 20, glyph: 'M5 5l14 14M19 5L5 19M5 5v4M5 5h4M19 5v4M19 5h-4' }
+  battle: { label: 'Место битвы', minZoom: -2.6, group: 'poi', size: 20, glyph: 'M5 5l14 14M19 5L5 19M5 5v4M5 5h4M19 5v4M19 5h-4' },
+  memorial: { label: 'Место памяти', minZoom: -2, group: 'poi', size: 20, glyph: 'M12 3c2 3 4 4 4 7a4 4 0 01-8 0c0-3 2-4 4-7zM9 21h6l-1-7h-4zM6 21h12' },
+  treasury: { label: 'Сокровищница', minZoom: -1.5, group: 'poi', size: 20, glyph: 'M4 10h16v10H4zM4 10l2-4h12l2 4M10 14h4v3h-4zM12 6V3' },
+  assembly: { label: 'Собрание', minZoom: -1.5, group: 'poi', size: 20, glyph: 'M3 20h18M5 20v-8M9 20v-8M15 20v-8M19 20v-8M3 12h18L12 5z' },
+  gallows: { label: 'Место казней', minZoom: -2, group: 'poi', size: 18, glyph: 'M6 21V4h10M6 8l4-4M14 4v4M12 8h4v5h-4zM4 21h6' },
+  strike: { label: 'Стачка', minZoom: -2.2, group: 'poi', size: 18, glyph: 'M7 11V5a1.5 1.5 0 013 0v5M10 10V4a1.5 1.5 0 013 0v6M13 10V5a1.5 1.5 0 013 0v7c0 4-3 8-7 8s-5-3-6-6l-1-3a1.5 1.5 0 012.5-1.5L7 12' }
 }
 
 export const PLACE_TYPE_OPTIONS = (Object.keys(PLACE_TYPES) as PlaceType[]).map((t) => ({

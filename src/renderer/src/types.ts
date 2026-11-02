@@ -170,6 +170,11 @@ export type PlaceType =
   | 'tower'
   | 'landmark'
   | 'battle'
+  | 'memorial'
+  | 'treasury'
+  | 'assembly'
+  | 'gallows'
+  | 'strike'
 
 export interface PlaceFields {
   name: string
@@ -352,6 +357,58 @@ export interface Legislature {
   bills: Bill[]
   chronicle: { year: number; text: string; auto: string; convocation: string }[]
   archive: { date: WorldDate; title: string; text: string }[]
+  /** выборы по весу голоса (Республика) */
+  elections?: Election[]
+  /** кабинеты министров по годам */
+  cabinets?: Cabinet[]
+  /** глава государства над собранием (канцлер) */
+  head?: { title: string; entryId: string }
+  /** неофициальный орган (Совет рабочих) */
+  unofficial?: boolean
+  strikes?: { from: WorldDate; to: WorldDate; town: string; title: string; text: string }[]
+  /** городской парламент: город и провинция */
+  town?: string
+  provinceId?: number
+  hall?: string
+}
+
+export interface Election {
+  date: WorldDate
+  name: string
+  system: string
+  constituent: boolean
+  note: string
+  /** разряды избирателей и вес их голоса */
+  classes: { id: string; name: string; weight: number; who: string }[]
+  districts: {
+    name: string
+    seats: number
+    /** точки провинций округа для карты */
+    pts: [number, number][]
+    voters: Record<string, number>
+    turnout: Record<string, number>
+    /** голоса с учётом веса и по головам */
+    votes: Record<string, number>
+    heads: Record<string, number>
+    seatsBy: Record<string, number>
+    winner: string
+  }[]
+  voters: Record<string, number>
+  came: Record<string, number>
+  total: { votes: Record<string, number>; heads: Record<string, number>; seats: Record<string, number> }
+  /** доля голосов каждой фракции внутри разряда */
+  classVotes: Record<string, Record<string, number>>
+  incidents: { district: string; text: string }[]
+}
+
+export interface Cabinet {
+  id: string
+  name: string
+  from: WorldDate
+  to: WorldDate | null
+  coalition: string[]
+  end: string
+  ministers: { post: string; memberId: string; entryId: string; name: string; faction: string }[]
 }
 
 export interface LegislatureMember {
@@ -371,6 +428,11 @@ export interface LegislatureMember {
   bio: string
   left: string
   gender: string
+  /** округ (Республика) */
+  district?: string
+  race?: string
+  cls?: string
+  image?: string
 }
 
 export interface Bill {
