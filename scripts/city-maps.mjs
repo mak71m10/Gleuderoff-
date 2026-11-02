@@ -293,7 +293,7 @@ for (const c of CITIES) {
   writeFileSync(`source-maps/cities/${c.slug}.svg`, svg)
   // картинку перерисовываем, только если план новее неё (или просили явно)
   const img = `${OUT}/${c.slug}.webp`
-  const fresh = existsSync(img) && statSync(img).size > 0 && statSync(img).mtimeMs > statSync(src).mtimeMs && statSync(img).mtimeMs > statSync('scripts/city-maps.mjs').mtimeMs
+  const fresh = existsSync(img) && statSync(img).size > 0 && statSync(img).mtimeMs > statSync(src).mtimeMs
   if (fresh && !FORCE) {
     plan.landmarks = marks.filter((m) => m.b >= 0).map((m) => ({ b: m.b, name: m.name }))
     writeFileSync(`${OUT}/${c.slug}.plan.json`, JSON.stringify(plan))

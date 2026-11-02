@@ -6,6 +6,9 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { depKey } from './deputy-portraits.mjs'
 import { COUNCIL, SENATE } from './lore/power.mjs'
 import { PARTIES } from './lore/parties.mjs'
+import { SOUTH_PARTIES } from './lore/south-parties.mjs'
+import { SOUTH, SOUTH_NAMES } from './lore/south.mjs'
+import { southBodies } from './lore/south-power.mjs'
 import { HOUSES } from './lore/empire.mjs'
 import { MINOR_HOUSES } from './lore/argus.mjs'
 import { ASSEMBLY, CITY_COUNCILS, CITY_ELECTIONS, CLASS_AFFINITY, CLASS_MIX, CLASS_TURNOUT, DISTRICT_AFFINITY, FACTIONS, ISSUES, STRIKES, VOTE_CLASSES, WORKERS } from './lore/republic-power.mjs'
@@ -574,6 +577,7 @@ function buildElected(body, tpl, perYear, unitsOf, opts = {}) {
   }
   const nameIt = (m) => {
     if (m.entryId) return
+    if (opts.namer) return opts.namer(m)
     nameRepublic(m, pick(m.female ? WOMEN : MEN))
   }
   const named = new Set()
@@ -846,11 +850,64 @@ const workers = build(WORKERS, WORKERS_TPL, [2, 4])
 workers.unofficial = true
 workers.strikes = STRIKES.map(([from, to, town, title, text]) => ({ from: D(from), to: D(to), town, title, text }))
 
-world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities]
+// ---------- южные республики: парламенты с цензом (голосуют знать и помещики) и рабочие комитеты ----------
+const ORIGIN_SOUTH = {
+  banks: ['Банкир', 'Меняла', 'Вкладчик банка Фальконьери'], merchants: ['Купец шёлка', 'Судовладелец', 'Виноторговец'], grandees: ['Помещик', 'Сеньор холмов', 'Граф внутренних земель'],
+  liberals: ['Помещик, учившийся в Тиррите', 'Адвокат', 'Врач'], left: ['Сын помещика, отказавшийся от наследства', 'Учитель', 'Помещик-ренегат'], church: ['Епископ', 'Аббат', 'Каноник собора'],
+  imperials: ['Отставной полковник', 'Бывший имперский чиновник', 'Помещик'], union: ['Помещик побережья', 'Консул', 'Граф'], harbors: ['Судовладелец', 'Консул гавани', 'Купец'],
+  sword: ['Полковник', 'Майор', 'Помещик-офицер'], teria: ['Каноник Терии', 'Церковный помещик', 'Аббат'], harbor: ['Судовладелец', 'Виноторговец', 'Торговец пробкой'],
+  captains: ['Капитан роты', 'Ветеран роты', 'Оружейник'], teachers: ['Учитель', 'Выпускник школы, помещик', 'Старший учитель'], clans: ['Старейшина клана', 'Хозяин табунов', 'Помещик гор']
+}
+const nameSouth = (culture) => (m) => {
+  const N = SOUTH_NAMES[culture]
+  if (['church', 'teria'].includes(m.faction) && rnd() < 0.7) m.female = false
+  const f = pick(m.female ? N.women : N.men)
+  const noble = culture === 'romance' && rnd() < (['left', 'liberals'].includes(m.faction) ? 0.3 : 0.6)
+  m.name = noble ? `${f} ${pick(N.noble)}` : `${f} ${pick(N.surnames)}`
+  m.origin = pick(ORIGIN_SOUTH[m.faction] ?? ['Помещик'])
+  m.cls = noble ? 'noble' : 'owner'
+}
+const southState = new Map(SOUTH.map((s) => [s.key, world.states.find((x) => x.base.name === s.state)]))
+const capitalArea = (s) => areaOfP(world.provinces.find((p) => p.name === s.capital))
+const { parliaments: southParl, committees: southComm } = southBodies(D, capitalArea)
+const southLegs = southParl.map(({ key, culture, body, head, tpl }) => {
+  const st = southState.get(key)
+  const unitsOf = (el) => {
+    const groups = new Map()
+    for (const p of world.provinces.filter((p) => ownerAt(p, D(el.year)) === st.id)) {
+      const k = areaOfP(p)
+      if (!groups.has(k)) groups.set(k, [])
+      groups.get(k).push(p)
+    }
+    return [...groups].map(([name, ps]) => {
+      const voters = {}
+      for (const p of ps) {
+        const n = provPop(p) * 0.32 * 8.2
+        const mix = URBAN.has(p.settlement?.type) ? CLASS_MIX.town : CLASS_MIX.land
+        // ценз: знать и помещики (каждый восьмой хозяин), в Шеше — ещё офицеры и духовенство, в Тоскане с 1002 г. — купцы I гильдии
+        voters.noble = (voters.noble ?? 0) + n * mix.noble
+        voters.owner = (voters.owner ?? 0) + n * mix.owner * 0.12
+        if (key === 'she') voters.learned = (voters.learned ?? 0) + n * mix.learned * 0.35
+        if (key === 'tos' && el.year > 1002.3) voters.money = (voters.money ?? 0) + n * mix.money
+      }
+      return { name, voters, pts: ps.map((p) => [p.x, p.y]) }
+    })
+  }
+  return buildElected(body, tpl, [3, 6], unitsOf, { namer: nameSouth(culture), title: `Член ${body.name === 'Синьория' ? 'Синьории' : body.name === 'Большой совет' ? 'Большого совета' : body.name === 'Сенат Меча' ? 'Сената Меча' : 'Совета кланов'}`, where: body.name === 'Синьория' ? 'Синьории' : 'парламенте', extra: () => ({ head }) })
+})
+const southCommittees = southComm.map((body, i) => {
+  body.namer = nameSouth(southParl[i].culture)
+  const r = build(body, WORKERS_TPL.map((t) => () => { const g = t(); g.sponsor = pick(['loyal', 'local', 'radicals']); g.w = { strike: g.w.strike ?? 0, violence: g.w.violence ?? 0 }; return g }), [1, 2])
+  r.unofficial = true
+  return r
+})
+
+world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities, ...southLegs, ...southCommittees]
 // история, манифест и устройство партий (городские парламенты берут партии Народного собрания)
 for (const L of world.legislatures) {
-  const lore = PARTIES[L.id]
-  if (lore) for (const f of L.factions) if (lore[f.id]) f.party = { ...lore[f.id], draft: true }
+  const lore = PARTIES[L.id] ?? SOUTH_PARTIES[L.id]
+  const ids = new Set(L.factions.map((f) => f.id))
+  if (lore) for (const f of L.factions) if (lore[f.id]) f.party = { ...lore[f.id], allies: (lore[f.id].allies ?? []).filter((x) => ids.has(x)), rivals: (lore[f.id].rivals ?? []).filter((x) => ids.has(x)), draft: true }
 }
 // OUT — пробный прогон в другой файл, пока мир занят (например, рисуются портреты)
 writeFileSync(process.env.OUT ?? WORLD, JSON.stringify(world, null, 1))

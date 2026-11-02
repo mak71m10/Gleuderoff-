@@ -3,6 +3,7 @@
 // реки и моря рядом (карта рельефа) и описания провинции (губернатор, родовое гнездо, кастра, почтовая станция…).
 // Придумано по поручению автора (02.11.2026), тег «черновик». Особые города — вручную в cities.mjs, они главнее.
 import sharp from 'sharp'
+import { SOUTH } from './south.mjs'
 
 const TR = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'i', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }
 export const slugOf = (name) => [...name.toLowerCase()].map((c) => TR[c] ?? (/[a-z0-9]/.test(c) ? c : '')).join('')
@@ -17,6 +18,12 @@ const pickN = (list, n, seed) => {
 const DRY = ['Старый город', 'Рыночный конец', 'Кожевенная слобода', 'Ремесленный конец', 'Соборная сторона', 'Верхний город', 'Гончарная слобода', 'Кузнечный конец', 'Ткацкий двор', 'Новый город', 'Пивоварный конец', 'Солдатская слобода', 'Монетный двор', 'Конная слобода', 'Свечной конец', 'Бочарный двор']
 const WET = ['Рыбный конец', 'Причалы', 'Набережная', 'Мельничный берег', 'Лодочная слобода', 'Портовый двор', 'Канатный берег']
 const MINE = ['Рудничная слобода', 'Литейный двор', 'Плавильни']
+// юг: испано-итальянский колорит и кальтранцы
+const SOUTH_DRY = ['Пьяцца', 'Борго', 'Контрада Оливы', 'Санта-Лучия', 'Борго-Нуово', 'Аркады', 'Сан-Микеле', 'Ла-Лонха', 'Контрада дель Пьяно', 'Виноградная сторона', 'Кожевенная контрада', 'Сан-Бартоло', 'Монастырская сторона', 'Верхний Борго']
+const SOUTH_WET = ['Марина', 'Порто-Веккьо', 'Рыбачья контрада', 'Ривьера']
+const KALT_DRY = ['Дом рот', 'Школьный конец', 'Кузни', 'Конные дворы', 'Клановая слобода', 'Старый очаг', 'Оружейный ряд', 'Верхнее селение']
+const KALT_WET = ['Рыбачий берег', 'Причалы клана']
+const SOUTH_STATES = { 'Тоскана': 'tos', 'Вуфинская Республика': 'vuf', 'Республика Шеша': 'she', 'Кальтранская Республика': 'kal' }
 const SLAVE = ['Невольничий двор', 'Цепная слобода']
 
 /** Факты из описания провинции → примечательные места [название, тип метки, правило, текст] */
@@ -41,6 +48,13 @@ function landmarksFrom(name, type, text, state) {
   if (/сторожевая вышка/.test(text)) L.push(['Старая сторожевая вышка', 'tower', 'edge', sentence('вышка')])
   if (/торг|рынок|ярмар/.test(text) && !L.some((l) => l[2] === 'plaza')) L.push(['Рыночная площадь', 'landmark', 'plaza', sentence('торг|рынок|ярмар')])
   if (/верфи|верфь/.test(text)) L.push(['Верфи', 'landmark', 'water', sentence('верф')])
+  if (/Подеста/.test(text)) L.push(['Дом подесты', 'landmark', 'center', sentence('Подеста')])
+  if (/Комендант/.test(text)) L.push(['Комендатура полка', 'castle', 'center', sentence('Комендант')])
+  if (/Старейшина клана/.test(text)) L.push(['Дом старейшины', 'landmark', 'center', sentence('Старейшина')])
+  if (/школа|школу|Школьный/.test(text)) L.push(['Школа', 'landmark', 'big', sentence('школ')])
+  if (/фонтан/.test(text)) L.push(['Фонтан с дельфинами', 'landmark', 'plaza2', sentence('фонтан')])
+  if (/Колокольня/.test(text)) L.push(['Колокольня', 'tower', 'center', sentence('Колокольня')])
+  if (/трюмах/.test(text)) L.push(['Склады у пристани', 'landmark', 'water', sentence('трюм')])
   return L.slice(0, 7)
 }
 
@@ -60,36 +74,43 @@ export async function autoCities(world, handmade) {
   const taken = new Set(handmade.map((c) => c.province).filter(Boolean))
   const takenSlugs = new Set(handmade.map((c) => c.slug))
   const out = []
-  for (const sn of ['Империя', 'Корона Аргус', 'Республика']) {
+  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES)]) {
     const st = world.states.find((s) => s.base.name === sn)
     for (const p of world.provinces) {
       const s = p.settlement
       if (!s || p.owners?.at(-1)?.[1] !== st.id || taken.has(p.name)) continue
       const text = p.description ?? ''
       const castra = /кастра [IVX]+/.test(text)
-      if (!['city', 'town', 'port'].includes(s.type) && !castra) continue
+      const south = SOUTH_STATES[sn]
+      // на юге — все поселения, включая деревни и рыбачьи посёлки (кроме развалин)
+      if (south ? s.type === 'ruins' : !['city', 'town', 'port'].includes(s.type) && !castra) continue
       const slug = slugOf(p.name)
       if (takenSlugs.has(slug)) continue
       const seed = hash(slug)
-      const type = castra ? 'castra' : s.type
+      const type = castra ? 'castra' : south && ['village', 'fishing', 'temple', 'castle'].includes(s.type) ? s.type : s.type
+      const capital = south && world.places.find((x) => x.id === `lore-${south}-capital` && x.base.name === p.name)
       const coast = (type === 'port' || p.coastal) && nearSea(s.x, s.y)
       const river = nearRiver(s.x, s.y)
       const nest = /гнездо/.test(text)
-      const size = { city: 30 + (seed % 7), town: 10 + (seed % 9), port: 14 + (seed % 8), castra: 8 + (seed % 3) }[type]
+      const size = capital ? 22 + (seed % 8) : { city: 30 + (seed % 7), town: 10 + (seed % 9), port: 14 + (seed % 8), castra: 8 + (seed % 3), village: 7 + (seed % 3), fishing: 6 + (seed % 2), temple: 10, castle: 7 }[type]
       const gen = {
-        size, walls: type === 'town' ? (/стен/.test(text) || nest || seed % 3 === 0 ? 1 : 0) : 1,
-        citadel: castra || nest || type === 'city' ? 1 : 0, plaza: 1, temple: type === 'castra' ? 0 : 1, river: river ? 1 : 0,
-        coast: coast ? 1 : 0, shantytown: type === 'city' ? 1 : 0, greens: seed % 4 === 0 ? 1 : 0
+        size, walls: capital ? 1 : ['village', 'fishing'].includes(type) ? 0 : type === 'town' ? (/стен/.test(text) || nest || seed % 3 === 0 ? 1 : 0) : 1,
+        citadel: capital || castra || nest || type === 'city' || type === 'castle' ? 1 : 0, plaza: ['village', 'fishing'].includes(type) ? 0 : 1, temple: type === 'castra' ? 0 : 1, river: river ? 1 : 0,
+        coast: coast ? 1 : 0, shantytown: type === 'city' || capital ? 1 : 0, greens: south ? (seed % 2) : seed % 4 === 0 ? 1 : 0
       }
       const extra = [...(/рудник|копи/.test(text) ? MINE : []), ...(sn === 'Корона Аргус' && /раб|невольн/.test(text) ? SLAVE : [])]
-      const dry = [...extra.slice(0, 1), ...pickN(DRY, 12, seed)]
-      const wet = coast || river ? pickN(WET, coast ? 3 : 2, seed + 1).map((n) => `~${n}`) : []
+      const kalt = south === 'kal'
+      const dry = south ? pickN(kalt ? KALT_DRY : SOUTH_DRY, 12, seed) : [...extra.slice(0, 1), ...pickN(DRY, 12, seed)]
+      const wet = coast || river ? pickN(south ? (kalt ? KALT_WET : SOUTH_WET) : WET, coast ? (south ? 2 : 3) : 2, seed + 1).map((n) => `~${n}`) : []
       out.push({
-        slug, name: p.name, province: p.name, state: sn, auto: true,
+        slug, name: p.name, province: p.name, state: sn, auto: true, ...(capital ? { place: capital.id } : {}),
         forest: p.terrain === 2 ? 0.25 : 0.1, hills: p.terrain === 3 || undefined, rocky: p.terrain >= 4 || undefined,
-        citadelName: castra ? 'Кастра' : nest ? 'Замковая гора' : 'Замок',
+        citadelName: castra ? 'Кастра' : nest ? 'Замковая гора' : south ? (kalt ? 'Дом капитанов' : capital ? 'Палаццо' : 'Кастелло') : 'Замок',
         gen, districts: [...wet.slice(0, 1), ...dry.slice(0, 2), ...wet.slice(1), ...dry.slice(2)],
-        landmarks: landmarksFrom(p.name, type, text, sn)
+        landmarks: [
+          ...(capital ? (() => { const r = SOUTH.find((x) => x.key === south); return [[r.hall.split(',')[0], 'assembly', 'citadel', `Здесь заседает ${r.chamber} и живёт ${r.rulerTitle.toLowerCase()}.`]] })() : []),
+          ...landmarksFrom(p.name, type, text, sn).map((l) => (south && l[2] === 'temple' ? [kalt ? 'Храм клана' : `Церковь ${pickN(['Сан-Микеле', 'Санта-Лучия', 'Сан-Бартоло', 'Санта-Агна', 'Сан-Доменико', 'Санта-Клара'], 1, seed)[0]}`, l[1], l[2], l[3]] : l))
+        ].slice(0, 7)
       })
     }
   }

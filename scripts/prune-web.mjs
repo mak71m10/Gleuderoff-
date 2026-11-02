@@ -3,6 +3,9 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync } from 'fs'
 import sharp from 'sharp'
 
+// Windows не даёт удалить файл, который sharp держит в кэше, — читаем картинки в память и кэш выключаем
+sharp.cache(false)
+
 const DIR = 'out-web/default-world'
 for (const z of readdirSync(`${DIR}/maps/tiles`)) if (Number(z) > 1) rmSync(`${DIR}/maps/tiles/${z}`, { recursive: true, force: true })
 rmSync(`${DIR}/maps/terrain.png`, { force: true })
@@ -23,7 +26,7 @@ if (existsSync(DEP)) {
   mkdirSync(`${DIR}/portraits/depsheet`, { recursive: true })
   for (let s = 0; s * N * N < files.length; s++) {
     const part = files.slice(s * N * N, (s + 1) * N * N)
-    const tiles = await Promise.all(part.map((f) => sharp(`${DEP}/${f}`).resize(TW, TH, { fit: 'cover' }).toBuffer()))
+    const tiles = await Promise.all(part.map((f) => sharp(readFileSync(`${DEP}/${f}`)).resize(TW, TH, { fit: 'cover' }).toBuffer()))
     const name = `portraits/depsheet/${String(s).padStart(2, '0')}.webp`
     await sharp({ create: { width: TW * N, height: TH * N, channels: 3, background: '#222' } })
       .composite(tiles.map((input, i) => ({ input, left: (i % N) * TW, top: Math.floor(i / N) * TH })))
@@ -44,7 +47,7 @@ if (existsSync(DEP)) {
   mkdirSync(`${DIR}/portraits/sheet`, { recursive: true })
   for (let s = 0; s * C * R < files.length; s++) {
     const part = files.slice(s * C * R, (s + 1) * C * R)
-    const tiles = await Promise.all(part.map((f) => sharp(`${DIR}/portraits/${f}`).resize(TW, TH, { fit: 'cover', position: 'top' }).toBuffer()))
+    const tiles = await Promise.all(part.map((f) => sharp(readFileSync(`${DIR}/portraits/${f}`)).resize(TW, TH, { fit: 'cover', position: 'top' }).toBuffer()))
     const rows = Math.ceil(part.length / C)
     const img = await sharp({ create: { width: TW * C, height: TH * rows, channels: 3, background: '#222' } })
       .composite(tiles.map((input, i) => ({ input, left: (i % C) * TW, top: Math.floor(i / C) * TH })))
