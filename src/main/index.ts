@@ -349,6 +349,18 @@ async function migrateWorld(dir: string): Promise<void> {
     for (const p of user.provinces ?? []) if (defCity.has(p.id)) p.cityMapId = defCity.get(p.id)
     user.legislatures = structuredClone(def.legislatures ?? [])
   }
+  if ((user.version ?? 1) < 22) {
+    // v22: походы Святого ордена на материк (978–979), осада Корины и костры 979 г.; портреты членов Верховного совета,
+    // Сената Короны и Совета святых архиепископов. Новые лорные походы добавляются, свои походы пользователя не трогаются
+    const have = new Set((user.armies ?? []).map((a: Json) => a.id))
+    user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => !have.has(a.id)))]
+    user.legislatures = structuredClone(def.legislatures ?? [])
+    const places = new Set((user.places ?? []).map((p: Json) => p.id))
+    user.places = [...(user.places ?? []), ...structuredClone((def.places ?? []).filter((p: Json) => p.id.startsWith('lore-ch-') && !places.has(p.id)))]
+    // хранитель библиотеки Иероним Гласиан — отдельная запись (раньше совпадал по id с самой библиотекой)
+    const hier = (def.entries ?? []).find((e: Json) => e.id === 'lore-ch-hieronym')
+    if (hier && !(user.entries ?? []).some((e: Json) => e.id === hier.id)) user.entries = [...(user.entries ?? []), structuredClone(hier)]
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))
