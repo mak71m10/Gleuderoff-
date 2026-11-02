@@ -69,6 +69,7 @@ if (existsSync(DEP)) {
 {
   const CD = `${DIR}/maps/cities`
   const plans = {}
+  const small = []
   for (const m of world.maps.filter((m) => m.kind === 'city')) {
     const slug = m.id.replace(/^map-city-/, '')
     if (m.plan && existsSync(`${DIR}/${m.plan}`)) {
@@ -76,13 +77,43 @@ if (existsSync(DEP)) {
       rmSync(`${DIR}/${m.plan}`)
       m.plan = `maps/cities/plans.json#${slug}`
     }
-    if (existsSync(`${DIR}/${m.image}`)) {
-      const buf = await sharp(readFileSync(`${DIR}/${m.image}`), { limitInputPixels: false }).resize({ width: 2048 }).webp({ quality: 80 }).toBuffer()
-      writeFileSync(`${DIR}/${m.image}`, buf)
-    }
+    if (!existsSync(`${DIR}/${m.image}`)) continue
+    // деревни, замки и посёлки (меньше 150 зданий) — в листы, их сотни; города — отдельными картинками 2048 px
+    if ((plans[slug]?.buildings.length ?? 999) < 150) small.push(m)
+    else writeFileSync(`${DIR}/${m.image}`, await sharp(readFileSync(`${DIR}/${m.image}`), { limitInputPixels: false }).resize({ width: 2048 }).webp({ quality: 80 }).toBuffer())
+  }
+  // листы мелких планов: по 16 картинок шириной 768 px в одном SVG; в мире — «лист.svg#svgView(viewBox(…))»,
+  // Leaflet показывает их обычным <img>, браузер сам вырезает нужный кусок
+  const TW = 768, PER = 16, COLS = 4
+  mkdirSync(`${CD}/sheet`, { recursive: true })
+  for (let s = 0; s * PER < small.length; s++) {
+    const part = small.slice(s * PER, (s + 1) * PER)
+    const tiles = await Promise.all(part.map(async (m) => { const { data, info } = await sharp(readFileSync(`${DIR}/${m.image}`), { limitInputPixels: false }).resize({ width: TW }).toBuffer({ resolveWithObject: true }); return { data, h: info.height } }))
+    const rowH = []
+    tiles.forEach((t, i) => (rowH[Math.floor(i / COLS)] = Math.max(rowH[Math.floor(i / COLS)] ?? 0, t.h)))
+    const rowY = rowH.map((_, r) => rowH.slice(0, r).reduce((a, b) => a + b, 0))
+    const H = rowH.reduce((a, b) => a + b, 0)
+    const img = await sharp({ create: { width: TW * COLS, height: H, channels: 3, background: '#3f6f86' } })
+      .composite(tiles.map((t, i) => ({ input: t.data, left: (i % COLS) * TW, top: rowY[Math.floor(i / COLS)] })))
+      .webp({ quality: 78 }).toBuffer()
+    const name = `maps/cities/sheet/${String(s).padStart(2, '0')}.svg`
+    writeFileSync(`${DIR}/${name}`, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${TW * COLS}" height="${H}" viewBox="0 0 ${TW * COLS} ${H}"><image width="${TW * COLS}" height="${H}" xlink:href="data:image/webp;base64,${img.toString('base64')}"/></svg>`)
+    const sheetPlans = {}
+    part.forEach((m, i) => {
+      rmSync(`${DIR}/${m.image}`)
+      m.image = `${name}#svgView(viewBox(${(i % COLS) * TW},${rowY[Math.floor(i / COLS)]},${TW},${tiles[i].h}))`
+      // контуры зданий деревни — в маленький файл рядом с листом, а не в общий plans.json
+      const slug = m.id.replace(/^map-city-/, '')
+      if (plans[slug]) {
+        sheetPlans[slug] = plans[slug]
+        delete plans[slug]
+        m.plan = `${name.replace(/\.svg$/, '.json')}#${slug}`
+      }
+    })
+    writeFileSync(`${DIR}/${name.replace(/\.svg$/, '.json')}`, JSON.stringify(sheetPlans))
   }
   writeFileSync(`${CD}/plans.json`, JSON.stringify(plans))
-  console.log(`out-web: планы городов (${Object.keys(plans).length}) — одним файлом, картинки 2048 px`)
+  console.log(`out-web: планы городов (${Object.keys(plans).length}) — одним файлом; мелкие (${small.length}) — в ${Math.ceil(small.length / PER)} листах, остальные — 2048 px`)
 }
 // метка сборки: телефон выбрасывает свою сохранённую копию мира, если вышла новая сборка
 world.build = Date.now()

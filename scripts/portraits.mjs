@@ -19,6 +19,8 @@ const STYLE = 'oil painting, medieval fantasy court portrait, renaissance old ma
 const RP_STYLE = 'oil painting, dutch golden age style, renaissance old master, chiaroscuro lighting, dark background, visible brush strokes, detailed face, half-length portrait'
 // юг: испано-итальянский колорит — испанский и итальянский придворный портрет
 const SOUTH_STYLE = 'oil painting, spanish and italian renaissance court portrait, velazquez and titian style, chiaroscuro lighting, dark background, visible brush strokes, detailed face, half-length portrait'
+// Святая церковь: папский двор эпохи Возрождения, белое с золотом
+const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael and titian style, warm golden light, dark background, visible brush strokes, detailed face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
 // цвета домов -> слова для одежды
@@ -211,14 +213,15 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
   const id = e.id.slice(5)
   const file = `${OUT}/${id}.webp`
+  const holy = e.base.tags.includes('Святая церковь')
   const southern = e.base.tags.includes('южные республики')
-  const rp = e.base.tags.includes('Республика') || southern
+  const rp = e.base.tags.includes('Республика') || southern || holy
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -233,7 +236,7 @@ for (const e of chars) {
   // Республика: короче описание и явный возраст числом — с LCM длинный запрос сводит всех к одному молодому лицу
   const age = Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
   const prompt = rp
-    ? `${southern ? SOUTH_STYLE : RP_STYLE}, ${banner}portrait of a (${age} year old ${e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${southern ? (/Кальтран/.test(race) ? '(celtic european, pale weathered skin, braided hair:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : imperial ? '(northern european, pale skin:1.15), ' : ''}${subject}`
+    ? `${holy ? CHURCH_STYLE : southern ? SOUTH_STYLE : RP_STYLE}, ${holy ? '' : banner}portrait of a (${age} year old ${e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${holy ? `(european:1.1), ${/Папа/.test(e.base.title) ? 'pope in white and gold papal vestments with a tall white mitre, golden sun pendant' : /паладин|магистр|Командор|Маршал/i.test(e.base.title) ? 'paladin knight in polished white plate armor with a golden sun emblem on the chest, white cloak' : 'archbishop in white and gold robes with a mitre and a golden crozier, golden sun pendant'}, ` : southern ? (/Кальтран/.test(race) ? '(celtic european, pale weathered skin, braided hair:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : imperial ? '(northern european, pale skin:1.15), ' : ''}${holy ? '' : subject}`
     : `${STYLE}, ${banner}portrait of a ${imperial ? (id === 'oktavian-2' ? '(pale european baby:1.2), ' : '(northern european, germanic features, pale skin, deep-set eyes, strong brow ridge, prominent straight nose:1.3), ') : ''}${subject}`
   if (process.env.DRY) {
     console.log(`${e.base.name}: ${prompt.slice(STYLE.length + 2)}`)

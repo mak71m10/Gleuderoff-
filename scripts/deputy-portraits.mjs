@@ -36,16 +36,21 @@ const RACE = {
   'Полуорк': 'half-orc with greenish grey skin and small lower tusks, ',
   'Человек (беглец из Короны Аргус)': 'dark-skinned southern freedman, '
 }
+// юг: испано-итальянский придворный портрет; кальтранцы — кельтские лица
+const SOUTH_STYLE = 'oil painting, spanish and italian renaissance portrait, velazquez and titian style, chiaroscuro lighting, plain dark background, visible brush strokes, detailed face, head and shoulders portrait'
+const SOUTH_CLS = { church: 'clergy', teria: 'clergy', sword: 'officer', captains: 'officer', banks: 'money', merchants: 'money', harbor: 'money', harbors: 'money', teachers: 'learned', liberals: 'learned' }
+export const isSouth = (leg) => /^(tos|vuf|she|kal)-/.test(leg.id)
 export const prompt = (m, leg) => {
   const f = m.gender === 'Женский'
   const end = m.to ? Math.floor(m.to / 500) + 1 : 1010
   const age = end - m.born
   const ageW = age < 30 ? 'young' : age < 45 ? 'adult' : age < 60 ? 'middle-aged' : age < 72 ? 'aging grey-haired' : 'elderly white-haired'
-  const cls = m.cls ?? (leg.id === 'rp-workers' ? 'worker' : 'learned')
+  const south = isSouth(leg)
+  const cls = south ? (leg.unofficial ? 'worker' : SOUTH_CLS[m.faction] ?? m.cls ?? 'noble') : m.cls ?? (leg.id === 'rp-workers' ? 'worker' : 'learned')
   const clothes = (CLOTHES[cls] ?? CLOTHES.learned)(f)
-  const race = m.race ? RACE[m.race] ?? '' : '(northern european, germanic features, pale skin:1.2), '
+  const race = south ? (leg.id.startsWith('kal-') ? '(celtic european, pale weathered skin:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : m.race ? RACE[m.race] ?? '' : '(northern european, germanic features, pale skin:1.2), '
   const color = leg.factions.find((x) => x.id === m.faction)?.color
-  return `${STYLE}, portrait of a ${race}${ageW} ${f ? 'woman' : 'man'}, ${clothes}${color ? `, small ${colorWord(color)} ribbon rosette on the chest` : ''}`
+  return `${south ? SOUTH_STYLE : STYLE}, portrait of a ${race}${ageW} ${f ? 'woman' : 'man'}, ${clothes}${color ? `, small ${colorWord(color)} ribbon rosette on the chest` : ''}`
 }
 const colorWord = (hex) => {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
@@ -63,7 +68,7 @@ if (process.argv[1].endsWith('deputy-portraits.mjs')) {
   const world = JSON.parse(readFileSync(WORLD, 'utf8'))
   const onlyNow = process.argv.includes('now')
   const todo = []
-  for (const leg of world.legislatures.filter((l) => l.id.startsWith('rp-'))) {
+  for (const leg of world.legislatures.filter((l) => l.id.startsWith('rp-') || isSouth(l))) {
     for (const m of leg.members) {
       if (m.entryId) continue // у людей из карточек — свой портрет
       if (onlyNow && m.to != null) continue
@@ -71,7 +76,7 @@ if (process.argv[1].endsWith('deputy-portraits.mjs')) {
     }
   }
   // сначала нынешние члены, потом бывшие; внутри — Народное собрание первым
-  const rank = (leg) => (leg.id === 'rp-assembly' ? 0 : leg.id === 'rp-workers' ? 2 : 1)
+  const rank = (leg) => (leg.id === 'rp-assembly' ? 0 : leg.id === 'rp-workers' ? 2 : isSouth(leg) ? (leg.unofficial ? 4 : 3) : 1)
   todo.sort((a, b) => (a[1].to == null ? 0 : 1) - (b[1].to == null ? 0 : 1) || rank(a[0]) - rank(b[0]))
   let done = 0
   const left = todo.filter(([leg, m]) => !existsSync(`${OUT}/${depKey(leg.id, m)}.webp`))

@@ -10,8 +10,11 @@ const path = require('path')
 
 const SITE = 'https://watabou.github.io/city-generator/'
 const OUT = path.resolve('source-maps/cities')
-const renders = process.argv.slice(2).filter((a) => a.startsWith('--render=')).map((a) => path.resolve(a.slice(9)))
-const jobs = process.argv.slice(2).filter((a) => a.includes('=') && !a.startsWith('-')).map((a) => {
+// длинные списки (сотни деревень) не влезают в командную строку Windows — их передают файлом: --list=<json>
+const listArg = process.argv.find((a) => a.startsWith('--list='))
+const args = [...process.argv.slice(2), ...(listArg ? JSON.parse(readFileSync(listArg.slice(7), 'utf8')) : [])]
+const renders = args.filter((a) => a.startsWith('--render=')).map((a) => path.resolve(a.slice(9)))
+const jobs = args.filter((a) => a.includes('=') && !a.startsWith('-')).map((a) => {
   const i = a.indexOf('=')
   return { slug: a.slice(0, i), query: a.slice(i + 1) }
 })

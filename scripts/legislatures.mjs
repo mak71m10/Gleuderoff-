@@ -9,6 +9,7 @@ import { PARTIES } from './lore/parties.mjs'
 import { SOUTH_PARTIES } from './lore/south-parties.mjs'
 import { SOUTH, SOUTH_NAMES } from './lore/south.mjs'
 import { southBodies } from './lore/south-power.mjs'
+import { CHURCH_BILLS, CHURCH_COUNCILS, CHURCH_FACTIONS, CHURCH_ISSUES, CHURCH_NAMES, CHURCH_PARTIES, CONTINENT_ARCHBISHOPS, HOLY_ARCHBISHOPS, ORDER_PEOPLE } from './lore/church.mjs'
 import { HOUSES } from './lore/empire.mjs'
 import { MINOR_HOUSES } from './lore/argus.mjs'
 import { ASSEMBLY, CITY_COUNCILS, CITY_ELECTIONS, CLASS_AFFINITY, CLASS_MIX, CLASS_TURNOUT, DISTRICT_AFFINITY, FACTIONS, ISSUES, STRIKES, VOTE_CLASSES, WORKERS } from './lore/republic-power.mjs'
@@ -862,10 +863,11 @@ const nameSouth = (culture) => (m) => {
   const N = SOUTH_NAMES[culture]
   if (['church', 'teria'].includes(m.faction) && rnd() < 0.7) m.female = false
   const f = pick(m.female ? N.women : N.men)
-  const noble = culture === 'romance' && rnd() < (['left', 'liberals'].includes(m.faction) ? 0.3 : 0.6)
+  const worker = ['loyal', 'local', 'radicals'].includes(m.faction)
+  const noble = culture === 'romance' && !worker && rnd() < (['left', 'liberals'].includes(m.faction) ? 0.3 : 0.6)
   m.name = noble ? `${f} ${pick(N.noble)}` : `${f} ${pick(N.surnames)}`
-  m.origin = pick(ORIGIN_SOUTH[m.faction] ?? ['Помещик'])
-  m.cls = noble ? 'noble' : 'owner'
+  m.origin = pick(worker ? ['Грузчик', 'Ткач шёлка', 'Гребец', 'Рыбак', 'Конторщик', 'Оружейник', 'Батрак'] : ORIGIN_SOUTH[m.faction] ?? ['Помещик'])
+  m.cls = worker ? 'worker' : noble ? 'noble' : 'owner'
 }
 const southState = new Map(SOUTH.map((s) => [s.key, world.states.find((x) => x.base.name === s.state)]))
 const capitalArea = (s) => areaOfP(world.provinces.find((p) => p.name === s.capital))
@@ -902,10 +904,45 @@ const southCommittees = southComm.map((body, i) => {
   return r
 })
 
-world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities, ...southLegs, ...southCommittees]
+// ---------- Святая церковь: Совет святых архиепископов ----------
+const CHURCH_TITLES = { oramey: 'Епископ Престола', bodhi: 'Инквизитор Ордена Пламени', komosar: 'Приор госпиталя', magnus: 'Хранитель реликвий', argentu: 'Приор Звёздной стражи', amaterasu: 'Настоятель обители', yunona: 'Хранитель Свитка', order: 'Командор Святого ордена' }
+const churchCouncil = build({
+  id: 'ch-council', state: 'Святая церковь', name: 'Совет святых архиепископов', entryId: 'lore-ch-council', chairTitle: 'Святой отец', seats: 40, from: 958.4,
+  seatOrder: ['amaterasu', 'komosar', 'argentu', 'oramey', 'yunona', 'magnus', 'bodhi', 'order'], groups: [],
+  description: 'Сорок мест: двенадцать святых архиепископов (только они избирают папу), архиепископы материка (с 979 г.), Великий магистр и командоры Святого ордена, главы меньших орденов. Фракции — по богам Света. С Устава советов 1001 г. решения папы без Совета не действуют.',
+  issues: CHURCH_ISSUES,
+  factions: CHURCH_FACTIONS.map(([id, name, color, , ideology, stance]) => ({ id, name, color, ideology, stance, leader: '' })),
+  convocations: CHURCH_COUNCILS.map(([year, name, seats, note]) => ({ year, name, seats, note })),
+  named: [
+    ...HOLY_ARCHBISHOPS.map(([id, , , born, title, fac]) => [`lore-${id}`, fac, 'Сантарея', Math.max(958.4, born + 46), null, title]),
+    ...ORDER_PEOPLE.map(([id, , , born, title, fac]) => [`lore-${id}`, fac, 'Святой орден', Math.max(958.4, born + 40), null, title]),
+    ...CONTINENT_ARCHBISHOPS.map(([id, , , arch]) => [`lore-${id}`, 'oramey', arch, 979.5, null, `Архиепископ: ${arch}`])
+  ],
+  bills: CHURCH_BILLS,
+  years: { 958: 'Конклав: избран Целестин VI.', 976: 'Молчание престола; Святой орден на материке.', 979: 'Сожжения и учреждение архиепархий.', 1001: 'Устав советов: власть переходит к Совету.', 1010: 'Папе почти девяносто — все считают голоса.' },
+  namer: (m) => {
+    m.female = m.faction === 'order' && rnd() < 0.15
+    m.name = `${pick(m.female ? CHURCH_NAMES.women : CHURCH_NAMES.men)} ${pick(CHURCH_NAMES.surnames)}`
+    m.title = CHURCH_TITLES[m.faction] ?? 'Епископ'
+    m.origin = m.faction === 'order' ? 'Святой орден' : pick(['Сантарея', 'Сакриэа', 'Фидора', 'Беатора', 'Пиения', 'Фидум'])
+    m.cls = 'clergy'
+  }
+}, [
+  // рядовые решения Совета (шаблоны должны быть разными: в год их до четырёх)
+  () => ({ title: `Назначение епископа ${pick(['Сакриэа', 'Фидоры', 'Беаторы', 'Пиении', 'Корины', 'Мисеролии', 'Глореции'])}`, kind: 'булла', w: { pope: 0.5, continent: 0.5 }, sponsor: pick(['oramey', 'yunona']), summary: 'Каждая фракция предлагает своего человека.' }),
+  () => ({ title: `Канонизация ${pick(CHURCH_NAMES.men)} ${pick(CHURCH_NAMES.surnames)}`, kind: 'булла', w: { pope: 0.3 }, sponsor: pick(['oramey', 'amaterasu', 'komosar']), summary: 'Новый святой — новые паломники и новые споры, чьему богу он служил.' }),
+  () => ({ title: 'Отлучение еретика', kind: 'приговор', w: { crusade: 1.2 }, sponsor: 'bodhi', summary: 'Орден Пламени требует отлучить и выдать.' }),
+  () => ({ title: 'Подать на паломников', kind: 'булла', w: { gold: 1.2 }, sponsor: pick(['argentu', 'oramey']), summary: 'Сбор с каждого паломника у причалов Сантареи.' }),
+  () => ({ title: 'Займ в банке Акелаты', kind: 'булла', w: { gold: 0.8 }, sponsor: 'oramey', summary: 'Престол берёт в долг у Альбанелли под залог десятины архиепархий.' }),
+  () => ({ title: 'Арсенал Святого ордена', kind: 'булла', w: { crusade: 0.8, gold: -0.5 }, sponsor: pick(['order', 'magnus']), summary: 'Новые клинки паладинам и ремонт замка Витора.' }),
+  () => ({ title: 'Госпиталь Ордена Чаши', kind: 'булла', w: { gold: -0.8 }, sponsor: 'komosar', summary: 'Новый госпиталь — за счёт престола.' })
+], [2, 4])
+churchCouncil.head = { title: 'Святой отец', entryId: 'lore-pope-now' }
+
+world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities, ...southLegs, ...southCommittees, churchCouncil]
 // история, манифест и устройство партий (городские парламенты берут партии Народного собрания)
 for (const L of world.legislatures) {
-  const lore = PARTIES[L.id] ?? SOUTH_PARTIES[L.id]
+  const lore = PARTIES[L.id] ?? SOUTH_PARTIES[L.id] ?? (L.id === 'ch-council' ? CHURCH_PARTIES : null)
   const ids = new Set(L.factions.map((f) => f.id))
   if (lore) for (const f of L.factions) if (lore[f.id]) f.party = { ...lore[f.id], allies: (lore[f.id].allies ?? []).filter((x) => ids.has(x)), rivals: (lore[f.id].rivals ?? []).filter((x) => ids.has(x)), draft: true }
 }

@@ -617,14 +617,25 @@ export function MapView() {
       let i = 0
       while (i < wp.length - 2 && date >= wp[i + 1].date) i++
       const t = Math.max(0, Math.min(1, (date - wp[i].date) / Math.max(1, wp[i + 1].date - wp[i].date)))
-      const pos = { x: wp[i].x + (wp[i + 1].x - wp[i].x) * t, y: wp[i].y + (wp[i + 1].y - wp[i].y) * t }
-      const done = [...wp.slice(0, i + 1), pos]
-      L.polyline(wp.map(ll), { pane: 'armies', color: a.color, weight: 2, opacity: 0.55, dashArray: '6 7', interactive: false }).addTo(layer)
+      // отрезок похода: проложенный путь по дорогам и местности, если он есть, иначе прямая
+      const leg = (k: number): { x: number; y: number }[] =>
+        wp[k].path?.length ? wp[k].path!.map(([x, y]) => ({ x, y })) : [wp[k - 1], wp[k]]
+      const route = [wp[0], ...wp.slice(1).flatMap((_, k) => leg(k + 1).slice(1))]
+      // позиция — на доле t длины текущего отрезка
+      const cur = leg(i + 1)
+      const lens = cur.slice(1).map((p, k) => Math.hypot(p.x - cur[k].x, p.y - cur[k].y))
+      let left = lens.reduce((s, l) => s + l, 0) * t
+      let j = 0
+      while (j < lens.length - 1 && left > lens[j]) left -= lens[j++]
+      const f = lens[j] ? Math.min(1, left / lens[j]) : 0
+      const pos = { x: cur[j].x + (cur[j + 1].x - cur[j].x) * f, y: cur[j].y + (cur[j + 1].y - cur[j].y) * f }
+      const done = [wp[0], ...wp.slice(1, i + 1).flatMap((_, k) => leg(k + 1).slice(1)), ...cur.slice(1, j + 1), pos]
+      L.polyline(route.map(ll), { pane: 'armies', color: a.color, weight: 2, opacity: 0.55, dashArray: '6 7', interactive: false }).addTo(layer)
       L.polyline(done.map(ll), { pane: 'armies', color: '#120d08', weight: 7, opacity: 0.45, interactive: false }).addTo(layer)
       L.polyline(done.map(ll), { pane: 'armies', color: a.color, weight: 4, opacity: 0.95, interactive: false }).addTo(layer)
-      // направление движения — к следующей точке
-      const nx = date > last ? wp[wp.length - 1] : wp[i + 1]
-      const prev = date > last ? wp[wp.length - 2] : wp[i]
+      // направление движения — по ходу пути
+      const nx = date > last ? route[route.length - 1] : cur[j + 1]
+      const prev = date > last ? route[route.length - 2] : cur[j]
       const ang = (Math.atan2(nx.y - prev.y, nx.x - prev.x) * 180) / Math.PI
       const marching = date <= last
       L.marker(ll(pos), {

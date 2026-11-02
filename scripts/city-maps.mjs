@@ -5,6 +5,8 @@
 // карта города в world.maps, примечательные здания — метками на ней. Параметры городов — lore/cities.mjs.
 import sharp from 'sharp'
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs'
+import { tmpdir } from 'os'
+import { join } from 'path'
 import { CITY_MAPS } from './lore/cities.mjs'
 import { autoCities } from './lore/cities-auto.mjs'
 
@@ -14,6 +16,12 @@ const world = JSON.parse(readFileSync(WORLD, 'utf8'))
 const worldMap = world.maps.find((m) => m.kind === 'world')
 // города, описанные вручную (cities.mjs), и все остальные города, городки, порты и кастры — по описаниям из мира
 const CITIES = [...CITY_MAPS, ...(await autoCities(world, CITY_MAPS))]
+// список заданий для scripts/city-gen.cjs — файлом: сотни деревень не влезают в командную строку Windows
+const listFile = (items) => {
+  const f = join(tmpdir(), `gleuderoff-cities-${process.pid}.json`)
+  writeFileSync(f, JSON.stringify(items))
+  return `--list=${f}`
+}
 const seedOf = (s) => ([...s].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7) % 2000000000) + 1
 
 /** Где город на карте мира: поселение провинции или место-столица */
@@ -70,7 +78,7 @@ if (process.argv[2] === 'gen') {
   generated = jobs.map((u) => u.slug)
   const { execFileSync } = await import('child_process')
   const electron = (await import('electron')).default
-  execFileSync(electron, ['scripts/city-gen.cjs', ...jobs.map((u) => `${u.slug}=${u.query}`)], { stdio: 'inherit' })
+  execFileSync(electron, ['scripts/city-gen.cjs', listFile(jobs.map((u) => `${u.slug}=${u.query}`))], { stdio: 'inherit' })
 }
 
 // ================= рендер плана =================
@@ -183,7 +191,7 @@ function renderCity(c, J) {
     else if ((c.rocky || c.hills) && R() < (c.rocky ? 0.1 : 0.05)) rocks.push([x, y, 5 + R() * 8])
   }
 
-  const roof = ['#8f5e48', '#9a6a4f', '#865640', '#a07258', '#7d5a46']
+  const roof = c.roof ?? ['#8f5e48', '#9a6a4f', '#865640', '#a07258', '#7d5a46']
   // крыши — по цвету квартала, если он задан (Хауссер), иначе общие
   const dOf = (b) => { const ce = centroid(b.r); return districts.findIndex((q) => inside(ce, q.r)) }
   B.forEach((b) => (b.d = dOf(b)))
@@ -197,7 +205,8 @@ function renderCity(c, J) {
     `<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" stroke="#efe4c6" stroke-width="${(size / 5).toFixed(1)}" paint-order="stroke" stroke-linejoin="round" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" ${extra}>${esc(t)}</text>`
   const ang = [0, 45, 90, 135]
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * PX}" height="${H * PX}" viewBox="0 0 ${W} ${H}">
+  const px = c.px ?? PX
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * px}" height="${H * px}" viewBox="0 0 ${W} ${H}">
 <defs>
   ${ang.map((a) => `<pattern id="furrow${a}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(${a})"><rect width="7" height="7" fill="#b9b06e"/><line x1="0" y1="0" x2="0" y2="7" stroke="#9e9558" stroke-width="2.2"/></pattern>`).join('')}
   <pattern id="vines" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><rect width="9" height="9" fill="#8f9a5a"/><circle cx="4.5" cy="4.5" r="2" fill="#5f6e3a"/></pattern>
@@ -313,14 +322,14 @@ for (const c of CITIES) {
 if (toRender.length) {
   const { execFileSync } = await import('child_process')
   const electron = (await import('electron')).default
-  execFileSync(electron, ['scripts/city-gen.cjs', ...toRender.map(({ c }) => `--render=source-maps/cities/${c.slug}.svg`)], { stdio: 'inherit' })
+  execFileSync(electron, ['scripts/city-gen.cjs', listFile(toRender.map(({ c }) => `--render=source-maps/cities/${c.slug}.svg`))], { stdio: 'inherit' })
   for (const { c, H } of toRender) {
     const nw = 256, nh = Math.round((256 * H) / W)
     const R2 = rnd(seedOf(c.slug) + 5)
     const noise = Buffer.alloc(nw * nh * 3)
     for (let i = 0; i < nw * nh; i++) { const v = 215 + Math.round(R2() * 40); noise[i * 3] = v; noise[i * 3 + 1] = v - 6; noise[i * 3 + 2] = v - 18 }
-    const paper = await sharp(noise, { raw: { width: nw, height: nh, channels: 3 } }).resize(W * PX, H * PX, { kernel: 'cubic' }).blur(3).png().toBuffer()
-    await sharp(`source-maps/cities/${c.slug}.png`, { limitInputPixels: false }).composite([{ input: paper, blend: 'multiply' }]).webp({ quality: 84 }).toFile(`${OUT}/${c.slug}.webp`)
+    const paper = await sharp(noise, { raw: { width: nw, height: nh, channels: 3 } }).resize(W * (c.px ?? PX), H * (c.px ?? PX), { kernel: 'cubic' }).blur(3).png().toBuffer()
+    await sharp(`source-maps/cities/${c.slug}.png`, { limitInputPixels: false }).composite([{ input: paper, blend: 'multiply' }]).webp({ quality: c.px === 1 ? 76 : 84 }).toFile(`${OUT}/${c.slug}.webp`)
     rmSync(`source-maps/cities/${c.slug}.png`)
   }
 }

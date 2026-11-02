@@ -341,7 +341,8 @@ export interface Army {
   mapId: string
   stateId: string
   color: string
-  waypoints: { x: number; y: number; date: WorldDate }[]
+  /** path — проложенный путь от предыдущей точки до этой (по дорогам и местности, scripts/army-routes.mjs); без него — по прямой */
+  waypoints: { x: number; y: number; date: WorldDate; path?: [number, number][] }[]
 }
 
 /** Законодательное собрание (Верховный совет, Сенат): состав по годам, законы и поимённые голоса */
