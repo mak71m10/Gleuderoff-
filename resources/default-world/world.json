@@ -1,5 +1,5 @@
 {
- "version": 18,
+ "version": 19,
  "name": "Gleuderoff",
  "calendar": {
   "name": "Реквием (Имперский календарь)",
@@ -149,6 +149,512 @@
    "height": 2048,
    "plan": "maps/cities/hausser.plan.json",
    "placeId": "lore-haussler"
+  },
+  {
+   "id": "map-city-aurhafen",
+   "name": "Аурхафен — план города",
+   "kind": "city",
+   "image": "maps/cities/aurhafen.webp",
+   "width": 2048,
+   "height": 2033,
+   "plan": "maps/cities/aurhafen.plan.json",
+   "placeId": "lore-emp-aurhafen"
+  },
+  {
+   "id": "map-city-norershtadt",
+   "name": "Норерштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/norershtadt.webp",
+   "width": 2048,
+   "height": 1797,
+   "plan": "maps/cities/norershtadt.plan.json",
+   "placeId": "lore-argus-capital"
+  },
+  {
+   "id": "map-city-landveiler",
+   "name": "Ландвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/landveiler.webp",
+   "width": 2048,
+   "height": 1637,
+   "plan": "maps/cities/landveiler.plan.json"
+  },
+  {
+   "id": "map-city-lauenvald",
+   "name": "Лауенвальд — план города",
+   "kind": "city",
+   "image": "maps/cities/lauenvald.webp",
+   "width": 2048,
+   "height": 2362,
+   "plan": "maps/cities/lauenvald.plan.json"
+  },
+  {
+   "id": "map-city-mitmyunde",
+   "name": "Митмюнде — план города",
+   "kind": "city",
+   "image": "maps/cities/mitmyunde.webp",
+   "width": 2048,
+   "height": 2215,
+   "plan": "maps/cities/mitmyunde.plan.json"
+  },
+  {
+   "id": "map-city-lauburg",
+   "name": "Лаубург — план города",
+   "kind": "city",
+   "image": "maps/cities/lauburg.webp",
+   "width": 2048,
+   "height": 1754,
+   "plan": "maps/cities/lauburg.plan.json"
+  },
+  {
+   "id": "map-city-shtainervedel",
+   "name": "Штайнерведель — план города",
+   "kind": "city",
+   "image": "maps/cities/shtainervedel.webp",
+   "width": 2048,
+   "height": 2125,
+   "plan": "maps/cities/shtainervedel.plan.json"
+  },
+  {
+   "id": "map-city-brasshtadt",
+   "name": "Брасштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/brasshtadt.webp",
+   "width": 2048,
+   "height": 1626,
+   "plan": "maps/cities/brasshtadt.plan.json"
+  },
+  {
+   "id": "map-city-tirerau",
+   "name": "Тирерау — план города",
+   "kind": "city",
+   "image": "maps/cities/tirerau.webp",
+   "width": 2048,
+   "height": 3023,
+   "plan": "maps/cities/tirerau.plan.json"
+  },
+  {
+   "id": "map-city-dalhauzen",
+   "name": "Дальхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/dalhauzen.webp",
+   "width": 2048,
+   "height": 1517,
+   "plan": "maps/cities/dalhauzen.plan.json"
+  },
+  {
+   "id": "map-city-altshtein",
+   "name": "Альтштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/altshtein.webp",
+   "width": 2048,
+   "height": 1624,
+   "plan": "maps/cities/altshtein.plan.json"
+  },
+  {
+   "id": "map-city-griselberg",
+   "name": "Грисельберг — план города",
+   "kind": "city",
+   "image": "maps/cities/griselberg.webp",
+   "width": 2048,
+   "height": 2092,
+   "plan": "maps/cities/griselberg.plan.json"
+  },
+  {
+   "id": "map-city-linrit",
+   "name": "Линрит — план города",
+   "kind": "city",
+   "image": "maps/cities/linrit.webp",
+   "width": 2048,
+   "height": 1635,
+   "plan": "maps/cities/linrit.plan.json"
+  },
+  {
+   "id": "map-city-shenelhauzen",
+   "name": "Шёнельхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/shenelhauzen.webp",
+   "width": 2048,
+   "height": 2259,
+   "plan": "maps/cities/shenelhauzen.plan.json"
+  },
+  {
+   "id": "map-city-mitbah",
+   "name": "Митбах — план города",
+   "kind": "city",
+   "image": "maps/cities/mitbah.webp",
+   "width": 2048,
+   "height": 3206,
+   "plan": "maps/cities/mitbah.plan.json"
+  },
+  {
+   "id": "map-city-neihauzen",
+   "name": "Нейхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/neihauzen.webp",
+   "width": 2048,
+   "height": 2350,
+   "plan": "maps/cities/neihauzen.plan.json"
+  },
+  {
+   "id": "map-city-hagelrit",
+   "name": "Хагельрит — план города",
+   "kind": "city",
+   "image": "maps/cities/hagelrit.webp",
+   "width": 2048,
+   "height": 2041,
+   "plan": "maps/cities/hagelrit.plan.json"
+  },
+  {
+   "id": "map-city-falinvald",
+   "name": "Фальинвальд — план города",
+   "kind": "city",
+   "image": "maps/cities/falinvald.webp",
+   "width": 2048,
+   "height": 1857,
+   "plan": "maps/cities/falinvald.plan.json"
+  },
+  {
+   "id": "map-city-kasintal",
+   "name": "Касинталь — план города",
+   "kind": "city",
+   "image": "maps/cities/kasintal.webp",
+   "width": 2048,
+   "height": 1944,
+   "plan": "maps/cities/kasintal.plan.json"
+  },
+  {
+   "id": "map-city-kasmyunde",
+   "name": "Касмюнде — план города",
+   "kind": "city",
+   "image": "maps/cities/kasmyunde.webp",
+   "width": 2048,
+   "height": 1841,
+   "plan": "maps/cities/kasmyunde.plan.json"
+  },
+  {
+   "id": "map-city-mitervedel",
+   "name": "Митерведель — план города",
+   "kind": "city",
+   "image": "maps/cities/mitervedel.webp",
+   "width": 2048,
+   "height": 1985,
+   "plan": "maps/cities/mitervedel.plan.json"
+  },
+  {
+   "id": "map-city-tirelburg",
+   "name": "Тирельбург — план города",
+   "kind": "city",
+   "image": "maps/cities/tirelburg.webp",
+   "width": 2048,
+   "height": 1786,
+   "plan": "maps/cities/tirelburg.plan.json"
+  },
+  {
+   "id": "map-city-tirenburg",
+   "name": "Тиренбург — план города",
+   "kind": "city",
+   "image": "maps/cities/tirenburg.webp",
+   "width": 2048,
+   "height": 1996,
+   "plan": "maps/cities/tirenburg.plan.json"
+  },
+  {
+   "id": "map-city-eberergard",
+   "name": "Эберергард — план города",
+   "kind": "city",
+   "image": "maps/cities/eberergard.webp",
+   "width": 2048,
+   "height": 1561,
+   "plan": "maps/cities/eberergard.plan.json"
+  },
+  {
+   "id": "map-city-landinlage",
+   "name": "Ландинлаге — план города",
+   "kind": "city",
+   "image": "maps/cities/landinlage.webp",
+   "width": 2048,
+   "height": 2467,
+   "plan": "maps/cities/landinlage.plan.json"
+  },
+  {
+   "id": "map-city-ostenholm",
+   "name": "Остенхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/ostenholm.webp",
+   "width": 2048,
+   "height": 2183,
+   "plan": "maps/cities/ostenholm.plan.json"
+  },
+  {
+   "id": "map-city-miterbah",
+   "name": "Митербах — план города",
+   "kind": "city",
+   "image": "maps/cities/miterbah.webp",
+   "width": 2048,
+   "height": 1533,
+   "plan": "maps/cities/miterbah.plan.json"
+  },
+  {
+   "id": "map-city-uldorf",
+   "name": "Ульдорф — план города",
+   "kind": "city",
+   "image": "maps/cities/uldorf.webp",
+   "width": 2048,
+   "height": 1761,
+   "plan": "maps/cities/uldorf.plan.json"
+  },
+  {
+   "id": "map-city-gryuninhaim",
+   "name": "Грюнинхайм — план города",
+   "kind": "city",
+   "image": "maps/cities/gryuninhaim.webp",
+   "width": 2048,
+   "height": 2386,
+   "plan": "maps/cities/gryuninhaim.plan.json"
+  },
+  {
+   "id": "map-city-kirhenholm",
+   "name": "Кирхенхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/kirhenholm.webp",
+   "width": 2048,
+   "height": 2242,
+   "plan": "maps/cities/kirhenholm.plan.json"
+  },
+  {
+   "id": "map-city-amlage",
+   "name": "Амлаге — план города",
+   "kind": "city",
+   "image": "maps/cities/amlage.webp",
+   "width": 2048,
+   "height": 2859,
+   "plan": "maps/cities/amlage.plan.json"
+  },
+  {
+   "id": "map-city-falburg",
+   "name": "Фальбург — план города",
+   "kind": "city",
+   "image": "maps/cities/falburg.webp",
+   "width": 2048,
+   "height": 2340,
+   "plan": "maps/cities/falburg.plan.json"
+  },
+  {
+   "id": "map-city-visendorf",
+   "name": "Висендорф — план города",
+   "kind": "city",
+   "image": "maps/cities/visendorf.webp",
+   "width": 2048,
+   "height": 1543,
+   "plan": "maps/cities/visendorf.plan.json"
+  },
+  {
+   "id": "map-city-badenfeld",
+   "name": "Баденфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/badenfeld.webp",
+   "width": 2048,
+   "height": 2173,
+   "plan": "maps/cities/badenfeld.plan.json"
+  },
+  {
+   "id": "map-city-aminbruk",
+   "name": "Аминбрук — план города",
+   "kind": "city",
+   "image": "maps/cities/aminbruk.webp",
+   "width": 2048,
+   "height": 1606,
+   "plan": "maps/cities/aminbruk.plan.json"
+  },
+  {
+   "id": "map-city-eberinrit",
+   "name": "Эберинрит — план города",
+   "kind": "city",
+   "image": "maps/cities/eberinrit.webp",
+   "width": 2048,
+   "height": 1845,
+   "plan": "maps/cities/eberinrit.plan.json"
+  },
+  {
+   "id": "map-city-brukshtein",
+   "name": "Брукштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/brukshtein.webp",
+   "width": 2048,
+   "height": 2127,
+   "plan": "maps/cities/brukshtein.plan.json"
+  },
+  {
+   "id": "map-city-altenfeld",
+   "name": "Альтенфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/altenfeld.webp",
+   "width": 2048,
+   "height": 2592,
+   "plan": "maps/cities/altenfeld.plan.json"
+  },
+  {
+   "id": "map-city-roienveiler",
+   "name": "Ройенвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/roienveiler.webp",
+   "width": 2048,
+   "height": 2684,
+   "plan": "maps/cities/roienveiler.plan.json"
+  },
+  {
+   "id": "map-city-landhauzen",
+   "name": "Ландхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/landhauzen.webp",
+   "width": 2048,
+   "height": 1726,
+   "plan": "maps/cities/landhauzen.plan.json"
+  },
+  {
+   "id": "map-city-kelholm",
+   "name": "Кельхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/kelholm.webp",
+   "width": 2048,
+   "height": 2277,
+   "plan": "maps/cities/kelholm.plan.json"
+  },
+  {
+   "id": "map-city-veddorf",
+   "name": "Веддорф — план города",
+   "kind": "city",
+   "image": "maps/cities/veddorf.webp",
+   "width": 2048,
+   "height": 2395,
+   "plan": "maps/cities/veddorf.plan.json"
+  },
+  {
+   "id": "map-city-zonerbruk",
+   "name": "Зонербрук — план города",
+   "kind": "city",
+   "image": "maps/cities/zonerbruk.webp",
+   "width": 2048,
+   "height": 1701,
+   "plan": "maps/cities/zonerbruk.plan.json"
+  },
+  {
+   "id": "map-city-unterinshtein",
+   "name": "Унтеринштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/unterinshtein.webp",
+   "width": 2048,
+   "height": 1817,
+   "plan": "maps/cities/unterinshtein.plan.json"
+  },
+  {
+   "id": "map-city-brukinbah",
+   "name": "Брукинбах — план города",
+   "kind": "city",
+   "image": "maps/cities/brukinbah.webp",
+   "width": 2048,
+   "height": 2238,
+   "plan": "maps/cities/brukinbah.plan.json"
+  },
+  {
+   "id": "map-city-shtainelshtein",
+   "name": "Штайнельштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/shtainelshtein.webp",
+   "width": 2048,
+   "height": 1932,
+   "plan": "maps/cities/shtainelshtein.plan.json"
+  },
+  {
+   "id": "map-city-vererau",
+   "name": "Верерау — план города",
+   "kind": "city",
+   "image": "maps/cities/vererau.webp",
+   "width": 2048,
+   "height": 2308,
+   "plan": "maps/cities/vererau.plan.json"
+  },
+  {
+   "id": "map-city-landmyunde",
+   "name": "Ландмюнде — план города",
+   "kind": "city",
+   "image": "maps/cities/landmyunde.webp",
+   "width": 2048,
+   "height": 2454,
+   "plan": "maps/cities/landmyunde.plan.json"
+  },
+  {
+   "id": "map-city-neiinberg",
+   "name": "Нейинберг — план города",
+   "kind": "city",
+   "image": "maps/cities/neiinberg.webp",
+   "width": 2048,
+   "height": 2973,
+   "plan": "maps/cities/neiinberg.plan.json"
+  },
+  {
+   "id": "map-city-erelberg",
+   "name": "Эрельберг — план города",
+   "kind": "city",
+   "image": "maps/cities/erelberg.webp",
+   "width": 2048,
+   "height": 2008,
+   "plan": "maps/cities/erelberg.plan.json"
+  },
+  {
+   "id": "map-city-tselhauzen",
+   "name": "Целхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/tselhauzen.webp",
+   "width": 2048,
+   "height": 2026,
+   "plan": "maps/cities/tselhauzen.plan.json"
+  },
+  {
+   "id": "map-city-eshholm",
+   "name": "Эшхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/eshholm.webp",
+   "width": 2048,
+   "height": 2375,
+   "plan": "maps/cities/eshholm.plan.json"
+  },
+  {
+   "id": "map-city-taldorf",
+   "name": "Тальдорф — план города",
+   "kind": "city",
+   "image": "maps/cities/taldorf.webp",
+   "width": 2048,
+   "height": 2486,
+   "plan": "maps/cities/taldorf.plan.json"
+  },
+  {
+   "id": "map-city-elmerrit",
+   "name": "Эльмеррит — план города",
+   "kind": "city",
+   "image": "maps/cities/elmerrit.webp",
+   "width": 2048,
+   "height": 1988,
+   "plan": "maps/cities/elmerrit.plan.json"
+  },
+  {
+   "id": "map-city-gerinvedel",
+   "name": "Геринведель — план города",
+   "kind": "city",
+   "image": "maps/cities/gerinvedel.webp",
+   "width": 2048,
+   "height": 1645,
+   "plan": "maps/cities/gerinvedel.plan.json"
+  },
+  {
+   "id": "map-city-norerholm",
+   "name": "Норерхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/norerholm.webp",
+   "width": 2048,
+   "height": 1484,
+   "plan": "maps/cities/norerholm.plan.json"
   }
  ],
  "states": [
@@ -7349,7 +7855,8 @@
    },
    "history": [],
    "from": 218000,
-   "to": null
+   "to": null,
+   "innerMapId": "map-city-aurhafen"
   },
   {
    "id": "lore-argus-capital",
@@ -7367,7 +7874,8 @@
    },
    "history": [],
    "from": null,
-   "to": null
+   "to": null,
+   "innerMapId": "map-city-norershtadt"
   },
   {
    "id": "lore-rp-capital",
@@ -8796,6 +9304,3520 @@
     "population": "",
     "ruler": "",
     "description": "По слухам — главная база имперских преступных группировок.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-0",
+   "mapId": "map-city-aurhafen",
+   "x": 841,
+   "y": 1008.2,
+   "building": 115,
+   "base": {
+    "name": "Маяк Сандры",
+    "type": "tower",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Башня на конце волнолома, на вершине которой вечно горит магический огонь.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-1",
+   "mapId": "map-city-aurhafen",
+   "x": 809.1,
+   "y": 954.9,
+   "building": 0,
+   "base": {
+    "name": "Морская биржа",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Через Аурхафен идёт почти вся морская торговля Империи: соль, вино Остервельдов, железо Грауэнштайнов, хлеб Литтенау.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-2",
+   "mapId": "map-city-aurhafen",
+   "x": 632.1,
+   "y": 1187.1,
+   "building": 3895,
+   "base": {
+    "name": "Адмиралтейство",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Гаванью и флотом ведает адмирал Империи Маргот Веллен; с губернатором они не здороваются уже девять лет.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-3",
+   "mapId": "map-city-aurhafen",
+   "x": 753.9,
+   "y": 806.4,
+   "building": 2770,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатора назначает совет из людей Морвингов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-4",
+   "mapId": "map-city-aurhafen",
+   "x": 872.7,
+   "y": 988.6,
+   "building": 95,
+   "base": {
+    "name": "Верфи Дома Морвинг",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Отсюда в 451 г. ушли корабли к Эльфборну.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-5",
+   "mapId": "map-city-aurhafen",
+   "x": 801.4,
+   "y": 980.4,
+   "building": 64,
+   "base": {
+    "name": "Казармы VI Морского легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Казармы легиона и южного флота.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-6",
+   "mapId": "map-city-aurhafen",
+   "x": 809.9,
+   "y": 1093.5,
+   "building": 740,
+   "base": {
+    "name": "Соляные склады Зальтмаров",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aurhafen-7",
+   "mapId": "map-city-aurhafen",
+   "x": 804.1,
+   "y": 966.7,
+   "building": 9132,
+   "base": {
+    "name": "Собор Аурхафена",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norershtadt-0",
+   "mapId": "map-city-norershtadt",
+   "x": 1547.8,
+   "y": 898.2,
+   "building": 1307,
+   "base": {
+    "name": "Аргенфельс",
+    "type": "castle",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Замок рода Аргус из серого камня с серебряными кровлями. В Синем зале Совет Крови выбирает короля; в Палате Клятвы хранятся рубиновое кольцо Тейбера и серебряная Корона гор.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norershtadt-1",
+   "mapId": "map-city-norershtadt",
+   "x": 1170.2,
+   "y": 884,
+   "building": 0,
+   "base": {
+    "name": "Палата Короны",
+    "type": "assembly",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Сенат заседает в бывшем храме у рыночной площади. На её воротах в 944 г. Люций повесил семерых сенаторов, а в 976 г. там же повесили его комиссара.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norershtadt-2",
+   "mapId": "map-city-norershtadt",
+   "x": 1203.1,
+   "y": 910.7,
+   "building": 2278,
+   "base": {
+    "name": "Собор Святого Ирмфрида",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Собор с серебряным куполом.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norershtadt-3",
+   "mapId": "map-city-norershtadt",
+   "x": 1122.2,
+   "y": 879.7,
+   "building": 141,
+   "base": {
+    "name": "Монетный двор",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "С 990 г. здесь чеканят собственный аргусский талер.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norershtadt-4",
+   "mapId": "map-city-norershtadt",
+   "x": 1100.6,
+   "y": 414.1,
+   "building": 2039,
+   "base": {
+    "name": "Литейные",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Кварталы литейщиков у реки.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norershtadt-5",
+   "mapId": "map-city-norershtadt",
+   "x": 1032.2,
+   "y": 644.7,
+   "building": 1352,
+   "base": {
+    "name": "Меняльные лавки",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landveiler-0",
+   "mapId": "map-city-landveiler",
+   "x": 969.7,
+   "y": 674.3,
+   "building": 63,
+   "base": {
+    "name": "Цепной рынок",
+    "type": "gallows",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Самый большой невольничий торг Лоры: крытые аркады на семьсот помостов. Цену раба объявляют звоном — по удару на сотню серебром.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landveiler-1",
+   "mapId": "map-city-landveiler",
+   "x": 1126.8,
+   "y": 461.3,
+   "building": 812,
+   "base": {
+    "name": "Замок бургграфов Эберсов",
+    "type": "castle",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Эберсы держат торг по Эберсфельдской правде с 44 г.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landveiler-2",
+   "mapId": "map-city-landveiler",
+   "x": 1105.6,
+   "y": 800,
+   "building": 611,
+   "base": {
+    "name": "Звонница торга",
+    "type": "tower",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landveiler-3",
+   "mapId": "map-city-landveiler",
+   "x": 1200,
+   "y": 586.1,
+   "building": 1007,
+   "base": {
+    "name": "Сребролистый квартал",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь живут эльфы-рабы, купленные домами города: музыканты, писцы, садовники.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landveiler-4",
+   "mapId": "map-city-landveiler",
+   "x": 953.2,
+   "y": 712.4,
+   "building": 1950,
+   "base": {
+    "name": "Храм Ландвейлера",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauenvald-0",
+   "mapId": "map-city-lauenvald",
+   "x": 1025.7,
+   "y": 1037.8,
+   "building": 336,
+   "base": {
+    "name": "Невольничий мол",
+    "type": "gallows",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Сюда приходят корабли с юга и островов с людьми в трюмах.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauenvald-1",
+   "mapId": "map-city-lauenvald",
+   "x": 991.2,
+   "y": 1061.3,
+   "building": 293,
+   "base": {
+    "name": "Стоянка Лауенвальдской эскадры",
+    "type": "castle",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Эскадра Короны на молу.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauenvald-2",
+   "mapId": "map-city-lauenvald",
+   "x": 1341.6,
+   "y": 1057.7,
+   "building": 230,
+   "base": {
+    "name": "Замок Аргус-Лауэн",
+    "type": "castle",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Порт держит младшая ветвь Аргус-Лауэн.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauenvald-3",
+   "mapId": "map-city-lauenvald",
+   "x": 1260.8,
+   "y": 828.1,
+   "building": 426,
+   "base": {
+    "name": "Кабак «Цепная речь»",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Портовые кабаки говорят на цепной речи; по ночам Вольники выкупают здесь беглых и прячут их на рыбачьих лодках.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauenvald-4",
+   "mapId": "map-city-lauenvald",
+   "x": 1327.6,
+   "y": 1357,
+   "building": 595,
+   "base": {
+    "name": "Храм Лауенвальда",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitmyunde-0",
+   "mapId": "map-city-mitmyunde",
+   "x": 1256.3,
+   "y": 522.8,
+   "building": 120,
+   "base": {
+    "name": "Академия Копья",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Старейшая военная академия Лоры, где в 116 г. учился Тейбер Ферн. Выпускники выходят знаменосцами.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitmyunde-1",
+   "mapId": "map-city-mitmyunde",
+   "x": 1285,
+   "y": 1139.3,
+   "base": {
+    "name": "Плац с бронзовым Тейбером",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Бронзовый Тейбер с отцовским знаменем у Сорочьего брода.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitmyunde-2",
+   "mapId": "map-city-mitmyunde",
+   "x": 1363.2,
+   "y": 1771.3,
+   "building": 140,
+   "base": {
+    "name": "Целебный родник",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Родник, который местные считают целебным.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitmyunde-3",
+   "mapId": "map-city-mitmyunde",
+   "x": 1257.2,
+   "y": 1130,
+   "building": 156,
+   "base": {
+    "name": "Храм Митмюнде",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauburg-0",
+   "mapId": "map-city-lauburg",
+   "x": 1149.8,
+   "y": 604,
+   "building": 75,
+   "base": {
+    "name": "Кастра II Пепельного легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Лаубург — кастра II Пепельного легиона, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauburg-1",
+   "mapId": "map-city-lauburg",
+   "x": 1064.3,
+   "y": 1071.3,
+   "building": 94,
+   "base": {
+    "name": "Храм Лаубург",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainervedel-0",
+   "mapId": "map-city-shtainervedel",
+   "x": 1063.3,
+   "y": 1021.5,
+   "building": 22,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор Ансельм Хайльбах держит город при поддержке гильдий.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainervedel-1",
+   "mapId": "map-city-shtainervedel",
+   "x": 1196,
+   "y": 984,
+   "building": 6,
+   "base": {
+    "name": "Ратуша Штайнерведель",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainervedel-2",
+   "mapId": "map-city-shtainervedel",
+   "x": 1152.1,
+   "y": 1016,
+   "building": 1878,
+   "base": {
+    "name": "Храм Штайнерведель",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainervedel-3",
+   "mapId": "map-city-shtainervedel",
+   "x": 1109.6,
+   "y": 988.5,
+   "building": 10,
+   "base": {
+    "name": "Почтовая станция",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Почтовая станция на имперском тракте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brasshtadt-0",
+   "mapId": "map-city-brasshtadt",
+   "x": 758,
+   "y": 718.7,
+   "building": 34,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор — Эльза Хайльниц.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brasshtadt-1",
+   "mapId": "map-city-brasshtadt",
+   "x": 651.3,
+   "y": 654.2,
+   "building": 71,
+   "base": {
+    "name": "Храм Брасштадт",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirerau-0",
+   "mapId": "map-city-tirerau",
+   "x": 847,
+   "y": 633.5,
+   "building": 51,
+   "base": {
+    "name": "Кастра III Штайнгардского легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Тирерау — кастра III Штайнгардского легиона, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirerau-1",
+   "mapId": "map-city-tirerau",
+   "x": 1161.4,
+   "y": 1384,
+   "building": 65,
+   "base": {
+    "name": "Храм Тирерау",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-dalhauzen-0",
+   "mapId": "map-city-dalhauzen",
+   "x": 597.9,
+   "y": 749.8,
+   "building": 65,
+   "base": {
+    "name": "Замок Дома Фалькенхорст",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Дальхаузен — родовое гнездо Дома Фалькенхорст: замок над городом, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-dalhauzen-1",
+   "mapId": "map-city-dalhauzen",
+   "x": 1005.2,
+   "y": 842.3,
+   "building": 90,
+   "base": {
+    "name": "Храм Дальхаузен",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-dalhauzen-2",
+   "mapId": "map-city-dalhauzen",
+   "x": 870.9,
+   "y": 795.3,
+   "building": 12,
+   "base": {
+    "name": "Почтовая станция",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Почтовая станция на имперском тракте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altshtein-0",
+   "mapId": "map-city-altshtein",
+   "x": 1551.1,
+   "y": 1069.4,
+   "building": 98,
+   "base": {
+    "name": "Замок Дома Тессен",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Альтштейн — родовое гнездо Дома Тессен: замок над долиной, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altshtein-1",
+   "mapId": "map-city-altshtein",
+   "x": 1107.7,
+   "y": 898.5,
+   "building": 107,
+   "base": {
+    "name": "Храм Альтштейн",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altshtein-2",
+   "mapId": "map-city-altshtein",
+   "x": 1250.7,
+   "y": 707.8,
+   "building": 0,
+   "base": {
+    "name": "Пивоварня",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь пивоварня, поставляющая пиво гарнизонам и курган воинов эпохи раздробленности.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-griselberg-0",
+   "mapId": "map-city-griselberg",
+   "x": 1191.8,
+   "y": 1230.2,
+   "building": 5,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Вендель Кирхер и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-griselberg-1",
+   "mapId": "map-city-griselberg",
+   "x": 882.3,
+   "y": 1022.6,
+   "building": 147,
+   "base": {
+    "name": "Храм Грисельберг",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-griselberg-2",
+   "mapId": "map-city-griselberg",
+   "x": 790.4,
+   "y": 1189.3,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "ярмарка каждую Квинну.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-linrit-0",
+   "mapId": "map-city-linrit",
+   "x": 763.4,
+   "y": 798.1,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Агата Митбах и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-linrit-1",
+   "mapId": "map-city-linrit",
+   "x": 734.8,
+   "y": 932.8,
+   "building": 101,
+   "base": {
+    "name": "Храм Линрит",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shenelhauzen-0",
+   "mapId": "map-city-shenelhauzen",
+   "x": 1137.2,
+   "y": 787.9,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Бертольд Митгер и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shenelhauzen-1",
+   "mapId": "map-city-shenelhauzen",
+   "x": 1301.5,
+   "y": 1125.7,
+   "building": 95,
+   "base": {
+    "name": "Ратуша Шёнельхаузен",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Шёнельхаузен — окружной городок с ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shenelhauzen-2",
+   "mapId": "map-city-shenelhauzen",
+   "x": 1222.2,
+   "y": 950.8,
+   "building": 150,
+   "base": {
+    "name": "Храм Шёнельхаузен",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitbah-0",
+   "mapId": "map-city-mitbah",
+   "x": 1066.2,
+   "y": 1043.7,
+   "building": 1,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Генрих Хагенвирт и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitbah-1",
+   "mapId": "map-city-mitbah",
+   "x": 870,
+   "y": 1248.1,
+   "building": 18,
+   "base": {
+    "name": "Ратуша Митбах",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Митбах — окружной городок с ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitbah-2",
+   "mapId": "map-city-mitbah",
+   "x": 908.6,
+   "y": 1042.1,
+   "building": 75,
+   "base": {
+    "name": "Храм Митбах",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitbah-3",
+   "mapId": "map-city-mitbah",
+   "x": 951.4,
+   "y": 523.4,
+   "building": 36,
+   "base": {
+    "name": "Старая сторожевая вышка",
+    "type": "tower",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь каменный мост времён Валериана Строителя и заброшенная сторожевая вышка эпохи княжеств.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neihauzen-0",
+   "mapId": "map-city-neihauzen",
+   "x": 1134.9,
+   "y": 1225,
+   "building": 29,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Хайнц Ротенхайм и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neihauzen-1",
+   "mapId": "map-city-neihauzen",
+   "x": 1052.4,
+   "y": 1362.2,
+   "building": 103,
+   "base": {
+    "name": "Храм Нейхаузен",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neihauzen-2",
+   "mapId": "map-city-neihauzen",
+   "x": 1243.6,
+   "y": 1436.2,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Нейхаузен — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hagelrit-0",
+   "mapId": "map-city-hagelrit",
+   "x": 845.5,
+   "y": 694.2,
+   "building": 55,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит назначенный губернатор Герхард Хофниц; ратуша спорит с ним по каждому налогу.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hagelrit-1",
+   "mapId": "map-city-hagelrit",
+   "x": 951.6,
+   "y": 1112.9,
+   "building": 39,
+   "base": {
+    "name": "Ратуша Хагельрит",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит назначенный губернатор Герхард Хофниц; ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hagelrit-2",
+   "mapId": "map-city-hagelrit",
+   "x": 976.2,
+   "y": 939.5,
+   "building": 102,
+   "base": {
+    "name": "Храм Хагельрит",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falinvald-0",
+   "mapId": "map-city-falinvald",
+   "x": 1125.8,
+   "y": 812.2,
+   "building": 6,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор — Гизела Бауман.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falinvald-1",
+   "mapId": "map-city-falinvald",
+   "x": 994.3,
+   "y": 924.5,
+   "building": 101,
+   "base": {
+    "name": "Храм Фальинвальд",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falinvald-2",
+   "mapId": "map-city-falinvald",
+   "x": 875.2,
+   "y": 850.3,
+   "building": 0,
+   "base": {
+    "name": "Пивоварня",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь пивоварня, поставляющая пиво гарнизонам и кузня, где куют подковы для имперской кавалерии.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falinvald-3",
+   "mapId": "map-city-falinvald",
+   "x": 924.1,
+   "y": 1111.1,
+   "building": 53,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Фальинвальд — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kasintal-0",
+   "mapId": "map-city-kasintal",
+   "x": 1138.8,
+   "y": 1406.4,
+   "building": 274,
+   "base": {
+    "name": "Замок Дома Хёльдерн",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Касинталь — родовое гнездо Дома Хёльдерн: замок над городом, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kasintal-1",
+   "mapId": "map-city-kasintal",
+   "x": 871.9,
+   "y": 883.7,
+   "building": 314,
+   "base": {
+    "name": "Храм Касинталь",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kasintal-2",
+   "mapId": "map-city-kasintal",
+   "x": 1001.7,
+   "y": 907.6,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "ярмарка в месяц Ячори.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kasmyunde-0",
+   "mapId": "map-city-kasmyunde",
+   "x": 1508.5,
+   "y": 815.6,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Вальтер Грюнбрандт и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kasmyunde-1",
+   "mapId": "map-city-kasmyunde",
+   "x": 1327.7,
+   "y": 841.9,
+   "building": 75,
+   "base": {
+    "name": "Храм Касмюнде",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kasmyunde-2",
+   "mapId": "map-city-kasmyunde",
+   "x": 1345.4,
+   "y": 687.5,
+   "building": 9,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Касмюнде — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitervedel-0",
+   "mapId": "map-city-mitervedel",
+   "x": 943.3,
+   "y": 1250.1,
+   "building": 241,
+   "base": {
+    "name": "Замок Дома Зальтмар",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Митерведель — родовое гнездо Дома Зальтмар: замок над городом, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mitervedel-1",
+   "mapId": "map-city-mitervedel",
+   "x": 1093.8,
+   "y": 1002.1,
+   "building": 285,
+   "base": {
+    "name": "Храм Митерведель",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirelburg-0",
+   "mapId": "map-city-tirelburg",
+   "x": 1410.7,
+   "y": 1157.6,
+   "building": 147,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор — Лизелотта Марбрандт.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirelburg-1",
+   "mapId": "map-city-tirelburg",
+   "x": 1541.2,
+   "y": 1219.6,
+   "building": 0,
+   "base": {
+    "name": "Ратуша Тирельбург",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Тирельбург — окружной городок с ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirelburg-2",
+   "mapId": "map-city-tirelburg",
+   "x": 1463.2,
+   "y": 1199.4,
+   "building": 169,
+   "base": {
+    "name": "Храм Тирельбург",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirenburg-0",
+   "mapId": "map-city-tirenburg",
+   "x": 987.7,
+   "y": 782.7,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит назначенный губернатор Ода Бауке; ратуша спорит с ним по каждому налогу.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirenburg-1",
+   "mapId": "map-city-tirenburg",
+   "x": 1001.8,
+   "y": 898.9,
+   "building": 135,
+   "base": {
+    "name": "Ратуша Тиренбург",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит назначенный губернатор Ода Бауке; ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirenburg-2",
+   "mapId": "map-city-tirenburg",
+   "x": 1094.8,
+   "y": 808.8,
+   "building": 224,
+   "base": {
+    "name": "Храм Тиренбург",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberergard-0",
+   "mapId": "map-city-eberergard",
+   "x": 1339.7,
+   "y": 992.5,
+   "building": 50,
+   "base": {
+    "name": "Кастра IV Северного легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Эберергард — кастра IV Северного легиона, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberergard-1",
+   "mapId": "map-city-eberergard",
+   "x": 945.7,
+   "y": 708.2,
+   "building": 65,
+   "base": {
+    "name": "Храм Эберергард",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberergard-2",
+   "mapId": "map-city-eberergard",
+   "x": 588.6,
+   "y": 768.8,
+   "building": 62,
+   "base": {
+    "name": "Старая сторожевая вышка",
+    "type": "tower",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь каменный мост времён Валериана Строителя и заброшенная сторожевая вышка эпохи княжеств.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landinlage-0",
+   "mapId": "map-city-landinlage",
+   "x": 1136.4,
+   "y": 1058.3,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Фридрих Штайнау и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landinlage-1",
+   "mapId": "map-city-landinlage",
+   "x": 1007.3,
+   "y": 1102.5,
+   "building": 269,
+   "base": {
+    "name": "Храм Ландинлаге",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landinlage-2",
+   "mapId": "map-city-landinlage",
+   "x": 895,
+   "y": 1090.2,
+   "building": 98,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Ландинлаге — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostenholm-0",
+   "mapId": "map-city-ostenholm",
+   "x": 1173.7,
+   "y": 1019,
+   "building": 72,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит губернатор Эккехард Баувирт и совет судовладельцев.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostenholm-1",
+   "mapId": "map-city-ostenholm",
+   "x": 1257.8,
+   "y": 1052.8,
+   "building": 275,
+   "base": {
+    "name": "Храм Остенхольм",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostenholm-2",
+   "mapId": "map-city-ostenholm",
+   "x": 1320.7,
+   "y": 802,
+   "building": 166,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "портовый город.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostenholm-3",
+   "mapId": "map-city-ostenholm",
+   "x": 1103.3,
+   "y": 909.3,
+   "building": 55,
+   "base": {
+    "name": "Склады Зальтмаров",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Соль и товары юга везут на склады Зальтмаров.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostenholm-4",
+   "mapId": "map-city-ostenholm",
+   "x": 1353.7,
+   "y": 999.2,
+   "building": 92,
+   "base": {
+    "name": "Почтовая станция",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Почтовая станция на имперском тракте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-miterbah-0",
+   "mapId": "map-city-miterbah",
+   "x": 916.7,
+   "y": 649.3,
+   "building": 25,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит назначенный губернатор Герхард Вайске; ратуша спорит с ним по каждому налогу.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-miterbah-1",
+   "mapId": "map-city-miterbah",
+   "x": 772.6,
+   "y": 830.5,
+   "building": 29,
+   "base": {
+    "name": "Ратуша Митербах",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Митербах — окружной городок с ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-miterbah-2",
+   "mapId": "map-city-miterbah",
+   "x": 740.8,
+   "y": 684.2,
+   "building": 128,
+   "base": {
+    "name": "Храм Митербах",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-uldorf-0",
+   "mapId": "map-city-uldorf",
+   "x": 1099.1,
+   "y": 1274.1,
+   "building": 105,
+   "base": {
+    "name": "Замок Дома Брандт",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Ульдорф — родовое гнездо Дома Брандт: замок над рекой, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-uldorf-1",
+   "mapId": "map-city-uldorf",
+   "x": 1098.5,
+   "y": 846,
+   "building": 180,
+   "base": {
+    "name": "Храм Ульдорф",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryuninhaim-0",
+   "mapId": "map-city-gryuninhaim",
+   "x": 1384.7,
+   "y": 674.9,
+   "building": 33,
+   "base": {
+    "name": "Кастра VII Лесного легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Грюнинхайм — кастра VII Лесного легиона, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryuninhaim-1",
+   "mapId": "map-city-gryuninhaim",
+   "x": 911.2,
+   "y": 1119.3,
+   "building": 36,
+   "base": {
+    "name": "Храм Грюнинхайм",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryuninhaim-2",
+   "mapId": "map-city-gryuninhaim",
+   "x": 696.6,
+   "y": 1162.4,
+   "building": 1,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "ярмарка в месяц Фраул и постоялый двор для гуртовщиков.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenholm-0",
+   "mapId": "map-city-kirhenholm",
+   "x": 1129.6,
+   "y": 868.3,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор — Эгон Хофмер; гаванью ведает портовый мастер Герхард Ротер.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenholm-1",
+   "mapId": "map-city-kirhenholm",
+   "x": 1012.8,
+   "y": 833.4,
+   "building": 355,
+   "base": {
+    "name": "Храм Кирхенхольм",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenholm-2",
+   "mapId": "map-city-kirhenholm",
+   "x": 1239.3,
+   "y": 1071.5,
+   "building": 200,
+   "base": {
+    "name": "Контора портового мастера",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "порт, куда заходят каботажные суда.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenholm-3",
+   "mapId": "map-city-kirhenholm",
+   "x": 750.6,
+   "y": 1171.1,
+   "building": 221,
+   "base": {
+    "name": "Склады Зальтмаров",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Соль и товары юга везут на склады Зальтмаров.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenholm-4",
+   "mapId": "map-city-kirhenholm",
+   "x": 939.8,
+   "y": 923.9,
+   "building": 45,
+   "base": {
+    "name": "Почтовая станция",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Почтовая станция на имперском тракте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenholm-5",
+   "mapId": "map-city-kirhenholm",
+   "x": 1092.4,
+   "y": 744.1,
+   "building": 17,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "В деревне верят, что серебряная монета Октавиана Счетовода приносит удачу в торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenholm-6",
+   "mapId": "map-city-kirhenholm",
+   "x": 873.9,
+   "y": 1041.4,
+   "building": 64,
+   "base": {
+    "name": "Верфи",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Кормится тем, что даёт земля: горные пастбища, медь и олово, малые верфи для баркасов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-amlage-0",
+   "mapId": "map-city-amlage",
+   "x": 1101.2,
+   "y": 1660.2,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Вильгельм Хайльгер и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-amlage-1",
+   "mapId": "map-city-amlage",
+   "x": 1028.9,
+   "y": 1915.8,
+   "building": 77,
+   "base": {
+    "name": "Храм Амлаге",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-amlage-2",
+   "mapId": "map-city-amlage",
+   "x": 933.8,
+   "y": 2085.6,
+   "building": 72,
+   "base": {
+    "name": "Склады Зальтмаров",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Соль и товары юга везут на склады Зальтмаров.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falburg-0",
+   "mapId": "map-city-falburg",
+   "x": 1259.3,
+   "y": 525.4,
+   "building": 70,
+   "base": {
+    "name": "Кастра VIII Конного легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Фальбург — кастра VIII Конного легиона, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falburg-1",
+   "mapId": "map-city-falburg",
+   "x": 1280.3,
+   "y": 975.3,
+   "building": 82,
+   "base": {
+    "name": "Храм Фальбург",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-visendorf-0",
+   "mapId": "map-city-visendorf",
+   "x": 387.8,
+   "y": 734.3,
+   "building": 292,
+   "base": {
+    "name": "Замок Дома Райнхольд",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Висендорф — родовое гнездо Дома Райнхольд: замок над рекой, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-visendorf-1",
+   "mapId": "map-city-visendorf",
+   "x": 687.9,
+   "y": 712.9,
+   "building": 348,
+   "base": {
+    "name": "Храм Висендорф",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-badenfeld-0",
+   "mapId": "map-city-badenfeld",
+   "x": 960.3,
+   "y": 892.3,
+   "building": 1,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Ансельм Дорнниц и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-badenfeld-1",
+   "mapId": "map-city-badenfeld",
+   "x": 1078.3,
+   "y": 1215.3,
+   "building": 101,
+   "base": {
+    "name": "Храм Баденфельд",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-badenfeld-2",
+   "mapId": "map-city-badenfeld",
+   "x": 1091.9,
+   "y": 1420.7,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "ярмарка каждую Кварту.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aminbruk-0",
+   "mapId": "map-city-aminbruk",
+   "x": 1368.3,
+   "y": 794.6,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Конрад Грюнле и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aminbruk-1",
+   "mapId": "map-city-aminbruk",
+   "x": 1320.8,
+   "y": 911.8,
+   "building": 24,
+   "base": {
+    "name": "Ратуша Аминбрук",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Аминбрук — окружной городок с ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-aminbruk-2",
+   "mapId": "map-city-aminbruk",
+   "x": 1336.6,
+   "y": 844.6,
+   "building": 277,
+   "base": {
+    "name": "Храм Аминбрук",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberinrit-0",
+   "mapId": "map-city-eberinrit",
+   "x": 1119.2,
+   "y": 862.1,
+   "building": 535,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом правит губернатор Маттиас Адбах, магистрат — от гильдий.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberinrit-1",
+   "mapId": "map-city-eberinrit",
+   "x": 1185.6,
+   "y": 996.3,
+   "building": 0,
+   "base": {
+    "name": "Ратуша Эберинрит",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "магистрат — от гильдий.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberinrit-2",
+   "mapId": "map-city-eberinrit",
+   "x": 1203.2,
+   "y": 1003.5,
+   "building": 2237,
+   "base": {
+    "name": "Храм Эберинрит",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberinrit-3",
+   "mapId": "map-city-eberinrit",
+   "x": 1255.4,
+   "y": 978.6,
+   "building": 210,
+   "base": {
+    "name": "Склады Зальтмаров",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Соль и товары юга везут на склады Зальтмаров.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberinrit-4",
+   "mapId": "map-city-eberinrit",
+   "x": 547.2,
+   "y": 490,
+   "building": 1688,
+   "base": {
+    "name": "Старая сторожевая вышка",
+    "type": "tower",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь заброшенная сторожевая вышка эпохи княжеств и курган воинов эпохи раздробленности.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukshtein-0",
+   "mapId": "map-city-brukshtein",
+   "x": 703.4,
+   "y": 765.5,
+   "building": 12,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит губернатор Агата Кальтштедт и совет судовладельцев.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukshtein-1",
+   "mapId": "map-city-brukshtein",
+   "x": 616.6,
+   "y": 750.2,
+   "building": 262,
+   "base": {
+    "name": "Храм Брукштейн",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukshtein-2",
+   "mapId": "map-city-brukshtein",
+   "x": 615.4,
+   "y": 905.5,
+   "building": 42,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "порт, куда заходят каботажные суда.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukshtein-3",
+   "mapId": "map-city-brukshtein",
+   "x": 653,
+   "y": 693.2,
+   "building": 13,
+   "base": {
+    "name": "Почтовая станция",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Почтовая станция на имперском тракте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altenfeld-0",
+   "mapId": "map-city-altenfeld",
+   "x": 932.2,
+   "y": 945,
+   "building": 21,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Городом управляет губернатор Генрих Оберхайм и земское собрание.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altenfeld-1",
+   "mapId": "map-city-altenfeld",
+   "x": 1048.2,
+   "y": 821.5,
+   "building": 75,
+   "base": {
+    "name": "Храм Альтенфельд",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altenfeld-2",
+   "mapId": "map-city-altenfeld",
+   "x": 951.5,
+   "y": 630.2,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Альтенфельд — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-roienveiler-0",
+   "mapId": "map-city-roienveiler",
+   "x": 1123,
+   "y": 1373.2,
+   "building": 151,
+   "base": {
+    "name": "Замок Дома Эссенвальд",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Ройенвейлер — родовое гнездо Дома Эссенвальд: замок над долиной, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-roienveiler-1",
+   "mapId": "map-city-roienveiler",
+   "x": 1086.9,
+   "y": 1857.3,
+   "building": 183,
+   "base": {
+    "name": "Храм Ройенвейлер",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landhauzen-0",
+   "mapId": "map-city-landhauzen",
+   "x": 973.3,
+   "y": 472.9,
+   "building": 69,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит губернатор Вендель Мардорф и совет судовладельцев.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landhauzen-1",
+   "mapId": "map-city-landhauzen",
+   "x": 1035.2,
+   "y": 597.7,
+   "building": 360,
+   "base": {
+    "name": "Храм Ландхаузен",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landhauzen-2",
+   "mapId": "map-city-landhauzen",
+   "x": 1287.6,
+   "y": 503.3,
+   "building": 174,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "порт, куда заходят каботажные суда.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kelholm-0",
+   "mapId": "map-city-kelholm",
+   "x": 1368.8,
+   "y": 1160.5,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор — Магдалена Шварцман; гаванью ведает портовый мастер Эккехард Баубрандт.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kelholm-1",
+   "mapId": "map-city-kelholm",
+   "x": 1412,
+   "y": 1134.8,
+   "building": 265,
+   "base": {
+    "name": "Храм Кельхольм",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kelholm-2",
+   "mapId": "map-city-kelholm",
+   "x": 1203,
+   "y": 1289.5,
+   "building": 212,
+   "base": {
+    "name": "Контора портового мастера",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "портовый город.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kelholm-3",
+   "mapId": "map-city-kelholm",
+   "x": 1420.5,
+   "y": 1518.4,
+   "building": 256,
+   "base": {
+    "name": "Старая сторожевая вышка",
+    "type": "tower",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь земская больница и заброшенная сторожевая вышка эпохи княжеств.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-veddorf-0",
+   "mapId": "map-city-veddorf",
+   "x": 1338.9,
+   "y": 570.9,
+   "building": 40,
+   "base": {
+    "name": "Кастра V Южного легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Веддорф — кастра V Южного легиона, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-veddorf-1",
+   "mapId": "map-city-veddorf",
+   "x": 1058.4,
+   "y": 980.8,
+   "building": 53,
+   "base": {
+    "name": "Храм Веддорф",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-zonerbruk-0",
+   "mapId": "map-city-zonerbruk",
+   "x": 775.8,
+   "y": 818.2,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор — Вендель Линхайм.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-zonerbruk-1",
+   "mapId": "map-city-zonerbruk",
+   "x": 614.1,
+   "y": 794.5,
+   "building": 7,
+   "base": {
+    "name": "Ратуша Зонербрук",
+    "type": "assembly",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Зонербрук — окружной городок с ратуш\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-zonerbruk-2",
+   "mapId": "map-city-zonerbruk",
+   "x": 669.2,
+   "y": 699.9,
+   "building": 79,
+   "base": {
+    "name": "Храм Зонербрук",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-unterinshtein-0",
+   "mapId": "map-city-unterinshtein",
+   "x": 1286.5,
+   "y": 475.3,
+   "building": 50,
+   "base": {
+    "name": "Кастра IX Легиона Стражей Брода",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Унтеринштейн — кастра IX Легиона Стражей Брода, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-unterinshtein-1",
+   "mapId": "map-city-unterinshtein",
+   "x": 1080.5,
+   "y": 959.3,
+   "building": 77,
+   "base": {
+    "name": "Храм Унтеринштейн",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-unterinshtein-2",
+   "mapId": "map-city-unterinshtein",
+   "x": 1381.5,
+   "y": 928.8,
+   "building": 43,
+   "base": {
+    "name": "Почтовая станция",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Почтовая станция на имперском тракте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukinbah-0",
+   "mapId": "map-city-brukinbah",
+   "x": 1060.1,
+   "y": 1068.3,
+   "building": 83,
+   "base": {
+    "name": "Кастра X Легиона Последней клятвы",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Брукинбах — кастра X Легиона Последней клятвы, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukinbah-1",
+   "mapId": "map-city-brukinbah",
+   "x": 739.6,
+   "y": 1323.1,
+   "building": 104,
+   "base": {
+    "name": "Храм Брукинбах",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukinbah-2",
+   "mapId": "map-city-brukinbah",
+   "x": 500.7,
+   "y": 1371.9,
+   "building": 33,
+   "base": {
+    "name": "Склады Зальтмаров",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Соль и товары юга везут на склады Зальтмаров.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukinbah-3",
+   "mapId": "map-city-brukinbah",
+   "x": 844.6,
+   "y": 1227.1,
+   "building": 0,
+   "base": {
+    "name": "Мельница",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь мельница на три жернова.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainelshtein-0",
+   "mapId": "map-city-shtainelshtein",
+   "x": 743.7,
+   "y": 455.8,
+   "building": 128,
+   "base": {
+    "name": "Замок Дома Литтенау",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Штайнельштейн — родовое гнездо Дома Литтенау: замок над городом, где хранят знамёна и родовые книги дома.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainelshtein-1",
+   "mapId": "map-city-shtainelshtein",
+   "x": 947.4,
+   "y": 834.1,
+   "building": 152,
+   "base": {
+    "name": "Храм Штайнельштейн",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainelshtein-2",
+   "mapId": "map-city-shtainelshtein",
+   "x": 961.3,
+   "y": 739.9,
+   "building": 0,
+   "base": {
+    "name": "Пивоварня",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь пивоварня, поставляющая пиво гарнизонам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vererau-0",
+   "mapId": "map-city-vererau",
+   "x": 1537.3,
+   "y": 1097.6,
+   "building": 122,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит губернатор Хайнц Хагенке и совет судовладельцев.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vererau-1",
+   "mapId": "map-city-vererau",
+   "x": 1343.1,
+   "y": 1088.6,
+   "building": 505,
+   "base": {
+    "name": "Храм Верерау",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vererau-2",
+   "mapId": "map-city-vererau",
+   "x": 1326.3,
+   "y": 1112.2,
+   "building": 5,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "порт, куда заходят каботажные суда.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vererau-3",
+   "mapId": "map-city-vererau",
+   "x": 1359.2,
+   "y": 1142.7,
+   "building": 174,
+   "base": {
+    "name": "Почтовая станция",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Почтовая станция на имперском тракте.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vererau-4",
+   "mapId": "map-city-vererau",
+   "x": 1331.7,
+   "y": 1134.8,
+   "building": 1,
+   "base": {
+    "name": "Верфи",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Лес и пенька отсюда уходят на верфи Морвингов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landmyunde-0",
+   "mapId": "map-city-landmyunde",
+   "x": 1475.7,
+   "y": 1334.5,
+   "building": 41,
+   "base": {
+    "name": "Кастра VI Морского легиона",
+    "type": "castle",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Ландмюнде — кастра VI Морского легиона, военный город, где живут легионеры, их семьи и ветераны.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landmyunde-1",
+   "mapId": "map-city-landmyunde",
+   "x": 1051.2,
+   "y": 1139.7,
+   "building": 61,
+   "base": {
+    "name": "Храм Ландмюнде",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-landmyunde-2",
+   "mapId": "map-city-landmyunde",
+   "x": 551.7,
+   "y": 1310.1,
+   "building": 42,
+   "base": {
+    "name": "Верфи",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Лес и пенька отсюда уходят на верфи Морвингов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neiinberg-0",
+   "mapId": "map-city-neiinberg",
+   "x": 1170.4,
+   "y": 1554.6,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Правит губернатор Юрген Тангер и совет судовладельцев.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neiinberg-1",
+   "mapId": "map-city-neiinberg",
+   "x": 1056.1,
+   "y": 1556.8,
+   "building": 251,
+   "base": {
+    "name": "Храм Нейинберг",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neiinberg-2",
+   "mapId": "map-city-neiinberg",
+   "x": 665.8,
+   "y": 1731.7,
+   "building": 111,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "портовый город.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neiinberg-3",
+   "mapId": "map-city-neiinberg",
+   "x": 656.7,
+   "y": 1614.6,
+   "building": 60,
+   "base": {
+    "name": "Верфи",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Лес и пенька отсюда уходят на верфи Морвингов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelberg-0",
+   "mapId": "map-city-erelberg",
+   "x": 1076,
+   "y": 655.2,
+   "building": 0,
+   "base": {
+    "name": "Дом губернатора",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Губернатор — Эккехард Вальддорф; гаванью ведает портовый мастер Вендель Берер.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelberg-1",
+   "mapId": "map-city-erelberg",
+   "x": 1041.6,
+   "y": 609.4,
+   "building": 258,
+   "base": {
+    "name": "Храм Эрельберг",
+    "type": "temple",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelberg-2",
+   "mapId": "map-city-erelberg",
+   "x": 1398.6,
+   "y": 756.9,
+   "building": 232,
+   "base": {
+    "name": "Контора портового мастера",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Эрельберг — гаван\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelberg-3",
+   "mapId": "map-city-erelberg",
+   "x": 1253.4,
+   "y": 592.3,
+   "building": 157,
+   "base": {
+    "name": "Мельница",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь мельница на три жернова и пивоварня, поставляющая пиво гарнизонам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelberg-4",
+   "mapId": "map-city-erelberg",
+   "x": 864.2,
+   "y": 624,
+   "building": 80,
+   "base": {
+    "name": "Пивоварня",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь мельница на три жернова и пивоварня, поставляющая пиво гарнизонам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelberg-5",
+   "mapId": "map-city-erelberg",
+   "x": 1035.3,
+   "y": 566.8,
+   "building": 74,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Эрельберг — гавань и торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelberg-6",
+   "mapId": "map-city-erelberg",
+   "x": 1313,
+   "y": 741.1,
+   "building": 235,
+   "base": {
+    "name": "Верфи",
+    "type": "landmark",
+    "stateId": "be9b309a-e",
+    "population": "",
+    "ruler": "",
+    "description": "Лес и пенька отсюда уходят на верфи Морвингов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tselhauzen-0",
+   "mapId": "map-city-tselhauzen",
+   "x": 1357.5,
+   "y": 1356.9,
+   "building": 149,
+   "base": {
+    "name": "Храм Целхаузен",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tselhauzen-1",
+   "mapId": "map-city-tselhauzen",
+   "x": 1290.5,
+   "y": 1305.3,
+   "building": 34,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "рынок\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eshholm-0",
+   "mapId": "map-city-eshholm",
+   "x": 683.4,
+   "y": 1825.9,
+   "building": 178,
+   "base": {
+    "name": "Гнездо Горных Аргусов",
+    "type": "castle",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Эшхольм — гнездо Горных Аргусов, ветви Хоэнфельс: железные и медные рудники на крутых склонах.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eshholm-1",
+   "mapId": "map-city-eshholm",
+   "x": 991.8,
+   "y": 1426.1,
+   "building": 210,
+   "base": {
+    "name": "Храм Эшхольм",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-taldorf-0",
+   "mapId": "map-city-taldorf",
+   "x": 806.4,
+   "y": 570.8,
+   "building": 122,
+   "base": {
+    "name": "Гнездо баронов Вальдгриз",
+    "type": "castle",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Тальдорф — гнездо баронов Вальдгриз, хлебная столица Зиггау.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-taldorf-1",
+   "mapId": "map-city-taldorf",
+   "x": 1011.1,
+   "y": 1224.1,
+   "building": 141,
+   "base": {
+    "name": "Храм Тальдорф",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-elmerrit-0",
+   "mapId": "map-city-elmerrit",
+   "x": 1321.7,
+   "y": 874,
+   "building": 206,
+   "base": {
+    "name": "Храм Эльмеррит",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-elmerrit-1",
+   "mapId": "map-city-elmerrit",
+   "x": 1140.5,
+   "y": 841.4,
+   "building": 0,
+   "base": {
+    "name": "Мельница",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь каменная мельница, по преданию, построенная Тибальтом Мельником.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gerinvedel-0",
+   "mapId": "map-city-gerinvedel",
+   "x": 1257.3,
+   "y": 855,
+   "building": 121,
+   "base": {
+    "name": "Храм Геринведель",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norerholm-0",
+   "mapId": "map-city-norerholm",
+   "x": 920.5,
+   "y": 759.9,
+   "building": 156,
+   "base": {
+    "name": "Храм Норерхольм",
+    "type": "temple",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norerholm-1",
+   "mapId": "map-city-norerholm",
+   "x": 895.5,
+   "y": 927.4,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "d79a323f-c",
+    "population": "",
+    "ruler": "",
+    "description": "ярмарочный городок, где раз в год на праздник Святой Агны Выкупленной оценщики Сената принимают выкуп.\n\n_черновик_",
     "image": ""
    },
    "history": [],
@@ -65757,7 +69779,8 @@
     "y": 1221
    },
    "coastal": false,
-   "description": "Целхаузен — соляной городок бывших земель Тальелей, ныне коронный домен. Солеварни работают на Сенат; соль идёт на Цепной рынок и в Империю. Коронный домен. До 126 г. — один из замков Маркграфства Фалькенрит."
+   "description": "Целхаузен — соляной городок бывших земель Тальелей, ныне коронный домен. Солеварни работают на Сенат; соль идёт на Цепной рынок и в Империю. Коронный домен. До 126 г. — один из замков Маркграфства Фалькенрит.",
+   "cityMapId": "map-city-tselhauzen"
   },
   {
    "id": 1069,
@@ -67011,7 +71034,8 @@
     "y": 1257
    },
    "coastal": false,
-   "description": "Эшхольм — гнездо Горных Аргусов, ветви Хоэнфельс: железные и медные рудники на крутых склонах. Старейшина рода Зигмар Хоэнфельс принимает здесь гостей в охотничьем зале с медвежьими шкурами. Землёй владеет род Аргус-Хоэнфельс. До 126 г. — один из замков Маркграфства Фалькенрит."
+   "description": "Эшхольм — гнездо Горных Аргусов, ветви Хоэнфельс: железные и медные рудники на крутых склонах. Старейшина рода Зигмар Хоэнфельс принимает здесь гостей в охотничьем зале с медвежьими шкурами. Землёй владеет род Аргус-Хоэнфельс. До 126 г. — один из замков Маркграфства Фалькенрит.",
+   "cityMapId": "map-city-eshholm"
   },
   {
    "id": 1100,
@@ -71413,7 +75437,8 @@
     "y": 1341
    },
    "coastal": false,
-   "description": "Ландвейлер — второй город Короны и самый большой невольничий торг Лоры: Цепной рынок под крытыми аркадами на семьсот помостов. Бургграфы Эберсы держат торг по Эберсфельдской правде с 44 г.; цену раба объявляют звоном — по удару на сотню серебром. В Сребролистом квартале живут эльфы-рабы, купленные домами города: музыканты, писцы, садовники. Землёй владеет род Эберс. До 127 г. — владение графов Эберсфельда."
+   "description": "Ландвейлер — второй город Короны и самый большой невольничий торг Лоры: Цепной рынок под крытыми аркадами на семьсот помостов. Бургграфы Эберсы держат торг по Эберсфельдской правде с 44 г.; цену раба объявляют звоном — по удару на сотню серебром. В Сребролистом квартале живут эльфы-рабы, купленные домами города: музыканты, писцы, садовники. Землёй владеет род Эберс. До 127 г. — владение графов Эберсфельда.",
+   "cityMapId": "map-city-landveiler"
   },
   {
    "id": 1210,
@@ -78593,7 +82618,8 @@
     "y": 1495
    },
    "coastal": true,
-   "description": "Лауенвальд — Невольничья гавань: сюда приходят корабли с юга и островов с людьми в трюмах. Порт держит младшая ветвь Аргус-Лауэн; на молу стоит Лауенвальдская эскадра Короны. Портовые кабаки говорят на цепной речи; по ночам Вольники выкупают здесь беглых и прячут их на рыбачьих лодках. Землёй владеет род Аргус-Лауэн. До 127 г. — владение графов Эберсфельда."
+   "description": "Лауенвальд — Невольничья гавань: сюда приходят корабли с юга и островов с людьми в трюмах. Порт держит младшая ветвь Аргус-Лауэн; на молу стоит Лауенвальдская эскадра Короны. Портовые кабаки говорят на цепной речи; по ночам Вольники выкупают здесь беглых и прячут их на рыбачьих лодках. Землёй владеет род Аргус-Лауэн. До 127 г. — владение графов Эберсфельда.",
+   "cityMapId": "map-city-lauenvald"
   },
   {
    "id": 1388,
@@ -79766,7 +83792,8 @@
     "y": 1533
    },
    "coastal": false,
-   "description": "Лаубург — кастра II Пепельного легиона, военный город, где живут легионеры, их семьи и ветераны. Серые плащи на стенах, пепельные знамёна над воротами. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Держится промыслами: ледники, где режут лёд для столицы, серебряный рудник. Здесь курган воинов эпохи раздробленности. До 126 г. — земля Графства Морвен; присоединена Тейбером в войны объединения."
+   "description": "Лаубург — кастра II Пепельного легиона, военный город, где живут легионеры, их семьи и ветераны. Серые плащи на стенах, пепельные знамёна над воротами. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Держится промыслами: ледники, где режут лёд для столицы, серебряный рудник. Здесь курган воинов эпохи раздробленности. До 126 г. — земля Графства Морвен; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-lauburg"
   },
   {
    "id": 1418,
@@ -80466,7 +84493,8 @@
     "y": 1545
    },
    "coastal": false,
-   "description": "Тальдорф — гнездо баронов Вальдгриз, хлебная столица Зиггау. Баронесса Герлинда отменила здесь кнут; соседи шепчутся, что её рабы работают усерднее чужих. Землёй владеет род Вальдгриз. До 127 г. — владение графов Эберсфельда."
+   "description": "Тальдорф — гнездо баронов Вальдгриз, хлебная столица Зиггау. Баронесса Герлинда отменила здесь кнут; соседи шепчутся, что её рабы работают усерднее чужих. Землёй владеет род Вальдгриз. До 127 г. — владение графов Эберсфельда.",
+   "cityMapId": "map-city-taldorf"
   },
   {
    "id": 1435,
@@ -80504,7 +84532,8 @@
     "y": 1567
    },
    "coastal": true,
-   "description": "Эльмеррит — городок с рыночной площадью и часовней. Кормится тем, что даёт земля: сыроварни, хмель. Надсмотрщик от Сената ведёт счёт рабам и раз в год отсылает его в Счётную палату. Городом правит губернатор от Сената Ульрих Эйхбах. Здесь каменная мельница, по преданию, построенная Тибальтом Мельником. Землёй владеет род Аргус-Лауэн. До 127 г. — владение графов Эберсфельда."
+   "description": "Эльмеррит — городок с рыночной площадью и часовней. Кормится тем, что даёт земля: сыроварни, хмель. Надсмотрщик от Сената ведёт счёт рабам и раз в год отсылает его в Счётную палату. Городом правит губернатор от Сената Ульрих Эйхбах. Здесь каменная мельница, по преданию, построенная Тибальтом Мельником. Землёй владеет род Аргус-Лауэн. До 127 г. — владение графов Эберсфельда.",
+   "cityMapId": "map-city-elmerrit"
   },
   {
    "id": 1436,
@@ -81473,7 +85502,8 @@
     "y": 1569
    },
    "coastal": false,
-   "description": "Геринведель — городок у моста, где в 977 г. полдня держались вчерашние рабы Вольной Зиггау. Теперь — коронный домен; кронпринцесса Леонора сдавала здесь Испытание счёта. Коронный домен. До 125 г. — земля монастырского княжества Вальдек."
+   "description": "Геринведель — городок у моста, где в 977 г. полдня держались вчерашние рабы Вольной Зиггау. Теперь — коронный домен; кронпринцесса Леонора сдавала здесь Испытание счёта. Коронный домен. До 125 г. — земля монастырского княжества Вальдек.",
+   "cityMapId": "map-city-gerinvedel"
   },
   {
    "id": 1458,
@@ -85703,7 +89733,8 @@
     "y": 1661
    },
    "coastal": false,
-   "description": "Норерхольм — ярмарочный городок, где раз в год на праздник Святой Агны Выкупленной оценщики Сената принимают выкуп. В этот день на площади продают Серебряные грамоты, и все рабы округа приходят посмотреть, как их получают пятеро из тысячи. Землёй владеет род Вальдгриз. До 127 г. — владение графов Эберсфельда."
+   "description": "Норерхольм — ярмарочный городок, где раз в год на праздник Святой Агны Выкупленной оценщики Сената принимают выкуп. В этот день на площади продают Серебряные грамоты, и все рабы округа приходят посмотреть, как их получают пятеро из тысячи. Землёй владеет род Вальдгриз. До 127 г. — владение графов Эберсфельда.",
+   "cityMapId": "map-city-norerholm"
   },
   {
    "id": 1556,
@@ -85783,7 +89814,8 @@
     "y": 1679
    },
    "coastal": false,
-   "description": "Штайнерведель — главный город своего края. Держится своим трудом: сланец и точильный камень, серебряный рудник. Лесничие Тессенов строго считают каждое срубленное дерево. Губернатор Ансельм Хайльбах держит город при поддержке гильдий. Здесь почтовая станция на имперском тракте. До 125 г. — земля Графства Морвен; присоединена Тейбером в войны объединения. Здесь родился знаменитый ветеран Пепельного легиона, и деревня до сих пор этим гордится."
+   "description": "Штайнерведель — главный город своего края. Держится своим трудом: сланец и точильный камень, серебряный рудник. Лесничие Тессенов строго считают каждое срубленное дерево. Губернатор Ансельм Хайльбах держит город при поддержке гильдий. Здесь почтовая станция на имперском тракте. До 125 г. — земля Графства Морвен; присоединена Тейбером в войны объединения. Здесь родился знаменитый ветеран Пепельного легиона, и деревня до сих пор этим гордится.",
+   "cityMapId": "map-city-shtainervedel"
   },
   {
    "id": 1558,
@@ -91773,7 +95805,8 @@
     "y": 1787
    },
    "coastal": false,
-   "description": "Брасштадт — ремесленный городок. Живёт промыслами: строевой лес, грибы и ягоды для столичных рынков. Лесничие Тессенов строго считают каждое срубленное дерево. Губернатор — Эльза Хайльниц. Землёй владеет род фон Брасштадт. Здесь кузня, где куют подковы для имперской кавалерии. До 125 г. — земля Княжества Ройвен; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета."
+   "description": "Брасштадт — ремесленный городок. Живёт промыслами: строевой лес, грибы и ягоды для столичных рынков. Лесничие Тессенов строго считают каждое срубленное дерево. Губернатор — Эльза Хайльниц. Землёй владеет род фон Брасштадт. Здесь кузня, где куют подковы для имперской кавалерии. До 125 г. — земля Княжества Ройвен; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета.",
+   "cityMapId": "map-city-brasshtadt"
   },
   {
    "id": 1696,
@@ -92544,7 +96577,8 @@
     "y": 1821
    },
    "coastal": false,
-   "description": "Тирерау — кастра III Штайнгардского легиона, военный город, где живут легионеры, их семьи и ветераны. Горные волки держат перевалы и учат новобранцев лазать по скалам. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Богатеет своим трудом: горные пастбища, сланец и точильный камень. На лугах пасутся табуны Фалькенхорстов. Здесь кладбище с плитами легионеров. До 125 г. — земля Княжества Кастерфельд; присоединена Тейбером в войны объединения. Половина деревни носит одну фамилию: все — потомки одного полкового бастарда Себастьяна Красавца."
+   "description": "Тирерау — кастра III Штайнгардского легиона, военный город, где живут легионеры, их семьи и ветераны. Горные волки держат перевалы и учат новобранцев лазать по скалам. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Богатеет своим трудом: горные пастбища, сланец и точильный камень. На лугах пасутся табуны Фалькенхорстов. Здесь кладбище с плитами легионеров. До 125 г. — земля Княжества Кастерфельд; присоединена Тейбером в войны объединения. Половина деревни носит одну фамилию: все — потомки одного полкового бастарда Себастьяна Красавца.",
+   "cityMapId": "map-city-tirerau"
   },
   {
    "id": 1714,
@@ -93930,7 +97964,8 @@
     "y": 1863
    },
    "coastal": false,
-   "description": "Дальхаузен — родовое гнездо Дома Фалькенхорст: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: скошенный щит, золото и червлень; чёрный орёл; девиз «Быстрее ветра». Кормится своим трудом: грибы и ягоды для столичных рынков, корабельные мачты. На лугах пасутся табуны Фалькенхорстов. Здесь почтовая станция на имперском тракте. До 125 г. — земля Графства Морвен; присоединена Тейбером в войны объединения. В 975–980 гг. здесь ждали императора и проклинали совет."
+   "description": "Дальхаузен — родовое гнездо Дома Фалькенхорст: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: скошенный щит, золото и червлень; чёрный орёл; девиз «Быстрее ветра». Кормится своим трудом: грибы и ягоды для столичных рынков, корабельные мачты. На лугах пасутся табуны Фалькенхорстов. Здесь почтовая станция на имперском тракте. До 125 г. — земля Графства Морвен; присоединена Тейбером в войны объединения. В 975–980 гг. здесь ждали императора и проклинали совет.",
+   "cityMapId": "map-city-dalhauzen"
   },
   {
    "id": 1746,
@@ -94575,7 +98610,8 @@
     "y": 1845
    },
    "coastal": false,
-   "description": "Альтштейн — родовое гнездо Дома Тессен: замок над долиной, где хранят знамёна и родовые книги дома. Над воротами — герб: зелёный щит с бурой каймой; серебряный волк; девиз «Лес укроет». Держится своим трудом: строевой лес, древесный уголь. Здесь пивоварня, поставляющая пиво гарнизонам и курган воинов эпохи раздробленности. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей. В колодце, говорят, утопили сборщика налогов при Люции Кровавом — и с тех пор вода горькая."
+   "description": "Альтштейн — родовое гнездо Дома Тессен: замок над долиной, где хранят знамёна и родовые книги дома. Над воротами — герб: зелёный щит с бурой каймой; серебряный волк; девиз «Лес укроет». Держится своим трудом: строевой лес, древесный уголь. Здесь пивоварня, поставляющая пиво гарнизонам и курган воинов эпохи раздробленности. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей. В колодце, говорят, утопили сборщика налогов при Люции Кровавом — и с тех пор вода горькая.",
+   "cityMapId": "map-city-altshtein"
   },
   {
    "id": 1761,
@@ -98616,7 +102652,8 @@
     "y": 1933
    },
    "coastal": false,
-   "description": "Грисельберг — небольшой город за старой стеной. Кормится тем, что даёт земля: лыко и плетёные короба, дёготь и смола. Городом управляет губернатор Вендель Кирхер и земское собрание. Землёй владеет род фон Грисельберг. Здесь ярмарка каждую Квинну. До 125 г. — земля Княжества Ройвен; присоединена Тейбером в войны объединения. Каждую весну здесь спорят, чей бык лучше, — и каждую весну спор кончается дракой."
+   "description": "Грисельберг — небольшой город за старой стеной. Кормится тем, что даёт земля: лыко и плетёные короба, дёготь и смола. Городом управляет губернатор Вендель Кирхер и земское собрание. Землёй владеет род фон Грисельберг. Здесь ярмарка каждую Квинну. До 125 г. — земля Княжества Ройвен; присоединена Тейбером в войны объединения. Каждую весну здесь спорят, чей бык лучше, — и каждую весну спор кончается дракой.",
+   "cityMapId": "map-city-griselberg"
   },
   {
    "id": 1856,
@@ -104384,7 +108421,8 @@
     "y": 2049
    },
    "coastal": false,
-   "description": "Линрит — ремесленный городок. Живёт своим трудом: грибы и ягоды для столичных рынков, бортничество. Городом управляет губернатор Агата Митбах и земское собрание. Землёй владеет род фон Линрит. Здесь часовня Орамея, построенная при Габриэле Благочестивом. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей."
+   "description": "Линрит — ремесленный городок. Живёт своим трудом: грибы и ягоды для столичных рынков, бортничество. Городом управляет губернатор Агата Митбах и земское собрание. Землёй владеет род фон Линрит. Здесь часовня Орамея, построенная при Габриэле Благочестивом. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей.",
+   "cityMapId": "map-city-linrit"
   },
   {
    "id": 1996,
@@ -105762,7 +109800,8 @@
     "y": 2075
    },
    "coastal": false,
-   "description": "Шёнельхаузен — окружной городок с ратушей и рынком. Богатеет своим трудом: древесный уголь, грибы и ягоды для столичных рынков. На лугах пасутся табуны Фалькенхорстов. Городом управляет губернатор Бертольд Митгер и земское собрание. Землёй владеет род фон Шёнельхаузен. Здесь старый межевой камень с гербом Аскенов и ярмарка каждую Квинну. До 124 г. — земля Княжества Кастерфельд; присоединена Тейбером в войны объединения."
+   "description": "Шёнельхаузен — окружной городок с ратушей и рынком. Богатеет своим трудом: древесный уголь, грибы и ягоды для столичных рынков. На лугах пасутся табуны Фалькенхорстов. Городом управляет губернатор Бертольд Митгер и земское собрание. Землёй владеет род фон Шёнельхаузен. Здесь старый межевой камень с гербом Аскенов и ярмарка каждую Квинну. До 124 г. — земля Княжества Кастерфельд; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-shenelhauzen"
   },
   {
    "id": 2030,
@@ -106865,7 +110904,8 @@
     "y": 2105
    },
    "coastal": false,
-   "description": "Митбах — окружной городок с ратушей и рынком. Богатеет тем, что даёт земля: древесный уголь, дёготь и смола. На лугах пасутся табуны Фалькенхорстов. Городом управляет губернатор Генрих Хагенвирт и земское собрание. Здесь каменный мост времён Валериана Строителя и заброшенная сторожевая вышка эпохи княжеств. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей."
+   "description": "Митбах — окружной городок с ратушей и рынком. Богатеет тем, что даёт земля: древесный уголь, дёготь и смола. На лугах пасутся табуны Фалькенхорстов. Городом управляет губернатор Генрих Хагенвирт и земское собрание. Здесь каменный мост времён Валериана Строителя и заброшенная сторожевая вышка эпохи княжеств. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей.",
+   "cityMapId": "map-city-mitbah"
   },
   {
    "id": 2057,
@@ -107275,7 +111315,8 @@
     "y": 2121
    },
    "coastal": false,
-   "description": "Нейхаузен — торговый городок. Кормится тем, что даёт земля: дёготь и смола, древесный уголь. Городом управляет губернатор Хайнц Ротенхайм и земское собрание. Здесь родник, который местные считают целебным и старая сыроварня с погребами. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей. В гражданскую войну осталась верна Короне. По ночам в развалинах старой башни видят огонь: одни говорят — маг, другие — контрабандисты."
+   "description": "Нейхаузен — торговый городок. Кормится тем, что даёт земля: дёготь и смола, древесный уголь. Городом управляет губернатор Хайнц Ротенхайм и земское собрание. Здесь родник, который местные считают целебным и старая сыроварня с погребами. До 120 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей. В гражданскую войну осталась верна Короне. По ночам в развалинах старой башни видят огонь: одни говорят — маг, другие — контрабандисты.",
+   "cityMapId": "map-city-neihauzen"
   },
   {
    "id": 2067,
@@ -108023,7 +112064,8 @@
     "y": 2127
    },
    "coastal": false,
-   "description": "Хагельрит — ремесленный городок. Держится тем, что даёт земля: охота на кабана и оленя, лыко и плетёные короба. Правит назначенный губернатор Герхард Хофниц; ратуша спорит с ним по каждому налогу. Землёй владеет род фон Хагельрит. Здесь часовня Орамея, построенная при Сандре II. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей. Говорят, в здешнем лесу до сих пор бродит призрак князя Ортвина Аскена."
+   "description": "Хагельрит — ремесленный городок. Держится тем, что даёт земля: охота на кабана и оленя, лыко и плетёные короба. Правит назначенный губернатор Герхард Хофниц; ратуша спорит с ним по каждому налогу. Землёй владеет род фон Хагельрит. Здесь часовня Орамея, построенная при Сандре II. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей. Говорят, в здешнем лесу до сих пор бродит призрак князя Ортвина Аскена.",
+   "cityMapId": "map-city-hagelrit"
   },
   {
    "id": 2086,
@@ -108347,7 +112389,8 @@
     "y": 2131
    },
    "coastal": false,
-   "description": "Фальинвальд — торговый городок. Богатеет тем, что даёт земля: корабельные мачты, строевой лес. Губернатор — Гизела Бауман. Землёй владеет род фон Фальинвальд. Здесь пивоварня, поставляющая пиво гарнизонам и кузня, где куют подковы для имперской кавалерии. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. В 975–980 гг. здесь держали сторону совета. Здешние дети играют «в Тейбера и Рагнвальда» — один поджигает, другой тонет."
+   "description": "Фальинвальд — торговый городок. Богатеет тем, что даёт земля: корабельные мачты, строевой лес. Губернатор — Гизела Бауман. Землёй владеет род фон Фальинвальд. Здесь пивоварня, поставляющая пиво гарнизонам и кузня, где куют подковы для имперской кавалерии. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. В 975–980 гг. здесь держали сторону совета. Здешние дети играют «в Тейбера и Рагнвальда» — один поджигает, другой тонет.",
+   "cityMapId": "map-city-falinvald"
   },
   {
    "id": 2094,
@@ -108970,7 +113013,8 @@
     "y": 2149
    },
    "coastal": false,
-   "description": "Касинталь — родовое гнездо Дома Хёльдерн: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: лазоревый щит, золотая раскрытая книга; девиз «Знание — огонь». Держится своим трудом: строевой лес, лыко и плетёные короба. Здесь кузня, где куют подковы для имперской кавалерии и большая осенняя ярмарка в месяц Ячори. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета."
+   "description": "Касинталь — родовое гнездо Дома Хёльдерн: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: лазоревый щит, золотая раскрытая книга; девиз «Знание — огонь». Держится своим трудом: строевой лес, лыко и плетёные короба. Здесь кузня, где куют подковы для имперской кавалерии и большая осенняя ярмарка в месяц Ячори. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета.",
+   "cityMapId": "map-city-kasintal"
   },
   {
    "id": 2110,
@@ -109605,7 +113649,8 @@
     "y": 2167
    },
    "coastal": false,
-   "description": "Касмюнде — торговый городок. Держится своим трудом: охота на кабана и оленя, бортничество. На лугах пасутся табуны Фалькенхорстов. Городом управляет губернатор Вальтер Грюнбрандт и земское собрание. Землёй владеет род фон Касмюнде. Здесь ярмарка каждую Кварту. До 119 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей."
+   "description": "Касмюнде — торговый городок. Держится своим трудом: охота на кабана и оленя, бортничество. На лугах пасутся табуны Фалькенхорстов. Городом управляет губернатор Вальтер Грюнбрандт и земское собрание. Землёй владеет род фон Касмюнде. Здесь ярмарка каждую Кварту. До 119 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей.",
+   "cityMapId": "map-city-kasmyunde"
   },
   {
    "id": 2126,
@@ -112033,7 +116078,8 @@
     "y": 2221
    },
    "coastal": true,
-   "description": "Митерведель — родовое гнездо Дома Зальтмар: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: серебро и лазурь полосами; лазурные весы; девиз «Соль земли». Держится тем, что даёт земля: строевой лес, бортничество, устричные отмели. Здесь дуб, под которым, по преданию, ночевал Тейбер и постоялый двор для гуртовщиков. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения."
+   "description": "Митерведель — родовое гнездо Дома Зальтмар: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: серебро и лазурь полосами; лазурные весы; девиз «Соль земли». Держится тем, что даёт земля: строевой лес, бортничество, устричные отмели. Здесь дуб, под которым, по преданию, ночевал Тейбер и постоялый двор для гуртовщиков. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-mitervedel"
   },
   {
    "id": 2188,
@@ -115095,7 +119141,8 @@
     "y": 2277
    },
    "coastal": false,
-   "description": "Тирельбург — окружной городок с ратушей и рынком. Живёт тем, что даёт земля: грибы и ягоды для столичных рынков, охота на кабана и оленя. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Губернатор — Лизелотта Марбрандт. Здесь дуб, под которым, по преданию, ночевал Тейбер. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег."
+   "description": "Тирельбург — окружной городок с ратушей и рынком. Живёт тем, что даёт земля: грибы и ягоды для столичных рынков, охота на кабана и оленя. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Губернатор — Лизелотта Марбрандт. Здесь дуб, под которым, по преданию, ночевал Тейбер. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег.",
+   "cityMapId": "map-city-tirelburg"
   },
   {
    "id": 2263,
@@ -118550,7 +122597,8 @@
     "y": 2353
    },
    "coastal": false,
-   "description": "Тиренбург — торговый городок. Живёт тем, что даёт земля: охота на кабана и оленя, корабельные мачты. Правит назначенный губернатор Ода Бауке; ратуша спорит с ним по каждому налогу. Здесь памятный столб с именами погибших в 975–980 гг. и дуб, под которым, по преданию, ночевал Тейбер. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения."
+   "description": "Тиренбург — торговый городок. Живёт тем, что даёт земля: охота на кабана и оленя, корабельные мачты. Правит назначенный губернатор Ода Бауке; ратуша спорит с ним по каждому налогу. Здесь памятный столб с именами погибших в 975–980 гг. и дуб, под которым, по преданию, ночевал Тейбер. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-tirenburg"
   },
   {
    "id": 2346,
@@ -118934,7 +122982,8 @@
     "y": 2363
    },
    "coastal": false,
-   "description": "Эберергард — кастра IV Северного легиона, военный город, где живут легионеры, их семьи и ветераны. Отсюда в 975 г. Гериберт Штайнер увёл легион к совету. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Богатеет своим трудом: соль, финики. Подати идут прямо в столичную казну Эссенвальдов. Здесь каменный мост времён Валериана Строителя и заброшенная сторожевая вышка эпохи княжеств. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей. В гражданскую войну стояла за Пакт Ставки и Совета."
+   "description": "Эберергард — кастра IV Северного легиона, военный город, где живут легионеры, их семьи и ветераны. Отсюда в 975 г. Гериберт Штайнер увёл легион к совету. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Богатеет своим трудом: соль, финики. Подати идут прямо в столичную казну Эссенвальдов. Здесь каменный мост времён Валериана Строителя и заброшенная сторожевая вышка эпохи княжеств. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей. В гражданскую войну стояла за Пакт Ставки и Совета.",
+   "cityMapId": "map-city-eberergard"
   },
   {
    "id": 2355,
@@ -119516,7 +123565,8 @@
     "y": 2371
    },
    "coastal": false,
-   "description": "Ландинлаге — торговый городок. Кормится своим трудом: лыко и плетёные короба, корабельные мачты. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Городом управляет губернатор Фридрих Штайнау и земское собрание. Здесь часовня Орамея, построенная при Лотаре Набожном и родник, который местные считают целебным. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег."
+   "description": "Ландинлаге — торговый городок. Кормится своим трудом: лыко и плетёные короба, корабельные мачты. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Городом управляет губернатор Фридрих Штайнау и земское собрание. Здесь часовня Орамея, построенная при Лотаре Набожном и родник, который местные считают целебным. До 124 г. — земля Герцогства Эшенвальд; присоединена Тейбером в войны объединения. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег.",
+   "cityMapId": "map-city-landinlage"
   },
   {
    "id": 2369,
@@ -119644,7 +123694,8 @@
     "y": 2363
    },
    "coastal": true,
-   "description": "Остенхольм — портовый город. Живёт промыслами: корабельные мачты, дёготь и смола, канатные мастерские. Соль и товары юга везут на склады Зальтмаров. Правит губернатор Эккехард Баувирт и совет судовладельцев. Землёй владеет род фон Остенхольм. Здесь почтовая станция на имперском тракте. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета."
+   "description": "Остенхольм — портовый город. Живёт промыслами: корабельные мачты, дёготь и смола, канатные мастерские. Соль и товары юга везут на склады Зальтмаров. Правит губернатор Эккехард Баувирт и совет судовладельцев. Землёй владеет род фон Остенхольм. Здесь почтовая станция на имперском тракте. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета.",
+   "cityMapId": "map-city-ostenholm"
   },
   {
    "id": 2372,
@@ -119904,7 +123955,8 @@
     "y": 2367
    },
    "coastal": false,
-   "description": "Митербах — окружной городок с ратушей и рынком. Живёт промыслами: охота на кабана и оленя, бортничество. Подати идут прямо в столичную казну Эссенвальдов. Правит назначенный губернатор Герхард Вайске; ратуша спорит с ним по каждому налогу. Землёй владеет род фон Митербах. Здесь большая осенняя ярмарка в месяц Алпрас. До 119 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей. В 975–980 гг. здесь держали сторону совета."
+   "description": "Митербах — окружной городок с ратушей и рынком. Живёт промыслами: охота на кабана и оленя, бортничество. Подати идут прямо в столичную казну Эссенвальдов. Правит назначенный губернатор Герхард Вайске; ратуша спорит с ним по каждому налогу. Землёй владеет род фон Митербах. Здесь большая осенняя ярмарка в месяц Алпрас. До 119 г. — земля Графства Ливенхольм; присоединена Тейбером в Войну двух соседей. В 975–980 гг. здесь держали сторону совета.",
+   "cityMapId": "map-city-miterbah"
   },
   {
    "id": 2378,
@@ -120624,7 +124676,8 @@
     "y": 2389
    },
    "coastal": false,
-   "description": "Ульдорф — родовое гнездо Дома Брандт: замок над рекой, где хранят знамёна и родовые книги дома. Над воротами — герб: чёрный щит, червлёное пламя; девиз «Мы помним огонь». Богатеет промыслами: грибы и ягоды для столичных рынков, лыко и плетёные короба. В трактире висит портрет Огненного Дракона — Брандты требуют этого от каждого арендатора. Здесь ремесленная гильдия ткачей и дуб, под которым, по преданию, ночевал Тейбер. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей."
+   "description": "Ульдорф — родовое гнездо Дома Брандт: замок над рекой, где хранят знамёна и родовые книги дома. Над воротами — герб: чёрный щит, червлёное пламя; девиз «Мы помним огонь». Богатеет промыслами: грибы и ягоды для столичных рынков, лыко и плетёные короба. В трактире висит портрет Огненного Дракона — Брандты требуют этого от каждого арендатора. Здесь ремесленная гильдия ткачей и дуб, под которым, по преданию, ночевал Тейбер. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей.",
+   "cityMapId": "map-city-uldorf"
   },
   {
    "id": 2395,
@@ -120898,7 +124951,8 @@
     "y": 2401
    },
    "coastal": false,
-   "description": "Грюнинхайм — кастра VII Лесного легиона, военный город, где живут легионеры, их семьи и ветераны. Зелёные плащи, самые суеверные солдаты Империи: у ворот висят обереги из эльфийских костей. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Живёт промыслами: дёготь и смола, грибы и ягоды для столичных рынков. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Здесь большая осенняя ярмарка в месяц Фраул и постоялый двор для гуртовщиков. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения. Здесь родился знаменитый ветеран Пепельного легиона, и деревня до сих пор этим гордится."
+   "description": "Грюнинхайм — кастра VII Лесного легиона, военный город, где живут легионеры, их семьи и ветераны. Зелёные плащи, самые суеверные солдаты Империи: у ворот висят обереги из эльфийских костей. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Живёт промыслами: дёготь и смола, грибы и ягоды для столичных рынков. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Здесь большая осенняя ярмарка в месяц Фраул и постоялый двор для гуртовщиков. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения. Здесь родился знаменитый ветеран Пепельного легиона, и деревня до сих пор этим гордится.",
+   "cityMapId": "map-city-gryuninhaim"
   },
   {
    "id": 2402,
@@ -122060,7 +126114,8 @@
     "y": 2433
    },
    "coastal": true,
-   "description": "Кирхенхольм — порт, куда заходят каботажные суда. Кормится тем, что даёт земля: горные пастбища, медь и олово, малые верфи для баркасов. Соль и товары юга везут на склады Зальтмаров. Губернатор — Эгон Хофмер; гаванью ведает портовый мастер Герхард Ротер. Здесь почтовая станция на имперском тракте. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. В деревне верят, что серебряная монета Октавиана Счетовода приносит удачу в торге."
+   "description": "Кирхенхольм — порт, куда заходят каботажные суда. Кормится тем, что даёт земля: горные пастбища, медь и олово, малые верфи для баркасов. Соль и товары юга везут на склады Зальтмаров. Губернатор — Эгон Хофмер; гаванью ведает портовый мастер Герхард Ротер. Здесь почтовая станция на имперском тракте. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. В деревне верят, что серебряная монета Октавиана Счетовода приносит удачу в торге.",
+   "cityMapId": "map-city-kirhenholm"
   },
   {
    "id": 2429,
@@ -122255,7 +126310,8 @@
     "y": 2421
    },
    "coastal": false,
-   "description": "Амлаге — ремесленный городок. Держится промыслами: строевой лес, охота на кабана и оленя. Соль и товары юга везут на склады Зальтмаров. Городом управляет губернатор Вильгельм Хайльгер и земское собрание. Здесь кузня, где куют подковы для имперской кавалерии. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. Сюда тайно приезжают монархисты поклониться дому, где ночевал Тейбер II в 977 г."
+   "description": "Амлаге — ремесленный городок. Держится промыслами: строевой лес, охота на кабана и оленя. Соль и товары юга везут на склады Зальтмаров. Городом управляет губернатор Вильгельм Хайльгер и земское собрание. Здесь кузня, где куют подковы для имперской кавалерии. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. Сюда тайно приезжают монархисты поклониться дому, где ночевал Тейбер II в 977 г.",
+   "cityMapId": "map-city-amlage"
   },
   {
    "id": 2434,
@@ -123285,7 +127341,8 @@
     "y": 2465
    },
    "coastal": true,
-   "description": "Фальбург — кастра VIII Конного легиона, военный город, где живут легионеры, их семьи и ветераны. Конюшни на тысячи коней и манеж под крышей. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Живёт тем, что даёт земля: железные копи, медь и олово, соль из выпарных прудов. Здесь дуб, под которым, по преданию, ночевал Тейбер. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей."
+   "description": "Фальбург — кастра VIII Конного легиона, военный город, где живут легионеры, их семьи и ветераны. Конюшни на тысячи коней и манеж под крышей. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Живёт тем, что даёт земля: железные копи, медь и олово, соль из выпарных прудов. Здесь дуб, под которым, по преданию, ночевал Тейбер. До 120 г. — земля Княжества Зигмарк; присоединена Тейбером в Войну двух соседей.",
+   "cityMapId": "map-city-falburg"
   },
   {
    "id": 2459,
@@ -125241,7 +129298,8 @@
     "y": 2507
    },
    "coastal": false,
-   "description": "Висендорф — родовое гнездо Дома Райнхольд: замок над рекой, где хранят знамёна и родовые книги дома. Над воротами — герб: рассечённый щит, червлень и чернь; два скрещённых серебряных меча; девиз «Меч не спрашивает». Живёт своим трудом: финики, соль. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Здесь каменный мост времён Валериана Строителя и памятный столб с именами погибших в 975–980 гг. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения."
+   "description": "Висендорф — родовое гнездо Дома Райнхольд: замок над рекой, где хранят знамёна и родовые книги дома. Над воротами — герб: рассечённый щит, червлень и чернь; два скрещённых серебряных меча; девиз «Меч не спрашивает». Живёт своим трудом: финики, соль. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Здесь каменный мост времён Валериана Строителя и памятный столб с именами погибших в 975–980 гг. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-visendorf"
   },
   {
    "id": 2507,
@@ -125654,7 +129712,8 @@
     "y": 2499
    },
    "coastal": false,
-   "description": "Баденфельд — небольшой город за старой стеной. Живёт промыслами: бортничество, корабельные мачты. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Городом управляет губернатор Ансельм Дорнниц и земское собрание. Землёй владеет род фон Баденфельд. Здесь каменный мост времён Валериана Строителя и ярмарка каждую Кварту. Земля старого Дагерфорда, ещё Аскенов. В 975–980 гг. здесь ждали императора и проклинали совет."
+   "description": "Баденфельд — небольшой город за старой стеной. Живёт промыслами: бортничество, корабельные мачты. Каждый второй двор отдаёт сына в легионы, как велит обычай Райнхольдов. Городом управляет губернатор Ансельм Дорнниц и земское собрание. Землёй владеет род фон Баденфельд. Здесь каменный мост времён Валериана Строителя и ярмарка каждую Кварту. Земля старого Дагерфорда, ещё Аскенов. В 975–980 гг. здесь ждали императора и проклинали совет.",
+   "cityMapId": "map-city-badenfeld"
   },
   {
    "id": 2517,
@@ -126048,7 +130107,8 @@
     "y": 2523
    },
    "coastal": false,
-   "description": "Аминбрук — окружной городок с ратушей и рынком. Держится промыслами: ячмень, пшеница. Подати идут прямо в столичную казну Эссенвальдов. Городом управляет губернатор Конрад Грюнле и земское собрание. Здесь большая осенняя ярмарка в месяц Ячори и земская больница. Здесь правили князья Аскены задолго до Тейбера."
+   "description": "Аминбрук — окружной городок с ратушей и рынком. Держится промыслами: ячмень, пшеница. Подати идут прямо в столичную казну Эссенвальдов. Городом управляет губернатор Конрад Грюнле и земское собрание. Здесь большая осенняя ярмарка в месяц Ячори и земская больница. Здесь правили князья Аскены задолго до Тейбера.",
+   "cityMapId": "map-city-aminbruk"
   },
   {
    "id": 2527,
@@ -126768,7 +130828,8 @@
     "y": 2545
    },
    "coastal": false,
-   "description": "Эберинрит — один из больших городов Империи. Живёт тем, что даёт земля: железные копи, горные пастбища. Соль и товары юга везут на склады Зальтмаров. Городом правит губернатор Маттиас Адбах, магистрат — от гильдий. Здесь заброшенная сторожевая вышка эпохи княжеств и курган воинов эпохи раздробленности. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета."
+   "description": "Эберинрит — один из больших городов Империи. Живёт тем, что даёт земля: железные копи, горные пастбища. Соль и товары юга везут на склады Зальтмаров. Городом правит губернатор Маттиас Адбах, магистрат — от гильдий. Здесь заброшенная сторожевая вышка эпохи княжеств и курган воинов эпохи раздробленности. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения. В гражданскую войну стояла за Пакт Ставки и Совета.",
+   "cityMapId": "map-city-eberinrit"
   },
   {
    "id": 2546,
@@ -128339,7 +132400,8 @@
     "y": 2607
    },
    "coastal": true,
-   "description": "Брукштейн — порт, куда заходят каботажные суда. Кормится промыслами: серебряный рудник, горные пастбища, канатные мастерские. Правит губернатор Агата Кальтштедт и совет судовладельцев. Землёй владеет род фон Брукштейн. Здесь почтовая станция на имперском тракте. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения."
+   "description": "Брукштейн — порт, куда заходят каботажные суда. Кормится промыслами: серебряный рудник, горные пастбища, канатные мастерские. Правит губернатор Агата Кальтштедт и совет судовладельцев. Землёй владеет род фон Брукштейн. Здесь почтовая станция на имперском тракте. До 125 г. — земля Герцогства Веренфельс; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-brukshtein"
   },
   {
    "id": 2587,
@@ -128985,7 +133047,8 @@
     "y": 2601
    },
    "coastal": false,
-   "description": "Альтенфельд — торговый городок. Держится промыслами: бортничество, лыко и плетёные короба. Городом управляет губернатор Генрих Оберхайм и земское собрание. Землёй владеет род фон Альтенфельд. Здесь родник, который местные считают целебным. Здесь правили князья Аскены задолго до Тейбера. Местные уверяют, что Сандра Огненная однажды остановилась здесь на ночь и сожгла сарай, не проснувшись."
+   "description": "Альтенфельд — торговый городок. Держится промыслами: бортничество, лыко и плетёные короба. Городом управляет губернатор Генрих Оберхайм и земское собрание. Землёй владеет род фон Альтенфельд. Здесь родник, который местные считают целебным. Здесь правили князья Аскены задолго до Тейбера. Местные уверяют, что Сандра Огненная однажды остановилась здесь на ночь и сожгла сарай, не проснувшись.",
+   "cityMapId": "map-city-altenfeld"
   },
   {
    "id": 2604,
@@ -129106,7 +133169,8 @@
     "y": 2613
    },
    "coastal": false,
-   "description": "Ройенвейлер — родовое гнездо Дома Эссенвальд: замок над долиной, где хранят знамёна и родовые книги дома. Над воротами — герб: четверочастный щит, чёрное и золото; поверх — серебряные весы; девиз «Прежде трона — закон». Богатеет своим трудом: бортничество, дёготь и смола. Здесь каменный мост времён Валериана Строителя и курган воинов эпохи раздробленности. Земля старого Дагерфорда, ещё Аскенов. В 975–980 гг. здесь держали сторону совета."
+   "description": "Ройенвейлер — родовое гнездо Дома Эссенвальд: замок над долиной, где хранят знамёна и родовые книги дома. Над воротами — герб: четверочастный щит, чёрное и золото; поверх — серебряные весы; девиз «Прежде трона — закон». Богатеет своим трудом: бортничество, дёготь и смола. Здесь каменный мост времён Валериана Строителя и курган воинов эпохи раздробленности. Земля старого Дагерфорда, ещё Аскенов. В 975–980 гг. здесь держали сторону совета.",
+   "cityMapId": "map-city-roienveiler"
   },
   {
    "id": 2607,
@@ -129886,7 +133950,8 @@
     "y": 2651
    },
    "coastal": true,
-   "description": "Ландхаузен — порт, куда заходят каботажные суда. Кормится своим трудом: строевой лес, корабельные мачты, устричные отмели. Правит губернатор Вендель Мардорф и совет судовладельцев. Землёй владеет род фон Ландхаузен. Здесь кузня, где куют подковы для имперской кавалерии и часовня Орамея, построенная при Габриэле Благочестивом. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения."
+   "description": "Ландхаузен — порт, куда заходят каботажные суда. Кормится своим трудом: строевой лес, корабельные мачты, устричные отмели. Правит губернатор Вендель Мардорф и совет судовладельцев. Землёй владеет род фон Ландхаузен. Здесь кузня, где куют подковы для имперской кавалерии и часовня Орамея, построенная при Габриэле Благочестивом. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-landhauzen"
   },
   {
    "id": 2626,
@@ -130193,7 +134258,8 @@
     "y": 2641
    },
    "coastal": true,
-   "description": "Кельхольм — портовый город. Кормится промыслами: бортничество, строевой лес, канатные мастерские. Губернатор — Магдалена Шварцман; гаванью ведает портовый мастер Эккехард Баубрандт. Землёй владеет род фон Кельхольм. Здесь земская больница и заброшенная сторожевая вышка эпохи княжеств. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения."
+   "description": "Кельхольм — портовый город. Кормится промыслами: бортничество, строевой лес, канатные мастерские. Губернатор — Магдалена Шварцман; гаванью ведает портовый мастер Эккехард Баубрандт. Землёй владеет род фон Кельхольм. Здесь земская больница и заброшенная сторожевая вышка эпохи княжеств. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-kelholm"
   },
   {
    "id": 2634,
@@ -131757,7 +135823,8 @@
     "y": 2691
    },
    "coastal": true,
-   "description": "Веддорф — кастра V Южного легиона, военный город, где живут легионеры, их семьи и ветераны. Ветераны джакских восстаний держат южное побережье. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Кормится своим трудом: горные пастбища, сланец и точильный камень, устричные отмели. Здесь памятный столб с именами погибших в 975–980 гг. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения. Сюда тайно приезжают монархисты поклониться дому, где ночевал Тейбер II в 977 г."
+   "description": "Веддорф — кастра V Южного легиона, военный город, где живут легионеры, их семьи и ветераны. Ветераны джакских восстаний держат южное побережье. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Кормится своим трудом: горные пастбища, сланец и точильный камень, устричные отмели. Здесь памятный столб с именами погибших в 975–980 гг. До 124 г. — земля Маркграфства Тальбург; присоединена Тейбером в войны объединения. Сюда тайно приезжают монархисты поклониться дому, где ночевал Тейбер II в 977 г.",
+   "cityMapId": "map-city-veddorf"
   },
   {
    "id": 2675,
@@ -132727,7 +136794,8 @@
     "y": 2717
    },
    "coastal": false,
-   "description": "Митмюнде — городок вокруг Академии Копья, старейшей военной академии Лоры, где в 116 г. учился Тейбер Ферн. Выпускники выходят знаменосцами; на плацу стоит бронзовый Тейбер с отцовским знаменем у Сорочьего брода. Кормится своим трудом: грибы и ягоды для столичных рынков, охота на кабана и оленя. Здесь родник, который местные считают целебным. Исконная земля Дагерфорда. В гражданскую войну стояла за Пакт Ставки и Совета."
+   "description": "Митмюнде — городок вокруг Академии Копья, старейшей военной академии Лоры, где в 116 г. учился Тейбер Ферн. Выпускники выходят знаменосцами; на плацу стоит бронзовый Тейбер с отцовским знаменем у Сорочьего брода. Кормится своим трудом: грибы и ягоды для столичных рынков, охота на кабана и оленя. Здесь родник, который местные считают целебным. Исконная земля Дагерфорда. В гражданскую войну стояла за Пакт Ставки и Совета.",
+   "cityMapId": "map-city-mitmyunde"
   },
   {
    "id": 2700,
@@ -135438,7 +139506,8 @@
     "y": 2819
    },
    "coastal": false,
-   "description": "Зонербрук — окружной городок с ратушей и рынком. Держится промыслами: лыко и плетёные короба, охота на кабана и оленя. Подати идут прямо в столичную казну Эссенвальдов. Губернатор — Вендель Линхайм. Здесь старая сыроварня с погребами. Исконная земля Дагерфорда. В гражданскую войну стояла за Пакт Ставки и Совета."
+   "description": "Зонербрук — окружной городок с ратушей и рынком. Держится промыслами: лыко и плетёные короба, охота на кабана и оленя. Подати идут прямо в столичную казну Эссенвальдов. Губернатор — Вендель Линхайм. Здесь старая сыроварня с погребами. Исконная земля Дагерфорда. В гражданскую войну стояла за Пакт Ставки и Совета.",
+   "cityMapId": "map-city-zonerbruk"
   },
   {
    "id": 2772,
@@ -137481,7 +141550,8 @@
     "y": 2893
    },
    "coastal": false,
-   "description": "Унтеринштейн — кастра IX Легиона Стражей Брода, военный город, где живут легионеры, их семьи и ветераны. Скучная служба у переправ и лучшая выслуга в армии. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Кормится промыслами: дёготь и смола, древесный уголь. Зерно свозят в житницы Литтенау. Здесь почтовая станция на имперском тракте и памятный столб с именами погибших в 975–980 гг. Исконная земля Дагерфорда. В 975–980 гг. здесь держали сторону совета."
+   "description": "Унтеринштейн — кастра IX Легиона Стражей Брода, военный город, где живут легионеры, их семьи и ветераны. Скучная служба у переправ и лучшая выслуга в армии. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Кормится промыслами: дёготь и смола, древесный уголь. Зерно свозят в житницы Литтенау. Здесь почтовая станция на имперском тракте и памятный столб с именами погибших в 975–980 гг. Исконная земля Дагерфорда. В 975–980 гг. здесь держали сторону совета.",
+   "cityMapId": "map-city-unterinshtein"
   },
   {
    "id": 2825,
@@ -138030,7 +142100,8 @@
     "y": 2899
    },
    "coastal": true,
-   "description": "Брукинбах — кастра X Легиона Последней клятвы, военный город, где живут легионеры, их семьи и ветераны. Собран заново после 980 г.; старые казармы пусты, на стенах соскоблены портреты Люция. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Богатеет промыслами: горные пастбища, ледники, где режут лёд для столицы, устричные отмели. Соль и товары юга везут на склады Зальтмаров. Здесь мельница на три жернова. До 126 г. — земля Герцогства Брассау; присоединена Тейбером в войны объединения."
+   "description": "Брукинбах — кастра X Легиона Последней клятвы, военный город, где живут легионеры, их семьи и ветераны. Собран заново после 980 г.; старые казармы пусты, на стенах соскоблены портреты Люция. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Богатеет промыслами: горные пастбища, ледники, где режут лёд для столицы, устричные отмели. Соль и товары юга везут на склады Зальтмаров. Здесь мельница на три жернова. До 126 г. — земля Герцогства Брассау; присоединена Тейбером в войны объединения.",
+   "cityMapId": "map-city-brukinbah"
   },
   {
    "id": 2841,
@@ -141318,7 +145389,8 @@
     "y": 3025
    },
    "coastal": true,
-   "description": "Штайнельштейн — родовое гнездо Дома Литтенау: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: зелёный щит, золотой колосистый дуб; девиз «Хлеб прежде меча». Живёт тем, что даёт земля: бортничество, древесный уголь, канатные мастерские. Здесь пивоварня, поставляющая пиво гарнизонам. Исконная земля Дагерфорда."
+   "description": "Штайнельштейн — родовое гнездо Дома Литтенау: замок над городом, где хранят знамёна и родовые книги дома. Над воротами — герб: зелёный щит, золотой колосистый дуб; девиз «Хлеб прежде меча». Живёт тем, что даёт земля: бортничество, древесный уголь, канатные мастерские. Здесь пивоварня, поставляющая пиво гарнизонам. Исконная земля Дагерфорда.",
+   "cityMapId": "map-city-shtainelshtein"
   },
   {
    "id": 2926,
@@ -142817,7 +146889,8 @@
     "y": 3089
    },
    "coastal": true,
-   "description": "Верерау — порт, куда заходят каботажные суда. Богатеет своим трудом: железные копи, ледники, где режут лёд для столицы, канатные мастерские. Лес и пенька отсюда уходят на верфи Морвингов. Правит губернатор Хайнц Хагенке и совет судовладельцев. Землёй владеет род фон Верерау. Здесь трактир «Пепел и мёд» и почтовая станция на имперском тракте. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. В 975–980 гг. здесь держали сторону совета."
+   "description": "Верерау — порт, куда заходят каботажные суда. Богатеет своим трудом: железные копи, ледники, где режут лёд для столицы, канатные мастерские. Лес и пенька отсюда уходят на верфи Морвингов. Правит губернатор Хайнц Хагенке и совет судовладельцев. Землёй владеет род фон Верерау. Здесь трактир «Пепел и мёд» и почтовая станция на имперском тракте. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. В 975–980 гг. здесь держали сторону совета.",
+   "cityMapId": "map-city-vererau"
   },
   {
    "id": 2967,
@@ -145511,7 +149584,8 @@
     "y": 3191
    },
    "coastal": true,
-   "description": "Ландмюнде — кастра VI Морского легиона, военный город, где живут легионеры, их семьи и ветераны. Казармы морской пехоты у самой воды. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Кормится тем, что даёт земля: ледники, где режут лёд для столицы, медь и олово, устричные отмели. Лес и пенька отсюда уходят на верфи Морвингов. Здесь каменный мост времён Валериана Строителя. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег."
+   "description": "Ландмюнде — кастра VI Морского легиона, военный город, где живут легионеры, их семьи и ветераны. Казармы морской пехоты у самой воды. Знатью здесь никого не считают: в кастре свой суд — Военный трибунал, свои кладбища и свои обычаи. Кормится тем, что даёт земля: ледники, где режут лёд для столицы, медь и олово, устричные отмели. Лес и пенька отсюда уходят на верфи Морвингов. Здесь каменный мост времён Валериана Строителя. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег.",
+   "cityMapId": "map-city-landmyunde"
   },
   {
    "id": 3040,
@@ -150342,7 +154416,8 @@
     "y": 3351
    },
    "coastal": true,
-   "description": "Нейинберг — портовый город. Кормится промыслами: лыко и плетёные короба, дёготь и смола, канатные мастерские. Лес и пенька отсюда уходят на верфи Морвингов. Правит губернатор Юрген Тангер и совет судовладельцев. Землёй владеет род фон Нейинберг. Здесь трактир «Старый брод» и ремесленная гильдия ткачей. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. В 975–980 гг. здесь держали сторону совета. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег."
+   "description": "Нейинберг — портовый город. Кормится промыслами: лыко и плетёные короба, дёготь и смола, канатные мастерские. Лес и пенька отсюда уходят на верфи Морвингов. Правит губернатор Юрген Тангер и совет судовладельцев. Землёй владеет род фон Нейинберг. Здесь трактир «Старый брод» и ремесленная гильдия ткачей. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. В 975–980 гг. здесь держали сторону совета. Старики рассказывают, что в год Ночи Пепла здесь три дня шёл чёрный снег.",
+   "cityMapId": "map-city-neiinberg"
   },
   {
    "id": 3171,
@@ -152109,7 +156184,8 @@
     "y": 3403
    },
    "coastal": true,
-   "description": "Эрельберг — гавань и торговый город. Богатеет своим трудом: железные копи, серебряный рудник, вяленая рыба для легионов. Лес и пенька отсюда уходят на верфи Морвингов. Губернатор — Эккехард Вальддорф; гаванью ведает портовый мастер Вендель Берер. Здесь мельница на три жернова и пивоварня, поставляющая пиво гарнизонам. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. В деревне верят, что серебряная монета Октавиана Счетовода приносит удачу в торге."
+   "description": "Эрельберг — гавань и торговый город. Богатеет своим трудом: железные копи, серебряный рудник, вяленая рыба для легионов. Лес и пенька отсюда уходят на верфи Морвингов. Губернатор — Эккехард Вальддорф; гаванью ведает портовый мастер Вендель Берер. Здесь мельница на три жернова и пивоварня, поставляющая пиво гарнизонам. До 125 г. — земля Княжества Альтмарк; присоединена Тейбером в войны объединения. В деревне верят, что серебряная монета Октавиана Счетовода приносит удачу в торге.",
+   "cityMapId": "map-city-erelberg"
   },
   {
    "id": 3216,

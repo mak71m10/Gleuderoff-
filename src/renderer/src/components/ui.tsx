@@ -7,8 +7,22 @@ import type { WorldDate } from '../types'
 /** Значки кнопок, которые что-то меняют в мире — их прячет режим игрока */
 const EDIT_ICONS = new Set<IconName>(['trash', 'plus', 'image', 'pen', 'shield', 'brush'])
 
-export const assetUrl = (rel: string | undefined | null): string =>
-  rel ? `${window.api.assetBase}${rel.split('/').map(encodeURIComponent).join('/')}` : ''
+export const assetUrl = (rel: string | undefined | null): string => {
+  if (!rel) return ''
+  // «лист.svg#svgView(viewBox(…))» — кусок листа портретов в веб-сборке: фрагмент после # не кодируем
+  const i = rel.indexOf('#')
+  const path = i < 0 ? rel : rel.slice(0, i)
+  return `${window.api.assetBase}${path.split('/').map(encodeURIComponent).join('/')}${i < 0 ? '' : rel.slice(i)}`
+}
+
+/** План города (контуры зданий). В веб-сборке все планы лежат одним файлом: «plans.json#slug» */
+const bundles = new Map<string, Promise<Record<string, unknown>>>()
+export function loadPlan<T>(rel: string): Promise<T> {
+  const [file, key] = rel.split('#')
+  if (!key) return fetch(assetUrl(file)).then((r) => r.json())
+  if (!bundles.has(file)) bundles.set(file, fetch(assetUrl(file)).then((r) => r.json()))
+  return bundles.get(file)!.then((b) => b[key] as T)
+}
 
 /** Поле, которое сохраняет значение по потере фокуса — без записи в историю на каждую букву. */
 export function TextField({

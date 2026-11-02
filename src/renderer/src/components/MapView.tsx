@@ -4,7 +4,7 @@ import { useStore, applyTemporal, uid } from '../store'
 import { existsAt, regionOwner, resolve } from '../temporal'
 import { PLACE_TYPES } from '../constants'
 import { labelPoint, newPlace, ringArea } from '../model'
-import { assetUrl } from './ui'
+import { assetUrl, loadPlan } from './ui'
 import { GlowRenderer, type GlowOptions } from './glowRenderer'
 import { ProvinceRenderer, SettlementRenderer, TextRenderer, type SettlementItem, type TextLabel } from './provinceRenderer'
 import { onSpritesReady, SETTLEMENT_SCALE, SPRITE_LOGICAL, type SettlementType } from '../settlements3d'
@@ -247,8 +247,7 @@ export function MapView() {
     setPlan(null)
     if (!mapDef?.plan) return
     let alive = true
-    fetch(assetUrl(mapDef.plan))
-      .then((r) => r.json())
+    loadPlan<{ buildings: number[][] }>(mapDef.plan)
       .then((p) => alive && setPlan({ id: mapDef.id, buildings: p.buildings }))
       .catch(() => {})
     return () => {

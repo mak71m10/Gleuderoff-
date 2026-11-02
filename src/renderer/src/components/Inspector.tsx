@@ -3,7 +3,7 @@ import { PowerButton } from './PowerView'
 import { useStore, applyTemporal, uid } from '../store'
 import { existsAt, regionOwner, resolve } from '../temporal'
 import { PLACE_TYPE_OPTIONS } from '../constants'
-import { Button, DateField, DateLabel, EditModeSwitch, ImageField, RefField, SelectField, TextField, assetUrl } from './ui'
+import { Button, DateField, DateLabel, EditModeSwitch, ImageField, RefField, SelectField, TextField, assetUrl, loadPlan } from './ui'
 import { Icon } from './Icon'
 import { formatDate } from '../calendar'
 import { CULTURE_INFO, TERRAIN_INFO, ownerAt } from '../provinces'
@@ -549,8 +549,7 @@ function BuildingInspector({ id }: { id: string }) {
   const [name, setName] = useState('')
   useEffect(() => {
     if (!map?.plan) return
-    fetch(assetUrl(map.plan))
-      .then((r) => r.json())
+    loadPlan<{ districts: { name: string }[]; buildings: number[][] }>(map.plan)
       .then(setPlan)
       .catch(() => {})
   }, [map?.plan])

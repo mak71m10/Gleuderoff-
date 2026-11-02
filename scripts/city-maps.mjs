@@ -6,11 +6,14 @@
 import sharp from 'sharp'
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs'
 import { CITY_MAPS } from './lore/cities.mjs'
+import { autoCities } from './lore/cities-auto.mjs'
 
 const WORLD = 'resources/default-world/world.json'
 const OUT = 'resources/default-world/maps/cities'
 const world = JSON.parse(readFileSync(WORLD, 'utf8'))
 const worldMap = world.maps.find((m) => m.kind === 'world')
+// города, описанные вручную (cities.mjs), и все остальные города, городки, порты и кастры — по описаниям из мира
+const CITIES = [...CITY_MAPS, ...(await autoCities(world, CITY_MAPS))]
 const seedOf = (s) => ([...s].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7) % 2000000000) + 1
 
 /** Где город на карте мира: поселение провинции или место-столица */
@@ -44,7 +47,7 @@ async function seaOf(x, y) {
 
 export async function genUrls() {
   const out = []
-  for (const c of CITY_MAPS.filter((c) => !c.custom)) {
+  for (const c of CITIES.filter((c) => !c.custom)) {
     const a = anchor(c)
     const sea = c.gen.coast ? (c.sea ?? (await seaOf(a.x, a.y)) ?? 0) : 0
     const q = new URLSearchParams({ seed: String(c.seed ?? seedOf(c.slug)), ...Object.fromEntries(Object.entries(c.gen).map(([k, v]) => [k, String(v)])), sea: String(sea), export: 'json' })
@@ -58,10 +61,13 @@ if (process.argv[2] === 'urls') {
   process.exit(0)
 }
 
-// gen [slug …]: планы от генератора Watabou в скрытом окне Electron (scripts/city-gen.cjs), затем отрисовка
+// gen [slug …]: планы от генератора Watabou в скрытом окне Electron (scripts/city-gen.cjs), затем отрисовка;
+// без списка — только города, у которых плана ещё нет (готовые не трогаются)
+let generated = []
 if (process.argv[2] === 'gen') {
   const want = process.argv.slice(3).filter((a) => a !== 'force')
-  const jobs = (await genUrls()).filter((u) => !want.length || want.includes(u.slug))
+  const jobs = (await genUrls()).filter((u) => (want.length ? want.includes(u.slug) : !existsSync(`source-maps/cities/${u.slug}.json`)))
+  generated = jobs.map((u) => u.slug)
   const { execFileSync } = await import('child_process')
   const electron = (await import('electron')).default
   execFileSync(electron, ['scripts/city-gen.cjs', ...jobs.map((u) => `${u.slug}=${u.query}`)], { stdio: 'inherit' })
@@ -131,9 +137,10 @@ function renderCity(c, J) {
   const wetNames = c.districts.filter((n) => n.startsWith('~')).map((n) => n.slice(1))
   const dryNames = c.districts.filter((n) => !n.startsWith('~'))
   const byWet = [...open].sort((a, b) => wdist(a) - wdist(b))
-  for (const q of byWet.filter((q) => !q.name).slice(0, wet.length ? wetNames.length : 0)) q.name = wetNames.shift()
+  // «водные» имена — только кварталам, что выходят к воде (иначе «Причалы» оказываются посреди города)
+  for (const q of byWet.filter((q) => !q.name && wdist(q) < 20).slice(0, wet.length ? wetNames.length : 0)) q.name = wetNames.shift()
   let k = 0
-  for (const q of open) if (!q.name) q.name = dryNames.shift() ?? wetNames.shift() ?? `Слобода ${++k}`
+  for (const q of open) if (!q.name) q.name = dryNames.shift() ?? `Слобода ${++k}`
 
   // занятые клетки — чтобы лес и камни не лезли на дома, поля, дороги и воду
   const G = 10
@@ -266,9 +273,9 @@ mkdirSync(OUT, { recursive: true })
 const made = []
 const toRender = []
 // без аргументов — все города; slug … — только эти; force или gen — перерисовать картинку заново
-const only = process.argv.slice(2).filter((a) => !['gen', 'force'].includes(a))
+const only = process.argv[2] === 'gen' ? generated : process.argv.slice(2).filter((a) => a !== 'force')
 const FORCE = process.argv.includes('force') || process.argv[2] === 'gen'
-for (const c of CITY_MAPS) {
+for (const c of CITIES) {
   if (only.length && !only.includes(c.slug)) continue
   const src = `source-maps/cities/${c.slug}.json`
   // свой план вместо генератора Watabou (Хауссер): собирается скриптом из c.custom при каждом запуске

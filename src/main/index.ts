@@ -273,8 +273,9 @@ async function migrateWorld(dir: string): Promise<void> {
     user.armies = [...(user.armies ?? []).filter((a: Json) => !String(a.id).startsWith('lore-')), ...structuredClone(def.armies ?? [])]
     user.legislatures = structuredClone(def.legislatures ?? [])
   }
-  if ((user.version ?? 1) < 18) {
-    // v18: план Хауссера по эскизу автора (scripts/hausser-plan.mjs): карта, вход из столицы, метки зданий города
+  if ((user.version ?? 1) < 19) {
+    // v18: план Хауссера по эскизу автора (scripts/hausser-plan.mjs); v19: планы городов, городков, портов и кастр
+    // Империи и Короны Аргус. Карты, вход из столицы или провинции; метки зданий city-* добавятся ниже со всеми новыми местами
     const cityMaps = (def.maps ?? []).filter((m: Json) => String(m.id).startsWith('map-city-'))
     const cityIds = new Set(cityMaps.map((m: Json) => m.id))
     user.maps = [...user.maps.filter((m: Json) => !cityIds.has(m.id)), ...structuredClone(cityMaps)]
@@ -282,6 +283,8 @@ async function migrateWorld(dir: string): Promise<void> {
       const up = m.placeId && user.places.find((p: Json) => p.id === m.placeId)
       if (up && !up.innerMapId) up.innerMapId = m.id
     }
+    const defCity = new Map<number, string>((def.provinces ?? []).filter((p: Json) => p.cityMapId).map((p: Json) => [p.id, p.cityMapId]))
+    for (const p of user.provinces ?? []) if (!p.cityMapId && defCity.has(p.id)) p.cityMapId = defCity.get(p.id)
   }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
