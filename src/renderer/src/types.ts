@@ -61,6 +61,8 @@ export interface MapDef {
   provinceMap?: string
   /** Рельеф: R высота, G класс местности ×40, B реки, A суша */
   terrainMap?: string
+  /** План города (генератор Watabou, переработанный city-maps.mjs): контуры зданий для выбора на карте */
+  plan?: string
   /** Плитки высокого разрешения: {path}/{z}/{x}_{y}.webp, на уровне z ширина = width × 2^z */
   tiles?: { path: string; minZoom: number; maxZoom: number; size: number }
 }
@@ -193,6 +195,8 @@ export interface Place extends Temporal<PlaceFields> {
   y: number
   /** Карта этого города/подземелья */
   innerMapId?: string
+  /** Номер здания на плане города, если место — здание */
+  building?: number
   /** Своя объёмная модель вместо модели по типу (например, «grandport») */
   model?: string
 }
@@ -310,6 +314,8 @@ export interface Province {
   settlement?: { type: 'village' | 'fishing' | 'town' | 'city' | 'capital' | 'castle' | 'port' | 'temple' | 'ruins' | 'tower'; x: number; y: number } | null
   /** Описание поселения/провинции */
   description?: string
+  /** Карта города этой провинции */
+  cityMapId?: string
   /** Особое место (например, «aurhafen» — поселение заменено местом автора) */
   landmark?: string
   /** Владельцы по датам: [дата | null, id страны | null] */
@@ -339,6 +345,38 @@ export interface Army {
 }
 
 /** Законодательное собрание (Верховный совет, Сенат): состав по годам, законы и поимённые голоса */
+/** Скамья или партия собрания; party — история, манифест и устройство (может отсутствовать) */
+export interface LegislatureFaction {
+  id: string
+  name: string
+  group: string
+  color: string
+  ideology: string
+  leader: string
+  stance: number[]
+  party?: Party
+}
+
+export interface Party {
+  founded: number
+  founder: string
+  motto: string
+  symbol: string
+  press: string
+  base: string
+  origin: string
+  ideal: string
+  principles: string[]
+  manifesto: string
+  structure: { name: string; text: string; tiers: [string, string, string][] }
+  leaders: [number, number | null, string, string][]
+  history: [number, string][]
+  allies: string[]
+  rivals: string[]
+  secret?: string
+  draft?: boolean
+}
+
 export interface Legislature {
   id: string
   stateId: string
@@ -351,7 +389,7 @@ export interface Legislature {
   groups: string[]
   seatOrder: string[]
   issues: { id: string; name: string; minus: string; plus: string }[]
-  factions: { id: string; name: string; group: string; color: string; ideology: string; leader: string; stance: number[] }[]
+  factions: LegislatureFaction[]
   convocations: { date: WorldDate; name: string; note: string; seats: Record<string, number> }[]
   members: LegislatureMember[]
   bills: Bill[]

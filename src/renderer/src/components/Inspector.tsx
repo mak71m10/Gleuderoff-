@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { PowerButton } from './PowerView'
 import { useStore, applyTemporal, uid } from '../store'
 import { existsAt, regionOwner, resolve } from '../temporal'
@@ -12,13 +13,33 @@ import { newPlace } from '../model'
 export function Inspector() {
   const selection = useStore((s) => s.selection)
   const select = useStore((s) => s.select)
+  // на телефоне панель — шторка снизу: ручкой тянут вверх (развернуть), вниз (свернуть или закрыть)
+  const [full, setFull] = useState(false)
+  const swipe = useRef<number | null>(null)
+  const key = selection ? `${selection.type}:${selection.id}` : ''
+  useEffect(() => setFull(false), [key])
   if (!selection || selection.type === 'entry') return null
   return (
-    <aside className="inspector">
+    <aside className={`inspector ${full ? 'sheet-full' : ''}`}>
+      <div
+        className="sheet-handle"
+        onPointerDown={(e) => ((swipe.current = e.clientY), (e.target as HTMLElement).setPointerCapture(e.pointerId))}
+        onPointerUp={(e) => {
+          const dy = swipe.current == null ? 0 : e.clientY - swipe.current
+          swipe.current = null
+          if (Math.abs(dy) < 8) setFull(!full)
+          else if (dy < 0) setFull(true)
+          else if (full) setFull(false)
+          else select(null)
+        }}
+      >
+        <i />
+      </div>
       <button className="inspector-close" onClick={() => select(null)} title="Закрыть">
         <Icon name="x" />
       </button>
       {selection.type === 'place' && <PlaceInspector id={selection.id} />}
+      {selection.type === 'building' && <BuildingInspector id={selection.id} />}
       {selection.type === 'region' && <RegionInspector id={selection.id} />}
       {selection.type === 'state' && <StateSummary id={selection.id} />}
       {selection.type === 'label' && <LabelInspector id={selection.id} />}
@@ -76,6 +97,7 @@ function PlaceInspector({ id }: { id: string }) {
       <TextField value={f.name} onChange={(name) => set({ name })} className="title-input" />
       {f.image && <img className="inspector-hero" src={assetUrl(f.image)} alt="" />}
       <EditModeSwitch />
+      {innerMap?.plan && <CityMapButton mapId={innerMap.id} />}
       {world.legislatures?.filter((l) => l.town === f.name && l.stateId === f.stateId).map((l) => <PowerButton key={l.id} legislature={l} title={`${l.name} — городской парламент`} />)}
       <div className="grid-2">
         <SelectField label="Тип" value={f.type} options={PLACE_TYPE_OPTIONS} onChange={(type) => set({ type: type as PlaceType })} />
@@ -102,10 +124,14 @@ function PlaceInspector({ id }: { id: string }) {
           </div>
         ) : (
           <Button icon="image" onClick={attachMap}>
-            Загрузить карту города
+            {place.building != null ? 'Загрузить карту локации' : 'Загрузить карту города'}
           </Button>
         )}
-        <p className="hint">Например, из генератора городов Watabou. Внутри можно ставить свои метки.</p>
+        <p className="hint">
+          {place.building != null
+            ? 'Здание на плане города. Загрузите план этажа, подземелья или двора — внутри можно ставить свои метки.'
+            : 'Например, из генератора городов Watabou. Внутри можно ставить свои метки.'}
+        </p>
       </div>
       <HistoryList
         items={place.history.map((c) => ({ id: c.id, date: c.date, text: Object.keys(c.patch).join(', ') }))}
@@ -317,6 +343,7 @@ function ProvinceInspector({ id }: { id: number }) {
           <span>{TERRAIN_INFO[p.terrain]?.name}</span>
         </div>
       </div>
+      {p.cityMapId && <CityMapButton mapId={p.cityMapId} />}
       {world.legislatures?.filter((l) => l.provinceId === p.id).map((l) => <PowerButton key={l.id} legislature={l} title={`${l.name} — городской парламент`} />)}
       {p.settlement && (
         <div className="inspector-block">
@@ -505,5 +532,93 @@ export function HistoryList({ items, onDelete }: { items: { id: string; date: nu
           </div>
         ))}
     </div>
+  )
+}
+
+/** Здание на плане города: квартал, размер и превращение в локацию */
+function BuildingInspector({ id }: { id: string }) {
+  const world = useStore((s) => s.world!)
+  const mutate = useStore((s) => s.mutate)
+  const select = useStore((s) => s.select)
+  const masterMode = useStore((s) => s.masterMode)
+  const [mapId, idxStr] = id.split('#')
+  const idx = Number(idxStr)
+  const map = world.maps.find((m) => m.id === mapId)
+  const [plan, setPlan] = useState<{ districts: { name: string }[]; buildings: number[][] } | null>(null)
+  const [type, setType] = useState<PlaceType>('landmark')
+  const [name, setName] = useState('')
+  useEffect(() => {
+    if (!map?.plan) return
+    fetch(assetUrl(map.plan))
+      .then((r) => r.json())
+      .then(setPlan)
+      .catch(() => {})
+  }, [map?.plan])
+  const b = plan?.buildings[idx]
+  if (!map || !b) return <div className="inspector-body">Загружаю план…</div>
+  const pts: [number, number][] = []
+  for (let k = 2; k < b.length; k += 2) pts.push([b[k], b[k + 1]])
+  const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length
+  const cy = pts.reduce((s, p) => s + p[1], 0) / pts.length
+  const sq = Math.abs(pts.reduce((s, [x, y], i) => { const [u, v] = pts[(i + 1) % pts.length]; return s + x * v - u * y }, 0) / 2)
+  const district = plan.districts[b[0]]?.name
+  const city = map.name.replace(/ — план города$/, '')
+  const size = sq > 900 ? 'большое здание' : sq > 300 ? 'дом' : 'небольшой дом'
+  const make = (): void => {
+    const p = newPlace(mapId, Math.round(cx * 10) / 10, Math.round(cy * 10) / 10, type)
+    p.building = idx
+    p.base.name = name.trim() || (b[1] ? 'Главное здание' : `Дом в квартале «${district ?? city}»`)
+    mutate((w) => {
+      w.places.push(p)
+    })
+    select({ type: 'place', id: p.id })
+  }
+  return (
+    <div className="inspector-body">
+      <div className="inspector-kicker">Здание · {city}</div>
+      <div className="inspector-title">{b[1] ? 'Особое здание' : size[0].toUpperCase() + size.slice(1)}</div>
+      <div className="crumbs">
+        <b>{city}</b>
+        {district && (
+          <>
+            {' '}› <b>{district}</b>
+          </>
+        )}
+      </div>
+      <p className="hint">
+        Пока это просто {size} на плане. Сделайте его локацией — у неё появятся название, описание, иллюстрация и своя карта: план этажа,
+        подвал, двор.
+      </p>
+      {masterMode ? (
+        <div className="inspector-block">
+          <div className="field-label">Сделать локацией</div>
+          <TextField label="Название" value={name} placeholder="Например, «Трактир „Три моста“»" onChange={setName} />
+          <SelectField label="Тип" value={type} options={PLACE_TYPE_OPTIONS} onChange={(t) => setType(t as PlaceType)} />
+          <Button icon="pin" variant="primary" onClick={make}>
+            Создать локацию
+          </Button>
+        </div>
+      ) : (
+        <p className="muted small">Локации из зданий создаёт мастер.</p>
+      )}
+    </div>
+  )
+}
+
+/** Крупная кнопка «план города» в панели провинции или места */
+function CityMapButton({ mapId }: { mapId: string }) {
+  const world = useStore((s) => s.world!)
+  const openMap = useStore((s) => s.openMap)
+  const m = world.maps.find((x) => x.id === mapId)
+  if (!m) return null
+  const n = world.places.filter((p) => p.mapId === mapId).length
+  return (
+    <button className="power-open" onClick={() => openMap(mapId)}>
+      <Icon name="map" size={26} />
+      <span>
+        <b>{m.name}</b>
+        <span>улицы, кварталы и здания · мест на плане: {n} · любое здание можно сделать локацией</span>
+      </span>
+    </button>
   )
 }

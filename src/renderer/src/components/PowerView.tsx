@@ -7,6 +7,7 @@ import { assetUrl } from './ui'
 import { Icon } from './Icon'
 import type { Bill, Legislature, LegislatureMember } from '../types'
 import { CabinetView, ElectionsView } from './Elections'
+import { PartyTile, PartyView } from './Party'
 
 type Tab = 'hall' | 'bills' | 'chronicle' | 'factions' | 'elections' | 'cabinet'
 const VOTE = { y: { label: 'За', color: '#5f9a4f' }, n: { label: 'Против', color: '#b8433a' }, a: { label: 'Воздержался', color: '#a99c80' }, '-': { label: 'Отсутствовал', color: '#3a3f4a' } } as const
@@ -54,6 +55,7 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
   const [tab, setTab] = useState<Tab>('hall')
   const [member, setMember] = useState<string | null>(null)
   const [billId, setBillId] = useState<string | null>(null)
+  const [partyId, setPartyId] = useState<string | null>(null)
   const [q, setQ] = useState('')
   const entry = (id: string) => world.entries.find((e) => e.id === id)
   const fac = useMemo(() => new Map(L.factions.map((f) => [f.id, f])), [L])
@@ -65,7 +67,7 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
   const sitting = useMemo(() => {
     const list = L.members.filter((m) => m.from <= at && (m.to == null || m.to > at))
     const order = (f: string): number => (L.seatOrder.indexOf(f) + 1 || 99)
-    return list.sort((a, b) => order(a.faction) - order(b.faction) || a.group.localeCompare(b.group) || a.from - b.from)
+    return list.sort((a, b) => order(a.faction) - order(b.faction) || (a.group ?? '').localeCompare(b.group ?? '') || a.from - b.from)
   }, [L, at])
   const seats = useMemo(() => hemicycle(Math.max(sitting.length, 1)), [sitting.length])
   const yearBills = L.bills.filter((b) => yearOf(b.date) === year)
@@ -80,6 +82,12 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  // на телефоне карточка депутата или закона стоит под залом — подкручиваем к ней
+  useEffect(() => {
+    if (!(member || billId) || !window.matchMedia('(max-width: 900px)').matches) return
+    document.querySelector('.power .pw-side')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [member, billId])
+
   const openEntry = (id: string): void => {
     const e = entry(id)
     if (!e) return
@@ -91,9 +99,12 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
     const e = m.entryId ? entry(m.entryId) : null
     const img = e ? resolve(e, date).image : m.image ?? ''
     const color = fac.get(m.faction)?.color ?? '#888'
+    // в версии для телефона портреты депутатов собраны листами 10×10: «лист#колонка,строка»
+    const sheet = img.match(/^(.+)#(\d+),(\d+)$/)
     return (
       <span className="pw-portrait" style={{ width: size, height: size, borderColor: color }}>
-        {img ? <img src={assetUrl(img)} alt="" /> : <span style={{ background: color }}>{m.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</span>}
+        <span style={{ background: color }}>{m.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</span>
+        {img && (sheet ? <i className="pw-sheet" style={{ backgroundImage: `url(${assetUrl(sheet[1])})`, backgroundPosition: `${(Number(sheet[2]) / 9) * 100}% ${(Number(sheet[3]) / 9) * 100}%` }} /> : <img src={assetUrl(img)} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} />)}
       </span>
     )
   }
@@ -153,9 +164,9 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
           <div>
             <h2>{m.name}</h2>
             <div className="pw-sub">{m.title}{m.origin ? ` · ${m.origin}` : ''}</div>
-            <div className="pw-chip" style={{ borderColor: f.color }}>
+            <button className="pw-chip" style={{ borderColor: f.color }} onClick={() => (setPartyId(f.id), setTab('factions'))} title="Открыть страницу партии">
               <i style={{ background: f.color }} /> {f.name}{m.group ? ` · ${m.group}` : ''}{m.race ? ` · ${m.race}` : ''}
-            </div>
+            </button>
             <div className="pw-sub">
               В собрании: {formatDate(cal, m.from, false)} — {m.to ? `${formatDate(cal, m.to, false)}${m.left ? ` (${m.left})` : ''}` : 'по сей день'} · род. {m.born} г.
             </div>
@@ -303,8 +314,12 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
   }
 
   // ---------- зал ----------
+  // на телефоне зал шире экрана — открываем его по центру
+  const centerHall = (el: HTMLDivElement | null): void => {
+    if (el && el.scrollLeft === 0 && el.scrollWidth > el.clientWidth) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2
+  }
   const hall = (
-    <div className="pw-hall">
+    <div className="pw-hall" ref={centerHall}>
       <svg viewBox="40 20 920 480" className="pw-hemi">
         <defs>
           <radialGradient id="pw-floor" cx="50%" cy="100%" r="80%">
@@ -383,7 +398,7 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
               ['hall', 'Зал'],
               ['bills', 'Законы'],
               ['chronicle', 'Хроника'],
-              ['factions', 'Скамьи'],
+              ['factions', 'Партии'],
               ...(L.elections ? [['elections', 'Выборы']] : []),
               ...(L.cabinets ? [['cabinet', 'Кабинет']] : [])
             ] as [Tab, string][]
@@ -510,51 +525,37 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
 
       {tab === 'factions' && (
         <div className="pw-body pw-body-one">
-          <div className="pw-factions">
-            {L.seatOrder.map((fid) => {
-              const f = fac.get(fid)!
-              const ms = sitting.filter((m) => m.faction === fid)
-              const leader = f.leader ? entry(f.leader) : null
-              const theirs = L.bills.filter((b) => b.sponsorFaction === fid && b.key)
-              return (
-                <div key={fid} className="pw-faction" style={{ borderTopColor: f.color }}>
-                  <div className="pw-faction-head">
-                    <h3>{f.name}</h3>
-                    <b style={{ color: f.color }}>{ms.length}</b>
-                  </div>
-                  <div className="pw-sub">
-                    {f.ideology} · {f.group}
-                  </div>
-                  {leader && (
-                    <button className="link-btn" onClick={() => openEntry(leader.id)}>
-                      Лидер: {leader.base.name}
-                    </button>
-                  )}
-                  {stanceBars(f.stance, f.color)}
-                  {theirs.length > 0 && (
-                    <>
-                      <div className="field-label">Главные законы скамьи</div>
-                      <ul className="pw-chron-bills">
-                        {theirs.map((b) => (
-                          <li key={b.id} onClick={() => (setBillId(b.id), setTab('bills'), setYear(yearOf(b.date)))}>
-                            {outcome(b)} {yearOf(b.date)} — {b.title}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
-                  <div className="field-label">Члены в {year} г.</div>
-                  <div className="pw-members">
-                    {ms.map((m) => (
-                      <button key={m.id} onClick={() => (setMember(m.id), setBillId(null), setTab('hall'))} title={m.title}>
-                        {portrait(m, 26)} {m.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+          {partyId && fac.get(partyId) ? (
+            <PartyView
+              key={partyId}
+              L={L}
+              f={fac.get(partyId)!}
+              year={year}
+              onYear={(y) => (setYear(y), setBillId(null))}
+              onMember={(id) => (setMember(id), setBillId(null), setTab('hall'))}
+              onEntry={openEntry}
+              onBill={(id) => {
+                const b = L.bills.find((x) => x.id === id)
+                setBillId(id)
+                setMember(null)
+                setTab('bills')
+                if (b) setYear(yearOf(b.date))
+              }}
+              onParty={(id) => (setPartyId(id), document.querySelector('.power .pw-body-one')?.scrollTo({ top: 0 }))}
+              onBack={() => setPartyId(null)}
+              portrait={portrait}
+              stanceBars={stanceBars}
+            />
+          ) : (
+            <>
+              <p className="pw-desc">Партии и скамьи собрания — нажмите, чтобы открыть историю, заветы, манифест, устройство и главных лиц.</p>
+              <div className="pt-tiles">
+                {L.seatOrder.map((fid) => (
+                  <PartyTile key={fid} L={L} f={fac.get(fid)!} seats={sitting.filter((m) => m.faction === fid).length} onOpen={() => setPartyId(fid)} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>,

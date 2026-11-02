@@ -105,10 +105,25 @@ export function Timeline() {
     setView([anchor - ratio * nextSpan, anchor + (1 - ratio) * nextSpan])
   }
 
+  // мышь: перетаскивание ставит дату (средняя/правая кнопка или Alt — сдвиг шкалы);
+  // палец: одним — ставит дату, двумя — щипок масштабирует и сдвигает шкалу
   const dragRef = useRef<{ mode: 'set' | 'pan'; startX: number; v0: number; v1: number } | null>(null)
+  const touches = useRef(new Map<number, number>())
+  const pinchRef = useRef<{ a: number; dist: number; v0: number; v1: number } | null>(null)
+  const startPinch = (): void => {
+    const [xa, xb] = [...touches.current.values()]
+    const rect = trackRef.current!.getBoundingClientRect()
+    const mid = (xa + xb) / 2 - rect.left
+    pinchRef.current = { a: v0 + (mid / width) * span, dist: Math.max(Math.abs(xa - xb), 20), v0, v1 }
+    dragRef.current = null
+  }
   const onPointerDown = (e: React.PointerEvent): void => {
     const rect = trackRef.current!.getBoundingClientRect()
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    if (e.pointerType === 'touch') {
+      touches.current.set(e.pointerId, e.clientX)
+      if (touches.current.size === 2) return startPinch()
+    }
     if (e.button === 1 || e.button === 2 || e.altKey) dragRef.current = { mode: 'pan', startX: e.clientX, v0, v1 }
     else {
       dragRef.current = { mode: 'set', startX: e.clientX, v0, v1 }
@@ -116,14 +131,37 @@ export function Timeline() {
     }
   }
   const onPointerMove = (e: React.PointerEvent): void => {
+    const rect = trackRef.current!.getBoundingClientRect()
+    if (e.pointerType === 'touch' && touches.current.has(e.pointerId)) {
+      touches.current.set(e.pointerId, e.clientX)
+      const pz = pinchRef.current
+      if (pz && touches.current.size >= 2) {
+        const [xa, xb] = [...touches.current.values()]
+        const k = pz.dist / Math.max(Math.abs(xa - xb), 20)
+        const nextSpan = Math.min(Math.max((pz.v1 - pz.v0) * k, 20), len * 20000)
+        const mid = (xa + xb) / 2 - rect.left
+        const from = pz.a - (mid / width) * nextSpan
+        setView([from, from + nextSpan])
+        return
+      }
+    }
     const d = dragRef.current
     if (!d) return
-    const rect = trackRef.current!.getBoundingClientRect()
     if (d.mode === 'set') setDate(dateAt(Math.max(0, Math.min(width, e.clientX - rect.left))))
     else {
       const shift = ((d.startX - e.clientX) / width) * (d.v1 - d.v0)
       setView([d.v0 + shift, d.v1 + shift])
     }
+  }
+  const onPointerUp = (e: React.PointerEvent): void => {
+    touches.current.delete(e.pointerId)
+    if (touches.current.size < 2) pinchRef.current = null
+    dragRef.current = null
+  }
+  const zoomBy = (k: number): void => {
+    const nextSpan = Math.min(Math.max(span * k, 20), len * 20000)
+    const ratio = Math.min(Math.max((date - v0) / span, 0), 1)
+    setView([date - ratio * nextSpan, date + (1 - ratio) * nextSpan])
   }
 
   const step = (fn: (d: number) => number) => () => setDate(fn(date))
@@ -134,7 +172,7 @@ export function Timeline() {
       <div className="tl-controls">
         <button onClick={step((d) => addYears(cal, d, -1))} title="Год назад">«Г</button>
         <button onClick={step((d) => addMonths(cal, d, -1))} title="Месяц назад">‹М</button>
-        <button onClick={step((d) => d - 1)} title="День назад">‹Д</button>
+        <button className="tl-wide" onClick={step((d) => d - 1)} title="День назад">‹Д</button>
         <button className="tl-date" onClick={() => setPicker(!picker)} title="Выбрать дату">
           <span className="tl-date-main">
             {p.day} {cal.months[p.month]?.name}
@@ -144,24 +182,42 @@ export function Timeline() {
             {[weekday(cal, date), eraOf(cal, p.year)].filter(Boolean).join(' · ')}
           </span>
         </button>
-        <button onClick={step((d) => d + 1)} title="День вперёд">Д›</button>
+        <button className="tl-wide" onClick={step((d) => d + 1)} title="День вперёд">Д›</button>
         <button onClick={step((d) => addMonths(cal, d, 1))} title="Месяц вперёд">М›</button>
         <button onClick={step((d) => addYears(cal, d, 1))} title="Год вперёд">Г»</button>
-        <span className="tl-sep" />
+        <span className="tl-sep tl-wide" />
         <button className={playing ? 'active' : ''} onClick={() => setPlaying(!playing)} title="Проиграть историю">
           <Icon name={playing ? 'pause' : 'play'} size={14} />
         </button>
-        <select value={speed} onChange={(e) => setSpeed(e.target.value as Speed)} title="Шаг проигрывания">
+        <select className="tl-wide" value={speed} onChange={(e) => setSpeed(e.target.value as Speed)} title="Шаг проигрывания">
           <option value="day">по дням</option>
           <option value="month">по месяцам</option>
           <option value="year">по годам</option>
         </select>
-        <button onClick={() => setDate(cal.present)} title="Настоящее время лора">
+        <button className="tl-wide" onClick={() => setDate(cal.present)} title="Настоящее время лора">
           Сейчас
         </button>
+        <span className="tl-zoom">
+          <button onClick={() => zoomBy(1.6)} aria-label="Отдалить шкалу">−</button>
+          <button onClick={() => zoomBy(0.6)} aria-label="Приблизить шкалу">+</button>
+        </span>
         {picker && (
           <div className="tl-picker">
             <DateField label="Перейти к дате" value={date} allowEmpty={false} onChange={(d) => d !== null && setDate(d)} />
+            <div className="tl-picker-row">
+              <button onClick={step((d) => d - 1)}>‹ день</button>
+              <button onClick={step((d) => d + 1)}>день ›</button>
+              <button onClick={() => setDate(cal.present)}>Сейчас</button>
+            </div>
+            <label className="tl-picker-row">
+              <span className="muted small">Проигрывать</span>
+              <select value={speed} onChange={(e) => setSpeed(e.target.value as Speed)}>
+                <option value="day">по дням</option>
+                <option value="month">по месяцам</option>
+                <option value="year">по годам</option>
+              </select>
+            </label>
+            <button className="tl-picker-close" onClick={() => setPicker(false)}>Готово</button>
           </div>
         )}
       </div>
@@ -171,7 +227,8 @@ export function Timeline() {
         onWheel={onWheel}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={() => (dragRef.current = null)}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         onContextMenu={(e) => e.preventDefault()}
         title="Колесо мыши: масштаб. Shift + колесо или правая кнопка: прокрутка"
       >

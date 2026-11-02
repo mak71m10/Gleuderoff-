@@ -240,6 +240,54 @@ export function MapView() {
     else ref.remove()
   }, [layers.base, layers.reference, layers.referenceOpacity, mapDef?.reference])
 
+  // --- план города: здания можно выбрать и сделать локацией ---
+  const planRef = useRef<{ layer: L.LayerGroup; polys: L.Polygon[] } | null>(null)
+  const [plan, setPlan] = useState<{ id: string; buildings: number[][] } | null>(null)
+  useEffect(() => {
+    setPlan(null)
+    if (!mapDef?.plan) return
+    let alive = true
+    fetch(assetUrl(mapDef.plan))
+      .then((r) => r.json())
+      .then((p) => alive && setPlan({ id: mapDef.id, buildings: p.buildings }))
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [mapDef?.id, mapDef?.plan])
+  const buildingPlaces = world.places.filter((p) => p.mapId === mapDef?.id && p.building != null)
+  const selBuilding = selection?.type === 'building' ? selection.id : selection?.type === 'place' ? (() => { const p = world.places.find((x) => x.id === selection.id); return p?.building != null ? `${p.mapId}#${p.building}` : '' })() : ''
+  useEffect(() => {
+    const map = mapRef.current
+    planRef.current?.layer.remove()
+    planRef.current = null
+    if (!map || !plan || plan.id !== mapDef.id) return
+    const renderer = L.canvas({ padding: 0.5, tolerance: 1 })
+    const layer = L.layerGroup().addTo(map)
+    const byBuilding = new Map(buildingPlaces.map((p) => [p.building!, p.id]))
+    const base = (i: number): L.PathOptions => {
+      const key = `${plan.id}#${i}`
+      const isSel = key === selBuilding
+      const isPlace = byBuilding.has(i)
+      return { renderer, weight: isSel ? 3 : isPlace ? 1.6 : 0, color: isSel ? '#fff3c4' : '#e8cd8e', fillColor: '#e8cd8e', fillOpacity: isSel ? 0.35 : isPlace ? 0.12 : 0, opacity: 1 }
+    }
+    const list = plan.buildings.map((b, i) => {
+      const pts: L.LatLngExpression[] = []
+      for (let k = 2; k < b.length; k += 2) pts.push(toLL([b[k], b[k + 1]]))
+      const poly = L.polygon(pts, base(i)).addTo(layer)
+      poly.on('mouseover', () => poly.setStyle({ weight: 2, color: '#fff3c4', fillOpacity: 0.25 }))
+      poly.on('mouseout', () => poly.setStyle(base(i)))
+      poly.on('click', (e) => {
+        if (useStore.getState().tool.kind !== 'select') return
+        L.DomEvent.stopPropagation(e)
+        const pid = byBuilding.get(i)
+        useStore.getState().select(pid ? { type: 'place', id: pid } : { type: 'building', id: `${plan.id}#${i}` })
+      })
+      return poly
+    })
+    planRef.current = { layer, polys: list }
+  }, [plan, mapDef?.id, selBuilding, buildingPlaces.map((p) => `${p.id}:${p.building}`).join(',')])
+
   // --- клики по карте ---
   const handleMapClick = (ll: L.LatLng, regionId?: string): void => {
     const s = useStore.getState()
@@ -975,12 +1023,17 @@ export function MapView() {
     <div className="map-shell">
       <div ref={divRef} className="map-canvas" />
       <div ref={tipRef} className="prov-tip" />
-      {mapDef.kind !== 'world' && (
-        <div className="map-breadcrumb">
-          <button onClick={() => openMap(world.maps.find((m) => m.kind === 'world')!.id)}>← Карта мира</button>
-          <span>{mapDef.name}</span>
-        </div>
-      )}
+      {mapDef.kind !== 'world' && (() => {
+        // назад — на карту, где стоит место с этой картой (здание → город → мир)
+        const owner = world.places.find((p) => p.innerMapId === mapDef.id)
+        const parent = world.maps.find((m) => m.id === owner?.mapId) ?? world.maps.find((m) => m.kind === 'world')!
+        return (
+          <div className="map-breadcrumb">
+            <button onClick={() => openMap(parent.id)}>← {parent.kind === 'world' ? 'Карта мира' : parent.name.replace(/ — план города$/, '')}</button>
+            <span>{mapDef.name}</span>
+          </div>
+        )
+      })()}
       {tool.kind === 'draw' && (
         <div className="map-hint">
           Кликайте по карте, чтобы ставить точки границы ({drawCount}). Двойной клик, Enter или клик по первой точке завершают

@@ -87,10 +87,12 @@ export function CodexView({ kind }: { kind: EntryKind }) {
     .map((e) => ({ e, f: resolve(e, date) }))
     .filter(({ f }) => (f.name + ' ' + f.title + ' ' + f.tags.join(' ')).toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => (kind === 'event' ? (a.e.from ?? 0) - (b.e.from ?? 0) : a.f.name.localeCompare(b.f.name, 'ru')))
-  const selectedId = selection?.type === 'entry' && world.entries.find((e) => e.id === selection.id)?.kind === kind ? selection.id : list[0]?.e.id
+  const picked = selection?.type === 'entry' && world.entries.find((e) => e.id === selection.id)?.kind === kind
+  const selectedId = picked ? selection.id : list[0]?.e.id
 
+  // на телефоне список и карточка — отдельные экраны: выбранная запись открывается поверх списка
   return (
-    <div className="codex">
+    <div className={`codex ${picked ? 'picked' : ''}`}>
       <aside className="codex-list">
         <header>
           <h1>
@@ -131,7 +133,12 @@ export function CodexView({ kind }: { kind: EntryKind }) {
           {!list.length && <p className="muted pad">Пусто. Нажмите «+», чтобы добавить.</p>}
         </div>
       </aside>
-      <main className="codex-detail">{selectedId ? <EntryEditor key={selectedId} id={selectedId} /> : <EmptyCodex kind={kind} />}</main>
+      <main className="codex-detail">
+        <button className="codex-back" onClick={() => select(null)}>
+          <Icon name="back" size={16} /> {KINDS[kind].plural}
+        </button>
+        {selectedId ? <EntryEditor key={selectedId} id={selectedId} /> : <EmptyCodex kind={kind} />}
+      </main>
     </div>
   )
 }

@@ -250,6 +250,7 @@ async function migrateWorld(dir: string): Promise<void> {
       p.owners = structuredClone(dp.owners)
       p.settlement = structuredClone(dp.settlement ?? null)
       if (dp.description) p.description = dp.description
+      if (dp.cityMapId) p.cityMapId = dp.cityMapId
     }
     const defAdmin = new Map<string, Json>((def.adminRegions ?? []).map((a: Json) => [a.id, a]))
     for (const a of user.adminRegions ?? []) {
@@ -261,6 +262,11 @@ async function migrateWorld(dir: string): Promise<void> {
         a.descAuto = true
       }
     }
+    // планы городов Республики (генератор Watabou + city-maps.mjs): картинки уже скопированы вместе с maps;
+    // метки зданий city-* добавятся ниже вместе с прочими новыми местами
+    const cityMaps = (def.maps ?? []).filter((m: Json) => String(m.id).startsWith('map-city-'))
+    const cityIds = new Set(cityMaps.map((m: Json) => m.id))
+    user.maps = [...user.maps.filter((m: Json) => !cityIds.has(m.id)), ...structuredClone(cityMaps)]
     const lorePlaces = def.places.filter((p: Json) => String(p.id).startsWith('lore-'))
     const ids = new Set(lorePlaces.map((p: Json) => p.id))
     user.places = [...user.places.filter((p: Json) => !ids.has(p.id) && !String(p.id).startsWith('lore-battle-') && !String(p.id).startsWith('lore-rp-')), ...structuredClone(lorePlaces)]

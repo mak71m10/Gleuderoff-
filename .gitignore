@@ -9,3 +9,4 @@ out-web/
 source-maps/base-16384.png
 source-maps/provinces-raw.png
 source-maps/pub*.txt
+source-maps/cities/*.svg

@@ -12,6 +12,7 @@ export type Selection =
   | { type: 'entry'; id: string }
   | { type: 'label'; id: string }
   | { type: 'province'; id: number }
+  | { type: 'building'; id: string }
   | null
 
 export type Tool =

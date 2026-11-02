@@ -22,6 +22,7 @@ const yearOf = (d) => (d == null ? null : Math.floor(d / YEAR) + 1)
 mkdirSync(OUT, { recursive: true })
 
 const STYLE = 'oil painting, medieval fantasy court portrait, renaissance old master style, dramatic chiaroscuro lighting, dark ornate background, rich textures, visible brush strokes, highly detailed face, half-length portrait, masterpiece'
+const RP_STYLE = 'oil painting, dutch golden age style, renaissance old master, chiaroscuro lighting, dark background, visible brush strokes, detailed face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
 // цвета домов -> слова для одежды
@@ -231,16 +232,21 @@ for (const e of chars) {
   const imperial = !['jakasta', 'durin-kald'].includes(id) && (!race || /гладр|имперец|^Человек$/.test(race))
   // у незнатных и монахов — знамя рода без эмблемы, иначе нейросеть надевает им корону с герба
   const flag = NO_CROWN.has(id) ? bannerFor(e).replace(/ with .*$/, '') : bannerFor(e)
-  const banner = flag ? `(${flag} hanging on the wall behind:1.35), ` : ''
-  const prompt = `${STYLE}, ${banner}portrait of a ${imperial ? (id === 'oktavian-2' ? '(pale european baby:1.2), ' : '(northern european, germanic features, pale skin, deep-set eyes, strong brow ridge, prominent straight nose:1.3), ') : ''}${subject}`
+  const banner = flag ? `(${flag} hanging on the wall behind:${rp ? 1.1 : 1.35}), ` : ''
+  // Республика: короче описание и явный возраст числом — с LCM длинный запрос сводит всех к одному молодому лицу
+  const age = Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
+  const prompt = rp
+    ? `${RP_STYLE}, ${banner}portrait of a (${age} year old ${e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${imperial ? '(northern european, pale skin:1.15), ' : ''}${subject}`
+    : `${STYLE}, ${banner}portrait of a ${imperial ? (id === 'oktavian-2' ? '(pale european baby:1.2), ' : '(northern european, germanic features, pale skin, deep-set eyes, strong brow ridge, prominent straight nose:1.3), ') : ''}${subject}`
   if (process.env.DRY) {
     console.log(`${e.base.name}: ${prompt.slice(STYLE.length + 2)}`)
     continue
   }
   const tmp = `tools/sd/out-${id}.png`
   const t0 = Date.now()
-  execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', `${prompt}<lora:lcm-sd15:1>`, '-n', NO_CROWN.has(id) || rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG, '-W', '512', '-H', '640', '--steps', '7', '--cfg-scale', '1.8', '--sampling-method', 'lcm', '-s', String(seedOf(id) + Number(process.env.SEED_OFFSET ?? 0)), '-o', tmp], { stdio: 'ignore' })
-  await sharp(tmp).webp({ quality: 86 }).toFile(file)
+  execFileSync(SD, ['-m', MODEL, ...BACKEND, '-p', `${prompt}<lora:lcm-sd15:1>`, '-n', rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5), (picture frame, gilded frame, border:1.4)` : NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG, '-W', '512', '-H', '640', '--steps', '7', '--cfg-scale', '1.8', '--sampling-method', 'lcm', '-s', String(seedOf(id) + Number(process.env.SEED_OFFSET ?? 0)), '-o', tmp], { stdio: 'ignore' })
+  // республиканцев LCM любит рисовать в раме — обрезаем края
+  await (rp ? sharp(tmp).extract({ left: 28, top: 32, width: 456, height: 576 }) : sharp(tmp)).webp({ quality: 86 }).toFile(file)
   rmSync(tmp, { force: true })
   e.base.image = `portraits/${id}.webp`
   if (!process.env.NOWRITE) writeFileSync(WORLD, JSON.stringify(world, null, 1)) // сохраняем после каждого — можно прервать и продолжить

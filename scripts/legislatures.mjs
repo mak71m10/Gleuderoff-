@@ -5,6 +5,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { depKey } from './deputy-portraits.mjs'
 import { COUNCIL, SENATE } from './lore/power.mjs'
+import { PARTIES } from './lore/parties.mjs'
 import { HOUSES } from './lore/empire.mjs'
 import { MINOR_HOUSES } from './lore/argus.mjs'
 import { ASSEMBLY, CITY_COUNCILS, CITY_ELECTIONS, CLASS_AFFINITY, CLASS_MIX, CLASS_TURNOUT, DISTRICT_AFFINITY, FACTIONS, ISSUES, STRIKES, VOTE_CLASSES, WORKERS } from './lore/republic-power.mjs'
@@ -846,6 +847,11 @@ workers.unofficial = true
 workers.strikes = STRIKES.map(([from, to, town, title, text]) => ({ from: D(from), to: D(to), town, title, text }))
 
 world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities]
+// история, манифест и устройство партий (городские парламенты берут партии Народного собрания)
+for (const L of world.legislatures) {
+  const lore = PARTIES[L.id]
+  if (lore) for (const f of L.factions) if (lore[f.id]) f.party = { ...lore[f.id], draft: true }
+}
 // OUT — пробный прогон в другой файл, пока мир занят (например, рисуются портреты)
 writeFileSync(process.env.OUT ?? WORLD, JSON.stringify(world, null, 1))
 for (const l of world.legislatures) {
