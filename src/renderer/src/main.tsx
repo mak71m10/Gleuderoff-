@@ -29,15 +29,15 @@ if (!window.api) {
     // относительный путь — работает и с сервера разработки, и с опубликованной страницы (телефон)
     assetBase: 'default-world/',
     loadWorld: async () => {
-      const def = await (await fetch('default-world/world.json')).json()
+      const def = await (await fetch('default-world/world.json', { cache: 'no-cache' })).json()
       let saved = null
       try {
         saved = JSON.parse(localStorage.getItem('gleuderoff.web.world') ?? 'null')
       } catch {
         saved = null
       }
-      // сохранённая копия устарела (вышла новая версия мира) — берём новую
-      const data = saved && (saved.version ?? 1) >= def.version ? saved : def
+      // сохранённая копия устарела (вышла новая сборка мира) — берём новую; метку build ставит prune-web
+      const data = saved && (saved.version ?? 1) >= def.version && saved.build === def.build ? saved : def
       return { dir: 'browser', data }
     },
     saveWorld: async (data) => {

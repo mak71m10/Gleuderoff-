@@ -35,6 +35,8 @@ if (existsSync(DEP)) {
   rmSync(DEP, { recursive: true, force: true })
   console.log(`out-web: портреты депутатов (${files.length}) собраны в ${Math.ceil(files.length / (N * N))} листов`)
 }
+// метка сборки: телефон выбрасывает свою сохранённую копию мира, если вышла новая сборка
+world.build = Date.now()
 writeFileSync(`${DIR}/world.json`, JSON.stringify(world))
 console.log('out-web: плитки до z=1, мир сжат')
 
