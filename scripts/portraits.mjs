@@ -65,7 +65,7 @@ const CUSTOM = {
   'heribert-steiner': 'tough supreme marshal, broad shoulders, close-cropped grey hair, many medals, steel and dark blue uniform',
   'margot-vellen': 'stern female admiral, weathered face, dark blue naval coat with gold braid, sea behind',
   'kaya-head': 'smiling rich merchant patriarch, golden chains and rings, black velvet, coins and ships behind',
-  'styria-now': 'pale nocturnal grand duke, gaunt, dark purple and black velvet, moonlight, unsettling eyes',
+  'styria-now': 'gaunt count, black velvet, moonlight, unsettling eyes',
   'ulrike-brandt': 'fierce woman commander in snowy north, fur cloak over black armor, flame emblem',
   'matthias-essenwald': 'young army captain, steel breastplate, defiant eyes',
   'bernhard-rheinhold': 'old veteran legate with an eyepatch, missing leg, crutch, worn crimson coat',
@@ -213,7 +213,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -221,7 +221,8 @@ for (const e of chars) {
   const file = `${OUT}/${id}.webp`
   const holy = e.base.tags.includes('Святая церковь')
   const southern = e.base.tags.includes('южные республики')
-  const rp = e.base.tags.includes('Республика') || southern || holy
+  const sty = e.base.tags.includes('Графство Штирия') || id === 'styria-now'
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -235,7 +236,11 @@ for (const e of chars) {
   const banner = flag ? `(${flag} hanging on the wall behind:${rp ? 1.1 : 1.35}), ` : ''
   // Республика: короче описание и явный возраст числом — с LCM длинный запрос сводит всех к одному молодому лицу
   const age = Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
-  const prompt = rp
+  const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
+  const female = e.base.props?.gender === 'Женский'
+  const prompt = sty
+    ? `oil painting, dark gothic medieval portrait, candlelight, deep shadows, black background, visible brush strokes, detailed face, half-length portrait, ${banner}portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european:1.15), ${stHouse ? `(snow white skin, jet black hair:1.35), ${female ? 'black velvet gown' : 'black velvet doublet'} with a silver crescent, cold eyes` : /немая|скита/.test(e.base.title) ? 'grim hooded figure in grey robe, ink-stained hands' : /Капитан/.test(e.base.title) ? 'scarred mercenary general in worn black armor' : /Кастелян/.test(e.base.title) ? 'impoverished nobleman in a patched old doublet, tired face' : /Епископ/.test(e.base.title) ? 'bored bishop in shabby white robes with a golden sun pendant' : /Мастер|Управляющий/.test(e.base.title) ? 'shady merchant in black clothes with rings, sly look' : subject}`
+    : rp
     ? `${holy ? CHURCH_STYLE : southern ? SOUTH_STYLE : RP_STYLE}, ${holy ? '' : banner}portrait of a (${age} year old ${e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${holy ? `(european:1.1), ${/Папа/.test(e.base.title) ? 'pope in white and gold papal vestments with a tall white mitre, golden sun pendant' : /паладин|магистр|Командор|Маршал/i.test(e.base.title) ? 'paladin knight in polished white plate armor with a golden sun emblem on the chest, white cloak' : 'archbishop in white and gold robes with a mitre and a golden crozier, golden sun pendant'}, ` : southern ? (/Кальтран/.test(race) ? '(celtic european, pale weathered skin, braided hair:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : imperial ? '(northern european, pale skin:1.15), ' : ''}${holy ? '' : subject}`
     : `${STYLE}, ${banner}portrait of a ${imperial ? (id === 'oktavian-2' ? '(pale european baby:1.2), ' : '(northern european, germanic features, pale skin, deep-set eyes, strong brow ridge, prominent straight nose:1.3), ') : ''}${subject}`
   if (process.env.DRY) {

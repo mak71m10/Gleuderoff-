@@ -41,12 +41,21 @@ const SOUTH_STYLE = 'oil painting, spanish and italian renaissance portrait, vel
 const SOUTH_CLS = { church: 'clergy', teria: 'clergy', sword: 'officer', captains: 'officer', banks: 'money', merchants: 'money', harbor: 'money', harbors: 'money', teachers: 'learned', liberals: 'learned' }
 const IMPERIAL_STYLE = 'oil painting, medieval fantasy court portrait, renaissance old master style, dramatic chiaroscuro lighting, dark ornate background, visible brush strokes, detailed face, head and shoulders portrait'
 const HOLY_STYLE = 'oil painting, renaissance papal court portrait, raphael and titian style, warm golden light, dark background, visible brush strokes, detailed face, head and shoulders portrait'
+const STYRIA_STYLE = 'oil painting, dark gothic medieval portrait, candlelight, deep shadows, black background, visible brush strokes, detailed face, head and shoulders portrait'
+const STYRIA_OVER = {
+  rodnya: (f) => `${f ? 'noblewoman' : 'nobleman'} with (snow white skin, jet black hair:1.3), black velvet with a silver crescent brooch`,
+  nemye: (f) => `silent grim ${f ? 'woman' : 'man'} clerk in a grey hooded robe, closed lips, ink-stained fingers`,
+  market: (f) => `shady ${f ? 'merchant woman' : 'merchant'} in dark red and black clothes with rings, sly look`,
+  bank: (f) => `${f ? 'moneylender woman' : 'moneylender'} in a plain black coat with a white collar and a heavy key on a chain`,
+  roty: (f) => `scarred mercenary captain${f ? ' woman' : ''} in worn leather and a dented steel gorget`,
+  kast: (f) => `impoverished minor ${f ? 'noblewoman' : 'nobleman'} in a patched old doublet, tired hollow face`
+}
 export const isSouth = (leg) => /^(tos|vuf|she|kal)-/.test(leg.id)
 export const prompt = (m, leg) => {
   const f = m.gender === 'Женский'
   const end = m.to ? Math.floor(m.to / 500) + 1 : 1010
   const age = end - m.born
-  const ageW = age < 30 ? 'young' : age < 45 ? 'adult' : age < 60 ? 'middle-aged' : age < 72 ? 'aging grey-haired' : 'elderly white-haired'
+  const ageW = leg.id === 'sty-council' && m.faction === 'rodnya' ? (age < 45 ? 'young' : 'old') : age < 30 ? 'young' : age < 45 ? 'adult' : age < 60 ? 'middle-aged' : age < 72 ? 'aging grey-haired' : 'elderly white-haired'
   const south = isSouth(leg)
   // Верховный совет Империи, Сенат Короны, Совет святых архиепископов — своя одежда по скамье
   const imperial = leg.id === 'empire-council' || leg.id === 'argus-senate'
@@ -54,11 +63,12 @@ export const prompt = (m, leg) => {
   const over = holy
     ? m.faction === 'order' ? (f ? 'paladin woman in polished white plate armor with a golden sun emblem, white cloak' : 'paladin knight in polished white plate armor with a golden sun emblem, white cloak') : 'bishop in white and gold robes with a mitre, golden sun pendant'
     : imperial ? (m.faction === 'chaplains' ? 'imperial chaplain in black cassock with a golden sun pendant and a red sash' : m.group === 'Генералитет' ? 'imperial general in black and crimson uniform with gold epaulettes and a steel gorget' : f ? 'noblewoman in dark velvet gown with a fur collar and family jewels' : 'nobleman in dark velvet doublet with a fur collar and a heavy gold chain') : ''
+  const sty = leg.id === 'sty-council'
   const cls = south ? (leg.unofficial ? 'worker' : SOUTH_CLS[m.faction] ?? m.cls ?? 'noble') : m.cls ?? (leg.id === 'rp-workers' ? 'worker' : 'learned')
-  const clothes = over || (CLOTHES[cls] ?? CLOTHES.learned)(f)
-  const race = holy ? '(european:1.1), ' : south ? (leg.id.startsWith('kal-') ? '(celtic european, pale weathered skin:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : m.race ? RACE[m.race] ?? '' : '(northern european, germanic features, pale skin:1.2), '
+  const clothes = (sty && STYRIA_OVER[m.faction]?.(f)) || over || (CLOTHES[cls] ?? CLOTHES.learned)(f)
+  const race = sty ? '(northern european, pale skin, gaunt:1.2), ' : holy ? '(european:1.1), ' : south ? (leg.id.startsWith('kal-') ? '(celtic european, pale weathered skin:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : m.race ? RACE[m.race] ?? '' : '(northern european, germanic features, pale skin:1.2), '
   const color = leg.factions.find((x) => x.id === m.faction)?.color
-  return `${holy ? HOLY_STYLE : imperial ? IMPERIAL_STYLE : south ? SOUTH_STYLE : STYLE}, portrait of a ${race}${ageW} ${f ? 'woman' : 'man'}, ${clothes}${color ? `, small ${colorWord(color)} ribbon rosette on the chest` : ''}`
+  return `${sty ? STYRIA_STYLE : holy ? HOLY_STYLE : imperial ? IMPERIAL_STYLE : south ? SOUTH_STYLE : STYLE}, portrait of a ${race}${ageW} ${f ? 'woman' : 'man'}, ${clothes}${color ? `, small ${colorWord(color)} ribbon rosette on the chest` : ''}`
 }
 const colorWord = (hex) => {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
@@ -76,7 +86,7 @@ if (process.argv[1].endsWith('deputy-portraits.mjs')) {
   const world = JSON.parse(readFileSync(WORLD, 'utf8'))
   const onlyNow = process.argv.includes('now')
   const todo = []
-  for (const leg of world.legislatures.filter((l) => l.id.startsWith('rp-') || isSouth(l) || ['empire-council', 'argus-senate', 'ch-council'].includes(l.id))) {
+  for (const leg of world.legislatures.filter((l) => l.id.startsWith('rp-') || isSouth(l) || ['empire-council', 'argus-senate', 'ch-council', 'sty-council'].includes(l.id))) {
     for (const m of leg.members) {
       if (m.entryId) continue // у людей из карточек — свой портрет
       if (onlyNow && m.to != null) continue

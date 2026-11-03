@@ -30,6 +30,10 @@ const CHURCH_WET = ['Пристань паломников', 'Молы Звёз�
 export const MARBLE = ['#d9d3c5', '#cfc7b6', '#e3ddd0', '#c6bda8', '#d4cdbd']
 const CHURCH_STATES = ['Святая церковь', 'Архиепархия Луправена', 'Архиепархия Ошоморида', 'Архиепископия Окрупия', 'Архиепархия Бувезеона']
 const SOUTH_STATES = { 'Тоскана': 'tos', 'Вуфинская Республика': 'vuf', 'Республика Шеша': 'she', 'Кальтранская Республика': 'kal' }
+// Штирия: нищие сланцевые городки и Ночной рынок
+const STYRIA_DRY = ['Немой конец', 'Долговой ряд', 'Свечной ряд', 'Кожевенная яма', 'Висельный спуск', 'Нищая слобода', 'Рудничная яма', 'Воровской двор', 'Верхняя слобода', 'Сажевый конец', 'Угольный двор', 'Вексельный ряд']
+const STYRIA_WET = ['Мутный берег', 'Мельничная яма']
+export const SLATE = ['#3f3d44', '#4a4650', '#38363e', '#524d55', '#45424a']
 const SLAVE = ['Невольничий двор', 'Цепная слобода']
 
 /** Факты из описания провинции → примечательные места [название, тип метки, правило, текст] */
@@ -45,7 +49,7 @@ function landmarksFrom(name, type, text, state) {
   const gov = text.match(/[Гг]убернатор(?: —)? ([А-ЯЁ][а-яё]+ [А-ЯЁ][а-яё]+)/)
   if (gov) L.push(['Дом губернатора', 'landmark', 'center', sentence('[Гг]убернатор')])
   if (/ратуш|магистрат/.test(text) || type === 'city') L.push([`Ратуша ${name}`, 'assembly', 'plaza', sentence('ратуш|магистрат')])
-  L.push([`Храм ${name}`, 'temple', 'temple', ''])
+  if (state !== 'Графство Штирия' || /[Чч]асовн|[Хх]рам|собор/.test(text)) L.push([/заколочен/.test(text) ? 'Заколоченная часовня' : `Храм ${name}`, 'temple', 'temple', state === 'Графство Штирия' ? sentence('[Чч]асовн|[Хх]рам|собор') : ''])
   if (type === 'port') L.push([/портовый мастер/.test(text) ? 'Контора портового мастера' : 'Гавань', 'landmark', 'water', sentence('[Гг]аван|порт')])
   if (/склады Зальтмаров/.test(text)) L.push(['Склады Зальтмаров', 'landmark', type === 'port' ? 'water' : 'gate', sentence('Зальтмаров')])
   if (/почтовая станция/.test(text)) L.push(['Почтовая станция', 'landmark', 'gate', 'Почтовая станция на имперском тракте.'])
@@ -61,6 +65,13 @@ function landmarksFrom(name, type, text, state) {
   if (/фонтан/.test(text)) L.push(['Фонтан с дельфинами', 'landmark', 'plaza2', sentence('фонтан')])
   if (/Колокольня/.test(text)) L.push(['Колокольня', 'tower', 'center', sentence('Колокольня')])
   if (/трюмах/.test(text)) L.push(['Склады у пристани', 'landmark', 'water', sentence('трюм')])
+  // Штирия
+  if (/Кастелян/.test(text)) L.push(['Дом кастеляна', 'castle', 'citadel', sentence('Кастелян')])
+  if (/мытарь/.test(text)) L.push(['Дом мытаря', 'landmark', 'center', sentence('мытарь')])
+  if (/контора Вексельного дома/.test(text)) L.push(['Контора Вексельного дома', 'landmark', 'big', sentence('Вексельного дома')])
+  if (/виселица/.test(text)) L.push(['Виселица', 'landmark', 'gate', sentence('виселица')])
+  if (/синюю свечу/.test(text)) L.push(['Дом с синей свечой', 'landmark', 'edge', sentence('синюю свечу')])
+  if (/ночью — всем/.test(text)) L.push(['Ночные ряды', 'landmark', 'plaza', sentence('ночью — всем')])
   // Святая церковь
   if (/епископ-пастырь/.test(text)) L.push(['Палата епископа-пастыря', 'assembly', 'plaza', sentence('епископ-пастырь')])
   if (/Командор Святого ордена/.test(text)) L.push(['Дом Святого ордена', 'castle', 'citadel', sentence('Командор')])
@@ -87,7 +98,7 @@ export async function autoCities(world, handmade) {
   const taken = new Set(handmade.map((c) => c.province).filter(Boolean))
   const takenSlugs = new Set(handmade.map((c) => c.slug))
   const out = []
-  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES]) {
+  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES, 'Графство Штирия']) {
     const st = world.states.find((s) => s.base.name === sn)
     for (const p of world.provinces) {
       const s = p.settlement
@@ -102,7 +113,8 @@ export async function autoCities(world, handmade) {
       if (takenSlugs.has(slug)) continue
       const seed = hash(slug)
       const type = castra ? 'castra' : s.type
-      const capital = south && world.places.find((x) => x.id === `lore-${south}-capital` && x.base.name === p.name)
+      const sty = sn === 'Графство Штирия'
+      const capital = (south && world.places.find((x) => x.id === `lore-${south}-capital` && x.base.name === p.name)) || (sty && world.places.find((x) => x.id === 'lore-sty-capital' && x.base.name === p.name))
       const coast = (type === 'port' || p.coastal) && nearSea(s.x, s.y)
       const river = nearRiver(s.x, s.y)
       const nest = /гнездо/.test(text)
@@ -115,15 +127,16 @@ export async function autoCities(world, handmade) {
       const extra = [...(/рудник|копи/.test(text) ? MINE : []), ...(sn === 'Корона Аргус' && /раб|невольн/.test(text) ? SLAVE : [])]
       const kalt = south === 'kal'
       const holy = CHURCH_STATES.includes(sn)
-      const dry = holy ? pickN(CHURCH_DRY, 11, seed) : south ? pickN(kalt ? KALT_DRY : SOUTH_DRY, 12, seed) : [...extra.slice(0, 1), ...pickN(DRY, 12, seed)]
-      const wet = coast || river ? pickN(holy ? CHURCH_WET : south ? (kalt ? KALT_WET : SOUTH_WET) : WET, coast ? (south ? 2 : 3) : 2, seed + 1).map((n) => `~${n}`) : []
+      const dry = sty ? pickN(STYRIA_DRY, 11, seed) : holy ? pickN(CHURCH_DRY, 11, seed) : south ? pickN(kalt ? KALT_DRY : SOUTH_DRY, 12, seed) : [...extra.slice(0, 1), ...pickN(DRY, 12, seed)]
+      const wet = coast || river ? pickN(sty ? STYRIA_WET : holy ? CHURCH_WET : south ? (kalt ? KALT_WET : SOUTH_WET) : WET, coast ? (south ? 2 : 3) : 2, seed + 1).map((n) => `~${n}`) : []
       out.push({
-        slug, name: p.name, province: p.name, state: sn, auto: true, ...(holy ? { roof: MARBLE } : {}), ...(['village', 'fishing', 'castle', 'temple'].includes(type) ? { px: 1 } : {}), ...(capital ? { place: capital.id } : {}),
+        slug, name: p.name, province: p.name, state: sn, auto: true, ...(holy ? { roof: MARBLE } : {}), ...(sty ? { roof: SLATE } : {}), ...(['village', 'fishing', 'castle', 'temple'].includes(type) ? { px: 1 } : {}), ...(capital ? { place: capital.id } : {}),
         forest: p.terrain === 2 ? 0.25 : 0.1, hills: p.terrain === 3 || undefined, rocky: p.terrain >= 4 || undefined,
-        citadelName: holy ? 'Соборный двор' : castra ? 'Кастра' : nest ? 'Замковая гора' : south ? (kalt ? 'Дом капитанов' : capital ? 'Палаццо' : 'Кастелло') : 'Замок',
+        citadelName: sty ? (capital ? 'Чёрный замок' : 'Замок кастеляна') : holy ? 'Соборный двор' : castra ? 'Кастра' : nest ? 'Замковая гора' : south ? (kalt ? 'Дом капитанов' : capital ? 'Палаццо' : 'Кастелло') : 'Замок',
         gen, districts: [...wet.slice(0, 1), ...dry.slice(0, 2), ...wet.slice(1), ...dry.slice(2)],
         landmarks: [
-          ...(capital ? (() => { const r = SOUTH.find((x) => x.key === south); return [[r.hall.split(',')[0], 'assembly', 'citadel', `Здесь заседает ${r.chamber} и живёт ${r.rulerTitle.toLowerCase()}.`]] })() : []),
+          ...(capital && sty ? [['Чёрный замок', 'castle', 'citadel', 'Здесь живёт граф Конрад и заседает Ночной совет.'], ['Немая палата', 'assembly', 'center', 'Канцелярия его сиятельства: сюда не заходят по своей воле.'], ['Вексельный дом', 'landmark', 'big', 'Банк Штирии — прикрытие Ночного рынка.'], ['Ночной рынок', 'landmark', 'plaza', 'Ночной ряд: при свечах и в масках.']] : []),
+          ...(capital && !sty ? (() => { const r = SOUTH.find((x) => x.key === south); return [[r.hall.split(',')[0], 'assembly', 'citadel', `Здесь заседает ${r.chamber} и живёт ${r.rulerTitle.toLowerCase()}.`]] })() : []),
           ...landmarksFrom(p.name, type, text, sn).map((l) => (south && l[2] === 'temple' ? [kalt ? 'Храм клана' : `Церковь ${pickN(['Сан-Микеле', 'Санта-Лучия', 'Сан-Бартоло', 'Санта-Агна', 'Сан-Доменико', 'Санта-Клара'], 1, seed)[0]}`, l[1], l[2], l[3]] : l))
         ].slice(0, 7)
       })

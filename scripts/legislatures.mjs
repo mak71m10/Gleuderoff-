@@ -8,6 +8,7 @@ import { COUNCIL, SENATE } from './lore/power.mjs'
 import { PARTIES } from './lore/parties.mjs'
 import { SOUTH_PARTIES } from './lore/south-parties.mjs'
 import { SOUTH, SOUTH_NAMES } from './lore/south.mjs'
+import { STYRIA_BILLS, STYRIA_COUNCILS, STYRIA_COURT, STYRIA_FACTIONS, STYRIA_ISSUES, STYRIA_NAMES, STYRIA_PARTIES } from './lore/styria.mjs'
 import { southBodies } from './lore/south-power.mjs'
 import { CHURCH_BILLS, CHURCH_COUNCILS, CHURCH_FACTIONS, CHURCH_ISSUES, CHURCH_NAMES, CHURCH_PARTIES, CONTINENT_ARCHBISHOPS, HOLY_ARCHBISHOPS, ORDER_PEOPLE } from './lore/church.mjs'
 import { HOUSES } from './lore/empire.mjs'
@@ -939,10 +940,39 @@ const churchCouncil = build({
 ], [2, 4])
 churchCouncil.head = { title: 'Святой отец', entryId: 'lore-pope-now' }
 
-world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities, ...southLegs, ...southCommittees, churchCouncil]
+// ---------- Графство Штирия: Ночной совет ----------
+const STYRIA_TITLES = { rodnya: 'Кровный родич дома', nemye: 'Старший немой', market: 'Мастер Ночного рынка', bank: 'Вексельщик', roty: 'Капитан вольной роты', kast: 'Кастелян' }
+const styriaCouncil = build({
+  id: 'sty-council', state: 'Графство Штирия', name: 'Ночной совет', entryId: 'lore-sty-council', chairTitle: 'Граф', seats: 36, from: 960.4,
+  seatOrder: ['kast', 'roty', 'bank', 'market', 'nemye', 'rodnya'], groups: [],
+  description: 'Тридцать шесть кресел при графе: родня, немые, рыночники, вексельщики, капитаны и кастеляны. Законы не принимает: подписывает указы графа и делит доли. Заседает только после заката. Придумано по поручению автора — черновик.',
+  issues: STYRIA_ISSUES,
+  factions: STYRIA_FACTIONS.map(([id, name, color, ideology, stance]) => ({ id, name, color, ideology, stance, leader: '' })),
+  convocations: STYRIA_COUNCILS.map(([year, name, seats, note]) => ({ year, name, seats, note })),
+  named: STYRIA_COURT.map(([id, , , born, title, fac]) => [`lore-${id}`, fac, 'Корбрук', Math.max(960.4, born + 30), null, title]),
+  bills: STYRIA_BILLS,
+  years: { 960: 'Смерть графа Августа, регентство Гизелы.', 966: 'Башня Корбрука: Конрад берёт власть.', 978: 'Купленная независимость.', 980: 'Вассальная грамота.', 992: 'Голод; прошение кастелянов отклонено.', 1010: 'Графу шестьдесят.' },
+  namer: (m) => {
+    const first = pick(m.female ? STYRIA_NAMES.women : STYRIA_NAMES.men)
+    m.name = m.faction === 'rodnya' ? `${first} Штирийск${m.female ? 'ая' : 'ий'}` : m.faction === 'kast' ? `${first} фон ${pick(STYRIA_NAMES.noble)}` : `${first} ${pick(STYRIA_NAMES.surnames)}`
+    m.title = STYRIA_TITLES[m.faction]
+    m.origin = m.faction === 'rodnya' ? 'Дом Штирийский' : pick(['Корбрук', 'Брасрит', 'Росинберг', 'Эрхайм', 'Касинберг', 'Верлаге'])
+  }
+}, [
+  () => ({ title: `Доля с ярмарки в ${pick(['Брасрите', 'Корбруке', 'Эрхайме'])}`, kind: 'указ', w: { market: 0.8 }, sponsor: 'market', summary: 'Спор о десятой части: кому и сколько.' }),
+  () => ({ title: `Подать округа ${pick(['Брасхольм', 'Зонталь', 'Веренберг', 'Дальфельд', 'Эберлаге', 'Висберг'])}`, kind: 'указ', w: { levy: 1 }, sponsor: pick(['bank', 'rodnya']), summary: 'Ночная подать поднята: «в округе слишком спокойно».' }),
+  () => ({ title: `Кредит атаману ${pick(STYRIA_NAMES.men)} ${pick(STYRIA_NAMES.surnames)}`, kind: 'указ', w: { rotes: 0.5, market: 0.4 }, sponsor: 'bank', summary: 'Сорок долей из ста от добычи.' }),
+  () => ({ title: 'Синяя свеча для члена совета', kind: 'приговор', w: { count: 0.6, rites: 0.4 }, sponsor: 'nemye', summary: 'Палата записала одного из сидящих; кресло скоро освободится.' }),
+  () => ({ title: 'Жалованье вольным ротам', kind: 'указ', w: { rotes: 1 }, sponsor: 'roty', summary: 'Капитаны напоминают, кто удержал перевалы.' }),
+  () => ({ title: 'Обоз в Верхний скит', kind: 'тайное решение', w: { rites: 1 }, sponsor: pick(['nemye', 'rodnya']), summary: 'Ещё «работники». Вопросов нет.' }),
+  () => ({ title: 'Посул в Хауссер', kind: 'указ', w: { vassal: 0.8 }, sponsor: pick(['rodnya', 'bank']), summary: 'Сколько стоит ещё год без ревизоров.' })
+], [2, 4])
+styriaCouncil.head = { title: 'Граф', entryId: 'lore-styria-now' }
+
+world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities, ...southLegs, ...southCommittees, churchCouncil, styriaCouncil]
 // история, манифест и устройство партий (городские парламенты берут партии Народного собрания)
 for (const L of world.legislatures) {
-  const lore = PARTIES[L.id] ?? SOUTH_PARTIES[L.id] ?? (L.id === 'ch-council' ? CHURCH_PARTIES : null)
+  const lore = PARTIES[L.id] ?? SOUTH_PARTIES[L.id] ?? (L.id === 'ch-council' ? CHURCH_PARTIES : L.id === 'sty-council' ? STYRIA_PARTIES : null)
   const ids = new Set(L.factions.map((f) => f.id))
   if (lore) for (const f of L.factions) if (lore[f.id]) f.party = { ...lore[f.id], allies: (lore[f.id].allies ?? []).filter((x) => ids.has(x)), rivals: (lore[f.id].rivals ?? []).filter((x) => ids.has(x)), draft: true }
 }
