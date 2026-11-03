@@ -5,6 +5,7 @@ import { existsAt, regionOwner, resolve } from '../temporal'
 import { PLACE_TYPES } from '../constants'
 import { labelPoint, newPlace, ringArea } from '../model'
 import { assetUrl, loadPlan } from './ui'
+import { City3D, type View3D } from './City3D'
 import { GlowRenderer, type GlowOptions } from './glowRenderer'
 import { ProvinceRenderer, SettlementRenderer, TextRenderer, type SettlementItem, type TextLabel } from './provinceRenderer'
 import { onSpritesReady, SETTLEMENT_SCALE, SPRITE_LOGICAL, type SettlementType } from '../settlements3d'
@@ -239,6 +240,10 @@ export function MapView() {
     if (layers.reference) ref.addTo(map).setOpacity(layers.referenceOpacity)
     else ref.remove()
   }, [layers.base, layers.reference, layers.referenceOpacity, mapDef?.reference])
+
+  // 3D-вид поселения поверх карты; при переходе на другую карту — снова план
+  const [view3d, setView3d] = useState<View3D | null>(null)
+  useEffect(() => setView3d(null), [mapDef?.id])
 
   // --- план города: здания можно выбрать и сделать локацией ---
   const planRef = useRef<{ layer: L.LayerGroup; polys: L.Polygon[] } | null>(null)
@@ -1033,6 +1038,7 @@ export function MapView() {
     <div className="map-shell">
       <div ref={divRef} className="map-canvas" />
       <div ref={tipRef} className="prov-tip" />
+      {view3d && mapDef.plan && <City3D key={mapDef.id} mapDef={mapDef} mode={view3d} setMode={setView3d} />}
       {mapDef.kind !== 'world' && (() => {
         // назад — на карту, где стоит место с этой картой (здание → город → мир)
         const owner = world.places.find((p) => p.innerMapId === mapDef.id)
@@ -1041,6 +1047,13 @@ export function MapView() {
           <div className="map-breadcrumb">
             <button onClick={() => openMap(parent.id)}>← {parent.kind === 'world' ? 'Карта мира' : parent.name.replace(/ — план города$/, '')}</button>
             <span>{mapDef.name}</span>
+            {mapDef.plan && (
+              <span className="map-view-switch">
+                <button className={!view3d ? 'on' : ''} onClick={() => setView3d(null)}>Карта</button>
+                <button className={view3d === 'orbit' ? 'on' : ''} onClick={() => setView3d('orbit')}>3D</button>
+                <button className={view3d === 'walk' ? 'on' : ''} onClick={() => setView3d('walk')}>Прогулка</button>
+              </span>
+            )}
           </div>
         )
       })()}

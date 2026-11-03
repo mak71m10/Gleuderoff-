@@ -90,6 +90,14 @@ const centroid = (r) => { let x = 0, y = 0; for (const p of r) (x += p[0]), (y +
 const inside = ([x, y], r) => { let c = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const [xi, yi] = r[i], [xj, yj] = r[j]; if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c } return c }
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;')
 
+// облик построек в 3D-виде (src/renderer/src/city3d.ts) по государству
+const styleOf = (state) =>
+  state === 'Графство Штирия' ? 'styria'
+    : state === 'Кальтранская Республика' ? 'kalt'
+      : ['Тоскана', 'Вуфинская Республика', 'Республика Шеша'].includes(state) ? 'south'
+        : state === 'Святая церковь' || String(state).startsWith('Архиепархия') ? 'church'
+          : state === 'Корона Аргус' ? 'argus' : 'empire'
+
 function renderCity(c, J) {
   const f = (id) => J.features.find((x) => x.id === id)
   const vals = f('values')
@@ -236,7 +244,18 @@ ${text(W / 2, 64, c.name, 58, '#2a1d12', 'font-weight="bold" letter-spacing="6"'
   const plan = {
     w: W, h: H,
     districts: districts.map((q) => { const [x, y] = centroid(q.r); return { name: q.name, x: +x.toFixed(1), y: +y.toFixed(1) } }),
-    buildings: B.map((b) => [b.d, b.special ? 1 : 0, ...b.r.flat().map((v) => Math.round(v))])
+    buildings: B.map((b) => [b.d, b.special ? 1 : 0, ...b.r.flat().map((v) => Math.round(v))]),
+    // для 3D-вида: всё, кроме зданий, плоскими списками x,y… (деревья и камни рисует сам 3D по forest/hills/rocky)
+    scene: (() => {
+      const fl = (r) => r.flat().map((v) => Math.round(v))
+      const line = (q) => ({ r: fl(q.r), w: +q.w.toFixed(1) })
+      return {
+        s: +s.toFixed(4), style: styleOf(c.state), forest: c.forest ?? 0.1, ...(c.hills ? { hills: 1 } : {}), ...(c.rocky ? { rocky: 1 } : {}),
+        tower: +(vals.towerRadius ?? 7.6).toFixed(1), ...(c.roof ? { roof: c.roof } : {}), droof: districts.map((q) => q.roof ?? null), citadel: citadel ? walls.indexOf(citadel) : -1,
+        dist: districts.map((q) => fl(q.r)), water: water.map(fl), fields: fields.map(fl), greens: greens.map(fl), squares: squares.map(fl),
+        walls: walls.map(line), roads: roads.map(line), rivers: rivers.map(line), planks: planks.map(line)
+      }
+    })()
   }
 
   // примечательные здания по правилам из lore/cities.mjs

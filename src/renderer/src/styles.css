@@ -1300,3 +1300,38 @@ button.pw-chip:hover { background: var(--panel-2); }
 }
 .pw-portrait > * { grid-area: 1 / 1; }
 .pw-sheet { display: block; width: 100%; height: 100%; background-size: 1000% 1000%; }
+
+/* 3D-вид поселения */
+.map-view-switch { display: inline-flex; gap: 2px; }
+.map-view-switch button { padding: 4px 10px; }
+.map-view-switch button.on { background: var(--accent, #c9a45c); color: #14171d; border-color: transparent; }
+.city3d { position: absolute; inset: 0; z-index: 850; background: #8fb3cf; overflow: hidden; touch-action: none; }
+.city3d-open .layers-panel, .city3d-open .map-toolbar, .city3d-open .map-modes, .city3d-open .leaflet-control-container, .city3d-open .zoom-indicator { display: none; }
+.city3d-open .map-breadcrumb button { white-space: nowrap; }
+.city3d-open .inspector { z-index: 950; }
+.city3d-canvas, .city3d-canvas canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+.city3d-status { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(20, 23, 29, 0.88); color: #f3ead6; padding: 10px 18px; border-radius: 10px; font-size: 15px; }
+.city3d-bar { position: absolute; top: 62px; left: 70px; right: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; pointer-events: none; }
+.city3d-bar > *, .city3d-group > * { pointer-events: auto; }
+.city3d-bar button, .city3d-unclean { min-height: 32px; background: rgba(20, 23, 29, 0.84); color: #f3ead6; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 8px; padding: 4px 11px; font-size: 13px; cursor: pointer; }
+.city3d-bar button.on { background: #c9a45c; color: #14171d; border-color: transparent; }
+.city3d-group { display: inline-flex; gap: 2px; }
+.city3d-clock { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; background: rgba(20, 23, 29, 0.84); color: #f3ead6; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 8px; padding: 0 10px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.city3d-clock input { width: 110px; accent-color: #c9a45c; }
+.city3d-unclean { position: absolute; top: 62px; left: 70px; }
+.city3d-hint { position: absolute; left: 70px; bottom: 12px; max-width: calc(100% - 260px); background: rgba(20, 23, 29, 0.72); color: #f3ead6; padding: 4px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; }
+.city3d-mini { position: absolute; right: 14px; bottom: 14px; width: 150px; max-height: 210px; padding: 0; border: 3px solid #f3ead6; border-radius: 10px; overflow: hidden; background: #3f6f86; cursor: pointer; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4); }
+.city3d-mini img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.city3d-arrow { position: absolute; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 15px solid #d13b2e; filter: drop-shadow(0 0 2px #fff); }
+.city3d-stick { position: absolute; left: 22px; bottom: 44px; width: 112px; height: 112px; border-radius: 50%; background: rgba(20, 23, 29, 0.35); border: 2px solid rgba(255, 255, 255, 0.45); display: flex; align-items: center; justify-content: center; touch-action: none; }
+.city3d-stick > div { width: 46px; height: 46px; border-radius: 50%; background: rgba(243, 234, 214, 0.85); pointer-events: none; }
+@media (max-width: 760px) {
+  .city3d-open .map-breadcrumb { left: 64px; max-width: calc(100vw - 72px); gap: 4px; padding: 3px; }
+  .city3d-open .map-breadcrumb > span:not(.map-view-switch) { display: none; }
+  .city3d-open .map-breadcrumb button { padding: 4px 8px; font-size: 12px; }
+  .city3d-bar { top: 58px; left: 8px; right: 8px; }
+  .city3d-clock input { width: 80px; }
+  .city3d-hint { display: none; }
+  .city3d-mini { width: 96px; max-height: 130px; right: 8px; bottom: 8px; }
+  .city3d-unclean { top: 58px; left: 8px; }
+}
