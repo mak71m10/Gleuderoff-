@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { buildCity, type CityPlan, type CityWorld } from '../city3d'
+import { buildCity, type CityPlace, type CityPlan, type CityWorld } from '../city3d'
+import type { PersonInfo } from '../city3dLife'
 import { useStore } from '../store'
 import { assetUrl, loadPlan } from './ui'
 import type { MapDef } from '../types'
@@ -22,6 +23,16 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
   const [tour, setTour] = useState(false)
   const [fly, setFly] = useState(false)
   const [clean, setClean] = useState(false)
+  const [labels, setLabels] = useState(true)
+  const [racesOn, setRacesOn] = useState(false)
+  const [census, setCensus] = useState<CityWorld['census']>([])
+  const [met, setMet] = useState<PersonInfo | null>(null)
+  const world = useStore((s) => s.world!)
+  const placesOf = (): CityPlace[] => useStore.getState().world!.places.filter((p) => p.mapId === mapDef.id).map((p) => ({ id: p.id, name: p.base.name, x: p.x, y: p.y, building: p.building ?? null }))
+  // новая локация или новое имя сразу видны в 3D
+  const placeKey = world.places.filter((p) => p.mapId === mapDef.id).map((p) => `${p.id}:${p.base.name}:${p.building ?? ''}`).join('|')
+  useEffect(() => worldRef.current?.setPlaces(placesOf()), [placeKey])
+  useEffect(() => worldRef.current?.setMarks(racesOn), [racesOn])
   const [status, setStatus] = useState<string | null>('Строю поселение…')
   const [mini, setMini] = useState<{ w: number; h: number } | null>(null)
   const mobile = window.matchMedia('(pointer: coarse)').matches
@@ -46,6 +57,8 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
     state.current.fly = fly
   }, [flow, tour, fly])
 
+  useEffect(() => worldRef.current?.setLabels(labels), [labels])
+
   useEffect(() => {
     if (!mapDef.plan || !host.current) return
     const el = host.current
@@ -65,7 +78,12 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
         renderer.shadowMap.autoUpdate = false
         renderer.outputColorSpace = THREE.SRGBColorSpace
         el.appendChild(renderer.domElement)
-        const city = buildCity(plan, mapDef.id, { mobile, maxTexture: renderer.capabilities.maxTextureSize })
+        const w = useStore.getState().world!
+        // чьё поселение: состав жителей зависит от государства и культуры
+        const prov = w.provinces?.find((p) => p.cityMapId === mapDef.id)
+        const stateId = prov?.owners?.at(-1)?.[1] ?? w.places.find((p) => p.innerMapId === mapDef.id)?.base.stateId
+        const city = buildCity(plan, mapDef.id, { mobile, maxTexture: renderer.capabilities.maxTextureSize, places: placesOf(), state: w.states.find((q) => q.id === stateId)?.base.name ?? '', culture: prov?.culture ?? 'imperial' })
+        setCensus(city.census)
         worldRef.current = city
         setMini({ w: city.size[0], h: city.size[1] })
         const cam = new THREE.PerspectiveCamera(58, 1, 0.25, 12000)
@@ -138,6 +156,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
 
         // перетаскивание: в прогулке — взгляд; короткий клик — выбор здания
         const dom = renderer.domElement
+        dom.addEventListener('pointerleave', () => { hovered = null })
         let down: { x: number; y: number; id: number; t: number } | null = null
         let moved = 0
         const onDown = (e: PointerEvent): void => {
@@ -145,7 +164,16 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           moved = 0
           if (state.current.mode === 'walk') dom.setPointerCapture(e.pointerId)
         }
+        const hoverRay = new THREE.Raycaster()
+        let hovered: number | null = null
         const onMove = (e: PointerEvent): void => {
+          // наведение: как на плане, здание подсвечивается ещё до клика
+          if (!down && e.pointerType === 'mouse') {
+            const b = dom.getBoundingClientRect()
+            hoverRay.setFromCamera(new THREE.Vector2(((e.clientX - b.left) / b.width) * 2 - 1, -((e.clientY - b.top) / b.height) * 2 + 1), cam)
+            hovered = city.pick(hoverRay.ray.origin, hoverRay.ray.direction)
+            dom.style.cursor = hovered === null ? '' : 'pointer'
+          }
           if (!down || down.id !== e.pointerId) return
           const dx = e.clientX - down.x, dy = e.clientY - down.y
           moved += Math.abs(dx) + Math.abs(dy)
@@ -164,6 +192,12 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           const b = dom.getBoundingClientRect()
           const ray = new THREE.Raycaster()
           ray.setFromCamera(new THREE.Vector2(((e.clientX - b.left) / b.width) * 2 - 1, -((e.clientY - b.top) / b.height) * 2 + 1), cam)
+          const who = city.pickPerson(ray.ray.origin, ray.ray.direction)
+          if (who) {
+            setMet(who)
+            return
+          }
+          setMet(null)
           const i = city.pick(ray.ray.origin, ray.ray.direction)
           const s = useStore.getState()
           if (i === null || s.tool.kind !== 'select') return
@@ -254,6 +288,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           focus.y = st.mode === 'orbit' ? 99 : cam.position.y - city.heightAt(cam.position.x, cam.position.z) > 30 ? 99 : 0
           const hourMoved = Math.abs(st.hour - lastHourShadow) > 0.04
           const placeMoved = focus.distanceTo(lastShadow) > (st.mode === 'walk' ? 45 : 1e8)
+          if (city.takeDirty()) st.needShadow = true
           if (st.needShadow || hourMoved || placeMoved) {
             city.setTime(st.hour, focus)
             lastHourShadow = st.hour
@@ -275,6 +310,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           if (sel?.type === 'building' && sel.id.startsWith(`${mapDef.id}#`)) bi = Number(sel.id.split('#')[1])
           if (sel?.type === 'place') { const p = useStore.getState().world!.places.find((q) => q.id === sel.id); if (p?.mapId === mapDef.id && p.building != null) bi = p.building }
           const top = bi === null ? null : city.buildingTop(bi)
+          city.setHighlight(hovered, bi)
           marker.visible = !!top
           if (top) {
             marker.position.set(top[0], top[1] + 3 + Math.sin(now / 400) * 0.4, top[2])
@@ -284,6 +320,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           renderer.render(city.scene, cam)
         }
         city.setTime(state.current.hour, aim)
+        city.setLabels(labels)
         setStatus(null)
         raf = requestAnimationFrame(frame)
 
@@ -347,15 +384,45 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           <button className={flow ? 'on' : ''} onClick={() => setFlow(!flow)}>{flow ? 'Пауза' : 'Время идёт'}</button>
           {mode === 'orbit' && <button className={tour ? 'on' : ''} onClick={() => setTour(!tour)}>Облёт</button>}
           {mode === 'walk' && <button className={fly ? 'on' : ''} onClick={() => setFly(!fly)}>{fly ? 'Приземлиться' : 'Полёт'}</button>}
+          <button className={labels ? 'on' : ''} onClick={() => setLabels(!labels)}>Подписи</button>
+          <button className={racesOn ? 'on' : ''} onClick={() => setRacesOn(!racesOn)}>Расы</button>
           <button onClick={() => setClean(true)}>Чистый вид</button>
         </div>
       ) : (
         <button className="city3d-unclean" onClick={() => setClean(false)}>Показать панель</button>
       )}
+      {racesOn && !clean && (
+        <div className="city3d-races">
+          <b>Кто на улицах</b>
+          {census.map((q) => (
+            <div key={q.race.id}>
+              <i style={{ background: q.race.mark }} />
+              <span>{q.race.name}</span>
+              <em>{q.count}</em>
+            </div>
+          ))}
+          <small>Состав — черновик. Клик по жителю покажет, кто это.</small>
+        </div>
+      )}
+      {met && (
+        <div className="city3d-met" role="status">
+          <i style={{ background: met.race.mark }} />
+          <div>
+            <b>{met.race.name}</b>
+            <span>{met.role}</span>
+            {(() => {
+              const e = world.entries.find((q) => q.id === met.race.entry)
+              const text = (e?.base as { summary?: string } | undefined)?.summary
+              return text ? <p>{text}</p> : null
+            })()}
+          </div>
+          <button aria-label="Закрыть" onClick={() => setMet(null)}>×</button>
+        </div>
+      )}
       {!clean && (
         <div className="city3d-hint">
           {mode === 'orbit'
-            ? mobile ? 'Один палец — вращать, два — масштаб и сдвиг, касание — выбрать здание' : 'Мышь — вращать, правая кнопка — сдвиг, колесо — масштаб, клик — выбрать здание'
+            ? mobile ? 'Один палец — вращать, два — масштаб и сдвиг, касание — здание (можно сделать локацией) или житель' : 'Мышь — вращать, правая кнопка — сдвиг, колесо — масштаб, клик — здание (можно сделать локацией) или житель'
             : mobile ? 'Джойстик — идти, палец по экрану — взгляд' : fly ? 'WASD — лететь, Q/E — высота, Shift — быстрее, F — приземлиться' : 'WASD — идти, перетаскивание — взгляд, Shift — бежать, пробел — прыжок, F — полёт'}
         </div>
       )}

@@ -1325,6 +1325,20 @@ button.pw-chip:hover { background: var(--panel-2); }
 .city3d-arrow { position: absolute; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 15px solid #d13b2e; filter: drop-shadow(0 0 2px #fff); }
 .city3d-stick { position: absolute; left: 22px; bottom: 44px; width: 112px; height: 112px; border-radius: 50%; background: rgba(20, 23, 29, 0.35); border: 2px solid rgba(255, 255, 255, 0.45); display: flex; align-items: center; justify-content: center; touch-action: none; }
 .city3d-stick > div { width: 46px; height: 46px; border-radius: 50%; background: rgba(243, 234, 214, 0.85); pointer-events: none; }
+.city3d-races { position: absolute; top: 108px; left: 70px; width: 190px; max-height: calc(100% - 300px); overflow-y: auto; background: rgba(20, 23, 29, 0.88); color: #f3ead6; border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+.city3d-races > b { display: block; margin-bottom: 6px; font-family: var(--serif); font-size: 15px; }
+.city3d-races > div { display: flex; align-items: center; gap: 7px; line-height: 1.55; }
+.city3d-races i, .city3d-met > i { flex: none; width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.5); }
+.city3d-races span { flex: 1; min-width: 0; }
+.city3d-races em { font-style: normal; color: #b9b09a; font-variant-numeric: tabular-nums; }
+.city3d-races small { display: block; margin-top: 7px; color: #b9b09a; line-height: 1.3; }
+.city3d-met { position: absolute; left: 50%; bottom: 44px; transform: translateX(-50%); width: min(380px, calc(100% - 32px)); display: flex; gap: 10px; align-items: flex-start; background: rgba(20, 23, 29, 0.92); color: #f3ead6; border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+.city3d-met > i { margin-top: 4px; }
+.city3d-met > div { flex: 1; min-width: 0; }
+.city3d-met b { font-family: var(--serif); font-size: 16px; margin-right: 8px; }
+.city3d-met span { color: #b9b09a; }
+.city3d-met p { margin: 4px 0 0; line-height: 1.35; }
+.city3d-met button { background: none; border: none; color: #f3ead6; font-size: 18px; line-height: 1; cursor: pointer; min-width: 28px; min-height: 28px; }
 @media (max-width: 760px) {
   .city3d-open .map-breadcrumb { left: 64px; max-width: calc(100vw - 72px); gap: 4px; padding: 3px; }
   .city3d-open .map-breadcrumb > span:not(.map-view-switch) { display: none; }
@@ -1332,6 +1346,8 @@ button.pw-chip:hover { background: var(--panel-2); }
   .city3d-bar { top: 58px; left: 8px; right: 8px; }
   .city3d-clock input { width: 80px; }
   .city3d-hint { display: none; }
+  .city3d-races { top: 204px; left: 8px; width: 160px; max-height: 30%; font-size: 12px; }
+  .city3d-met { bottom: 150px; }
   .city3d-mini { width: 96px; max-height: 130px; right: 8px; bottom: 8px; }
   .city3d-unclean { top: 58px; left: 8px; }
 }

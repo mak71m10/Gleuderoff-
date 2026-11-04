@@ -1,4 +1,9 @@
 import * as THREE from 'three'
+import { buildStreets, type Streets } from './city3dStreets'
+import { buildMonument, MON_SIZE, monumentKind, type MonKind, type MonOut, type MonStyle } from './city3dMonuments'
+import { createLife, type PersonInfo } from './city3dLife'
+import type { Race } from './city3dRaces'
+import { populationFor } from './city3dRaces'
 
 /**
  * 3D-вид поселения: всё собирается из плана города (контуры зданий, улицы, стены, реки, поля) прямо в браузере.
@@ -71,7 +76,7 @@ const C = (hex: string): THREE.Color => {
   if (!c) colors.set(hex, (c = new THREE.Color(hex)))
   return c
 }
-class Bucket {
+export class Bucket {
   p: number[] = []
   c: number[] = []
   uv: number[] = []
@@ -226,10 +231,22 @@ export interface CityWorld {
   spawn: () => P2
   setTime: (hour: number, focus: THREE.Vector3) => void
   tick: (dt: number, t: number, cam: THREE.Camera) => void
+  /** Достроились детали: нужно обновить тени */
+  takeDirty: () => boolean
+  setLabels: (on: boolean) => void
+  /** Подписи и метки: все места на этой карте, в том числе созданные автором */
+  setPlaces: (list: CityPlace[]) => void
+  setMarks: (on: boolean) => void
+  /** Подсветка здания при наведении и выборе */
+  setHighlight: (hover: number | null, selected: number | null) => void
+  pickPerson: (o: THREE.Vector3, d: THREE.Vector3) => PersonInfo | null
+  census: { race: Race; count: number }[]
   dispose: () => void
 }
 
-export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: boolean; maxTexture: number }): CityWorld {
+export interface CityPlace { id: string; name: string; x: number; y: number; building?: number | null }
+
+export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: boolean; maxTexture: number; places: CityPlace[]; state: string; culture: string }): CityWorld {
   const S: PlanScene = plan.scene ?? { s: 1, style: 'empire', forest: 0.1, tower: 7.6, droof: [], citadel: -1, dist: [], water: [], fields: [], greens: [], squares: [], walls: [], roads: [], rivers: [], planks: [] }
   const st = STYLES[S.style] ?? STYLES.empire
   const R = rng(hashOf(seedName) + 1)
@@ -237,13 +254,20 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   // единицы генератора Watabou — не метры: подбираем масштаб так, чтобы обычный дом занимал около 70 м²
   const areas = plan.buildings.map((b) => Math.abs(areaOf(ringOf(b, 1, 2)))).sort((a, b) => a - b)
   const med = areas[areas.length >> 1] || 300
-  const k = Math.max(0.6, Math.min(Math.sqrt(med / 70), 12))
+  const k = Math.max(0.6, Math.min(Math.sqrt(med / 62), 12))
   const W = plan.w / k, H = plan.h / k
   const allPts = plan.buildings.flatMap((b) => ringOf(b, k, 2))
   const center: P2 = allPts.length ? centerOf(allPts) : [W / 2, H / 2]
   const radius = Math.max(30, Math.sqrt(allPts.reduce((m, p) => Math.max(m, (p[0] - center[0]) ** 2 + (p[1] - center[1]) ** 2), 0)))
 
-  const blds = plan.buildings.map((b) => ({ d: b[0], special: b[1] === 1, r: ringOf(b, k, 2) }))
+  // на плане дома стоят почти вплотную: в 3D чуть уже, чтобы между ними появились проходы и улицы
+  const inset = (r: P2[]): P2[] => {
+    const a = Math.abs(areaOf(r))
+    if (a < 18) return r
+    const q = grow(r, -Math.min(1.5, 0.5 + Math.sqrt(a) * 0.05))
+    return Math.abs(areaOf(q)) > a * 0.4 && areaOf(q) * areaOf(r) > 0 ? q : r
+  }
+  const blds = plan.buildings.map((b) => { const r = ringOf(b, k, 2); return { d: b[0], special: b[1] === 1, r: b[1] === 1 ? r : inset(r) } })
   const dists = S.dist.map((f) => ringOf(f, k))
   const waters = S.water.map((f) => ringOf(f, k))
   const fields = S.fields.map((f) => ringOf(f, k))
@@ -357,10 +381,204 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   }
   if (hasWater) for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) if (heightAt((i + 0.5) * cell, (j + 0.5) * cell) < -0.2) grid[j * gw + i] = -2
   planks.forEach((q) => fillLine(q.r, Math.max(q.w, 3), -3))
-  blds.forEach((b, i) => fillPoly(b.r, i + 1))
   const gridAt = (x: number, z: number): number => {
     const i = Math.floor(x / cell), j = Math.floor(z / cell)
     return i < 0 || j < 0 || i >= gw || j >= gh ? 0 : grid[j * gw + i]
+  }
+
+  // ---------- стены: где ворота, что занято ----------
+  const segCross = (a: P2, b: P2, c: P2, d: P2): number | null => {
+    const r = (b[0] - a[0]) * (d[1] - c[1]) - (b[1] - a[1]) * (d[0] - c[0])
+    if (Math.abs(r) < 1e-6) return null
+    const t = ((c[0] - a[0]) * (d[1] - c[1]) - (c[1] - a[1]) * (d[0] - c[0])) / r
+    const u = ((c[0] - a[0]) * (b[1] - a[1]) - (c[1] - a[1]) * (b[0] - a[0])) / r
+    return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? t : null
+  }
+  const GATE = 4.2
+  const gatesOn = (a: P2, b: P2, len: number): number[] => {
+    const out: number[] = []
+    for (const q of [...roads, ...planks]) for (let s = 1; s < q.r.length; s++) { const t = segCross(a, b, q.r[s - 1], q.r[s]); if (t !== null) out.push(t * len) }
+    return out.sort((m, n) => m - n)
+  }
+  const spansOf = (gates: number[], len: number): [number, number][] => {
+    const spans: [number, number][] = []
+    let cur = 0
+    for (const g0 of gates) { if (g0 - GATE > cur) spans.push([cur, g0 - GATE]); cur = Math.max(cur, g0 + GATE) }
+    if (cur < len) spans.push([cur, len])
+    return spans
+  }
+  const gatePts: P2[] = []
+  wallLines.forEach((w) => {
+    const th = Math.max(1.8, Math.min(3.2, w.w / 2)), towerR = Math.max(2.4, Math.min(4.4, (S.tower / k) * 0.9))
+    w.r.forEach((a, i) => {
+      const b = w.r[(i + 1) % w.r.length], len = Math.hypot(b[0] - a[0], b[1] - a[1])
+      if (len < 0.5) return
+      const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len
+      const gates = gatesOn(a, b, len)
+      for (const [s0, s1] of spansOf(gates, len)) fillLine([[a[0] + ux * s0, a[1] + uz * s0], [a[0] + ux * s1, a[1] + uz * s1]], th + 0.6, -1)
+      for (const g0 of gates) {
+        const cx = a[0] + ux * g0, cz = a[1] + uz * g0
+        gatePts.push([cx, cz])
+        for (const sd of [-1, 1]) fillLine([[cx + ux * sd * GATE, cz + uz * sd * GATE], [cx + ux * sd * GATE + 0.1, cz + uz * sd * GATE]], towerR * 1.7, -1)
+      }
+      fillLine([a, [a[0] + 0.1, a[1]]], towerR * 2, -1)
+    })
+  })
+
+  // ---------- что за здание: особые получают свою модель и место вокруг ----------
+  const N = blds.length
+  const marks = new Map<number, string>((plan.landmarks ?? []).map((l) => [l.b, l.name]))
+  // локации автора: их здания не сносятся, и название тоже может дать модель («Банк», «Собор»…)
+  for (const q of opts.places) if (q.building != null && !marks.has(q.building)) marks.set(q.building, q.name)
+  function pointIn([x, y]: P2, r: P2[]): boolean {
+    let c = false
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) if (r[i][1] > y !== r[j][1] > y && x < ((r[j][0] - r[i][0]) * (y - r[i][1])) / (r[j][1] - r[i][1]) + r[i][0]) c = !c
+    return c
+  }
+  const kindOf = (i: number): string => {
+    const n = marks.get(i) ?? ''
+    if (/храм|церк|часовн|капелл|сан-|санта-/i.test(n)) return 'temple'
+    if (/замок|кастра|цитадел|гнездо|крепост|кастелян/i.test(n)) return 'keep'
+    if (/ратуш|палат|совет|дворец|губернатор|подест|магистрат/i.test(n)) return 'civic'
+    if (/мельниц/i.test(n)) return 'mill'
+    if (blds[i].special) return S.citadel >= 0 && pointIn(centerOf(blds[i].r), wallLines[S.citadel].r) ? 'keep' : 'temple'
+    return ''
+  }
+  const obbOf = (r: P2[]): { ux: number; uz: number; cx: number; cz: number; L: number; W: number } => {
+    let best = 1e18, out = { ux: 1, uz: 0, cx: 0, cz: 0, L: 1, W: 1 }
+    for (let i = 0; i < r.length; i++) {
+      const p = r[i], q = r[(i + 1) % r.length], l = Math.hypot(q[0] - p[0], q[1] - p[1])
+      if (l < 0.01) continue // у своих планов контур замкнут повторной точкой
+      const ax = (q[0] - p[0]) / l, az = (q[1] - p[1]) / l
+      let a0 = 1e9, a1 = -1e9, c0 = 1e9, c1 = -1e9
+      for (const w of r) { const u = w[0] * ax + w[1] * az, v = -w[0] * az + w[1] * ax; a0 = Math.min(a0, u); a1 = Math.max(a1, u); c0 = Math.min(c0, v); c1 = Math.max(c1, v) }
+      const sq = (a1 - a0) * (c1 - c0)
+      if (sq < best) {
+        best = sq
+        const mu = (a0 + a1) / 2, mv = (c0 + c1) / 2, cx = mu * ax - mv * az, cz = mu * az + mv * ax
+        out = a1 - a0 >= c1 - c0 ? { ux: ax, uz: az, cx, cz, L: a1 - a0, W: c1 - c0 } : { ux: -az, uz: ax, cx, cz, L: c1 - c0, W: a1 - a0 }
+      }
+    }
+    return out
+  }
+  const hubAim: P2 = squares[0] ? centerOf(squares[0]) : center
+  const townScale = N < 60 ? 0.42 : N < 150 ? 0.62 : N < 500 ? 0.84 : 1
+  interface Mon { i: number; kind: MonKind; x: number; z: number; rot: number; L: number; W: number }
+  const mons: Mon[] = []
+  const removed = new Uint8Array(N)
+  const inRect = (m: Omit<Mon, 'i' | 'kind'>, x: number, z: number, pad = 0): boolean => {
+    const c = Math.cos(m.rot), n = Math.sin(m.rot), dx = x - m.x, dz = z - m.z
+    return Math.abs(dx * c + dz * n) <= m.L / 2 + pad && Math.abs(-dx * n + dz * c) <= m.W / 2 + pad
+  }
+  const rectBlocked = (m: Omit<Mon, 'i' | 'kind'>): boolean => {
+    const c = Math.cos(m.rot), n = Math.sin(m.rot)
+    for (let a = -3; a <= 3; a++) for (let b = -3; b <= 3; b++) {
+      const u = (a / 3) * (m.L / 2), v = (b / 3) * (m.W / 2), x = m.x + u * c - v * n, z = m.z + u * n + v * c
+      if (x < 0 || z < 0 || x > W || z > H) return true
+      const g = gridAt(x, z)
+      if (g === -1 || g === -2 || g === -3) return true
+    }
+    return false
+  }
+  for (const [i, name] of marks) {
+    const kind = monumentKind(name, N)
+    if (!kind || !blds[i]) continue
+    const o = obbOf(blds[i].r)
+    const want = MON_SIZE[kind]
+    let L = Math.max(o.L, want[0] * townScale), Wd = Math.max(o.W, want[1] * townScale)
+    let rot = Math.atan2(o.uz, o.ux)
+    // перед смотрит на центр
+    const front = -Math.sin(rot) * (hubAim[0] - o.cx) + Math.cos(rot) * (hubAim[1] - o.cz)
+    if (front < 0) rot += Math.PI
+    let placed: Mon | null = null
+    for (let t = 0; t < 5 && !placed; t++) {
+      const m = { i, kind, x: o.cx, z: o.cz, rot, L, W: Wd }
+      if (!rectBlocked(m)) placed = m
+      L = Math.max(o.L, L * 0.84)
+      Wd = Math.max(o.W, Wd * 0.84)
+    }
+    if (!placed) placed = { i, kind, x: o.cx, z: o.cz, rot, L: o.L, W: o.W }
+    mons.push(placed)
+  }
+  // соседние домики уступают место зданию; примечательные остаются
+  blds.forEach((b, i) => {
+    if (marks.has(i)) return
+    const c = centerOf(b.r)
+    if (mons.some((m) => inRect(m, c[0], c[1], 1.5))) removed[i] = 1
+  })
+  blds.forEach((b, i) => { if (!removed[i]) fillPoly(b.r, i + 1) })
+  const monAt = new Map<number, Mon>(mons.map((m) => [m.i, m]))
+  for (const m of mons) {
+    const c = Math.cos(m.rot), n = Math.sin(m.rot)
+    fillPoly([[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, d]) => { const u = (a * m.L) / 2, v = (d * m.W) / 2; return [m.x + u * c - v * n, m.z + u * n + v * c] as P2 }), m.i + 1)
+  }
+
+  // ---------- двери и улицы ----------
+  const doorEdges = new Map<number, number>()
+  const doors: P2[] = []
+  const pois: P2[] = []
+  blds.forEach((b, i) => {
+    if (removed[i]) return
+    const m = monAt.get(i)
+    if (m) {
+      const d = m.W / 2 + 2
+      const pt: P2 = [m.x - Math.sin(m.rot) * d, m.z + Math.cos(m.rot) * d]
+      pois.push(pt)
+      doors.push(pt)
+      return
+    }
+    const o = areaOf(b.r) > 0 ? 1 : -1
+    let best = -1, bl = 1.6
+    let pt: P2 | null = null
+    b.r.forEach((a, e) => {
+      const c = b.r[(e + 1) % b.r.length], l = Math.hypot(c[0] - a[0], c[1] - a[1])
+      if (l <= bl) return
+      const nx = ((c[1] - a[1]) / l) * o, nz = (-(c[0] - a[0]) / l) * o
+      const mx = (a[0] + c[0]) / 2 + nx * 1.1, mz = (a[1] + c[1]) / 2 + nz * 1.1
+      const g = gridAt(mx, mz)
+      if (g > 0) return
+      bl = l; best = e; pt = [(a[0] + c[0]) / 2 + nx * 1.4, (a[1] + c[1]) / 2 + nz * 1.4]
+    })
+    if (pt) { doorEdges.set(i, best); doors.push(pt); if (marks.has(i)) pois.push(pt) }
+  })
+  squares.forEach((r) => {
+    const c = centerOf(r)
+    fillLine([c, [c[0] + 0.1, c[1]]], 3.4, N + 2)
+    pois.push([c[0] + 5, c[1] + 2], [c[0] - 4, c[1] - 5])
+  })
+  const roadAt = sampler(canvasMask((c) => { roads.forEach((q) => { trace(c, q.r, false); c.lineWidth = Math.max(4, q.w); c.stroke() }) }, 0, 0))
+  const roadEnds: P2[] = roads.flatMap((q) => (q.r.length ? [q.r[0], q.r[q.r.length - 1]] : [])).filter((p) => p[0] > 0 && p[1] > 0 && p[0] < W && p[1] < H)
+  let streets: Streets | null = null
+  if (doors.length > 1) {
+    streets = buildStreets({
+      W, H,
+      cell: Math.max(1.4, Math.max(W, H) / (opts.mobile ? 420 : 640)),
+      free: (x, z) => { const g = gridAt(x, z); return (g === 0 || g === -3) && heightAt(x, z) > 0.05 },
+      roadAt,
+      hub: hubAim,
+      mains: [...gatePts, ...pois, ...roadEnds],
+      doors
+    })
+  }
+
+  // главные улицы шире: мелкие домики, что вылезают на проезд, сносятся (большие и примечательные остаются)
+  if (streets && N >= 150) {
+    const T = streets, mainMin = Math.max(5, Math.round(N * 0.035)), reach = Math.ceil((N < 500 ? 3 : 3.8) / T.cell)
+    const hit = new Set<number>()
+    for (let q = 0; q < T.traffic.length; q++) {
+      if (T.traffic[q] < mainMin) continue
+      const i0 = q % T.gw, j0 = (q / T.gw) | 0
+      for (let dj = -reach; dj <= reach; dj++) for (let di = -reach; di <= reach; di++) {
+        if (di * di + dj * dj > reach * reach) continue
+        const v = gridAt((i0 + di + 0.5) * T.cell, (j0 + dj + 0.5) * T.cell)
+        if (v > 0 && v <= N) hit.add(v - 1)
+      }
+    }
+    for (const i of hit) {
+      if (marks.has(i) || blds[i].special || Math.abs(areaOf(blds[i].r)) > 95) continue
+      removed[i] = 1
+      for (let q = 0; q < grid.length; q++) if (grid[q] === i + 1) grid[q] = 0
+    }
   }
 
   // ---------- земля: всё плоское рисуется на холсте ----------
@@ -419,7 +637,10 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   waters.forEach((r) => { trace(g, r); g.strokeStyle = sand; g.lineWidth = 7; g.stroke() })
   rivers.forEach((q) => { trace(g, q.r, false); g.strokeStyle = sand; g.lineWidth = q.w + 5; g.stroke() })
   // земля кварталов и площади: утоптанная земля и мостовая
-  dists.forEach((r) => { trace(g, r); g.fillStyle = st.dirt; g.globalAlpha = 0.92; g.fill(); g.globalAlpha = 1 })
+  const built = new Float32Array(dists.length)
+  blds.forEach((b, i) => { if (b.d >= 0 && !removed[i]) built[b.d] += Math.abs(areaOf(b.r)) })
+  const dense = dists.map((r, i) => built[i] / Math.max(1, Math.abs(areaOf(r))))
+  dists.forEach((r, i) => { trace(g, r); g.fillStyle = st.dirt; g.globalAlpha = dense[i] > 0.34 ? 0.9 : dense[i] > 0.2 ? 0.45 : 0.14; g.fill(); g.globalAlpha = 1 })
   const speck = (r: P2[], n: number, col: string, alpha: number, size: number): void => {
     g.save()
     trace(g, r)
@@ -431,7 +652,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     for (let i = 0; i < n; i++) { const s = size * (0.5 + RT()); g.fillRect(a + RT() * (b - a), c + RT() * (d - c), s, s * 0.7) }
     g.restore()
   }
-  dists.forEach((r) => speck(r, Math.min(5000, Math.abs(areaOf(r)) / 6), mixHex(st.dirt, '#3a3020', 0.4), 0.22, 0.9))
+  dists.forEach((r, i) => { if (dense[i] > 0.2) speck(r, Math.min(5000, Math.abs(areaOf(r)) / 6), mixHex(st.dirt, '#3a3020', 0.4), 0.22, 0.9) })
   squares.forEach((r) => {
     trace(g, r)
     g.fillStyle = st.pave
@@ -469,11 +690,54 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       g.globalAlpha = 1
     }
   }
+  // улицы: мостовая на главных, утоптанная земля на переулках и дорожках к дверям
+  if (streets) {
+    const T = streets, mainMin = Math.max(5, Math.round(N * 0.035))
+    const stones = document.createElement('canvas')
+    stones.width = stones.height = 48
+    const sg = stones.getContext('2d')!
+    sg.fillStyle = mixHex(st.pave, '#000', 0.26)
+    sg.fillRect(0, 0, 48, 48)
+    const RS = rng(77)
+    for (let row = 0; row < 6; row++) for (let c = -1; c < 6; c++) {
+      sg.fillStyle = mixHex(st.pave, RS() < 0.5 ? '#ffffff' : '#000000', RS() * 0.16)
+      sg.fillRect(c * 8 + (row % 2) * 4 + 0.6, row * 8 + 0.6, 6.8, 6.8)
+    }
+    const pattern = g.createPattern(stones, 'repeat')!
+    pattern.setTransform(new DOMMatrix().scale(1 / Math.max(pxPerM * 0.9, 1) * (N > 150 ? 1 : 1)))
+    const klass = (q: number): number => (T.traffic[q] >= mainMin || (T.main[q] && T.traffic[q] >= 6) ? 2 : T.traffic[q] >= 3 ? 1 : 0)
+    const paved = N >= 120
+    const strokeClass = (c: number, width: number, style: string | CanvasPattern, alpha = 1): void => {
+      g.beginPath()
+      for (let q = 0; q < T.traffic.length; q++) {
+        if (!T.traffic[q] || klass(q) < c) continue
+        const w = T.parent[q]
+        if (w < 0 || !T.traffic[w]) continue
+        g.moveTo(T.sp[q * 2], T.sp[q * 2 + 1])
+        g.lineTo(T.sp[w * 2], T.sp[w * 2 + 1])
+      }
+      g.strokeStyle = style
+      g.lineWidth = width
+      g.globalAlpha = alpha
+      g.stroke()
+      g.globalAlpha = 1
+    }
+    const lane = mixHex(st.dirt, st.grass, N < 120 ? 0.1 : 0)
+    const edge = mixHex(st.dirt, st.grass, 0.6)
+    strokeClass(0, 1.9, edge, 0.75)
+    strokeClass(0, 1.15, lane)
+    strokeClass(1, 3.9, edge, 0.8)
+    strokeClass(1, 2.9, paved && dense.some((d) => d > 0.3) ? mixHex(st.pave, st.dirt, 0.55) : lane)
+    const mw = N < 120 ? 4 : N < 500 ? 5.2 : 6.4
+    strokeClass(2, mw + 1.4, paved ? mixHex(st.pave, '#000', 0.34) : edge, 0.9)
+    strokeClass(2, mw, paved ? pattern : lane)
+    if (paved) strokeClass(2, 0.32, mixHex(st.pave, '#000', 0.42), 0.55)
+  }
   rivers.forEach((q) => { trace(g, q.r, false); g.strokeStyle = '#3f7488'; g.lineWidth = q.w; g.stroke() })
   // тень у основания домов: читается даже там, где нет настоящих теней
   g.strokeStyle = 'rgba(25,18,10,.3)'
   g.lineWidth = 1.5
-  blds.forEach((b) => { trace(g, b.r); g.stroke() })
+  blds.forEach((b, i) => { if (!removed[i]) { trace(g, b.r); g.stroke() } })
   g.restore()
 
   const groundTex = new THREE.CanvasTexture(tc)
@@ -510,6 +774,31 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     groundGeo.computeVertexNormals()
   }
   const groundMat = new THREE.MeshLambertMaterial({ map: groundTex, vertexColors: true })
+  // мелкая фактура поверх холста: вблизи земля и трава не расплываются
+  const grain = (() => {
+    const c = document.createElement('canvas')
+    c.width = c.height = 256
+    const q = c.getContext('2d')!
+    q.fillStyle = '#808080'
+    q.fillRect(0, 0, 256, 256)
+    const RG = rng(31)
+    for (let i = 0; i < 2600; i++) {
+      const v = 95 + Math.floor(RG() * 70)
+      q.fillStyle = `rgba(${v},${v},${v},${0.25 + RG() * 0.4})`
+      const x = RG() * 256, y = RG() * 256, w = 1 + RG() * 5
+      for (const [ox, oy] of [[0, 0], [256, 0], [0, 256], [-256, 0], [0, -256]]) { q.beginPath(); q.ellipse(x + ox, y + oy, w, w * (0.4 + RG() * 0.6), RG() * 3, 0, 7); q.fill() }
+    }
+    const t = new THREE.CanvasTexture(c)
+    t.wrapS = t.wrapT = THREE.RepeatWrapping
+    t.anisotropy = 4
+    return t
+  })()
+  disposable.push(grain)
+  groundMat.onBeforeCompile = (sh) => {
+    sh.uniforms.uGrain = { value: grain }
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGr;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGr = position.xz;')
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vGr; uniform sampler2D uGrain;').replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= 0.55 + 0.45 * texture2D(uGrain, vGr * 0.09).r + 0.45 * texture2D(uGrain, vGr * 0.31 + 0.37).r;')
+  }
   const ground = new THREE.Mesh(groundGeo, groundMat)
   ground.receiveShadow = true
   scene.add(ground)
@@ -531,24 +820,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     return c
   }
   // детальность по размеру: столица в десять тысяч домов и деревня строятся по-разному
-  const N = blds.length
   const detail = opts.mobile ? (N > 1500 ? 0 : N > 400 ? 1 : 2) : N > 5000 ? 0 : N > 1800 ? 1 : 2
-
-  const marks = new Map<number, string>((plan.landmarks ?? []).map((l) => [l.b, l.name]))
-  const kindOf = (i: number): string => {
-    const n = marks.get(i) ?? ''
-    if (/храм|собор|церк|часовн|капелл|сан-|санта-/i.test(n)) return 'temple'
-    if (/замок|кастра|цитадел|гнездо|крепост|кастелян/i.test(n)) return 'keep'
-    if (/ратуш|палат|совет|дворец|губернатор|подест|магистрат|дом /i.test(n)) return 'civic'
-    if (/мельниц/i.test(n)) return 'mill'
-    if (blds[i].special) return S.citadel >= 0 && pointIn(centerOf(blds[i].r), wallLines[S.citadel].r) ? 'keep' : 'temple'
-    return ''
-  }
-  function pointIn([x, y]: P2, r: P2[]): boolean {
-    let c = false
-    for (let i = 0, j = r.length - 1; i < r.length; j = i++) if (r[i][1] > y !== r[j][1] > y && x < ((r[j][0] - r[i][0]) * (y - r[i][1])) / (r[j][1] - r[i][1]) + r[i][0]) c = !c
-    return c
-  }
 
   const tops = new Float32Array(N)
   const crenel = (ch: Chunk, a: P2, b: P2, y: number, col: string, t: number, step = 2.1): void => {
@@ -560,15 +832,34 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
   }
 
-  blds.forEach((b, idx) => {
+  const monStyle: MonStyle = { wall: mixHex(st.wall, st.plaster[0], 0.35), stone: st.stone, roof: S.style === 'styria' ? '#34323a' : st.roof[0], dark: S.style === 'styria' ? '#1f1c24' : st.tower, pillar: mixHex(st.plaster[2], '#ffffff', 0.3), banner: S.style === 'styria' ? '#2a1a2a' : S.style === 'church' ? '#d8c070' : '#8f2f2f', timber: st.timber }
+  const monOut: MonOut = { smoke: [], beacon: [] }
+  const chimneys: [number, number, number][] = []
+  // кабачок: вывеска на столбе, столы и лавки
+  const tavern = (q: { x: number; z: number; y: number; rot: number; ch: Chunk }): void => {
+    const c = Math.cos(q.rot), n = Math.sin(q.rot), b = q.ch.solid
+    b.box(q.x + c * 2, q.y, q.z + n * 2, 0.14, 3.1, 0.14, st.timber)
+    b.box(q.x + c * 2, q.y + 3, q.z + n * 2, 1, 0.08, 0.08, st.timber, q.rot)
+    b.box(q.x + c * 2.3, q.y + 2.2, q.z + n * 2.3, 0.75, 0.75, 0.06, S.style === 'styria' ? '#3a2c3a' : '#a8862e', q.rot)
+    for (const sd of [-1.1, 0.5]) {
+      const tx = q.x + c * sd, tz = q.z + n * sd
+      b.box(tx, q.y, tz, 1.2, 0.8, 0.7, '#7a5a38', q.rot)
+      b.box(tx - n * 0.65, q.y, tz + c * 0.65, 1.2, 0.42, 0.26, '#6a4a2c', q.rot)
+      b.box(tx + n * 0.65, q.y, tz - c * 0.65, 1.2, 0.42, 0.26, '#6a4a2c', q.rot)
+      b.cyl(tx, q.y + 0.8, tz, 0.09, 0.16, 6, '#d9c48e')
+    }
+  }
+  for (const m of mons) tops[m.i] = buildMonument(m.kind, chunkAt(m.x, m.z), m.x, m.z, m.rot, m.L, m.W, heightAt(m.x, m.z), monStyle, monOut)
+  // один дом заданной детальности; случайность своя у каждого дома, поэтому при достройке он остаётся тем же
+  const buildHouse = (idx: number, ch: Chunk, detail: number, first: boolean): void => {
+    const b = blds[idx]
     let r = b.r.filter((p, i) => { const q = b.r[(i + 1) % b.r.length]; return Math.hypot(p[0] - q[0], p[1] - q[1]) > 0.25 })
     if (r.length < 3) { r = b.r; if (r.length < 3) return }
     const ctr = centerOf(r)
-    const ch = chunkAt(ctr[0], ctr[1])
     const base = heightAt(ctr[0], ctr[1])
     const area = Math.abs(areaOf(r))
     const kind = kindOf(idx)
-    const rv = (): number => R()
+    const rv = rng(hashOf(seedName) + idx * 7919 + 13)
     const orient = areaOf(r) > 0 ? 1 : -1
 
     // ось конька — длинная сторона наименьшего описанного прямоугольника
@@ -678,6 +969,11 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const visible = edges.filter((e) => !e.hidden && e.len > 1.6)
     let door: (typeof edges)[number] | null = null
     if (visible.length) door = visible.reduce((a, e) => (e.len > a.len ? e : a), visible[0])
+    // кабачок: вывеска и столы у двери, если перед домом оживлённая улица
+    if (door && !kind && detail >= 2 && N > 30 && rv() < 0.07) {
+      const cx = (door.a[0] + door.b[0]) / 2 + door.n[0] * 2.4, cz = (door.a[1] + door.b[1]) / 2 + door.n[1] * 2.4
+      if (gridAt(cx, cz) === 0) tavern({ x: cx, z: cz, y: base, rot: Math.atan2(door.b[1] - door.a[1], door.b[0] - door.a[0]), ch })
+    }
     if (detail >= 1) {
       const storeys = kind === 'temple' ? 1 : kind === 'keep' ? Math.floor(eave / 4) : kind === 'civic' ? 3 : floors
       const fh = kind === 'temple' ? eave - 1 : kind === 'keep' ? 4 : (eave - 0.5) / Math.max(1, storeys)
@@ -743,6 +1039,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const y = base + eave + rise - Math.abs(v) * pitch - 0.4
       ch.solid.box(cx, y, cz, 0.75, 1.9, 0.75, st.stone, Math.atan2(uz, ux))
       ch.solid.box(cx, y + 1.9, cz, 0.95, 0.16, 0.95, mixHex(st.stone, '#000', 0.3), Math.atan2(uz, ux))
+      if (first && chimneys.length < 400) chimneys.push([cx, y + 2.1, cz])
     }
     // башня с шатром у храма, башенка с часами у ратуши, крылья у мельницы
     if (kind === 'temple') {
@@ -777,17 +1074,65 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         ch.solid.quad([hx, hy, hz], [hx + dx * 7, hy + dy * 7, hz + dz * 7], [hx + dx * 7 + Math.sin(a) * 0, hy + dy * 7 + 1, hz + dz * 7], [hx, hy + 1, hz], '#d9cfb4')
       }
     }
+  }
+  // дома лежат кусками: большой город строится упрощённо, а вокруг камеры куски достраиваются окнами и фахверком
+  interface HouseCell { idxs: number[]; lvl: number; meshes: THREE.Mesh[]; x: number; z: number }
+  const HCELL = opts.mobile ? 180 : 120
+  const cells = new Map<string, HouseCell>()
+  blds.forEach((b, i) => {
+    if (removed[i] || monAt.has(i)) return
+    const c = centerOf(b.r), key = `${Math.floor(c[0] / HCELL)}:${Math.floor(c[1] / HCELL)}`
+    let h = cells.get(key)
+    if (!h) cells.set(key, (h = { idxs: [], lvl: detail, meshes: [], x: (Math.floor(c[0] / HCELL) + 0.5) * HCELL, z: (Math.floor(c[1] / HCELL) + 0.5) * HCELL }))
+    h.idxs.push(i)
   })
+  const makeMeshes = (ch: Chunk): THREE.Mesh[] => {
+    const out: THREE.Mesh[] = []
+    const add = (b: Bucket, m: THREE.Material, shadow: boolean): void => {
+      const geo = b.geometry()
+      if (!geo) return
+      geo.computeBoundingSphere()
+      const mesh = new THREE.Mesh(geo, m)
+      mesh.castShadow = shadow
+      mesh.receiveShadow = shadow
+      scene.add(mesh)
+      out.push(mesh)
+    }
+    add(ch.solid, solidMat, true)
+    add(ch.roof, roofMat, true)
+    add(ch.glow, glowMat, false)
+    return out
+  }
+  const fillCell = (h: HouseCell, lvl: number, first: boolean): void => {
+    const ch: Chunk = { solid: new Bucket(), roof: new Bucket(), glow: new Bucket() }
+    for (const i of h.idxs) buildHouse(i, ch, lvl, first)
+    for (const m of h.meshes) { scene.remove(m); m.geometry.dispose() }
+    h.meshes = makeMeshes(ch)
+    h.lvl = lvl
+  }
+  for (const h of cells.values()) fillCell(h, detail, true)
+  let dirty = false
+  let upgradeWait = 0
+  const upgradeNear = (cam: THREE.Camera, dt: number): void => {
+    upgradeWait -= dt
+    if (upgradeWait > 0) return
+    const low = cam.position.y - heightAt(cam.position.x, cam.position.z) < (opts.mobile ? 45 : 110)
+    if (!low) return
+    let best: HouseCell | null = null, bd = (opts.mobile ? 1.1 : 1.8) * HCELL
+    for (const h of cells.values()) {
+      if (h.lvl >= 2) continue
+      const d = Math.hypot(h.x - cam.position.x, h.z - cam.position.z)
+      if (d < bd) { bd = d; best = h }
+    }
+    if (best) {
+      fillCell(best, 2, false)
+      dirty = true
+      upgradeWait = 0.12
+    }
+  }
 
   // ---------- стены города: зубцы, башни, ворота там, где стену пересекает дорога ----------
   const wallColor = st.wall
-  const segCross = (a: P2, b: P2, c: P2, d: P2): number | null => {
-    const r = (b[0] - a[0]) * (d[1] - c[1]) - (b[1] - a[1]) * (d[0] - c[0])
-    if (Math.abs(r) < 1e-6) return null
-    const t = ((c[0] - a[0]) * (d[1] - c[1]) - (c[1] - a[1]) * (d[0] - c[0])) / r
-    const u = ((c[0] - a[0]) * (b[1] - a[1]) - (c[1] - a[1]) * (b[0] - a[0])) / r
-    return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? t : null
-  }
   wallLines.forEach((w, wi) => {
     const r = w.r
     if (r.length < 2) return
@@ -803,15 +1148,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       if (len < 0.5) continue
       const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len, nx = -uz, nz = ux
       // ворота на этом участке
-      const gates: number[] = []
-      for (const q of roads) for (let s = 1; s < q.r.length; s++) { const t = segCross(a, b, q.r[s - 1], q.r[s]); if (t !== null) gates.push(t * len) }
-      for (const q of planks) for (let s = 1; s < q.r.length; s++) { const t = segCross(a, b, q.r[s - 1], q.r[s]); if (t !== null) gates.push(t * len) }
-      gates.sort((m, n) => m - n)
-      const GATE = 4.2
-      const spans: [number, number][] = []
-      let cur = 0
-      for (const g0 of gates) { if (g0 - GATE > cur) spans.push([cur, g0 - GATE]); cur = Math.max(cur, g0 + GATE) }
-      if (cur < len) spans.push([cur, len])
+      const gates = gatesOn(a, b, len)
+      const spans = spansOf(gates, len)
       for (const [s0, s1] of spans) {
         const L = s1 - s0, n = Math.max(1, Math.ceil(L / 7))
         for (let j = 0; j < n; j++) {
@@ -829,7 +1167,6 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           if (detail >= 1) {
             for (const sd of [1, -1]) crenel(ch, [A[0] + nx * o * sd, A[1] + nz * o * sd], [B[0] + nx * o * sd, B[1] + nz * o * sd], (ya + yb) / 2 + wh, wallColor, 0.4)
           }
-          fillLine([A, B], th + 0.6, -1)
         }
       }
       // надвратные башни
@@ -839,7 +1176,6 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           const tx = cx + ux * sd * 4.2, tz = cz + uz * sd * 4.2
           ch.solid.cyl(tx, y - 2, tz, towerR * 0.85, wh + 5, 10, wallColor)
           for (let m = 0; m < 8; m++) { const q = (m / 8) * 6.283; ch.solid.box(tx + Math.cos(q) * towerR * 0.85, y + wh + 3, tz + Math.sin(q) * towerR * 0.85, 1, 1, 0.5, wallColor, q + 1.57) }
-          fillLine([[tx, tz], [tx + 0.1, tz]], towerR * 1.7, -1)
         }
         // свод над проездом и герб над аркой
         ch.solid.box(cx, y + wh - 2.2, cz, 8.4, 3.6, th + 1, mixHex(wallColor, '#000', 0.05), rot)
@@ -851,7 +1187,6 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       ch.solid.cyl(a[0], ty - 2, a[1], towerR, wh + 4.5, detail ? 12 : 8, wallColor)
       if (i % 3 === 0 && S.style !== 'south') ch.solid.cyl(a[0], ty + wh + 2.5, a[1], towerR * 1.15, towerR * 2.1, 12, st.tower, 0, false)
       else if (detail >= 1) for (let m = 0; m < 10; m++) { const q = (m / 10) * 6.283; ch.solid.box(a[0] + Math.cos(q) * towerR, ty + wh + 2.5, a[1] + Math.sin(q) * towerR, 1, 1.1, 0.5, wallColor, q + 1.57) }
-      fillLine([a, [a[0] + 0.1, a[1]]], towerR * 2, -1)
     }
   })
 
@@ -877,14 +1212,30 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   })
 
   // ---------- площади: колодец, прилавки ----------
+  const vendors: { x: number; z: number; a: number }[] = []
   const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
-    ch.solid.cyl(cx, y, cz, 1.3, 0.9, 10, st.stone)
-    fillLine([[cx, cz], [cx + 0.1, cz]], 3.4, N + 2 + si)
-    ch.solid.cyl(cx, y + 0.9, cz, 0.95, 0.02, 10, '#26404d')
-    for (const s of [-1, 1]) ch.solid.box(cx + s * 1.1, y + 0.8, cz, 0.15, 2.1, 0.15, st.timber)
-    ch.solid.cyl(cx, y + 2.9, cz, 1.8, 1, 4, mixHex(st.roof[0], '#000', 0.1), 0, false, Math.PI / 4)
+    if (area > 500) {
+      // большая площадь: фонтан или памятник на постаменте
+      if (si % 2 === 0) {
+        ch.solid.cyl(cx, y, cz, 3.4, 0.8, 16, st.stone)
+        ch.solid.cyl(cx, y + 0.8, cz, 3, 0.02, 16, '#3f7f96')
+        ch.solid.cyl(cx, y, cz, 0.7, 2.8, 8, st.stone)
+        ch.solid.cyl(cx, y + 2.8, cz, 1.5, 0.3, 10, st.stone, 1.2)
+      } else {
+        ch.solid.box(cx, y, cz, 3, 2.6, 3, st.stone)
+        ch.solid.box(cx, y + 2.6, cz, 1, 2.4, 0.7, '#6d7a70')
+        ch.solid.cyl(cx, y + 5, cz, 0.42, 0.75, 8, '#6d7a70', 0.3)
+      }
+      fillLine([[cx, cz], [cx + 0.1, cz]], 7, N + 2 + si)
+    } else {
+      ch.solid.cyl(cx, y, cz, 1.3, 0.9, 10, st.stone)
+      fillLine([[cx, cz], [cx + 0.1, cz]], 3.4, N + 2 + si)
+      ch.solid.cyl(cx, y + 0.9, cz, 0.95, 0.02, 10, '#26404d')
+      for (const s of [-1, 1]) ch.solid.box(cx + s * 1.1, y + 0.8, cz, 0.15, 2.1, 0.15, st.timber)
+      ch.solid.cyl(cx, y + 2.9, cz, 1.8, 1, 4, mixHex(st.roof[0], '#000', 0.1), 0, false, Math.PI / 4)
+    }
     const stalls = Math.min(detail >= 1 ? 14 : 0, Math.floor(Math.sqrt(area) / 3.2))
     const rad = Math.sqrt(area) * 0.3
     for (let i = 0; i < stalls; i++) {
@@ -896,6 +1247,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       ch.solid.box(sx, y + 2.2, sz, 2.9, 0.1, 1.5, col, rot)
       ch.solid.box(sx, y + 0.85, sz, 2, 0.18, 0.7, ['#c9843a', '#8fa04a', '#c94a3a', '#d8c070'][i % 4], rot)
       fillLine([[sx, sz], [sx + 0.1, sz]], 2, si + N + 2)
+      // торговец за прилавком, лицом к центру площади
+      vendors.push({ x: sx + Math.cos(a) * 1.15, z: sz + Math.sin(a) * 1.15, a: Math.atan2(-Math.cos(a), -Math.sin(a)) })
     }
   })
 
@@ -1013,6 +1366,18 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         run = (run + l) % LAMP_STEP
       }
     }
+    // вдоль главных улиц города
+    if (streets && N >= 40) {
+      const T = streets, stepCells = Math.max(6, Math.round(LAMP_STEP / T.cell))
+      let count = 0
+      for (let q = 0; q < T.traffic.length && glows.length < 900; q++) {
+        if (!T.main[q] || !T.traffic[q] || T.parent[q] < 0) continue
+        if (((q % T.gw) + ((q / T.gw) | 0)) % stepCells !== 0 || count++ % 2) continue
+        const w = T.parent[q], dx = T.sp[w * 2] - T.sp[q * 2], dz = T.sp[w * 2 + 1] - T.sp[q * 2 + 1], l = Math.hypot(dx, dz) || 1
+        const sd = q % 2 ? 1 : -1
+        lamp(T.sp[q * 2] - (dz / l) * 3 * sd, T.sp[q * 2 + 1] + (dx / l) * 3 * sd)
+      }
+    }
     squares.forEach((r) => r.forEach((p, i) => { if (i % 2 === 0) lamp(p[0] + (centerOf(r)[0] - p[0]) * 0.08, p[1] + (centerOf(r)[1] - p[1]) * 0.08) }))
   }
   const dot = softDot()
@@ -1024,19 +1389,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
 
   // сборка кусков в меши
   for (const ch of chunks.values()) {
-    const add = (b: Bucket, m: THREE.Material, shadow: boolean): void => {
-      const geo = b.geometry()
-      if (!geo) return
-      geo.computeBoundingSphere()
-      const mesh = new THREE.Mesh(geo, m)
-      mesh.castShadow = shadow
-      mesh.receiveShadow = shadow
-      scene.add(mesh)
-      disposable.push(geo)
-    }
-    add(ch.solid, solidMat, true)
-    add(ch.roof, roofMat, true)
-    add(ch.glow, glowMat, false)
+    for (const m of makeMeshes(ch)) disposable.push(m.geometry)
     ch.solid.p = ch.solid.c = ch.roof.p = ch.roof.c = ch.roof.uv = ch.glow.p = ch.glow.c = []
   }
 
@@ -1141,37 +1494,89 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   scene.add(clouds)
 
   // ---------- люди ----------
-  const walkers: { x: number; z: number; a: number; v: number; ph: number; rest: number }[] = []
-  const WN = Math.min(opts.mobile ? 60 : 180, Math.round(N / 3) + 8)
-  for (let i = 0, tries = 0; i < WN && tries < 8000; tries++) {
-    const x = center[0] + (R() - 0.5) * radius * 1.9, z = center[1] + (R() - 0.5) * radius * 1.9
-    if (gridAt(x, z) !== 0 || paved(x, z) < 0.3 || heightAt(x, z) < 0.3) continue
-    walkers.push({ x, z, a: R() * 6.28, v: 1 + R() * 0.6, ph: R() * 6.28, rest: 0 })
-    i++
+  const life = createLife({ scene, streets, heightAt, gridAt, doors, pois, gates: gatePts, vendors, center, radius, size: [W, H], style: S.style, buildings: N, mobile: opts.mobile, rnd: R, dot, population: populationFor({ state: opts.state, culture: opts.culture, style: S.style, forest: S.forest, hills: !!S.hills, rocky: !!S.rocky, water: hasWater, buildings: N }) })
+  let marksOn = false
+
+  // ---------- дым из труб ----------
+  const smokeSrc = [...monOut.smoke, ...monOut.smoke, ...chimneys.filter((_, i) => i % (opts.mobile ? 8 : 3) === 0).slice(0, opts.mobile ? 20 : 70)]
+  const PUFFS = 3
+  const smokePos = new Float32Array(smokeSrc.length * PUFFS * 3)
+  const smokeGeo = new THREE.BufferGeometry()
+  smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePos, 3))
+  const smokeMat = new THREE.PointsMaterial({ map: dot, color: '#cfcfcf', size: 3.6, transparent: true, opacity: 0.34, depthWrite: false })
+  const smokePts = new THREE.Points(smokeGeo, smokeMat)
+  smokePts.frustumCulled = false
+  scene.add(smokePts)
+  disposable.push(smokeGeo, smokeMat)
+
+  // ---------- подписи особых зданий ----------
+  const labels = new THREE.Group()
+  labels.visible = false
+  const labelCache = new Map<string, { sp: THREE.Sprite; name: string; tex: THREE.Texture; mat: THREE.SpriteMaterial }>()
+  const setPlaces = (list: CityPlace[]): void => {
+    const seen = new Set<string>()
+    for (const q of list) {
+      seen.add(q.id)
+      const old = labelCache.get(q.id)
+      if (old && old.name === q.name) continue
+      if (old) { labels.remove(old.sp); old.tex.dispose(); old.mat.dispose() }
+      const c = document.createElement('canvas')
+      const ctx = c.getContext('2d')!
+      const font = '600 30px Georgia, serif'
+      ctx.font = font
+      c.width = Math.ceil(ctx.measureText(q.name).width) + 28
+      c.height = 48
+      ctx.font = font
+      ctx.fillStyle = 'rgba(20,23,29,.82)'
+      ctx.beginPath()
+      ctx.roundRect(0, 0, c.width, c.height, 10)
+      ctx.fill()
+      ctx.fillStyle = '#f3ead6'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(q.name, 14, 25)
+      const tex = new THREE.CanvasTexture(c)
+      tex.colorSpace = THREE.SRGBColorSpace
+      const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true, sizeAttenuation: false, fog: false })
+      const sp = new THREE.Sprite(mat)
+      const b = q.building
+      const at = b != null ? monAt.get(b) : undefined
+      const ctr: P2 = at ? [at.x, at.z] : b != null && blds[b] ? centerOf(blds[b].r) : [q.x / k, q.y / k]
+      const top = b != null && tops[b] ? tops[b] : heightAt(ctr[0], ctr[1]) + 2
+      sp.position.set(ctr[0], top + 3, ctr[1])
+      sp.scale.set((c.width / c.height) * 0.026, 0.026, 1)
+      sp.renderOrder = 20
+      labels.add(sp)
+      labelCache.set(q.id, { sp, name: q.name, tex, mat })
+    }
+    for (const [id, v] of labelCache) if (!seen.has(id)) { labels.remove(v.sp); v.tex.dispose(); v.mat.dispose(); labelCache.delete(id) }
   }
-  const body = new Bucket()
-  body.box(-0.1, 0, 0, 0.13, 0.82, 0.16, '#3a332c')
-  body.box(0.1, 0, 0, 0.13, 0.82, 0.16, '#3a332c')
-  body.box(0, 0.8, 0, 0.42, 0.62, 0.24, '#ffffff')
-  body.box(-0.27, 0.86, 0, 0.1, 0.55, 0.12, '#f0f0f0')
-  body.box(0.27, 0.86, 0, 0.1, 0.55, 0.12, '#f0f0f0')
-  const bodyGeo = body.geometry()!
-  const headB = new Bucket()
-  headB.box(0, 1.42, 0, 0.23, 0.26, 0.23, '#ecc8ae')
-  headB.box(0, 1.64, 0, 0.27, 0.07, 0.27, '#5b4630')
-  const headGeo = headB.geometry()!
-  const pplMat = new THREE.MeshLambertMaterial({ vertexColors: true })
-  const bodies = new THREE.InstancedMesh(bodyGeo, pplMat, Math.max(1, walkers.length))
-  const heads = new THREE.InstancedMesh(headGeo, pplMat, Math.max(1, walkers.length))
-  const CLOTH = S.style === 'styria' ? ['#2a2630', '#3a3540', '#322a30', '#4a4048'] : ['#7a3b2e', '#3f5f7a', '#6a7a3a', '#8a6a3a', '#5a4a6a', '#a8a08a', '#3f6a4a']
-  walkers.forEach((_, i) => bodies.setColorAt(i, new THREE.Color(CLOTH[i % CLOTH.length])))
-  bodies.count = heads.count = walkers.length
-  bodies.castShadow = true
-  bodies.frustumCulled = heads.frustumCulled = false
-  scene.add(bodies, heads)
-  disposable.push(bodyGeo, headGeo, pplMat)
-  let shown = 1
-  const tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpP = new THREE.Vector3(), tmpS = new THREE.Vector3(1, 1, 1), YUP = new THREE.Vector3(0, 1, 0)
+  setPlaces(opts.places)
+  scene.add(labels)
+  let nightNow = 0
+
+  // подсветка здания: полупрозрачная оболочка по контуру, как рамка на плане
+  const shellMat = (color: string, op: number): THREE.MeshBasicMaterial => new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, side: THREE.DoubleSide, depthWrite: false, toneMapped: false, fog: false })
+  const hoverMat = shellMat('#fff3c4', 0.32), selMat = shellMat('#ffd76a', 0.5)
+  const shell = (mat: THREE.Material): THREE.Mesh => { const m = new THREE.Mesh(new THREE.BufferGeometry(), mat); m.visible = false; m.frustumCulled = false; m.renderOrder = 6; scene.add(m); disposable.push(m.geometry, mat as THREE.Material); return m }
+  const hoverShell = shell(hoverMat), selShell = shell(selMat)
+  const shellFor = (mesh: THREE.Mesh, i: number | null): void => {
+    if (i === null || (!blds[i] && !monAt.has(i)) || removed[i]) { mesh.visible = false; return }
+    const m = monAt.get(i)
+    let r: P2[] = blds[i].r
+    if (m) {
+      const c = Math.cos(m.rot), n = Math.sin(m.rot)
+      r = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, d]) => { const u = (a * m.L) / 2 + a * 0.6, v = (d * m.W) / 2 + d * 0.6; return [m.x + u * c - v * n, m.z + u * n + v * c] as P2 })
+    } else r = grow(r, 0.25)
+    const ce = centerOf(r), y0 = heightAt(ce[0], ce[1]) - 0.2, y1 = Math.max(tops[i], y0 + 3) + 0.4
+    const pos: number[] = []
+    r.forEach((a, e) => {
+      const b = r[(e + 1) % r.length]
+      pos.push(a[0], y0, a[1], b[0], y0, b[1], b[0], y1, b[1], a[0], y0, a[1], b[0], y1, b[1], a[0], y1, a[1])
+    })
+    mesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
+    mesh.visible = true
+  }
+  let lastHover: number | null = null, lastSel: number | null = null
 
   // ---------- свет и время суток ----------
   const hemi = new THREE.HemisphereLight('#ffffff', '#7a8a5a', 1)
@@ -1239,40 +1644,35 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     starMat.opacity = nightK
     cloudMat.color.set(k.hor).lerp(new THREE.Color('#ffffff'), 0.65 * (1 - nightK))
     cloudMat.opacity = 0.62 - nightK * 0.46
-    shown = nightK > 0.6 ? 0.25 : 1
+    nightNow = nightK
+    smokeMat.color.set(nightK > 0.5 ? '#50566a' : '#cfcfcf')
   }
 
   // ---------- кадр ----------
+  const tmpFocus = new THREE.Vector3(), tmpDir = new THREE.Vector3()
   const tick = (dt: number, t: number, cam: THREE.Camera): void => {
     waterUni.uT.value = t
     clouds.position.x = ((t * 1.1) % 800) - 400
     sky.position.copy(cam.position)
     stars.position.copy(cam.position)
-    const n = Math.floor(walkers.length * shown)
-    bodies.count = heads.count = n
-    for (let i = 0; i < n; i++) {
-      const w = walkers[i]
-      if (w.rest > 0) w.rest -= dt
-      else {
-        const nx = w.x + Math.cos(w.a) * w.v * dt, nz = w.z + Math.sin(w.a) * w.v * dt
-        const lx = w.x + Math.cos(w.a) * 2.2, lz = w.z + Math.sin(w.a) * 2.2
-        if (gridAt(lx, lz) !== 0 || paved(lx, lz) < 0.25 || heightAt(lx, lz) < 0.2) {
-          w.a += 0.9 + Math.random() * 2.2
-          if (Math.random() < 0.12) w.rest = 1 + Math.random() * 4
-        } else {
-          w.x = nx
-          w.z = nz
-          w.ph += dt * 7
-          if (Math.random() < dt * 0.1) w.a += (Math.random() - 0.5) * 1.4
-        }
+    const camH = cam.position.y - heightAt(cam.position.x, cam.position.z)
+    // с высоты людей видно плохо: чем выше камера, тем крупнее они нарисованы (как фишки на макете)
+    const boost = Math.max(1, Math.min(6, camH / 22))
+    tmpFocus.set(cam.position.x, 0, cam.position.z)
+    if (camH > 12) { cam.getWorldDirection(tmpDir); if (tmpDir.y < -0.05) { const f = camH / -tmpDir.y; tmpFocus.set(cam.position.x + tmpDir.x * f, 0, cam.position.z + tmpDir.z * f) } }
+    life.tick(dt, t, nightNow, tmpFocus, boost)
+    upgradeNear(cam, dt)
+    for (let i = 0; i < smokeSrc.length; i++) {
+      const [sx, sy, sz] = smokeSrc[i]
+      for (let p = 0; p < PUFFS; p++) {
+        const f = (t * 0.16 + i * 0.37 + p / PUFFS) % 1
+        const q = (i * PUFFS + p) * 3
+        smokePos[q] = sx + f * f * 5 + Math.sin(t * 0.6 + i + f * 4) * 0.6 * f
+        smokePos[q + 1] = sy + f * 8
+        smokePos[q + 2] = sz + f * f * 2.4
       }
-      tmpQ.setFromAxisAngle(YUP, -w.a + Math.PI / 2)
-      tmpP.set(w.x, heightAt(w.x, w.z) + Math.abs(Math.sin(w.ph)) * 0.05, w.z)
-      tmpM.compose(tmpP, tmpQ, tmpS)
-      bodies.setMatrixAt(i, tmpM)
-      heads.setMatrixAt(i, tmpM)
     }
-    bodies.instanceMatrix.needsUpdate = heads.instanceMatrix.needsUpdate = true
+    smokeGeo.attributes.position.needsUpdate = true
   }
 
   const pick = (o: THREE.Vector3, d: THREE.Vector3): number | null => {
@@ -1298,7 +1698,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     walkable: (x, z) => { const v = gridAt(x, z); return v === 0 || v === -3 },
     deckAt: (x, z) => (gridAt(x, z) === -3 ? DECK : null),
     pick,
-    buildingTop: (i) => { const b = blds[i]; if (!b) return null; const c = centerOf(b.r); return [c[0], tops[i], c[1]] },
+    buildingTop: (i) => { const m = monAt.get(i); if (m) return [m.x, tops[i], m.z]; const b = blds[i]; if (!b) return null; const c = centerOf(b.r); return [c[0], tops[i], c[1]] },
     spawn: () => {
       const s = squares[0] ? centerOf(squares[0]) : roads[0]?.r.length ? roads[0].r[Math.floor(roads[0].r.length / 2)] : center
       // свободное место с запасом вокруг, чтобы не начать прогулку носом в колодец или прилавок
@@ -1311,10 +1711,30 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     },
     setTime,
     tick,
+    setLabels: (on) => { labels.visible = on },
+    setPlaces,
+    setMarks: (on) => { marksOn = on; life.setMarks(marksOn) },
+    setHighlight: (hover, sel) => {
+      if (hover !== lastHover) { lastHover = hover; shellFor(hoverShell, hover === sel ? null : hover) }
+      if (sel !== lastSel) { lastSel = sel; shellFor(selShell, sel) }
+    },
+    pickPerson: (o, d) => {
+      // люди за стеной не выбираются: сперва ищем, где луч упирается в здание или землю
+      const step = cell * 0.7
+      let tMax = radius * 8
+      for (let q = 1; q < tMax; q += step) {
+        const x = o.x + d.x * q, y = o.y + d.y * q, z = o.z + d.z * q
+        const v = gridAt(x, z)
+        if (y < heightAt(x, z) - 0.2 || (v > 0 && v <= N && y <= tops[v - 1])) { tMax = q + 3; break }
+      }
+      return life.pick(o, d, tMax)
+    },
+    census: life.census,
+    takeDirty: () => { const d = dirty; dirty = false; return d },
     dispose: () => {
       instanced.forEach((m) => m.dispose())
-      bodies.dispose()
-      heads.dispose()
+      life.dispose()
+      for (const h of cells.values()) for (const m of h.meshes) m.geometry.dispose()
       disposable.forEach((d) => d.dispose())
     }
   }
