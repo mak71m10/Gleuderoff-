@@ -349,6 +349,8 @@ export function createLife(o: {
 
   const tick = (dt: number, _t: number, night: number, focus: THREE.Vector3, boost: number): void => {
     focusNow.copy(focus)
+    // сверху фигуры лишь чуть крупнее настоящих, чтобы не вырастали выше домов; заметными издали их делают круги режима «Расы»
+    const body = 1 + (boost - 1) * 0.1
     // жители стягиваются туда, куда смотрят: дальних незаметно переселяем ближе, и улицы вокруг камеры не пустеют
     nearR = Math.min(o.radius * 1.4, 70 + 16 * boost * boost + (boost > 1 ? 60 : 0))
     for (let c = 0; c < 14 && people.length; c++) {
@@ -433,7 +435,7 @@ export function createLife(o: {
       const y = groundY(x, z) + (moving ? Math.abs(Math.sin(p.ph)) * 0.04 : 0)
       p.y = y
       Q.setFromAxisAngle(UP, p.a)
-      const sh = p.scale * p.race.h * boost, sw = p.scale * p.race.w * boost
+      const sh = p.scale * p.race.h * body, sw = p.scale * p.race.w * body
       Sc.set(sw, sh, sw)
       Pos.set(x, y, z)
       M.compose(Pos, Q, Sc)
@@ -488,7 +490,7 @@ export function createLife(o: {
       }
       Q.setFromAxisAngle(UP, c.a)
       Pos.set(c.x, groundY(c.x, c.z), c.z)
-      Sc.setScalar(boost)
+      Sc.setScalar(body)
       M.compose(Pos, Q, Sc)
       cartM.setMatrixAt(i, M)
     })
@@ -507,7 +509,7 @@ export function createLife(o: {
         }
         Q.setFromAxisAngle(UP, b.a)
         Pos.set(b.x, groundY(b.x, b.z), b.z)
-        Sc.setScalar(boost)
+        Sc.setScalar(body)
         M.compose(Pos, Q, Sc)
         bm[t].setMatrixAt(i, out && t < 2 ? ZERO : M)
       })

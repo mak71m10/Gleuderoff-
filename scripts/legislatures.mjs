@@ -45,7 +45,7 @@ const argusTowns = argusProvs.filter((p) => ['city', 'town', 'port'].includes(p.
 const argusCastles = argusProvs.filter((p) => p.settlement.type === 'castle').map((p) => p.name)
 const GOODS = ['соль', 'вино', 'железо', 'шерсть', 'кожи', 'зерно', 'лес', 'медь', 'пряности юга', 'меха', 'воск', 'серебро']
 const NEIGH = ['Республикой', 'Креитом', 'Фарвольской лигой', 'Рейхом', 'Землями Севера']
-const LENDERS = ['семьи Каяя', 'графини Мангениум', 'Дома Морвинг', 'гильдии Хауссера']
+const LENDERS = ['семьи Каяя', 'графа Мангениум', 'Дома Морвинг', 'гильдии Хауссера']
 
 const EMPIRE_TPL = [
   (y) => ({ title: `Бюджет Империи на ${y} г.`, kind: 'бюджет', w: { army: 0.6, trade: 0.4 }, sponsor: 'constit', summary: `Расходы казны на ${y} г.: легионам — ${60 + Math.floor(rnd() * 25)} частей из ста, дорогам и мостам — ${5 + Math.floor(rnd() * 8)}, Дистрикту Альфа — ${2 + Math.floor(rnd() * 3)}, долгам — остальное.`, yearly: true }),

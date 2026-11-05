@@ -51,7 +51,7 @@ export default function states({ world, Y, reigns }) {
   }
   for (const [name, house, ruler, title] of [
     ['Корона Аргус', 'lore-house-argus', 'lore-argus-now', 'Король'],
-    ['Графство Мангениум', 'lore-house-mangenium', 'lore-mangenium-now', 'Графиня'],
+    ['Графство Мангениум', 'lore-house-mangenium', 'lore-mangenium-now', 'Граф'],
     ['Графство Штирия', 'lore-house-styria', 'lore-styria-now', 'Граф']
   ]) {
     S(name, {

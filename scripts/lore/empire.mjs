@@ -155,14 +155,12 @@ export const HOUSES = [
       ]
     },
     {
-      id: 'house-mangenium', name: 'Дом Мангениум', motto: '«Счёт ведёт к победе»', vassal: 'Графство Мангениум', side: 'own',
+      id: 'house-mangenium', name: 'Дом Орнибуций', motto: '«Ключ не отдают»', vassal: 'Графство Мангениум', side: 'own',
       heraldry: H('bicolor-h', ['#5a3a1a', '#c9a45c'], 'key', '#1a1a1a'),
       arms: 'Пересечённый щит, бурый и золото; чёрный ключ.',
       title: 'Великий дом, графы Мангениум',
-      body: 'Банкиры среди великих домов: графы Мангениум веками ссужали деньги императорам и совету. В 978 г. отделились, в 980 г. стали прямыми вассалами Империи.',
-      people: [
-        ['mangenium-now', 'Изабелла Мангениум', F, 970, 'Графиня Мангениум', 'Холодная, расчётливая; держит в долгах половину скамей совета.']
-      ]
+      body: 'Издавна служили прямой ветви императоров. Революцию не приняли, но в 980 г. признали совет и стали его прямыми вассалами; на деле строят автономию.',
+      people: []
     },
     {
       id: 'house-styria', name: 'Дом Штирийский', motto: '«Ночь долга»', vassal: 'Графство Штирия', side: 'own',
@@ -179,7 +177,7 @@ export const HOUSES = [
 export default function empire({ E, Y, world }) {
   const DRAFT = 'черновик'
   // Дом Аргус, его люди и Корона — в scripts/lore/argus.mjs
-  for (const h of HOUSES.filter((h) => h.id !== 'house-argus')) {
+  for (const h of HOUSES.filter((h) => h.id !== 'house-argus' && h.id !== 'house-mangenium')) {
     E(h.id, 'dynasty', h.name, {
       title: h.title,
       summary: h.vassal ? `Правители: ${h.vassal}.` : `Девиз: ${h.motto}`,
@@ -308,7 +306,7 @@ export default function empire({ E, Y, world }) {
     if (!v) continue
     Object.assign(v.base, {
       dynastyId: `lore-${h.id}`,
-      rulerId: `lore-${h.people[0][0]}`,
+      rulerId: h.id === 'house-mangenium' ? 'lore-mangenium-now' : `lore-${h.people[0][0]}`,
       description: `${h.body}\n\nПрямой вассал Империи: не её часть, но подчиняется имперскому совету.`,
       government: 'Монархия, прямой вассал Империи'
     })

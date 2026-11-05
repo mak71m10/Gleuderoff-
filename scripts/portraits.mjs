@@ -66,6 +66,18 @@ const CUSTOM = {
   'margot-vellen': 'stern female admiral, weathered face, dark blue naval coat with gold braid, sea behind',
   'kaya-head': 'smiling rich merchant patriarch, golden chains and rings, black velvet, coins and ships behind',
   'styria-now': 'gaunt count, black velvet, moonlight, unsettling eyes',
+  'man-zhan-mal': 'small boy in a simple brown and gold tunic, small iron key on a cord, serious eyes',
+  'mangenium-now': 'restrained grey-haired count, plain dark brown coat with gold trim, iron key on a chain around the neck, calm patient eyes',
+  'man-kassiy-2': 'aging nobleman, keeper of the seal, brown and gold robes, heavy wax seal on a chain, thoughtful',
+  'man-c-chancellor': 'elderly imperial chancellor, black official robes with a gold chain of office, holding papers, shrewd tired eyes',
+  'man-c-treasurer': 'stern middle-aged treasurer woman, dark green gown, ledger and quill, tight hair, precise gaze',
+  'man-c-marshal': 'scarred veteran marshal, close-cropped grey hair, polished steel breastplate, brown cloak',
+  'man-c-judge': 'very old judge with white hair, black and white judicial robes, severe face, law book',
+  'man-c-spymaster': 'quiet woman archivist, plain dark grey dress, ink-stained fingers, attentive watchful eyes',
+  'man-c-roads': 'weathered official in a travelling coat with leather satchel and a rolled map, practical look',
+  'man-c-court': 'elegant court lady of forty, formal dark blue gown with lace collar, perfect posture',
+  'man-c-envoy': 'prelate diplomat in white robes with a golden sun pendant, smooth polite smile',
+  'man-c-tenth': 'very old frail librarian, white beard, faded imperial crimson robe, old books behind, kind sharp eyes',
   'ulrike-brandt': 'fierce woman commander in snowy north, fur cloak over black armor, flame emblem',
   'matthias-essenwald': 'young army captain, steel breastplate, defiant eyes',
   'bernhard-rheinhold': 'old veteran legate with an eyepatch, missing leg, crutch, worn crimson coat',
@@ -213,7 +225,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -222,7 +234,8 @@ for (const e of chars) {
   const holy = e.base.tags.includes('Святая церковь')
   const southern = e.base.tags.includes('южные республики')
   const sty = e.base.tags.includes('Графство Штирия') || id === 'styria-now'
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty
+  const man = e.base.tags.includes('Графство Мангениум')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -241,7 +254,7 @@ for (const e of chars) {
   const prompt = sty
     ? `oil painting, dark gothic medieval portrait, candlelight, deep shadows, black background, visible brush strokes, detailed face, half-length portrait, ${banner}portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european:1.15), ${stHouse ? `(snow white skin, jet black hair:1.35), ${female ? 'black velvet gown' : 'black velvet doublet'} with a silver crescent, cold eyes` : /немая|скита/.test(e.base.title) ? 'grim hooded figure in grey robe, ink-stained hands' : /Капитан/.test(e.base.title) ? 'scarred mercenary general in worn black armor' : /Кастелян/.test(e.base.title) ? 'impoverished nobleman in a patched old doublet, tired face' : /Епископ/.test(e.base.title) ? 'bored bishop in shabby white robes with a golden sun pendant' : /Мастер|Управляющий/.test(e.base.title) ? 'shady merchant in black clothes with rings, sly look' : subject}`
     : rp
-    ? `${holy ? CHURCH_STYLE : southern ? SOUTH_STYLE : RP_STYLE}, ${holy ? '' : banner}portrait of a (${age} year old ${e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${holy ? `(european:1.1), ${/Папа/.test(e.base.title) ? 'pope in white and gold papal vestments with a tall white mitre, golden sun pendant' : /паладин|магистр|Командор|Маршал/i.test(e.base.title) ? 'paladin knight in polished white plate armor with a golden sun emblem on the chest, white cloak' : 'archbishop in white and gold robes with a mitre and a golden crozier, golden sun pendant'}, ` : southern ? (/Кальтран/.test(race) ? '(celtic european, pale weathered skin, braided hair:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : imperial ? '(northern european, pale skin:1.15), ' : ''}${holy ? '' : subject}`
+    ? `${holy ? CHURCH_STYLE : southern ? SOUTH_STYLE : RP_STYLE}, ${holy ? '' : banner}portrait of a (${age} year old ${age < 14 ? (e.base.props?.gender === 'Женский' ? 'girl' : 'boy') : e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${holy ? `(european:1.1), ${/Папа/.test(e.base.title) ? 'pope in white and gold papal vestments with a tall white mitre, golden sun pendant' : /паладин|магистр|Командор|Маршал/i.test(e.base.title) ? 'paladin knight in polished white plate armor with a golden sun emblem on the chest, white cloak' : 'archbishop in white and gold robes with a mitre and a golden crozier, golden sun pendant'}, ` : southern ? (/Кальтран/.test(race) ? '(celtic european, pale weathered skin, braided hair:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : imperial ? '(northern european, pale skin:1.15), ' : ''}${holy ? '' : subject}`
     : `${STYLE}, ${banner}portrait of a ${imperial ? (id === 'oktavian-2' ? '(pale european baby:1.2), ' : '(northern european, germanic features, pale skin, deep-set eyes, strong brow ridge, prominent straight nose:1.3), ') : ''}${subject}`
   if (process.env.DRY) {
     console.log(`${e.base.name}: ${prompt.slice(STYLE.length + 2)}`)

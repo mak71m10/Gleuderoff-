@@ -1,5 +1,5 @@
 {
- "version": 24,
+ "version": 25,
  "name": "Gleuderoff",
  "calendar": {
   "name": "Реквием (Имперский календарь)",
@@ -8383,6 +8383,952 @@
    "width": 2048,
    "height": 1690,
    "plan": "maps/cities/haghaim.plan.json"
+  },
+  {
+   "id": "map-city-ulgard",
+   "name": "Ульгард — план города",
+   "kind": "city",
+   "image": "maps/cities/ulgard.webp",
+   "width": 2048,
+   "height": 1679,
+   "plan": "maps/cities/ulgard.plan.json"
+  },
+  {
+   "id": "map-city-falinhauzen",
+   "name": "Фальинхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/falinhauzen.webp",
+   "width": 2048,
+   "height": 3093,
+   "plan": "maps/cities/falinhauzen.plan.json"
+  },
+  {
+   "id": "map-city-kelshtadt",
+   "name": "Кельштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/kelshtadt.webp",
+   "width": 2048,
+   "height": 2106,
+   "plan": "maps/cities/kelshtadt.plan.json"
+  },
+  {
+   "id": "map-city-vedenrit",
+   "name": "Веденрит — план города",
+   "kind": "city",
+   "image": "maps/cities/vedenrit.webp",
+   "width": 2048,
+   "height": 1976,
+   "plan": "maps/cities/vedenrit.plan.json"
+  },
+  {
+   "id": "map-city-miterdorf",
+   "name": "Митердорф — план города",
+   "kind": "city",
+   "image": "maps/cities/miterdorf.webp",
+   "width": 2048,
+   "height": 2650,
+   "plan": "maps/cities/miterdorf.plan.json"
+  },
+  {
+   "id": "map-city-oberinbah",
+   "name": "Оберинбах — план города",
+   "kind": "city",
+   "image": "maps/cities/oberinbah.webp",
+   "width": 2048,
+   "height": 1926,
+   "plan": "maps/cities/oberinbah.plan.json"
+  },
+  {
+   "id": "map-city-livau",
+   "name": "Ливау — план города",
+   "kind": "city",
+   "image": "maps/cities/livau.webp",
+   "width": 2048,
+   "height": 1670,
+   "plan": "maps/cities/livau.plan.json"
+  },
+  {
+   "id": "map-city-dornlage",
+   "name": "Дорнлаге — план города",
+   "kind": "city",
+   "image": "maps/cities/dornlage.webp",
+   "width": 2048,
+   "height": 1589,
+   "plan": "maps/cities/dornlage.plan.json"
+  },
+  {
+   "id": "map-city-lauental",
+   "name": "Лауенталь — план города",
+   "kind": "city",
+   "image": "maps/cities/lauental.webp",
+   "width": 2048,
+   "height": 1699,
+   "plan": "maps/cities/lauental.plan.json"
+  },
+  {
+   "id": "map-city-morershtein",
+   "name": "Морерштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/morershtein.webp",
+   "width": 2048,
+   "height": 1413,
+   "plan": "maps/cities/morershtein.plan.json"
+  },
+  {
+   "id": "map-city-brukelvald",
+   "name": "Брукельвальд — план города",
+   "kind": "city",
+   "image": "maps/cities/brukelvald.webp",
+   "width": 2048,
+   "height": 1639,
+   "plan": "maps/cities/brukelvald.plan.json"
+  },
+  {
+   "id": "map-city-brukvald",
+   "name": "Бруквальд — план города",
+   "kind": "city",
+   "image": "maps/cities/brukvald.webp",
+   "width": 2048,
+   "height": 2586,
+   "plan": "maps/cities/brukvald.plan.json"
+  },
+  {
+   "id": "map-city-eberelshtein",
+   "name": "Эберельштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/eberelshtein.webp",
+   "width": 2048,
+   "height": 1567,
+   "plan": "maps/cities/eberelshtein.plan.json"
+  },
+  {
+   "id": "map-city-rosinvedel",
+   "name": "Росинведель — план города",
+   "kind": "city",
+   "image": "maps/cities/rosinvedel.webp",
+   "width": 2048,
+   "height": 1450,
+   "plan": "maps/cities/rosinvedel.plan.json"
+  },
+  {
+   "id": "map-city-grisenbruk",
+   "name": "Грисенбрук — план города",
+   "kind": "city",
+   "image": "maps/cities/grisenbruk.webp",
+   "width": 2048,
+   "height": 1884,
+   "plan": "maps/cities/grisenbruk.plan.json"
+  },
+  {
+   "id": "map-city-brukbruk",
+   "name": "Брукбрук — план города",
+   "kind": "city",
+   "image": "maps/cities/brukbruk.webp",
+   "width": 2048,
+   "height": 3655,
+   "plan": "maps/cities/brukbruk.plan.json"
+  },
+  {
+   "id": "map-city-eshintal",
+   "name": "Эшинталь — план города",
+   "kind": "city",
+   "image": "maps/cities/eshintal.webp",
+   "width": 2048,
+   "height": 2131,
+   "plan": "maps/cities/eshintal.plan.json"
+  },
+  {
+   "id": "map-city-holtserhauzen",
+   "name": "Хольцерхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/holtserhauzen.webp",
+   "width": 2048,
+   "height": 3368,
+   "plan": "maps/cities/holtserhauzen.plan.json"
+  },
+  {
+   "id": "map-city-eberau",
+   "name": "Эберау — план города",
+   "kind": "city",
+   "image": "maps/cities/eberau.webp",
+   "width": 2048,
+   "height": 2956,
+   "plan": "maps/cities/eberau.plan.json"
+  },
+  {
+   "id": "map-city-narni",
+   "name": "Нарни — план города",
+   "kind": "city",
+   "image": "maps/cities/narni.webp",
+   "width": 2048,
+   "height": 1753,
+   "plan": "maps/cities/narni.plan.json"
+  },
+  {
+   "id": "map-city-faltal",
+   "name": "Фальталь — план города",
+   "kind": "city",
+   "image": "maps/cities/faltal.webp",
+   "width": 2048,
+   "height": 2077,
+   "plan": "maps/cities/faltal.plan.json"
+  },
+  {
+   "id": "map-city-gradnets",
+   "name": "Граднец — план города",
+   "kind": "city",
+   "image": "maps/cities/gradnets.webp",
+   "width": 2048,
+   "height": 2565,
+   "plan": "maps/cities/gradnets.plan.json"
+  },
+  {
+   "id": "map-city-moringard",
+   "name": "Морингард — план города",
+   "kind": "city",
+   "image": "maps/cities/moringard.webp",
+   "width": 2048,
+   "height": 2494,
+   "plan": "maps/cities/moringard.plan.json"
+  },
+  {
+   "id": "map-city-altburg",
+   "name": "Альтбург — план города",
+   "kind": "city",
+   "image": "maps/cities/altburg.webp",
+   "width": 2048,
+   "height": 1617,
+   "plan": "maps/cities/altburg.plan.json"
+  },
+  {
+   "id": "map-city-norelhauzen",
+   "name": "Норельхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/norelhauzen.webp",
+   "width": 2048,
+   "height": 2528,
+   "plan": "maps/cities/norelhauzen.plan.json"
+  },
+  {
+   "id": "map-city-freiinfeld",
+   "name": "Фрейинфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/freiinfeld.webp",
+   "width": 2048,
+   "height": 1765,
+   "plan": "maps/cities/freiinfeld.plan.json"
+  },
+  {
+   "id": "map-city-gervedel",
+   "name": "Герведель — план города",
+   "kind": "city",
+   "image": "maps/cities/gervedel.webp",
+   "width": 2048,
+   "height": 2215,
+   "plan": "maps/cities/gervedel.plan.json"
+  },
+  {
+   "id": "map-city-norholm",
+   "name": "Норхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/norholm.webp",
+   "width": 2048,
+   "height": 1949,
+   "plan": "maps/cities/norholm.plan.json"
+  },
+  {
+   "id": "map-city-elmertal",
+   "name": "Эльмерталь — план города",
+   "kind": "city",
+   "image": "maps/cities/elmertal.webp",
+   "width": 2048,
+   "height": 1364,
+   "plan": "maps/cities/elmertal.plan.json"
+  },
+  {
+   "id": "map-city-orshtein",
+   "name": "Орштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/orshtein.webp",
+   "width": 2048,
+   "height": 2815,
+   "plan": "maps/cities/orshtein.plan.json"
+  },
+  {
+   "id": "map-city-morvald",
+   "name": "Морвальд — план города",
+   "kind": "city",
+   "image": "maps/cities/morvald.webp",
+   "width": 2048,
+   "height": 2197,
+   "plan": "maps/cities/morvald.plan.json"
+  },
+  {
+   "id": "map-city-elmelrit",
+   "name": "Эльмельрит — план города",
+   "kind": "city",
+   "image": "maps/cities/elmelrit.webp",
+   "width": 2048,
+   "height": 2151,
+   "plan": "maps/cities/elmelrit.plan.json"
+  },
+  {
+   "id": "map-city-mangen",
+   "name": "Манген — план города",
+   "kind": "city",
+   "image": "maps/cities/mangen.webp",
+   "width": 2048,
+   "height": 2546,
+   "plan": "maps/cities/mangen.plan.json",
+   "placeId": "lore-man-capital"
+  },
+  {
+   "id": "map-city-oberlage",
+   "name": "Оберлаге — план города",
+   "kind": "city",
+   "image": "maps/cities/oberlage.webp",
+   "width": 2048,
+   "height": 2339,
+   "plan": "maps/cities/oberlage.plan.json"
+  },
+  {
+   "id": "map-city-gerenberg",
+   "name": "Геренберг — план города",
+   "kind": "city",
+   "image": "maps/cities/gerenberg.webp",
+   "width": 2048,
+   "height": 2913,
+   "plan": "maps/cities/gerenberg.plan.json"
+  },
+  {
+   "id": "map-city-griserveiler",
+   "name": "Грисервейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/griserveiler.webp",
+   "width": 2048,
+   "height": 2200,
+   "plan": "maps/cities/griserveiler.plan.json"
+  },
+  {
+   "id": "map-city-kirhenrit",
+   "name": "Кирхенрит — план города",
+   "kind": "city",
+   "image": "maps/cities/kirhenrit.webp",
+   "width": 2048,
+   "height": 2242,
+   "plan": "maps/cities/kirhenrit.plan.json"
+  },
+  {
+   "id": "map-city-tirdorf",
+   "name": "Тирдорф — план города",
+   "kind": "city",
+   "image": "maps/cities/tirdorf.webp",
+   "width": 2048,
+   "height": 1737,
+   "plan": "maps/cities/tirdorf.plan.json"
+  },
+  {
+   "id": "map-city-lauelhaim",
+   "name": "Лауельхайм — план города",
+   "kind": "city",
+   "image": "maps/cities/lauelhaim.webp",
+   "width": 2048,
+   "height": 2103,
+   "plan": "maps/cities/lauelhaim.plan.json"
+  },
+  {
+   "id": "map-city-neielveiler",
+   "name": "Нейельвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/neielveiler.webp",
+   "width": 2048,
+   "height": 1819,
+   "plan": "maps/cities/neielveiler.plan.json"
+  },
+  {
+   "id": "map-city-linerfeld",
+   "name": "Линерфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/linerfeld.webp",
+   "width": 2048,
+   "height": 1722,
+   "plan": "maps/cities/linerfeld.plan.json"
+  },
+  {
+   "id": "map-city-erelvedel",
+   "name": "Эрельведель — план города",
+   "kind": "city",
+   "image": "maps/cities/erelvedel.webp",
+   "width": 2048,
+   "height": 2163,
+   "plan": "maps/cities/erelvedel.plan.json"
+  },
+  {
+   "id": "map-city-ulinfeld",
+   "name": "Ульинфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/ulinfeld.webp",
+   "width": 2048,
+   "height": 1713,
+   "plan": "maps/cities/ulinfeld.plan.json"
+  },
+  {
+   "id": "map-city-dornenhauzen",
+   "name": "Дорненхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/dornenhauzen.webp",
+   "width": 2048,
+   "height": 2794,
+   "plan": "maps/cities/dornenhauzen.plan.json"
+  },
+  {
+   "id": "map-city-visinberg",
+   "name": "Висинберг — план города",
+   "kind": "city",
+   "image": "maps/cities/visinberg.webp",
+   "width": 2048,
+   "height": 2770,
+   "plan": "maps/cities/visinberg.plan.json"
+  },
+  {
+   "id": "map-city-kasershtadt",
+   "name": "Касерштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/kasershtadt.webp",
+   "width": 2048,
+   "height": 2332,
+   "plan": "maps/cities/kasershtadt.plan.json"
+  },
+  {
+   "id": "map-city-kirhenveiler",
+   "name": "Кирхенвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/kirhenveiler.webp",
+   "width": 2048,
+   "height": 1667,
+   "plan": "maps/cities/kirhenveiler.plan.json"
+  },
+  {
+   "id": "map-city-vedelveiler",
+   "name": "Ведельвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/vedelveiler.webp",
+   "width": 2048,
+   "height": 2297,
+   "plan": "maps/cities/vedelveiler.plan.json"
+  },
+  {
+   "id": "map-city-shtainmyunde",
+   "name": "Штайнмюнде — план города",
+   "kind": "city",
+   "image": "maps/cities/shtainmyunde.webp",
+   "width": 2048,
+   "height": 2312,
+   "plan": "maps/cities/shtainmyunde.plan.json"
+  },
+  {
+   "id": "map-city-kirhenhaim",
+   "name": "Кирхенхайм — план города",
+   "kind": "city",
+   "image": "maps/cities/kirhenhaim.webp",
+   "width": 2048,
+   "height": 2386,
+   "plan": "maps/cities/kirhenhaim.plan.json"
+  },
+  {
+   "id": "map-city-norelshtadt",
+   "name": "Норельштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/norelshtadt.webp",
+   "width": 2048,
+   "height": 2161,
+   "plan": "maps/cities/norelshtadt.plan.json"
+  },
+  {
+   "id": "map-city-brasintal",
+   "name": "Брасинталь — план города",
+   "kind": "city",
+   "image": "maps/cities/brasintal.webp",
+   "width": 2048,
+   "height": 1550,
+   "plan": "maps/cities/brasintal.plan.json"
+  },
+  {
+   "id": "map-city-hagelhaim",
+   "name": "Хагельхайм — план города",
+   "kind": "city",
+   "image": "maps/cities/hagelhaim.webp",
+   "width": 2048,
+   "height": 1928,
+   "plan": "maps/cities/hagelhaim.plan.json"
+  },
+  {
+   "id": "map-city-talelveiler",
+   "name": "Тальельвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/talelveiler.webp",
+   "width": 2048,
+   "height": 2045,
+   "plan": "maps/cities/talelveiler.plan.json"
+  },
+  {
+   "id": "map-city-eshdorf",
+   "name": "Эшдорф — план города",
+   "kind": "city",
+   "image": "maps/cities/eshdorf.webp",
+   "width": 2048,
+   "height": 1620,
+   "plan": "maps/cities/eshdorf.plan.json"
+  },
+  {
+   "id": "map-city-braselrit",
+   "name": "Брасельрит — план города",
+   "kind": "city",
+   "image": "maps/cities/braselrit.webp",
+   "width": 2048,
+   "height": 2578,
+   "plan": "maps/cities/braselrit.plan.json"
+  },
+  {
+   "id": "map-city-ostelvedel",
+   "name": "Остельведель — план города",
+   "kind": "city",
+   "image": "maps/cities/ostelvedel.webp",
+   "width": 2048,
+   "height": 1949,
+   "plan": "maps/cities/ostelvedel.plan.json"
+  },
+  {
+   "id": "map-city-falenhauzen",
+   "name": "Фальенхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/falenhauzen.webp",
+   "width": 2048,
+   "height": 2104,
+   "plan": "maps/cities/falenhauzen.plan.json"
+  },
+  {
+   "id": "map-city-norinburg",
+   "name": "Норинбург — план города",
+   "kind": "city",
+   "image": "maps/cities/norinburg.webp",
+   "width": 2048,
+   "height": 2413,
+   "plan": "maps/cities/norinburg.plan.json"
+  },
+  {
+   "id": "map-city-marershtein",
+   "name": "Марерштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/marershtein.webp",
+   "width": 2048,
+   "height": 2610,
+   "plan": "maps/cities/marershtein.plan.json"
+  },
+  {
+   "id": "map-city-morengard",
+   "name": "Моренгард — план города",
+   "kind": "city",
+   "image": "maps/cities/morengard.webp",
+   "width": 2048,
+   "height": 1990,
+   "plan": "maps/cities/morengard.plan.json"
+  },
+  {
+   "id": "map-city-altenhauzen",
+   "name": "Альтенхаузен — план города",
+   "kind": "city",
+   "image": "maps/cities/altenhauzen.webp",
+   "width": 2048,
+   "height": 2282,
+   "plan": "maps/cities/altenhauzen.plan.json"
+  },
+  {
+   "id": "map-city-kelfeld",
+   "name": "Кельфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/kelfeld.webp",
+   "width": 2048,
+   "height": 1774,
+   "plan": "maps/cities/kelfeld.plan.json"
+  },
+  {
+   "id": "map-city-rosgard",
+   "name": "Росгард — план города",
+   "kind": "city",
+   "image": "maps/cities/rosgard.webp",
+   "width": 2048,
+   "height": 1557,
+   "plan": "maps/cities/rosgard.plan.json"
+  },
+  {
+   "id": "map-city-altenveiler",
+   "name": "Альтенвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/altenveiler.webp",
+   "width": 2048,
+   "height": 2141,
+   "plan": "maps/cities/altenveiler.plan.json"
+  },
+  {
+   "id": "map-city-badinrit",
+   "name": "Бадинрит — план города",
+   "kind": "city",
+   "image": "maps/cities/badinrit.webp",
+   "width": 2048,
+   "height": 2816,
+   "plan": "maps/cities/badinrit.plan.json"
+  },
+  {
+   "id": "map-city-neienshtein",
+   "name": "Нейенштейн — план города",
+   "kind": "city",
+   "image": "maps/cities/neienshtein.webp",
+   "width": 2048,
+   "height": 1573,
+   "plan": "maps/cities/neienshtein.plan.json"
+  },
+  {
+   "id": "map-city-vedburg",
+   "name": "Ведбург — план города",
+   "kind": "city",
+   "image": "maps/cities/vedburg.webp",
+   "width": 2048,
+   "height": 1402,
+   "plan": "maps/cities/vedburg.plan.json"
+  },
+  {
+   "id": "map-city-ulenhaim",
+   "name": "Ульенхайм — план города",
+   "kind": "city",
+   "image": "maps/cities/ulenhaim.webp",
+   "width": 2048,
+   "height": 2483,
+   "plan": "maps/cities/ulenhaim.plan.json"
+  },
+  {
+   "id": "map-city-ostental",
+   "name": "Остенталь — план города",
+   "kind": "city",
+   "image": "maps/cities/ostental.webp",
+   "width": 2048,
+   "height": 2456,
+   "plan": "maps/cities/ostental.plan.json"
+  },
+  {
+   "id": "map-city-ererveiler",
+   "name": "Эрервейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/ererveiler.webp",
+   "width": 2048,
+   "height": 2378,
+   "plan": "maps/cities/ererveiler.plan.json"
+  },
+  {
+   "id": "map-city-nim",
+   "name": "Ним — план города",
+   "kind": "city",
+   "image": "maps/cities/nim.webp",
+   "width": 2048,
+   "height": 1574,
+   "plan": "maps/cities/nim.plan.json"
+  },
+  {
+   "id": "map-city-rosenveiler",
+   "name": "Росенвейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/rosenveiler.webp",
+   "width": 2048,
+   "height": 2983,
+   "plan": "maps/cities/rosenveiler.plan.json"
+  },
+  {
+   "id": "map-city-amrit",
+   "name": "Амрит — план города",
+   "kind": "city",
+   "image": "maps/cities/amrit.webp",
+   "width": 2048,
+   "height": 2796,
+   "plan": "maps/cities/amrit.plan.json"
+  },
+  {
+   "id": "map-city-unterdorf",
+   "name": "Унтердорф — план города",
+   "kind": "city",
+   "image": "maps/cities/unterdorf.webp",
+   "width": 2048,
+   "height": 2721,
+   "plan": "maps/cities/unterdorf.plan.json"
+  },
+  {
+   "id": "map-city-linau",
+   "name": "Линау — план города",
+   "kind": "city",
+   "image": "maps/cities/linau.webp",
+   "width": 2048,
+   "height": 1949,
+   "plan": "maps/cities/linau.plan.json"
+  },
+  {
+   "id": "map-city-valinberg",
+   "name": "Вальинберг — план города",
+   "kind": "city",
+   "image": "maps/cities/valinberg.webp",
+   "width": 2048,
+   "height": 1297,
+   "plan": "maps/cities/valinberg.plan.json"
+  },
+  {
+   "id": "map-city-eberelholm",
+   "name": "Эберельхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/eberelholm.webp",
+   "width": 2048,
+   "height": 2037,
+   "plan": "maps/cities/eberelholm.plan.json"
+  },
+  {
+   "id": "map-city-gryunau",
+   "name": "Грюнау — план города",
+   "kind": "city",
+   "image": "maps/cities/gryunau.webp",
+   "width": 2048,
+   "height": 2463,
+   "plan": "maps/cities/gryunau.plan.json"
+  },
+  {
+   "id": "map-city-rotertal",
+   "name": "Ротерталь — план города",
+   "kind": "city",
+   "image": "maps/cities/rotertal.webp",
+   "width": 2048,
+   "height": 1358,
+   "plan": "maps/cities/rotertal.plan.json"
+  },
+  {
+   "id": "map-city-lauinvedel",
+   "name": "Лауинведель — план города",
+   "kind": "city",
+   "image": "maps/cities/lauinvedel.webp",
+   "width": 2048,
+   "height": 2601,
+   "plan": "maps/cities/lauinvedel.plan.json"
+  },
+  {
+   "id": "map-city-zigintal",
+   "name": "Зигинталь — план города",
+   "kind": "city",
+   "image": "maps/cities/zigintal.webp",
+   "width": 2048,
+   "height": 1138,
+   "plan": "maps/cities/zigintal.plan.json"
+  },
+  {
+   "id": "map-city-rotindorf",
+   "name": "Ротиндорф — план города",
+   "kind": "city",
+   "image": "maps/cities/rotindorf.webp",
+   "width": 2048,
+   "height": 3526,
+   "plan": "maps/cities/rotindorf.plan.json"
+  },
+  {
+   "id": "map-city-roishtadt",
+   "name": "Ройштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/roishtadt.webp",
+   "width": 2048,
+   "height": 3330,
+   "plan": "maps/cities/roishtadt.plan.json"
+  },
+  {
+   "id": "map-city-gryunelshtadt",
+   "name": "Грюнельштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/gryunelshtadt.webp",
+   "width": 2048,
+   "height": 2670,
+   "plan": "maps/cities/gryunelshtadt.plan.json"
+  },
+  {
+   "id": "map-city-zonelvald",
+   "name": "Зонельвальд — план города",
+   "kind": "city",
+   "image": "maps/cities/zonelvald.webp",
+   "width": 2048,
+   "height": 2198,
+   "plan": "maps/cities/zonelvald.plan.json"
+  },
+  {
+   "id": "map-city-shenerdorf",
+   "name": "Шёнердорф — план города",
+   "kind": "city",
+   "image": "maps/cities/shenerdorf.webp",
+   "width": 2048,
+   "height": 1797,
+   "plan": "maps/cities/shenerdorf.plan.json"
+  },
+  {
+   "id": "map-city-gerinfeld",
+   "name": "Геринфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/gerinfeld.webp",
+   "width": 2048,
+   "height": 3529,
+   "plan": "maps/cities/gerinfeld.plan.json"
+  },
+  {
+   "id": "map-city-elmshtadt",
+   "name": "Эльмштадт — план города",
+   "kind": "city",
+   "image": "maps/cities/elmshtadt.webp",
+   "width": 2048,
+   "height": 2001,
+   "plan": "maps/cities/elmshtadt.plan.json"
+  },
+  {
+   "id": "map-city-vedervald",
+   "name": "Ведервальд — план города",
+   "kind": "city",
+   "image": "maps/cities/vedervald.webp",
+   "width": 2048,
+   "height": 2009,
+   "plan": "maps/cities/vedervald.plan.json"
+  },
+  {
+   "id": "map-city-kirherlage",
+   "name": "Кирхерлаге — план города",
+   "kind": "city",
+   "image": "maps/cities/kirherlage.webp",
+   "width": 2048,
+   "height": 2087,
+   "plan": "maps/cities/kirherlage.plan.json"
+  },
+  {
+   "id": "map-city-rotinberg",
+   "name": "Ротинберг — план города",
+   "kind": "city",
+   "image": "maps/cities/rotinberg.webp",
+   "width": 2048,
+   "height": 2641,
+   "plan": "maps/cities/rotinberg.plan.json"
+  },
+  {
+   "id": "map-city-dalintal",
+   "name": "Дальинталь — план города",
+   "kind": "city",
+   "image": "maps/cities/dalintal.webp",
+   "width": 2048,
+   "height": 1495,
+   "plan": "maps/cities/dalintal.plan.json"
+  },
+  {
+   "id": "map-city-freielholm",
+   "name": "Фрейельхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/freielholm.webp",
+   "width": 2048,
+   "height": 2971,
+   "plan": "maps/cities/freielholm.plan.json"
+  },
+  {
+   "id": "map-city-kortal",
+   "name": "Корталь — план города",
+   "kind": "city",
+   "image": "maps/cities/kortal.webp",
+   "width": 2048,
+   "height": 1533,
+   "plan": "maps/cities/kortal.plan.json"
+  },
+  {
+   "id": "map-city-morelfeld",
+   "name": "Морельфельд — план города",
+   "kind": "city",
+   "image": "maps/cities/morelfeld.webp",
+   "width": 2048,
+   "height": 1480,
+   "plan": "maps/cities/morelfeld.plan.json"
+  },
+  {
+   "id": "map-city-kirhenberg",
+   "name": "Кирхенберг — план города",
+   "kind": "city",
+   "image": "maps/cities/kirhenberg.webp",
+   "width": 2048,
+   "height": 2157,
+   "plan": "maps/cities/kirhenberg.plan.json"
+  },
+  {
+   "id": "map-city-freiholm",
+   "name": "Фрейхольм — план города",
+   "kind": "city",
+   "image": "maps/cities/freiholm.webp",
+   "width": 2048,
+   "height": 2309,
+   "plan": "maps/cities/freiholm.plan.json"
+  },
+  {
+   "id": "map-city-ostrit",
+   "name": "Острит — план города",
+   "kind": "city",
+   "image": "maps/cities/ostrit.webp",
+   "width": 2048,
+   "height": 1518,
+   "plan": "maps/cities/ostrit.plan.json"
+  },
+  {
+   "id": "map-city-grislage",
+   "name": "Грислаге — план города",
+   "kind": "city",
+   "image": "maps/cities/grislage.webp",
+   "width": 2048,
+   "height": 2236,
+   "plan": "maps/cities/grislage.plan.json"
+  },
+  {
+   "id": "map-city-esherveiler",
+   "name": "Эшервейлер — план города",
+   "kind": "city",
+   "image": "maps/cities/esherveiler.webp",
+   "width": 2048,
+   "height": 1849,
+   "plan": "maps/cities/esherveiler.plan.json"
+  },
+  {
+   "id": "map-city-freibah",
+   "name": "Фрейбах — план города",
+   "kind": "city",
+   "image": "maps/cities/freibah.webp",
+   "width": 2048,
+   "height": 2011,
+   "plan": "maps/cities/freibah.plan.json"
+  },
+  {
+   "id": "map-city-dornental",
+   "name": "Дорненталь — план города",
+   "kind": "city",
+   "image": "maps/cities/dornental.webp",
+   "width": 2048,
+   "height": 2338,
+   "plan": "maps/cities/dornental.plan.json"
+  },
+  {
+   "id": "map-city-zondorf",
+   "name": "Зондорф — план города",
+   "kind": "city",
+   "image": "maps/cities/zondorf.webp",
+   "width": 2048,
+   "height": 2148,
+   "plan": "maps/cities/zondorf.plan.json"
+  },
+  {
+   "id": "map-city-amendorf",
+   "name": "Амендорф — план города",
+   "kind": "city",
+   "image": "maps/cities/amendorf.webp",
+   "width": 2048,
+   "height": 1910,
+   "plan": "maps/cities/amendorf.plan.json"
   }
  ],
  "states": [
@@ -8845,32 +9791,42 @@
    "id": "db02c283-8",
    "base": {
     "name": "Графство Мангениум",
-    "fullName": "",
+    "fullName": "Графство Мангениум",
     "color": "#e61313",
     "flag": "",
-    "motto": "",
-    "ruler": "",
-    "rulerTitle": "Графиня",
+    "motto": "«Ключ не отдают»",
+    "ruler": "Граф Жан Наний Орнибуций",
+    "rulerTitle": "Граф",
     "rulerId": "lore-mangenium-now",
-    "government": "Монархия, прямой вассал Империи",
-    "ideology": "",
-    "religion": "",
+    "government": "Наследственное графство, прямой вассал Империи; на деле автономия. Парламента нет: граф и Совет Десяти, как у императоров",
+    "ideology": "Верность старым устоям Империи и прямой ветви Монстаргов; вслух — лояльность совету",
+    "religion": "Дом Света",
     "religionId": "lore-house-light",
-    "capitalId": "",
-    "population": "",
-    "army": "",
-    "navy": "",
-    "economy": "",
-    "treasury": "",
-    "laws": "",
-    "culture": "Имперцы",
-    "languages": "",
-    "stability": 50,
-    "description": "Банкиры среди великих домов: графы Мангениум веками ссужали деньги императорам и совету. В 978 г. отделились, в 980 г. стали прямыми вассалами Империи.\n\nПрямой вассал Империи: не её часть, но подчиняется имперскому совету.",
+    "capitalId": "lore-man-capital",
+    "population": "Около 900 тысяч, из них около 140 тысяч принятых беженцев и их детей",
+    "army": "Графская стража — около 6 тысяч: заставы, тракты, гарнизоны.",
+    "navy": "Несколько сторожевых кораблей в Штайнмюнде и Фрейбахе; своих линейных сил нет.",
+    "economy": "**Хлеб Нарни** — главная житница графства.\n**Тракт и заставы** — дорога на Хауссер.\n**Дуб Мангены** — лес и корабельное дерево.\n**Горные промыслы Граднеца** — железо и камень.\n**Руки беженцев** — чиновники, офицеры, ремесленники со всей бывшей Империи.",
+    "treasury": "Скромная на вид: дань платится в срок, а граф часто жалуется на бедность.",
+    "laws": "**Старый кодекс** — имперские законы без поправок после 975 г.\n**День прошений** — раз в месяц граф лично принимает прошения.\n**Опись Жанны** — подати собирает сам граф, в Хауссер идёт готовая сумма.\n**Присяга принятого** — земля и служба в обмен на присягу графу.",
+    "culture": "Имперцы: обычная имперская культура без ярких особенностей, старые обычаи двора",
+    "languages": "Общий имперский",
+    "stability": 74,
+    "description": "Графство дома Орнибуций, одного из великих домов Империи, с центром в Мангене; главные города — Ним, Нарни и Граднец. Издавна дом служил прямой ветви императоров. Революцию он не принял, но не стал и бежать на север.\n\nНа бумаге графство остаётся в юрисдикции Империи. На деле влияние дома здесь так старо и сильно, что внутри Империи выросла собственная автономия, которая постепенно идёт к независимости. Здесь укрылись многие сторонники Империи, не настолько радикальные, чтобы бежать на север. Парламента нет: как в старину, при графе десять советников.\n\nЭто сдержанная страна: тихие дворы, старые законы, обычная имперская жизнь без ярких особенностей.\n\n_История рода, советники и службы — черновик_",
     "dynastyId": "lore-house-mangenium",
     "overlordId": "be9b309a-e",
-    "diplomacy": "",
-    "customFields": []
+    "diplomacy": "**Империя** — прямой вассал с 980 г. Граф платит дань в срок и сглаживает всё, что может.\n**Прямая ветвь Монстаргов** — вслух ничего, кроме почтения.\n**Имперские изгнанники на севере** — слишком горячи, но всё равно свои.\n**Республика** — вежливый холод: половина принятых бежала именно оттуда.\n**Корона Аргус** — дружба вассалов, тайный «союз трёх корон».\n**Графство Штирия** — соседство без всякого уважения.\n**Святая церковь** — ровные и добрые отношения через посланника.",
+    "customFields": [],
+    "heraldry": {
+     "layout": "bicolor-h",
+     "colors": [
+      "#5a3a1a",
+      "#c9a45c"
+     ],
+     "emblem": "key",
+     "emblemColor": "#1a1a1a"
+    },
+    "secret": "Граф тайно строит страну ради возвращения к истокам. Если совет об этом узнает, дом объявят предателями, поэтому граф сглаживает отношения с Хауссером, пока графство не наберётся сил."
    },
    "history": [
     {
@@ -8888,7 +9844,40 @@
      }
     }
    ],
-   "factions": [],
+   "factions": [
+    {
+     "id": "lore-man-f-court",
+     "name": "Старый двор",
+     "leader": "",
+     "ideology": "Граф и Совет Десяти: ждать, копить силы, ничего не говорить вслух",
+     "influence": 44,
+     "description": ""
+    },
+    {
+     "id": "lore-man-f-accepted",
+     "name": "Принятые",
+     "leader": "",
+     "ideology": "Беженцы Империи: верны графу, потому что идти больше некуда",
+     "influence": 26,
+     "description": ""
+    },
+    {
+     "id": "lore-man-f-officers",
+     "name": "Офицеры маршала",
+     "leader": "",
+     "ideology": "Ветераны Короны: хотят выступить раньше, чем хочет граф",
+     "influence": 18,
+     "description": ""
+    },
+    {
+     "id": "lore-man-f-quiet",
+     "name": "Тихие кастеляны",
+     "leader": "",
+     "ideology": "Старая местная знать: лишь бы не было новой войны",
+     "influence": 12,
+     "description": ""
+    }
+   ],
    "from": 488500,
    "to": null,
    "label": {
@@ -9292,7 +10281,7 @@
     "description": "Горный край на северо-западе Империи. Род Штирийских был здесь никем — мытарями у перевала, а поднялся на доносах и убийствах, медленно и кропотливо, поколение за поколением. Сегодня он держит самый тёмный рынок Империи и тайную организацию, которой боятся все в округе. Сам край — одна из худших земель Империи: простолюдины и мелкая знать живут очень бедно.\n\nНезависимость в 978 г. купили взятками, наёмниками и интригами; с 980 г. — прямой вассал Империи, но только пока это выгодно.\n\n_черновик_",
     "dynastyId": "lore-house-styria",
     "overlordId": "be9b309a-e",
-    "diplomacy": "**Империя** — прямой вассал с 980 г., пока это выгодно и пока есть защита.\n**Республика и Корона Аргус** — скепсис: их политика Штирии безразлична, их деньги — нет.\n**Святая церковь** — неприязнь; один собор на всё графство.\n**Графство Мангениум** — соперник в деньгах.\n**Республика Шеша** — поставщик живого товара.",
+    "diplomacy": "**Империя** — прямой вассал с 980 г., пока это выгодно и пока есть защита.\n**Республика и Корона Аргус** — скепсис: их политика Штирии безразлична, их деньги — нет.\n**Святая церковь** — неприязнь; один собор на всё графство.\n**Графство Мангениум** — сосед, который смотрит свысока.\n**Республика Шеша** — поставщик живого товара.",
     "customFields": [],
     "secret": "Граф Конрад мечтает стать вампиром. Настоящая власть, возможно, уже не у него, а у Немой палаты.",
     "heraldry": {
@@ -16749,6 +17738,7 @@
    "mapId": "world",
    "x": 4247,
    "y": 1297,
+   "innerMapId": "map-city-korbruk",
    "base": {
     "name": "Корбрук",
     "type": "capital",
@@ -16760,8 +17750,7 @@
    },
    "history": [],
    "from": null,
-   "to": null,
-   "innerMapId": "map-city-korbruk"
+   "to": null
   },
   {
    "id": "lore-sty-skete",
@@ -16833,6 +17822,61 @@
    },
    "history": [],
    "from": 482600,
+   "to": null
+  },
+  {
+   "id": "lore-man-capital",
+   "mapId": "world",
+   "x": 2927,
+   "y": 1837,
+   "base": {
+    "name": "Манген",
+    "type": "capital",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "Граф Жан Наний Орнибуций",
+    "image": "",
+    "description": "**Столица Графства Мангениум.** Графский дворец, Совет Десяти, Мангенский собор и старые ворота, ключ от которых носит наследник.\n\n_черновик_"
+   },
+   "history": [],
+   "from": null,
+   "to": null,
+   "innerMapId": "map-city-mangen"
+  },
+  {
+   "id": "lore-man-refuge",
+   "mapId": "world",
+   "x": 2851,
+   "y": 2017,
+   "base": {
+    "name": "Дом принятых",
+    "type": "landmark",
+    "stateId": "",
+    "population": "",
+    "ruler": "",
+    "image": "",
+    "description": "**Убежище верных Империи.** Сюда приезжают те, кому нельзя жить в Республике и не хочется жить при совете.\n\n_черновик_"
+   },
+   "history": [],
+   "from": 487500,
+   "to": null
+  },
+  {
+   "id": "lore-man-fort",
+   "mapId": "world",
+   "x": 3257,
+   "y": 1771,
+   "base": {
+    "name": "Склады Граднеца",
+    "type": "landmark",
+    "stateId": "",
+    "population": "",
+    "ruler": "",
+    "image": "",
+    "description": "**Горные склады Графской стражи.** На бумаге здесь хранится соль и овечья шерсть.\n\n_черновик_"
+   },
+   "history": [],
+   "from": 492000,
    "to": null
   },
   {
@@ -49279,6 +50323,2533 @@
    "history": [],
    "from": null,
    "to": null
+  },
+  {
+   "id": "city-ulgard-0",
+   "mapId": "map-city-ulgard",
+   "x": 1057.4,
+   "y": 703.5,
+   "building": 35,
+   "base": {
+    "name": "Храм Ульгард",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ulgard-1",
+   "mapId": "map-city-ulgard",
+   "x": 769.4,
+   "y": 1206.2,
+   "building": 24,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Эмиль Граве служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falinhauzen-0",
+   "mapId": "map-city-falinhauzen",
+   "x": 1223.5,
+   "y": 1532.5,
+   "building": 35,
+   "base": {
+    "name": "Храм Фальинхаузен",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falinhauzen-1",
+   "mapId": "map-city-falinhauzen",
+   "x": 960.4,
+   "y": 871.1,
+   "building": 25,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Бернард Лихт служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kelshtadt-0",
+   "mapId": "map-city-kelshtadt",
+   "x": 797.1,
+   "y": 848.6,
+   "building": 23,
+   "base": {
+    "name": "Храм Кельштадт",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kelshtadt-1",
+   "mapId": "map-city-kelshtadt",
+   "x": 1456.4,
+   "y": 1101.8,
+   "building": 20,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Филипп Пфайль служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vedenrit-0",
+   "mapId": "map-city-vedenrit",
+   "x": 1264.4,
+   "y": 1346.5,
+   "building": 37,
+   "base": {
+    "name": "Храм Веденрит",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-miterdorf-0",
+   "mapId": "map-city-miterdorf",
+   "x": 934.7,
+   "y": 859.9,
+   "building": 0,
+   "base": {
+    "name": "Храм Митердорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-oberinbah-0",
+   "mapId": "map-city-oberinbah",
+   "x": 1037.5,
+   "y": 947.9,
+   "building": 0,
+   "base": {
+    "name": "Храм Оберинбах",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-livau-0",
+   "mapId": "map-city-livau",
+   "x": 1303.3,
+   "y": 531.8,
+   "building": 4,
+   "base": {
+    "name": "Храм Ливау",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-dornlage-0",
+   "mapId": "map-city-dornlage",
+   "x": 645.3,
+   "y": 1097.5,
+   "building": 7,
+   "base": {
+    "name": "Храм Дорнлаге",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauental-0",
+   "mapId": "map-city-lauental",
+   "x": 1371.5,
+   "y": 1017,
+   "building": 0,
+   "base": {
+    "name": "Храм Лауенталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-morershtein-0",
+   "mapId": "map-city-morershtein",
+   "x": 676.8,
+   "y": 655.5,
+   "building": 12,
+   "base": {
+    "name": "Храм Морерштейн",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukelvald-0",
+   "mapId": "map-city-brukelvald",
+   "x": 726.3,
+   "y": 855.7,
+   "building": 4,
+   "base": {
+    "name": "Храм Брукельвальд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukvald-0",
+   "mapId": "map-city-brukvald",
+   "x": 647.5,
+   "y": 1186.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Бруквальд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberelshtein-0",
+   "mapId": "map-city-eberelshtein",
+   "x": 1210.6,
+   "y": 620.5,
+   "building": 54,
+   "base": {
+    "name": "Храм Эберельштейн",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberelshtein-1",
+   "mapId": "map-city-eberelshtein",
+   "x": 872.7,
+   "y": 523.3,
+   "building": 39,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Феликс Бауэр служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-rosinvedel-0",
+   "mapId": "map-city-rosinvedel",
+   "x": 1358.6,
+   "y": 643.4,
+   "building": 0,
+   "base": {
+    "name": "Храм Росинведель",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-grisenbruk-0",
+   "mapId": "map-city-grisenbruk",
+   "x": 838.1,
+   "y": 680.9,
+   "building": 118,
+   "base": {
+    "name": "Храм Грисенбрук",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukbruk-0",
+   "mapId": "map-city-brukbruk",
+   "x": 890.1,
+   "y": 1161.6,
+   "building": 0,
+   "base": {
+    "name": "Храм Брукбрук",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eshintal-0",
+   "mapId": "map-city-eshintal",
+   "x": 892,
+   "y": 717.8,
+   "building": 40,
+   "base": {
+    "name": "Храм Эшинталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eshintal-1",
+   "mapId": "map-city-eshintal",
+   "x": 658.5,
+   "y": 1404,
+   "building": 31,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Якоб Хольц служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-holtserhauzen-0",
+   "mapId": "map-city-holtserhauzen",
+   "x": 1199.3,
+   "y": 2410.9,
+   "building": 1,
+   "base": {
+    "name": "Храм Хольцерхаузен",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberau-0",
+   "mapId": "map-city-eberau",
+   "x": 927.4,
+   "y": 2006.6,
+   "building": 0,
+   "base": {
+    "name": "Храм Эберау",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-narni-0",
+   "mapId": "map-city-narni",
+   "x": 1233.9,
+   "y": 1127.9,
+   "building": 699,
+   "base": {
+    "name": "Амбары Нарни",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Запасы зерна, которыми кормятся все принятые графства.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-narni-1",
+   "mapId": "map-city-narni",
+   "x": 1032.9,
+   "y": 929.9,
+   "building": 10,
+   "base": {
+    "name": "Ратуша Нарни",
+    "type": "assembly",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-narni-2",
+   "mapId": "map-city-narni",
+   "x": 1009.7,
+   "y": 887,
+   "building": 1411,
+   "base": {
+    "name": "Храм Нарни",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-faltal-0",
+   "mapId": "map-city-faltal",
+   "x": 1066,
+   "y": 709.5,
+   "building": 24,
+   "base": {
+    "name": "Храм Фальталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gradnets-0",
+   "mapId": "map-city-gradnets",
+   "x": 1014.6,
+   "y": 1772.6,
+   "building": 790,
+   "base": {
+    "name": "Цитадель Граднеца",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Штаб Графской стражи и капитан Север Орнибуций.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gradnets-1",
+   "mapId": "map-city-gradnets",
+   "x": 1134.9,
+   "y": 1943.6,
+   "building": 1348,
+   "base": {
+    "name": "Казармы Графской стражи",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Устав и выучка здесь взяты у старых легионов.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gradnets-2",
+   "mapId": "map-city-gradnets",
+   "x": 946.2,
+   "y": 1304.4,
+   "building": 0,
+   "base": {
+    "name": "Склады Граднеца",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "На бумаге здесь хранится соль и овечья шерсть.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gradnets-3",
+   "mapId": "map-city-gradnets",
+   "x": 1012,
+   "y": 1288.5,
+   "building": 236,
+   "base": {
+    "name": "Ратуша Граднец",
+    "type": "assembly",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gradnets-4",
+   "mapId": "map-city-gradnets",
+   "x": 991.2,
+   "y": 1335.5,
+   "building": 1408,
+   "base": {
+    "name": "Храм Граднец",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-moringard-0",
+   "mapId": "map-city-moringard",
+   "x": 858.4,
+   "y": 923.7,
+   "building": 34,
+   "base": {
+    "name": "Храм Морингард",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-moringard-1",
+   "mapId": "map-city-moringard",
+   "x": 1169.1,
+   "y": 1709.8,
+   "building": 32,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Теодор Зоммер служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altburg-0",
+   "mapId": "map-city-altburg",
+   "x": 799.9,
+   "y": 682.8,
+   "building": 0,
+   "base": {
+    "name": "Храм Альтбург",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norelhauzen-0",
+   "mapId": "map-city-norelhauzen",
+   "x": 943.8,
+   "y": 1815.6,
+   "building": 35,
+   "base": {
+    "name": "Храм Норельхаузен",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norelhauzen-1",
+   "mapId": "map-city-norelhauzen",
+   "x": 957,
+   "y": 1153.1,
+   "building": 31,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Вильгельм Дорн служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-freiinfeld-0",
+   "mapId": "map-city-freiinfeld",
+   "x": 949.1,
+   "y": 836.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Фрейинфельд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gervedel-0",
+   "mapId": "map-city-gervedel",
+   "x": 1144.2,
+   "y": 1017.8,
+   "building": 0,
+   "base": {
+    "name": "Храм Герведель",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norholm-0",
+   "mapId": "map-city-norholm",
+   "x": 666.1,
+   "y": 994.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Норхольм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-elmertal-0",
+   "mapId": "map-city-elmertal",
+   "x": 615.9,
+   "y": 633,
+   "building": 0,
+   "base": {
+    "name": "Храм Эльмерталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-orshtein-0",
+   "mapId": "map-city-orshtein",
+   "x": 905,
+   "y": 1753.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Орштейн",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-morvald-0",
+   "mapId": "map-city-morvald",
+   "x": 1545.3,
+   "y": 974.8,
+   "building": 0,
+   "base": {
+    "name": "Храм Морвальд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-elmelrit-0",
+   "mapId": "map-city-elmelrit",
+   "x": 1065.3,
+   "y": 927.1,
+   "building": 213,
+   "base": {
+    "name": "Храм Эльмельрит",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-elmelrit-1",
+   "mapId": "map-city-elmelrit",
+   "x": 977.1,
+   "y": 941,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Эльмельрит — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mangen-0",
+   "mapId": "map-city-mangen",
+   "x": 833.7,
+   "y": 1003.9,
+   "building": 488,
+   "base": {
+    "name": "Графский дворец",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь живёт граф Жан Наний и заседает Совет Десяти.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mangen-1",
+   "mapId": "map-city-mangen",
+   "x": 1208.7,
+   "y": 1082.4,
+   "building": 1026,
+   "base": {
+    "name": "Мангенский собор",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Построен при Гийоме Постном; здесь Лавиния Орнибуция приняла первых беженцев.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mangen-2",
+   "mapId": "map-city-mangen",
+   "x": 1074.2,
+   "y": 1245.2,
+   "building": 84,
+   "base": {
+    "name": "Вторая канцелярия",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "На вывеске архив; о том, что внутри, не спрашивают.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mangen-3",
+   "mapId": "map-city-mangen",
+   "x": 1165.5,
+   "y": 1071,
+   "building": 0,
+   "base": {
+    "name": "Ратуша Манген",
+    "type": "assembly",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-mangen-4",
+   "mapId": "map-city-mangen",
+   "x": 1083,
+   "y": 1275.1,
+   "building": 88,
+   "base": {
+    "name": "Храм Манген",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-oberlage-0",
+   "mapId": "map-city-oberlage",
+   "x": 1129.7,
+   "y": 1126.7,
+   "building": 55,
+   "base": {
+    "name": "Храм Оберлаге",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-oberlage-1",
+   "mapId": "map-city-oberlage",
+   "x": 1224,
+   "y": 1687,
+   "building": 35,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Феликс Виттих служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gerenberg-0",
+   "mapId": "map-city-gerenberg",
+   "x": 558.3,
+   "y": 1898,
+   "building": 0,
+   "base": {
+    "name": "Храм Геренберг",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-griserveiler-0",
+   "mapId": "map-city-griserveiler",
+   "x": 678.7,
+   "y": 1185.4,
+   "building": 0,
+   "base": {
+    "name": "Храм Грисервейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenrit-0",
+   "mapId": "map-city-kirhenrit",
+   "x": 1456.8,
+   "y": 819.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Кирхенрит",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirdorf-0",
+   "mapId": "map-city-tirdorf",
+   "x": 1110.6,
+   "y": 1039.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Тирдорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauelhaim-0",
+   "mapId": "map-city-lauelhaim",
+   "x": 674.4,
+   "y": 1118.7,
+   "building": 0,
+   "base": {
+    "name": "Храм Лауельхайм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neielveiler-0",
+   "mapId": "map-city-neielveiler",
+   "x": 1391.3,
+   "y": 1063.7,
+   "building": 149,
+   "base": {
+    "name": "Храм Нейельвейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neielveiler-1",
+   "mapId": "map-city-neielveiler",
+   "x": 1274.4,
+   "y": 1000.3,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Нейельвейлер — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-linerfeld-0",
+   "mapId": "map-city-linerfeld",
+   "x": 1015.8,
+   "y": 407.7,
+   "building": 0,
+   "base": {
+    "name": "Храм Линерфельд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-erelvedel-0",
+   "mapId": "map-city-erelvedel",
+   "x": 1119.1,
+   "y": 1190.6,
+   "building": 84,
+   "base": {
+    "name": "Храм Эрельведель",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ulinfeld-0",
+   "mapId": "map-city-ulinfeld",
+   "x": 1032.3,
+   "y": 967.2,
+   "building": 47,
+   "base": {
+    "name": "Храм Ульинфельд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ulinfeld-1",
+   "mapId": "map-city-ulinfeld",
+   "x": 888.2,
+   "y": 533.6,
+   "building": 21,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Филипп Энгель служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-dornenhauzen-0",
+   "mapId": "map-city-dornenhauzen",
+   "x": 816.6,
+   "y": 1012.5,
+   "building": 20,
+   "base": {
+    "name": "Храм Дорненхаузен",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-visinberg-0",
+   "mapId": "map-city-visinberg",
+   "x": 1156.3,
+   "y": 2013.4,
+   "building": 0,
+   "base": {
+    "name": "Храм Висинберг",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kasershtadt-0",
+   "mapId": "map-city-kasershtadt",
+   "x": 907.3,
+   "y": 755.9,
+   "building": 0,
+   "base": {
+    "name": "Храм Касерштадт",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenveiler-0",
+   "mapId": "map-city-kirhenveiler",
+   "x": 807.4,
+   "y": 835.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Кирхенвейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vedelveiler-0",
+   "mapId": "map-city-vedelveiler",
+   "x": 1062.5,
+   "y": 833.6,
+   "building": 40,
+   "base": {
+    "name": "Храм Ведельвейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainmyunde-0",
+   "mapId": "map-city-shtainmyunde",
+   "x": 1268.7,
+   "y": 1211.5,
+   "building": 399,
+   "base": {
+    "name": "Храм Штайнмюнде",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainmyunde-1",
+   "mapId": "map-city-shtainmyunde",
+   "x": 889,
+   "y": 812.1,
+   "building": 303,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "порт с графской таможней.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenhaim-0",
+   "mapId": "map-city-kirhenhaim",
+   "x": 890.4,
+   "y": 805.1,
+   "building": 2,
+   "base": {
+    "name": "Храм Кирхенхайм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norelshtadt-0",
+   "mapId": "map-city-norelshtadt",
+   "x": 993.3,
+   "y": 1035.7,
+   "building": 6,
+   "base": {
+    "name": "Храм Норельштадт",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brasintal-0",
+   "mapId": "map-city-brasintal",
+   "x": 1123.9,
+   "y": 844.4,
+   "building": 35,
+   "base": {
+    "name": "Храм Брасинталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-hagelhaim-0",
+   "mapId": "map-city-hagelhaim",
+   "x": 1321,
+   "y": 1144.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Хагельхайм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-talelveiler-0",
+   "mapId": "map-city-talelveiler",
+   "x": 968.2,
+   "y": 986.8,
+   "building": 0,
+   "base": {
+    "name": "Храм Тальельвейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eshdorf-0",
+   "mapId": "map-city-eshdorf",
+   "x": 886.2,
+   "y": 768.2,
+   "building": 0,
+   "base": {
+    "name": "Храм Эшдорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-braselrit-0",
+   "mapId": "map-city-braselrit",
+   "x": 749,
+   "y": 628.9,
+   "building": 0,
+   "base": {
+    "name": "Храм Брасельрит",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostelvedel-0",
+   "mapId": "map-city-ostelvedel",
+   "x": 1083.9,
+   "y": 942.7,
+   "building": 4,
+   "base": {
+    "name": "Храм Остельведель",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-falenhauzen-0",
+   "mapId": "map-city-falenhauzen",
+   "x": 915.2,
+   "y": 1040.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Фальенхаузен",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-norinburg-0",
+   "mapId": "map-city-norinburg",
+   "x": 1002.7,
+   "y": 698.2,
+   "building": 0,
+   "base": {
+    "name": "Храм Норинбург",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-marershtein-0",
+   "mapId": "map-city-marershtein",
+   "x": 828.4,
+   "y": 1548.5,
+   "building": 30,
+   "base": {
+    "name": "Храм Марерштейн",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-morengard-0",
+   "mapId": "map-city-morengard",
+   "x": 1177.9,
+   "y": 1266.6,
+   "building": 0,
+   "base": {
+    "name": "Храм Моренгард",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altenhauzen-0",
+   "mapId": "map-city-altenhauzen",
+   "x": 1091.5,
+   "y": 1062.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Альтенхаузен",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kelfeld-0",
+   "mapId": "map-city-kelfeld",
+   "x": 807.6,
+   "y": 777.9,
+   "building": 0,
+   "base": {
+    "name": "Храм Кельфельд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-rosgard-0",
+   "mapId": "map-city-rosgard",
+   "x": 1378.8,
+   "y": 893.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Росгард",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-altenveiler-0",
+   "mapId": "map-city-altenveiler",
+   "x": 1491.3,
+   "y": 1469.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Альтенвейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-badinrit-0",
+   "mapId": "map-city-badinrit",
+   "x": 1126.3,
+   "y": 1204.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Бадинрит",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-neienshtein-0",
+   "mapId": "map-city-neienshtein",
+   "x": 1109.4,
+   "y": 931.7,
+   "building": 0,
+   "base": {
+    "name": "Храм Нейенштейн",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vedburg-0",
+   "mapId": "map-city-vedburg",
+   "x": 1231.2,
+   "y": 765.2,
+   "building": 23,
+   "base": {
+    "name": "Храм Ведбург",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ulenhaim-0",
+   "mapId": "map-city-ulenhaim",
+   "x": 953.1,
+   "y": 1232.4,
+   "building": 18,
+   "base": {
+    "name": "Храм Ульенхайм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostental-0",
+   "mapId": "map-city-ostental",
+   "x": 951.3,
+   "y": 1053.4,
+   "building": 267,
+   "base": {
+    "name": "Храм Остенталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostental-1",
+   "mapId": "map-city-ostental",
+   "x": 911,
+   "y": 1216.2,
+   "building": 0,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Остенталь — торг\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ererveiler-0",
+   "mapId": "map-city-ererveiler",
+   "x": 846.5,
+   "y": 1167,
+   "building": 0,
+   "base": {
+    "name": "Храм Эрервейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-nim-0",
+   "mapId": "map-city-nim",
+   "x": 1049.8,
+   "y": 845.2,
+   "building": 57,
+   "base": {
+    "name": "Дом принятых",
+    "type": "assembly",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Сюда едут те, кому нельзя жить в Республике и не хочется жить при совете.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-nim-1",
+   "mapId": "map-city-nim",
+   "x": 1126,
+   "y": 732.1,
+   "building": 0,
+   "base": {
+    "name": "Ратуша Ним",
+    "type": "assembly",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-nim-2",
+   "mapId": "map-city-nim",
+   "x": 1164.6,
+   "y": 773.5,
+   "building": 1952,
+   "base": {
+    "name": "Храм Ним",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-rosenveiler-0",
+   "mapId": "map-city-rosenveiler",
+   "x": 883.6,
+   "y": 2038.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Росенвейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-amrit-0",
+   "mapId": "map-city-amrit",
+   "x": 1211.5,
+   "y": 830.3,
+   "building": 29,
+   "base": {
+    "name": "Храм Амрит",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-unterdorf-0",
+   "mapId": "map-city-unterdorf",
+   "x": 945.7,
+   "y": 1007.7,
+   "building": 16,
+   "base": {
+    "name": "Храм Унтердорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-linau-0",
+   "mapId": "map-city-linau",
+   "x": 1038.6,
+   "y": 1115.6,
+   "building": 21,
+   "base": {
+    "name": "Храм Линау",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-valinberg-0",
+   "mapId": "map-city-valinberg",
+   "x": 1058.2,
+   "y": 761.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Вальинберг",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-eberelholm-0",
+   "mapId": "map-city-eberelholm",
+   "x": 1363.2,
+   "y": 1024.8,
+   "building": 30,
+   "base": {
+    "name": "Храм Эберельхольм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryunau-0",
+   "mapId": "map-city-gryunau",
+   "x": 942.8,
+   "y": 1145.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Грюнау",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-rotertal-0",
+   "mapId": "map-city-rotertal",
+   "x": 1335.4,
+   "y": 726.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Ротерталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-lauinvedel-0",
+   "mapId": "map-city-lauinvedel",
+   "x": 1353.4,
+   "y": 1324.7,
+   "building": 27,
+   "base": {
+    "name": "Храм Лауинведель",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-zigintal-0",
+   "mapId": "map-city-zigintal",
+   "x": 1301.7,
+   "y": 721.4,
+   "building": 8,
+   "base": {
+    "name": "Храм Зигинталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-rotindorf-0",
+   "mapId": "map-city-rotindorf",
+   "x": 976.2,
+   "y": 844.2,
+   "building": 0,
+   "base": {
+    "name": "Храм Ротиндорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-roishtadt-0",
+   "mapId": "map-city-roishtadt",
+   "x": 923.3,
+   "y": 961.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Ройштадт",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryunelshtadt-0",
+   "mapId": "map-city-gryunelshtadt",
+   "x": 738.3,
+   "y": 1915.2,
+   "building": 0,
+   "base": {
+    "name": "Храм Грюнельштадт",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-zonelvald-0",
+   "mapId": "map-city-zonelvald",
+   "x": 1049.7,
+   "y": 1026,
+   "building": 28,
+   "base": {
+    "name": "Храм Зонельвальд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-zonelvald-1",
+   "mapId": "map-city-zonelvald",
+   "x": 1465.5,
+   "y": 545.5,
+   "building": 21,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Лоренц Пфайль служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shenerdorf-0",
+   "mapId": "map-city-shenerdorf",
+   "x": 1100.3,
+   "y": 1289.4,
+   "building": 0,
+   "base": {
+    "name": "Храм Шёнердорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gerinfeld-0",
+   "mapId": "map-city-gerinfeld",
+   "x": 897.5,
+   "y": 1872.8,
+   "building": 49,
+   "base": {
+    "name": "Храм Геринфельд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-elmshtadt-0",
+   "mapId": "map-city-elmshtadt",
+   "x": 759.3,
+   "y": 1261.7,
+   "building": 49,
+   "base": {
+    "name": "Храм Эльмштадт",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vedervald-0",
+   "mapId": "map-city-vedervald",
+   "x": 926.7,
+   "y": 1077.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Ведервальд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirherlage-0",
+   "mapId": "map-city-kirherlage",
+   "x": 950.4,
+   "y": 1099.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Кирхерлаге",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-rotinberg-0",
+   "mapId": "map-city-rotinberg",
+   "x": 643.5,
+   "y": 862.6,
+   "building": 33,
+   "base": {
+    "name": "Храм Ротинберг",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-rotinberg-1",
+   "mapId": "map-city-rotinberg",
+   "x": 1396,
+   "y": 968.6,
+   "building": 30,
+   "base": {
+    "name": "Дом кастеляна",
+    "type": "castle",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "Кастелян Гуго Штерн служит графу, как его предки служили императорам.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-dalintal-0",
+   "mapId": "map-city-dalintal",
+   "x": 933.4,
+   "y": 939.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Дальинталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-freielholm-0",
+   "mapId": "map-city-freielholm",
+   "x": 1177.9,
+   "y": 2116.5,
+   "building": 0,
+   "base": {
+    "name": "Храм Фрейельхольм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kortal-0",
+   "mapId": "map-city-kortal",
+   "x": 1104.9,
+   "y": 632.8,
+   "building": 0,
+   "base": {
+    "name": "Храм Корталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-morelfeld-0",
+   "mapId": "map-city-morelfeld",
+   "x": 1266.9,
+   "y": 918.6,
+   "building": 0,
+   "base": {
+    "name": "Храм Морельфельд",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-kirhenberg-0",
+   "mapId": "map-city-kirhenberg",
+   "x": 922.2,
+   "y": 1359.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Кирхенберг",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-freiholm-0",
+   "mapId": "map-city-freiholm",
+   "x": 1401.4,
+   "y": 1469.2,
+   "building": 0,
+   "base": {
+    "name": "Храм Фрейхольм",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ostrit-0",
+   "mapId": "map-city-ostrit",
+   "x": 908.4,
+   "y": 582.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Острит",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-grislage-0",
+   "mapId": "map-city-grislage",
+   "x": 688.4,
+   "y": 706.2,
+   "building": 0,
+   "base": {
+    "name": "Храм Грислаге",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-esherveiler-0",
+   "mapId": "map-city-esherveiler",
+   "x": 946,
+   "y": 709.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Эшервейлер",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-freibah-0",
+   "mapId": "map-city-freibah",
+   "x": 1103.4,
+   "y": 733.4,
+   "building": 244,
+   "base": {
+    "name": "Храм Фрейбах",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-freibah-1",
+   "mapId": "map-city-freibah",
+   "x": 1111.5,
+   "y": 839.8,
+   "building": 65,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "порт с графской таможней.\n\n_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-dornental-0",
+   "mapId": "map-city-dornental",
+   "x": 845.9,
+   "y": 836.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Дорненталь",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-zondorf-0",
+   "mapId": "map-city-zondorf",
+   "x": 995.8,
+   "y": 672.3,
+   "building": 0,
+   "base": {
+    "name": "Храм Зондорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-amendorf-0",
+   "mapId": "map-city-amendorf",
+   "x": 959.9,
+   "y": 842.1,
+   "building": 0,
+   "base": {
+    "name": "Храм Амендорф",
+    "type": "temple",
+    "stateId": "db02c283-8",
+    "population": "",
+    "ruler": "",
+    "description": "_черновик_",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
   }
  ],
  "entries": [
@@ -55154,65 +58725,6 @@
    },
    "history": [],
    "from": 491000,
-   "to": null
-  },
-  {
-   "id": "lore-house-mangenium",
-   "kind": "dynasty",
-   "base": {
-    "name": "Дом Мангениум",
-    "title": "Великий дом, графы Мангениум",
-    "image": "",
-    "summary": "Правители: Графство Мангениум.",
-    "body": "Банкиры среди великих домов: графы Мангениум веками ссужали деньги императорам и совету. В 978 г. отделились, в 980 г. стали прямыми вассалами Империи.\n\n**Герб.** Пересечённый щит, бурый и золото; чёрный ключ.\n**Девиз.** «Счёт ведёт к победе»",
-    "tags": [
-     "Великие дома",
-     "Империя",
-     "черновик"
-    ],
-    "props": {
-     "motto": "«Счёт ведёт к победе»",
-     "arms": "Пересечённый щит, бурый и золото; чёрный ключ.",
-     "side": "Своё королевство, с 980 г. — вассал Империи"
-    },
-    "links": {},
-    "heraldry": {
-     "layout": "bicolor-h",
-     "colors": [
-      "#5a3a1a",
-      "#c9a45c"
-     ],
-     "emblem": "key",
-     "emblemColor": "#1a1a1a"
-    }
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "lore-mangenium-now",
-   "kind": "character",
-   "base": {
-    "name": "Изабелла Мангениум",
-    "title": "Графиня Мангениум",
-    "image": "portraits/mangenium-now.webp",
-    "summary": "Холодная, расчётливая; держит в долгах половину скамей совета..",
-    "body": "Холодная, расчётливая; держит в долгах половину скамей совета.",
-    "tags": [
-     "Великие дома",
-     "черновик"
-    ],
-    "props": {
-     "race": "Человек (гладр)",
-     "gender": "Женский"
-    },
-    "links": {
-     "dynasty": "lore-house-mangenium"
-    }
-   },
-   "history": [],
-   "from": 484500,
    "to": null
   },
   {
@@ -65247,6 +68759,1486 @@
    "history": [],
    "from": 488650,
    "to": 489550
+  },
+  {
+   "id": "lore-house-mangenium",
+   "kind": "dynasty",
+   "base": {
+    "name": "Дом Орнибуций",
+    "title": "Великий дом, графы Мангениум",
+    "image": "",
+    "summary": "Правители: Графство Мангениум. Ключники и хранители печати прямой ветви Монстаргов.",
+    "body": "## Служба\nОрнибуции не завоевали своих земель и не купили их. Род начинается с ключника, который девять дней держал ворота Мангена, потому что ключи ему никто не велел отдавать. Тейбер оставил ключи ему, и с тех пор дом служит прямой ветви Монстаргов: восемь веков хранители печати, судьи, министры дорог. Гордятся не победами, а тем, что ни разу не сменили хозяина.\n## Революция\nДля дома это не просто проигранная война. Прямая ветвь сидит под замком в Дистрикте Альфа, а Совет называет себя законной властью. Вслух граф этого не оспаривает. Он подчинился приказу Тейбера II в 980 г., исправно платит дань и шлёт поздравления, а тем временем строит страну, где всё осталось как до 975 г.\n## Обычаи рода\n- **Ключ.** Наследник получает ключ от старых ворот Мангена в шестнадцать лет и носит его на шее.\n- **День прошений.** Раз в месяц граф лично принимает прошения, со времён Аврелия Младшего.\n- **Браки.** Без лишнего блеска, чтобы никого не пугать.\n\n**Герб.** Пересечённый щит, бурый и золото; чёрный ключ.\n**Девиз.** «Ключ не отдают»",
+    "tags": [
+     "Великие дома",
+     "Империя",
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "motto": "«Ключ не отдают»",
+     "arms": "Пересечённый щит, бурый и золото; чёрный ключ.",
+     "seat": "Манген",
+     "founder": "Север Орнибуций",
+     "side": "Лоялисты Короны (975–980), с 980 г. — прямой вассал Империи"
+    },
+    "links": {
+     "founder": "lore-man-sever"
+    },
+    "secret": "Цель дома — возвращение к истокам: сначала полная независимость графства, а затем, если хватит сил, возвращение прямой ветви на престол. Граф держит это в тайне: иначе совет объявит его предателем.",
+    "heraldry": {
+     "layout": "bicolor-h",
+     "colors": [
+      "#5a3a1a",
+      "#c9a45c"
+     ],
+     "emblem": "key",
+     "emblemColor": "#1a1a1a"
+    }
+   },
+   "history": [],
+   "from": 48500,
+   "to": null
+  },
+  {
+   "id": "lore-man-sever",
+   "kind": "character",
+   "base": {
+    "name": "Север Орнибуций «Ключник»",
+    "title": "Глава рода Орнибуций (125–163)",
+    "image": "portraits/man-sever.webp",
+    "summary": "Ключник замка Манген у местного князя.",
+    "body": "Ключник замка Манген у местного князя. Когда в 125 г. пришёл Тейбер, князь уже был мёртв, а Север ещё девять дней держал ворота, потому что ключи ему никто не велел отдавать. Тейбер принял ключи из его рук и оставил их ему со словами: «Кто так хранит чужое, сохранит и моё». С этого начинается служба рода.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Ключник",
+     "occupation": "Глава рода"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium"
+    }
+   },
+   "history": [],
+   "from": 48500,
+   "to": 81200
+  },
+  {
+   "id": "lore-man-marcell",
+   "kind": "character",
+   "base": {
+    "name": "Марцелл Орнибуций «Печатник»",
+    "title": "Глава рода Орнибуций (163–201)",
+    "image": "portraits/man-marcell.webp",
+    "summary": "Первым из рода вошёл в Совет Десяти: при Роберте I стал хранителем императорской печати.",
+    "body": "Первым из рода вошёл в Совет Десяти: при Роберте I стал хранителем императорской печати. Должность оставалась в семье чаще, чем у кого-либо, хотя наследственной никогда не была.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Печатник",
+     "occupation": "Глава рода"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-sever"
+    }
+   },
+   "history": [],
+   "from": 63000,
+   "to": 100100
+  },
+  {
+   "id": "lore-man-flavia",
+   "kind": "character",
+   "base": {
+    "name": "Флавия Орнибуция «Хранительница»",
+    "title": "Глава рода, с 212 г. графиня Мангениум (201–238)",
+    "image": "portraits/man-flavia.webp",
+    "summary": "В 212 г.",
+    "body": "В 212 г. вынесла печать из горящей канцелярии. Роберт I пожаловал роду графский титул и земли по реке Мангене: так появилось Графство Мангениум.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "nickname": "Хранительница",
+     "occupation": "Глава рода"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-marcell"
+    }
+   },
+   "history": [],
+   "from": 79500,
+   "to": 118750
+  },
+  {
+   "id": "lore-man-tit",
+   "kind": "character",
+   "base": {
+    "name": "Тит Орнибуций «Дорожный»",
+    "title": "Граф Мангениум (238–272)",
+    "image": "portraits/man-tit.webp",
+    "summary": "Министр дорог при Роберте I и Октавиане I.",
+    "body": "Министр дорог при Роберте I и Октавиане I. Провёл тракт от Мангена к Хауссеру за счёт графства и взял за это право держать на нём собственные заставы. Именно этим правом дом пользуется до сих пор.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Дорожный",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "mother": "lore-man-flavia"
+    }
+   },
+   "history": [],
+   "from": 98000,
+   "to": 135650
+  },
+  {
+   "id": "lore-man-gay",
+   "kind": "character",
+   "base": {
+    "name": "Гай Орнибуций «Тихий»",
+    "title": "Граф Мангениум (272–319)",
+    "image": "portraits/man-gay.webp",
+    "summary": "Судья при Октавиане I и Валериане I.",
+    "body": "Судья при Октавиане I и Валериане I. Прославился только тем, что за сорок семь лет не проиграл ни одной тяжбы и ни разу не повысил голоса.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Тихий",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-tit"
+    }
+   },
+   "history": [],
+   "from": 119500,
+   "to": 159300
+  },
+  {
+   "id": "lore-man-kassiy",
+   "kind": "character",
+   "base": {
+    "name": "Кассий Орнибуций «Опальный»",
+    "title": "Граф Мангениум (319–361)",
+    "image": "portraits/man-kassiy.webp",
+    "summary": "Служил Маркусу I.",
+    "body": "Служил Маркусу I. Сандра II лишила его печати, но не головы: на допросе он единственный не солгал ей ни разу. Девять лет прожил в Мангене под присмотром и не написал ни одной жалобы.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Опальный",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-gay"
+    }
+   },
+   "history": [],
+   "from": 141000,
+   "to": 180100
+  },
+  {
+   "id": "lore-man-lavinia",
+   "kind": "character",
+   "base": {
+    "name": "Лавиния Орнибуция «Вернувшая»",
+    "title": "Графиня Мангениум (361–401)",
+    "image": "portraits/man-lavinia.webp",
+    "summary": "Тридцать лет возвращала роду доверие двора.",
+    "body": "Тридцать лет возвращала роду доверие двора. При Корвине I печать снова оказалась у Орнибуциев, и с тех пор этот дом ни разу надолго её не терял.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "nickname": "Вернувшая",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-kassiy"
+    }
+   },
+   "history": [],
+   "from": 160500,
+   "to": 200350
+  },
+  {
+   "id": "lore-man-hektor",
+   "kind": "character",
+   "base": {
+    "name": "Гектор Орнибуций «Корабел»",
+    "title": "Граф Мангениум (401–444)",
+    "image": "portraits/man-hektor.webp",
+    "summary": "Дал дубы Мангены и гавани своего побережья на флот Адриана I.",
+    "body": "Дал дубы Мангены и гавани своего побережья на флот Адриана I. Плату не взял, попросил только, чтобы графство судили по имперскому закону и никак иначе.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Корабел",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "mother": "lore-man-lavinia"
+    }
+   },
+   "history": [],
+   "from": 182000,
+   "to": 221550
+  },
+  {
+   "id": "lore-man-benedikt",
+   "kind": "character",
+   "base": {
+    "name": "Бенедикт Орнибуций «Бездетный»",
+    "title": "Граф Мангениум (444–489)",
+    "image": "portraits/man-benedikt.webp",
+    "summary": "Сорок лет Лесной войны посылал в легионы сыновей и трёх из них похоронил на Эльфборне.",
+    "body": "Сорок лет Лесной войны посылал в легионы сыновей и трёх из них похоронил на Эльфборне. Прозвище горькое: к концу войны при нём не осталось ни одного ребёнка, кроме младшего, которого он прятал в Мангене от призыва и этого стыдился.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Бездетный",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-hektor"
+    }
+   },
+   "history": [],
+   "from": 204500,
+   "to": 244100
+  },
+  {
+   "id": "lore-man-avrely",
+   "kind": "character",
+   "base": {
+    "name": "Аврелий Орнибуций «Младший»",
+    "title": "Граф Мангениум (489–533)",
+    "image": "portraits/man-avrely.webp",
+    "summary": "Тот самый спрятанный сын.",
+    "body": "Тот самый спрятанный сын. Всю жизнь отстраивал графство после войны: мосты, лазареты, вдовьи пенсии. Ввёл обычай, по которому граф лично принимает прошения один день в месяц.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Младший",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-benedikt"
+    }
+   },
+   "history": [],
+   "from": 232500,
+   "to": 266300
+  },
+  {
+   "id": "lore-man-livia",
+   "kind": "character",
+   "base": {
+    "name": "Ливия Орнибуция «Бодрствующая»",
+    "title": "Графиня Мангениум (533–584)",
+    "image": "portraits/man-livia.webp",
+    "summary": "Хранила печать при Феликсе I Сонном.",
+    "body": "Хранила печать при Феликсе I Сонном. Тридцать лет ни один указ не вышел без её подписи, а император почти их не читал. Трон могла бы забрать при желании: об этом знали все, и потому её уважали.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "nickname": "Бодрствующая",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-avrely"
+    },
+    "secret": "Дважды за эти годы к ней приходили с предложением занять регентство. Оба раза она отправляла гостей прямо к Железной Вдове, будущей Изольде I."
+   },
+   "history": [],
+   "from": 252000,
+   "to": 291650
+  },
+  {
+   "id": "lore-man-matje",
+   "kind": "character",
+   "base": {
+    "name": "Матье Орнибуций «Осторожный»",
+    "title": "Граф Мангениум (584–625)",
+    "image": "portraits/man-matje.webp",
+    "summary": "Служил Изольде I, которую боялся, и Доминику I, которого презирал.",
+    "body": "Служил Изольде I, которую боялся, и Доминику I, которого презирал. Завёл Вторую канцелярию: сначала просто архив чужих писем, чтобы знать, кого из соседей бояться.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Осторожный",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "mother": "lore-man-livia"
+    }
+   },
+   "history": [],
+   "from": 273500,
+   "to": 312400
+  },
+  {
+   "id": "lore-man-tibo",
+   "kind": "character",
+   "base": {
+    "name": "Тибо Орнибуций «Опекун»",
+    "title": "Граф Мангениум (625–668)",
+    "image": "portraits/man-tibo.webp",
+    "summary": "Сидел в опекунском совете при Октавиане II Дитя.",
+    "body": "Сидел в опекунском совете при Октавиане II Дитя. После короткого правления ребёнка оставил службу и уехал в Манген, ничего не объясняя. Вернулся только при Габриэле I, по его личной просьбе.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Опекун",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-matje"
+    }
+   },
+   "history": [],
+   "from": 297500,
+   "to": 333700
+  },
+  {
+   "id": "lore-man-giyom",
+   "kind": "character",
+   "base": {
+    "name": "Гийом Орнибуций «Постный»",
+    "title": "Граф Мангениум (668–722)",
+    "image": "portraits/man-giyom.webp",
+    "summary": "Благочестивый граф при благочестивом императоре.",
+    "body": "Благочестивый граф при благочестивом императоре. Выстроил Мангенский собор. Когда в 702 г. запретили торговлю людьми, исполнил закон первым в Империи и прошёлся по соседям с описью.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Постный",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-tibo"
+    }
+   },
+   "history": [],
+   "from": 319500,
+   "to": 360750
+  },
+  {
+   "id": "lore-man-klavdiy",
+   "kind": "character",
+   "base": {
+    "name": "Клавдий Орнибуций «Скучный»",
+    "title": "Граф Мангениум (722–771)",
+    "image": "portraits/man-klavdiy.webp",
+    "summary": "Тридцать лет верховный судья Империи.",
+    "body": "Тридцать лет верховный судья Империи. В хрониках о нём почти ничего нет, и в Мангене считают это лучшей похвалой.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Скучный",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-giyom"
+    }
+   },
+   "history": [],
+   "from": 346500,
+   "to": 385100
+  },
+  {
+   "id": "lore-man-zhanna",
+   "kind": "character",
+   "base": {
+    "name": "Жанна Орнибуция «Переписчица»",
+    "title": "Графиня Мангениум (771–822)",
+    "image": "portraits/man-zhanna.webp",
+    "summary": "При Маркусе II Картографе провела первую подворную опись графства и договорилась, что подати собирает сам граф, а в Хауссер идёт уже готовая сумма.",
+    "body": "При Маркусе II Картографе провела первую подворную опись графства и договорилась, что подати собирает сам граф, а в Хауссер идёт уже готовая сумма. Отсюда и начинается мангенская самостоятельность.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "nickname": "Переписчица",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-klavdiy"
+    }
+   },
+   "history": [],
+   "from": 368500,
+   "to": 410800
+  },
+  {
+   "id": "lore-man-lucian",
+   "kind": "character",
+   "base": {
+    "name": "Луциан Орнибуций «Красноречивый»",
+    "title": "Граф Мангениум (822–868)",
+    "image": "portraits/man-lucian.webp",
+    "summary": "Хранитель печати Себастьяна I и Конрада I.",
+    "body": "Хранитель печати Себастьяна I и Конрада I. Писал за них речи. Говорят, лучшие слова «Справедливого» принадлежат ему.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Красноречивый",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "mother": "lore-man-zhanna"
+    }
+   },
+   "history": [],
+   "from": 392500,
+   "to": 433550
+  },
+  {
+   "id": "lore-man-tit-2",
+   "kind": "character",
+   "base": {
+    "name": "Тит II Орнибуций «Спокойный»",
+    "title": "Граф Мангениум (868–907)",
+    "image": "portraits/man-tit-2.webp",
+    "summary": "Самое тихое правление в истории рода, совпавшее с последними спокойными годами Империи.",
+    "body": "Самое тихое правление в истории рода, совпавшее с последними спокойными годами Империи. Держал хлебные амбары полными, и над ним за это смеялись. Его амбары пригодились при Ульрихе I, когда начался голод.",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Спокойный",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-lucian"
+    }
+   },
+   "history": [],
+   "from": 420000,
+   "to": 453200
+  },
+  {
+   "id": "lore-man-marcell-2",
+   "kind": "character",
+   "base": {
+    "name": "Марцелл II Орнибуций «Подписавший»",
+    "title": "Граф Мангениум (907–971)",
+    "image": "portraits/man-marcell-2.webp",
+    "summary": "Хранитель печати Люция Кровавого.",
+    "body": "Хранитель печати Люция Кровавого. Когда император разогнал совет, остался при нём и скреплял печатью указы о казнях тридцать лет. На вопрос сына «зачем» ответил: «Служат не человеку, а престолу».",
+    "tags": [
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Подписавший",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-tit-2"
+    },
+    "secret": "Часть приговоров он терял, а осуждённых вывозил в Манген по подложным подорожным. Этот путь через заставы рода потом и стал дорогой для беженцев."
+   },
+   "history": [],
+   "from": 445000,
+   "to": 485100
+  },
+  {
+   "id": "lore-mangenium-now",
+   "kind": "character",
+   "base": {
+    "name": "Жан Наний Орнибуций",
+    "title": "Граф Мангениум (с 971)",
+    "image": "portraits/mangenium-now.webp",
+    "summary": "Сдержанный, терпеливый граф, принявший под свою руку верных Империи и не сказавший об этом ни слова вслух.",
+    "body": "Граф с двадцати трёх лет. Служил при дворе и знал Тейбера II ещё мальчиком. В 975 г. стоял за Корону, но своих людей без нужды на бойню не посылал. В 978 г., когда Корона уже проигрывала, закрыл заставы графства «до восстановления порядка» и открыл их только для своих. В 980 г. выполнил приказ императора и признал власть совета.\n\nСейчас ему шестьдесят два. Он тих, вежлив, ходит в простом тёмном кафтане с ключом на шее и каждый месяц лично выслушивает прошения. Совету пишет почтительно и платит в срок. Многие там считают его безобидным.",
+    "tags": [
+     "Великие дома",
+     "Графство Мангениум",
+     "правители",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "nickname": "Терпеливый",
+     "occupation": "Граф"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-marcell-2",
+     "spouse": "lore-man-adelina",
+     "religion": "lore-house-light"
+    },
+    "secret": "Граф не простил революцию и не собирается. Вся его политика — выиграть время: сгладить отношения с советом, накопить силы, тихо довести автономию до полной независимости, а затем вернуть страну к истокам."
+   },
+   "history": [],
+   "from": 473500,
+   "to": null
+  },
+  {
+   "id": "lore-man-adelina",
+   "kind": "character",
+   "base": {
+    "name": "Аделина Орнибуция",
+    "title": "Графиня, урождённая Райнхольд",
+    "image": "portraits/man-adelina.webp",
+    "summary": "Из воинского дома Райнхольд, принесла в Манген его верность Короне и его потери.",
+    "body": "Из воинского дома Райнхольд, принесла в Манген его верность Короне и его потери. Ведает госпиталями и вдовьими домами, куда идут беженцы.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "occupation": "Графиня"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "spouse": "lore-mangenium-now"
+    }
+   },
+   "history": [],
+   "from": 477000,
+   "to": null
+  },
+  {
+   "id": "lore-man-marcell-3",
+   "kind": "character",
+   "base": {
+    "name": "Марцелл Орнибуций",
+    "title": "Наследник графа",
+    "image": "portraits/man-marcell-3.webp",
+    "summary": "Родился в первый год войны, вырос среди беженцев.",
+    "body": "Родился в первый год войны, вырос среди беженцев. Сдержан, как отец, но не хочет ждать так долго.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Наследник графа"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-mangenium-now"
+    },
+    "secret": "Считает, что отец опоздает с независимостью, и тайно встречается с офицерами маршала."
+   },
+   "history": [],
+   "from": 487500,
+   "to": null
+  },
+  {
+   "id": "lore-man-mariana",
+   "kind": "character",
+   "base": {
+    "name": "Мариана Орнибуция",
+    "title": "Жена наследника",
+    "image": "portraits/man-mariana.webp",
+    "summary": "Дочь чиновника-беженца из Хауссера: брак нарочно заключён не с великим домом, чтобы совету было не на что смотреть..",
+    "body": "Дочь чиновника-беженца из Хауссера: брак нарочно заключён не с великим домом, чтобы совету было не на что смотреть.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "occupation": "Жена наследника"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "spouse": "lore-man-marcell-3"
+    }
+   },
+   "history": [],
+   "from": 490000,
+   "to": null
+  },
+  {
+   "id": "lore-man-zhan-mal",
+   "kind": "character",
+   "base": {
+    "name": "Жан Орнибуций",
+    "title": "Внук графа",
+    "image": "portraits/man-zhan-mal.webp",
+    "summary": "Шестилетний мальчик, которого в Мангене зовут Малым Ключником..",
+    "body": "Шестилетний мальчик, которого в Мангене зовут Малым Ключником.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Внук графа"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-marcell-3"
+    }
+   },
+   "history": [],
+   "from": 501500,
+   "to": null
+  },
+  {
+   "id": "lore-man-klara",
+   "kind": "character",
+   "base": {
+    "name": "Клара Орнибуция",
+    "title": "Дочь графа, почётная гостья в Хауссере",
+    "image": "portraits/man-klara.webp",
+    "summary": "С десяти лет живёт при дворе Хауссера, по сути заложница совета.",
+    "body": "С десяти лет живёт при дворе Хауссера, по сути заложница совета. Умна, приветлива и всем там нравится.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "occupation": "Дочь графа"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-mangenium-now"
+    },
+    "secret": "Переписывается с отцом простыми письмами о погоде и рукоделии. Вторая канцелярия читает в них, кто в совете о чём договорился."
+   },
+   "history": [],
+   "from": 489500,
+   "to": null
+  },
+  {
+   "id": "lore-man-sever-2",
+   "kind": "character",
+   "base": {
+    "name": "Север Орнибуций",
+    "title": "Младший сын графа, капитан Стражи Граднеца",
+    "image": "portraits/man-sever-2.webp",
+    "summary": "Прямой и шумный младший сын.",
+    "body": "Прямой и шумный младший сын. Любит горы и солдат, нелюбим при дворе за то, что всё говорит вслух.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Младший сын графа"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-mangenium-now"
+    }
+   },
+   "history": [],
+   "from": 493000,
+   "to": null
+  },
+  {
+   "id": "lore-man-kassiy-2",
+   "kind": "character",
+   "base": {
+    "name": "Кассий Орнибуций",
+    "title": "Брат графа, хранитель печати",
+    "image": "portraits/man-kassiy-2.webp",
+    "summary": "Младший брат Жана, шестой из Совета Десяти графа..",
+    "body": "Младший брат Жана, шестой из Совета Десяти графа.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Брат графа"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-marcell-2"
+    },
+    "secret": "Хранит не только печать графа, но и подлинную малую печать императора, увезённую из Хауссера в 978 г."
+   },
+   "history": [],
+   "from": 475500,
+   "to": null
+  },
+  {
+   "id": "lore-man-lavinia-2",
+   "kind": "character",
+   "base": {
+    "name": "Лавиния Орнибуция",
+    "title": "Старшая сестра графа",
+    "image": "portraits/man-lavinia-2.webp",
+    "summary": "Настоятельница мангенского приюта при соборе.",
+    "body": "Настоятельница мангенского приюта при соборе. Первая начала принимать беженцев в 976 г., когда брат ещё не решил, можно ли.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "occupation": "Старшая сестра графа"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-marcell-2"
+    }
+   },
+   "history": [],
+   "from": 472000,
+   "to": 501100
+  },
+  {
+   "id": "lore-man-tibo-2",
+   "kind": "character",
+   "base": {
+    "name": "Тибо Орнибуций-Нарни",
+    "title": "Младшая ветвь, наместник Нарни",
+    "image": "portraits/man-tibo-2.webp",
+    "summary": "Старший сводный брат графа Жана.",
+    "body": "Старший сводный брат графа Жана. Отказался от графства в пользу младшего, взял Нарни и основал ветвь, верную старшей линии без всяких условий.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Младшая ветвь"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-marcell-2"
+    }
+   },
+   "history": [],
+   "from": 462000,
+   "to": 498650
+  },
+  {
+   "id": "lore-man-hektor-2",
+   "kind": "character",
+   "base": {
+    "name": "Гектор Орнибуций-Нарни",
+    "title": "Наместник Нарни",
+    "image": "portraits/man-hektor-2.webp",
+    "summary": "Спокойный хозяин северной житницы.",
+    "body": "Спокойный хозяин северной житницы. Амбары Нарни кормят половину беженцев графства.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Наместник Нарни"
+    },
+    "links": {
+     "dynasty": "lore-house-mangenium",
+     "father": "lore-man-tibo-2"
+    }
+   },
+   "history": [],
+   "from": 478500,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-chancellor",
+   "kind": "character",
+   "base": {
+    "name": "Лоренц Виттих",
+    "title": "Канцлер Совета Десяти графа",
+    "image": "portraits/man-c-chancellor.webp",
+    "summary": "Служил в имперской канцелярии и приехал в 978 г.",
+    "body": "Служил в имперской канцелярии и приехал в 978 г. с тремя телегами документов. Ведёт все дела с Верховным советом и умеет писать о независимости так, что звучит как прошение о верности.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Канцлер"
+    },
+    "links": {},
+    "secret": "Имеет готовый акт о независимости графства. Дату вписать недолго."
+   },
+   "history": [],
+   "from": 472000,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-treasurer",
+   "kind": "character",
+   "base": {
+    "name": "Матильда Кронберг",
+    "title": "Казначей Совета Десяти графа",
+    "image": "portraits/man-c-treasurer.webp",
+    "summary": "Считает каждый грош и платит дань совету в срок и полностью, а потом жалуется на бедность.",
+    "body": "Считает каждый грош и платит дань совету в срок и полностью, а потом жалуется на бедность. Настоящие доходы графства знают только она и граф.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "occupation": "Казначей"
+    },
+    "links": {},
+    "secret": "Половина «обедневшего» бюджета уходит на склады в горах Граднеца."
+   },
+   "history": [],
+   "from": 478500,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-marshal",
+   "kind": "character",
+   "base": {
+    "name": "Аларих Штальберг",
+    "title": "Маршал Совета Десяти графа",
+    "image": "portraits/man-c-marshal.webp",
+    "summary": "Бывший легат той половины VIII Конного легиона, что в 975 г.",
+    "body": "Бывший легат той половины VIII Конного легиона, что в 975 г. ушла к Короне. В 980 г. приказ сложить оружие выполнил, а солдат отпустил только сюда. Командует Графской стражей.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Маршал"
+    },
+    "links": {},
+    "secret": "Его ветераны живут по деревням как поселенцы, держа оружие в амбарах. По сигналу из шести тысяч стражи станет пятнадцать тысяч."
+   },
+   "history": [],
+   "from": 474500,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-judge",
+   "kind": "character",
+   "base": {
+    "name": "Теодор Ланг",
+    "title": "Верховный судья Совета Десяти графа",
+    "image": "portraits/man-c-judge.webp",
+    "summary": "Самый старый законник Лоры, судит только по старому имперскому кодексу, без поправок после 975 г.",
+    "body": "Самый старый законник Лоры, судит только по старому имперскому кодексу, без поправок после 975 г. Считает это не политикой, а аккуратностью.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Верховный судья"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 469500,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-spymaster",
+   "kind": "character",
+   "base": {
+    "name": "Элиза Рот",
+    "title": "Глава Второй канцелярии Совета Десяти графа",
+    "image": "portraits/man-c-spymaster.webp",
+    "summary": "Дочь казнённого в Республике чиновника.",
+    "body": "Дочь казнённого в Республике чиновника. На бумаге ведает архивами, на деле читает чужую почту от Хауссера до Тиррита. С ней вежливы все.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "occupation": "Глава Второй канцелярии"
+    },
+    "links": {},
+    "secret": "Держит людей в канцелярии Верховного совета и узнаёт о ревизорах раньше самих ревизоров."
+   },
+   "history": [],
+   "from": 480500,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-roads",
+   "kind": "character",
+   "base": {
+    "name": "Гуго Майер",
+    "title": "Министр дорог Совета Десяти графа",
+    "image": "portraits/man-c-roads.webp",
+    "summary": "Держит тракты и заставы графства.",
+    "body": "Держит тракты и заставы графства. Именно его люди решают, кто из едущих с севера и из Республики беженец, а кто шпион.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Министр дорог"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 479000,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-court",
+   "kind": "character",
+   "base": {
+    "name": "Виктория фон Альтбург",
+    "title": "Министр двора Совета Десяти графа",
+    "image": "portraits/man-c-court.webp",
+    "summary": "Устроила двор Мангена точно как прежний имперский: этикет, те же обращения, те же чины.",
+    "body": "Устроила двор Мангена точно как прежний имперский: этикет, те же обращения, те же чины. Для многих беженцев это первое место за тридцать лет, где всё снова как надо.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Женский",
+     "occupation": "Министр двора"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 482500,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-envoy",
+   "kind": "character",
+   "base": {
+    "name": "Амброзий Линдт",
+    "title": "Посланник при Сантарее Совета Десяти графа",
+    "image": "portraits/man-c-envoy.webp",
+    "summary": "Прелат и дипломат.",
+    "body": "Прелат и дипломат. Держит добрые отношения с Святым престолом, чтобы в нужный день графству было кому сказать доброе слово.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "Посланник при Сантарее"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 473500,
+   "to": null
+  },
+  {
+   "id": "lore-man-c-tenth",
+   "kind": "character",
+   "base": {
+    "name": "Ансельм Граве",
+    "title": "«Десятый» Совета Десяти графа",
+    "image": "portraits/man-c-tenth.webp",
+    "summary": "Кого граф пожелает: сейчас это семидесятишестилетний библиотекарь.",
+    "body": "Кого граф пожелает: сейчас это семидесятишестилетний библиотекарь. Был в Совете Десяти ещё при Люции и Тейбере II, последний из тех, кто ещё жив.",
+    "tags": [
+     "Графство Мангениум",
+     "советники",
+     "черновик"
+    ],
+    "props": {
+     "race": "Человек (имперец)",
+     "gender": "Мужской",
+     "occupation": "«Десятый»"
+    },
+    "links": {},
+    "secret": "Через него идут письма в Дистрикт Альфа, к Тейберу II. Император на них почти не отвечает, но и не запрещает."
+   },
+   "history": [],
+   "from": 466500,
+   "to": null
+  },
+  {
+   "id": "lore-man-council",
+   "kind": "organization",
+   "base": {
+    "name": "Совет Десяти графа",
+    "title": "Единственный орган власти Графства Мангениум при графе",
+    "image": "",
+    "summary": "Парламента нет. Десять советников назначает сам граф — те же десять мест, что были у императоров до 975 г.",
+    "body": "## Как устроен\nГраф восстановил [[Совет Десяти]] в том виде, в каком тот был при императорах: канцлер, казначей, маршал, верховный судья, глава тайной службы, хранитель печати, министр дорог, министр двора, посланник при Сантарее и «десятый», кого граф пожелает. Советники не обязаны быть знатью. Нет ни выборов, ни фракций, ни голосований: граф выслушивает и решает сам.\n## Лестница графства\n| Ступень | Сколько | Что значит |\n|---|---|---|\n| Граф | 1 | Вся власть, но в старых рамках: законы подписывает сам и сам принимает прошения раз в месяц. |\n| Совет Десяти | 10 | Назначает граф, можно снять в любой день. Никаких выборов и фракций. |\n| Наместники городов | 4 | Манген, Ним, Нарни, Граднец. Отвечают перед графом и канцлером. |\n| Кастеляны и старая знать | около 40 | Держат замки и округа, служат как при Империи. |\n| Имперские чиновники-беженцы | около 3 тысяч | Канцелярии укомплектованы так, будто ещё правит император. |\n| Горожане и крестьяне | почти все | Обычная имперская жизнь: подати, тракты, приход, рынок. |\n| Принятые | около 140 тысяч | Беженцы с 975 г. и их дети. Получают землю или службу в обмен на присягу графу. |",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Государственный орган",
+     "headquarters": "Графский дворец, Манген",
+     "leader": "Граф Жан Наний Орнибуций",
+     "members": "10"
+    },
+    "links": {
+     "leader": "lore-mangenium-now"
+    },
+    "secret": "Совету в Хауссере сообщают, что это «домашние помощники графа». Настоящий смысл в том, что в Мангене уже работает готовое правительство на случай независимости или возвращения Короны.",
+    "advisors": [
+     {
+      "id": "lore-man-c-chancellor",
+      "office": "Канцлер"
+     },
+     {
+      "id": "lore-man-c-treasurer",
+      "office": "Казначей"
+     },
+     {
+      "id": "lore-man-c-marshal",
+      "office": "Маршал"
+     },
+     {
+      "id": "lore-man-c-judge",
+      "office": "Верховный судья"
+     },
+     {
+      "id": "lore-man-c-spymaster",
+      "office": "Глава Второй канцелярии"
+     },
+     {
+      "id": "lore-man-kassiy-2",
+      "office": "Хранитель печати"
+     },
+     {
+      "id": "lore-man-c-roads",
+      "office": "Министр дорог"
+     },
+     {
+      "id": "lore-man-c-court",
+      "office": "Министр двора"
+     },
+     {
+      "id": "lore-man-c-envoy",
+      "office": "Посланник при Сантарее"
+     },
+     {
+      "id": "lore-man-c-tenth",
+      "office": "«Десятый»"
+     }
+    ]
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "lore-man-guard",
+   "kind": "organization",
+   "base": {
+    "name": "Графская стража",
+    "title": "Войско Графства Мангениум",
+    "image": "",
+    "summary": "Шесть тысяч на бумаге: заставы, тракты, городские гарнизоны.",
+    "body": "По вассальной грамоте 980 г. графству дозволена только стража для порядка на дорогах. Устав, чины и выучка при этом взяты у старых легионов; многие офицеры служили у Короны.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик",
+     "армия"
+    ],
+    "props": {
+     "type": "Армия",
+     "headquarters": "Граднец",
+     "leader": "Маршал Аларих Штальберг",
+     "members": "около 6 тысяч"
+    },
+    "links": {
+     "leader": "lore-man-c-marshal"
+    },
+    "secret": "Около девяти тысяч ветеранов живут по деревням поселенцами, а в горах под Граднецом устроены склады. Настоящая сила графства примерно в два с половиной раза больше заявленной."
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "lore-man-office",
+   "kind": "organization",
+   "base": {
+    "name": "Вторая канцелярия",
+    "title": "Тихая служба графа",
+    "image": "",
+    "summary": "На бумаге архив. На деле читает чужую почту и отсеивает шпионов среди беженцев.",
+    "body": "Основана Матье Осторожным как архив чужих писем. Никого не пытает и не убивает без крайней нужды: мангенский стиль в том, чтобы знать заранее и ничего не делать, пока не придётся.",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Тайная служба",
+     "headquarters": "Манген, у собора",
+     "leader": "Элиза Рот"
+    },
+    "links": {
+     "leader": "lore-man-c-spymaster"
+    },
+    "secret": "Главная забота канцелярии — чтобы совет ничего не узнал о складах в Граднеце и письмах в Дистрикт Альфа."
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "lore-man-refuge",
+   "kind": "organization",
+   "base": {
+    "name": "Дом принятых",
+    "title": "Убежище верных Империи",
+    "image": "",
+    "summary": "Принимает тех, кто служил Короне и не бежал на север: чиновников, офицеров, семьи, казнённых в Республике.",
+    "body": "## Кто едет\nНе те, кто ушёл на север к Имперским изгнанникам, а люди умереннее: те, кому нельзя жить в Республике и не хочется жить при совете. Началось с приюта Лавинии Орнибуции при соборе в 976 г.\n## Условия\nПрисяга графу, отказ от мести на территории графства и служба или земля по способностям. Клятву никто не называет клятвой против совета: там сказано только о «старых законах».",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Управление",
+     "headquarters": "Ним",
+     "leader": "Графиня Аделина Орнибуция",
+     "members": "около 140 тысяч принятых с 975 г."
+    },
+    "links": {
+     "leader": "lore-man-adelina"
+    },
+    "secret": "Каждый принятый проходит через Вторую канцелярию. Лучших офицеров и чиновников отбирают для будущего правительства."
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "lore-man-how",
+   "kind": "note",
+   "base": {
+    "name": "Как устроено Графство Мангениум",
+    "title": "Автономия внутри Империи, старые законы, тихая подготовка",
+    "image": "",
+    "summary": "Как графство остаётся в юрисдикции Империи и при этом идёт к независимости.",
+    "body": "## На бумаге\nПрямой вассал Империи с 980 г.: дань, присяга совету, никакого войска, кроме стражи.\n## На деле\nАвтономия: своя казна, свои суды, свои заставы, свои чиновники. Влияние дома здесь настолько старое, что назначенным из Хауссера нечем управлять: все должности уже заняты людьми графа, а подати граф собирает сам со времён Жанны Переписчицы.\n## Старые законы\nСуды работают по имперскому кодексу без поправок после 975 г. Двор, чины и обращения — как при императорах. Это не бунт: совет никогда не запрещал уважать старину.\n## Жизнь\nСдержанная, обычная имперская страна. Без пышности, без ярких особенностей. Дороги чинят, подати умеренные, хлеб есть. Беженцы говорят: «как было до войны».\n## Отношения с советом\nГраф сглаживает всё, что можно: дань в срок, поздравления, недорогие займы нужным людям, дочь при дворе в Хауссере. Пока графство не наберётся сил, ссориться нельзя.",
+    "tags": [
+     "Графство Мангениум",
+     "законы",
+     "черновик"
+    ],
+    "props": {},
+    "links": {},
+    "secret": "Срок, который граф считает для себя: когда склады Граднеца будут полны, а Верховный совет занят чем-то другим, например новым кризисом с Короной Аргус или Республикой."
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-keys",
+   "kind": "event",
+   "base": {
+    "name": "Девять дней ключника",
+    "title": "",
+    "image": "",
+    "summary": "Север Орнибуций держит ворота Мангена и передаёт ключи Тейберу лично из рук в руки.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Присяга"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 62300,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-title",
+   "kind": "event",
+   "base": {
+    "name": "Графский титул",
+    "title": "",
+    "image": "",
+    "summary": "Флавия Хранительница спасает императорскую печать из пожара; род становится графами Мангениум.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Титул"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 105500,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-census",
+   "kind": "event",
+   "base": {
+    "name": "Опись Жанны",
+    "title": "",
+    "image": "",
+    "summary": "Граф сам собирает подати и отправляет в Хауссер готовую сумму: начало самостоятельности.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Закон"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 394500,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-refuge",
+   "kind": "event",
+   "base": {
+    "name": "Приют при соборе",
+    "title": "",
+    "image": "",
+    "summary": "Лавиния Орнибуция начинает принимать беженцев гражданской войны.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Милосердие"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 487500,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-gates",
+   "kind": "event",
+   "base": {
+    "name": "Закрытые заставы",
+    "title": "",
+    "image": "",
+    "summary": "Граф Жан закрывает заставы «до восстановления порядка» и пропускает только своих. На деле это начало автономии.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Политика"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 488500,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-oath",
+   "kind": "event",
+   "base": {
+    "name": "Присяга совету",
+    "title": "",
+    "image": "",
+    "summary": "По приказу Тейбера II граф признаёт власть совета и становится прямым вассалом Империи.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Политика"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 489550,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-council",
+   "kind": "event",
+   "base": {
+    "name": "Совет Десяти в Мангене",
+    "title": "",
+    "image": "",
+    "summary": "Граф созывает при себе десять советников по образцу императорских.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Реформа"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 490000,
+   "to": null
+  },
+  {
+   "id": "lore-man-ev-klara",
+   "kind": "event",
+   "base": {
+    "name": "Клара едет в Хауссер",
+    "title": "",
+    "image": "",
+    "summary": "Десятилетняя дочь графа становится почётной гостьей двора: залог дружбы с советом.",
+    "body": "",
+    "tags": [
+     "Графство Мангениум",
+     "черновик"
+    ],
+    "props": {
+     "type": "Дипломатия"
+    },
+    "links": {}
+   },
+   "history": [],
+   "from": 494500,
+   "to": null
   },
   {
    "id": "lore-battle-magpie-ford",
@@ -126443,7 +131435,9 @@
     "x": 3381,
     "y": 1573
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ульгард — горный замок с небольшим гарнизоном. Живёт тем, что есть вокруг: овцы, железная руда. Кастелян Эмиль Граве служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-ulgard"
   },
   {
    "id": 1468,
@@ -127106,7 +132100,9 @@
     "x": 3457,
     "y": 1603
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Фальинхаузен — замок старого кастеляна. Живёт тем, что есть вокруг: камень, железная руда. Кастелян Бернард Лихт служит графу, как его предки служили императорам. Староста раз в год ездит в Манген на День прошений и всякий раз возвращается довольным.\n\n_черновик_",
+   "cityMapId": "map-city-falinhauzen"
   },
   {
    "id": 1484,
@@ -128591,7 +133587,9 @@
     "x": 3305,
     "y": 1635
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Кельштадт — сторожевой замок на тракте. Живёт тем, что есть вокруг: уголь, железная руда. Кастелян Филипп Пфайль служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-kelshtadt"
   },
   {
    "id": 1517,
@@ -129642,7 +134640,9 @@
     "x": 3375,
     "y": 1641
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Веденрит — деревня с каменной церковью. Живёт тем, что есть вокруг: уголь. Старостой здесь Гуго Майер. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-vedenrit"
   },
   {
    "id": 1541,
@@ -130488,7 +135488,9 @@
     "x": 2789,
     "y": 1649
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Митердорф — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: пшеница, огороды. Старостой здесь Рудольф Хольц.\n\n_черновик_",
+   "cityMapId": "map-city-miterdorf"
   },
   {
    "id": 1561,
@@ -130965,7 +135967,9 @@
     "x": 2733,
     "y": 1655
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Оберинбах — рыбацкий посёлок с низкими домами. Живёт тем, что есть вокруг: пшеница, ячмень. Старостой здесь Стефан Граве.\n\n_черновик_",
+   "cityMapId": "map-city-oberinbah"
   },
   {
    "id": 1572,
@@ -131003,7 +136007,9 @@
     "x": 2819,
     "y": 1673
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ливау — опрятная деревня у тракта. Живёт тем, что есть вокруг: огороды, скот. Старостой здесь Филипп Ланг. Прошлым летом приезжал ревизор из Хауссера. Его хорошо накормили и ничего особенного не показали.\n\n_черновик_",
+   "cityMapId": "map-city-livau"
   },
   {
    "id": 1573,
@@ -131205,7 +136211,9 @@
     "x": 3263,
     "y": 1675
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Дорнлаге — тихая деревня среди полей. Живёт тем, что есть вокруг: железная руда. Старостой здесь Рудольф Зоммер.\n\n_черновик_",
+   "cityMapId": "map-city-dornlage"
   },
   {
    "id": 1578,
@@ -131243,7 +136251,9 @@
     "x": 3515,
     "y": 1679
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Лауенталь — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: уголь. Старостой здесь Стефан Бауэр.\n\n_черновик_",
+   "cityMapId": "map-city-lauental"
   },
   {
    "id": 1579,
@@ -131519,7 +136529,9 @@
     "x": 3451,
     "y": 1677
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Морерштейн — деревня с каменной церковью. Живёт тем, что есть вокруг: овцы, железная руда. Старостой здесь Рудольф Пфайль.\n\n_черновик_",
+   "cityMapId": "map-city-morershtein"
   },
   {
    "id": 1585,
@@ -131559,7 +136571,9 @@
     "x": 3033,
     "y": 1675
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Брукельвальд — тихая деревня среди полей. Живёт тем, что есть вокруг: овцы, соль. Старостой здесь Стефан Бауэр. Дорогу здесь чинят вовремя: за этим следит министр дорог.\n\n_черновик_",
+   "cityMapId": "map-city-brukelvald"
   },
   {
    "id": 1586,
@@ -132093,7 +137107,9 @@
     "x": 3207,
     "y": 1703
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Бруквальд — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: дуб, смола. Старостой здесь Николас Шульц.\n\n_черновик_",
+   "cityMapId": "map-city-brukvald"
   },
   {
    "id": 1598,
@@ -132797,7 +137813,9 @@
     "x": 2765,
     "y": 1705
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Эберельштейн — замок старого кастеляна. Живёт тем, что есть вокруг: железная руда, овцы. Кастелян Феликс Бауэр служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-eberelshtein"
   },
   {
    "id": 1614,
@@ -132936,7 +137954,9 @@
     "x": 3375,
     "y": 1713
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Росинведель — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: железная руда, овцы. Старостой здесь Роланд Рихтер.\n\n_черновик_",
+   "cityMapId": "map-city-rosinvedel"
   },
   {
    "id": 1617,
@@ -133197,7 +138217,9 @@
     "x": 3075,
     "y": 1709
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Грисенбрук — храмовый городок с монастырём. Живёт тем, что есть вокруг: пшеница, скот. Настоятелем здесь отец Антон Дорн. Дорогу здесь чинят вовремя: за этим следит министр дорог.\n\n_черновик_",
+   "cityMapId": "map-city-grisenbruk"
   },
   {
    "id": 1623,
@@ -133325,7 +138347,9 @@
     "x": 3137,
     "y": 1729
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Брукбрук — опрятная деревня у тракта. Живёт тем, что есть вокруг: лён, скот. Старостой здесь Эмиль Кессель. Староста раз в год ездит в Манген на День прошений и всякий раз возвращается довольным.\n\n_черновик_",
+   "cityMapId": "map-city-brukbruk"
   },
   {
    "id": 1626,
@@ -133444,7 +138468,9 @@
     "x": 3325,
     "y": 1751
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эшинталь — сторожевой замок на тракте. Живёт тем, что есть вокруг: железная руда. Кастелян Якоб Хольц служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-eshintal"
   },
   {
    "id": 1629,
@@ -133618,7 +138644,9 @@
     "x": 2953,
     "y": 1725
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Хольцерхаузен — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: пшеница, лён. Старостой здесь Роланд Дорн. Дорогу здесь чинят вовремя: за этим следит министр дорог.\n\n_черновик_",
+   "cityMapId": "map-city-holtserhauzen"
   },
   {
    "id": 1633,
@@ -133781,7 +138809,9 @@
     "x": 2817,
     "y": 1729
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эберау — деревня с каменной церковью. Живёт тем, что есть вокруг: лён, ячмень. Старостой здесь Каспар Ланг.\n\n_черновик_",
+   "cityMapId": "map-city-eberau"
   },
   {
    "id": 1637,
@@ -133821,7 +138851,7 @@
   },
   {
    "id": 1638,
-   "name": "Тальбах",
+   "name": "Нарни",
    "px": 1021,
    "x": 3013,
    "y": 1726,
@@ -133851,11 +138881,13 @@
     ]
    ],
    "settlement": {
-    "type": "town",
+    "type": "city",
     "x": 3015,
     "y": 1729
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Нарни — северная житница графства, город амбаров среди пшеничных равнин. Держит его младшая ветвь Орнибуций-Нарни, наместник Гектор. Запасов зерна здесь хватает, чтобы кормить всех принятых, и это предмет особой гордости.\n\n_черновик_",
+   "cityMapId": "map-city-narni"
   },
   {
    "id": 1639,
@@ -134304,7 +139336,9 @@
     "x": 2873,
     "y": 1737
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Фальталь — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: пшеница, скот. Старостой здесь Стефан Ротхе. Отставной сержант Короны учит мальчишек строю по воскресеньям: говорит, что для порядка.\n\n_черновик_",
+   "cityMapId": "map-city-faltal"
   },
   {
    "id": 1649,
@@ -134713,7 +139747,7 @@
   },
   {
    "id": 1658,
-   "name": "Грисинштадт",
+   "name": "Граднец",
    "px": 1359,
    "x": 3249,
    "y": 1759,
@@ -134744,11 +139778,13 @@
     ]
    ],
    "settlement": {
-    "type": "castle",
+    "type": "city",
     "x": 3243,
     "y": 1761
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Граднец — горный город-крепость на востоке графства, сторожит перевалы к Империи. Здесь штаб Графской стражи, каменоломни и рудные дворы. Капитаном стражи служит младший сын графа Север.\n\n_черновик_",
+   "cityMapId": "map-city-gradnets"
   },
   {
    "id": 1659,
@@ -134788,7 +139824,9 @@
     "x": 3409,
     "y": 1763
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Морингард — горный замок с небольшим гарнизоном. Живёт тем, что есть вокруг: овцы. Кастелян Теодор Зоммер служит графу, как его предки служили императорам. Дорогу здесь чинят вовремя: за этим следит министр дорог.\n\n_черновик_",
+   "cityMapId": "map-city-moringard"
   },
   {
    "id": 1660,
@@ -135427,7 +140465,9 @@
     "x": 3073,
     "y": 1765
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Альтбург — опрятная деревня у тракта. Живёт тем, что есть вокруг: ячмень, скот. Старостой здесь Вильгельм Хольц.\n\n_черновик_",
+   "cityMapId": "map-city-altburg"
   },
   {
    "id": 1675,
@@ -135936,7 +140976,9 @@
     "x": 3165,
     "y": 1781
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Норельхаузен — сторожевой замок на тракте. Живёт тем, что есть вокруг: камень. Кастелян Вильгельм Дорн служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-norelhauzen"
   },
   {
    "id": 1686,
@@ -136114,7 +141156,9 @@
     "x": 2767,
     "y": 1771
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Фрейинфельд — тихая деревня среди полей. Живёт тем, что есть вокруг: камень, уголь. Старостой здесь Николас Штерн. Отставной сержант Короны учит мальчишек строю по воскресеньям: говорит, что для порядка.\n\n_черновик_",
+   "cityMapId": "map-city-freiinfeld"
   },
   {
    "id": 1690,
@@ -136335,7 +141379,9 @@
     "x": 2887,
     "y": 1779
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Герведель — деревня с каменной церковью. Живёт тем, что есть вокруг: скот, лён. Старостой здесь Лоренц Ланг.\n\n_черновик_",
+   "cityMapId": "map-city-gervedel"
   },
   {
    "id": 1695,
@@ -136559,7 +141605,9 @@
     "x": 2997,
     "y": 1797
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Норхольм — опрятная деревня у тракта. Живёт тем, что есть вокруг: лес на сплав, мёд. Старостой здесь Якоб Ротхе. Дорогу здесь чинят вовремя: за этим следит министр дорог.\n\n_черновик_",
+   "cityMapId": "map-city-norholm"
   },
   {
    "id": 1700,
@@ -136596,7 +141644,9 @@
     "x": 2947,
     "y": 1779
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эльмерталь — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: лес на сплав, дичь. Старостой здесь Вильгельм Пфайль. Сюда приехала вдова имперского чиновника и учит детей грамоте.\n\n_черновик_",
+   "cityMapId": "map-city-elmertal"
   },
   {
    "id": 1701,
@@ -137052,7 +142102,9 @@
     "x": 2815,
     "y": 1799
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Орштейн — деревня с каменной церковью. Живёт тем, что есть вокруг: ячмень, огороды. Старостой здесь Теодор Майер. Здесь осели беженцы из Эшланда: они построили новую улицу и всё ещё называют её по старому городу.\n\n_черновик_",
+   "cityMapId": "map-city-orshtein"
   },
   {
    "id": 1711,
@@ -137090,7 +142142,9 @@
     "x": 3355,
     "y": 1803
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Морвальд — тихая деревня среди полей. Живёт тем, что есть вокруг: уголь, железная руда. Старостой здесь Стефан Ланг. Староста раз в год ездит в Манген на День прошений и всякий раз возвращается довольным.\n\n_черновик_",
+   "cityMapId": "map-city-morvald"
   },
   {
    "id": 1712,
@@ -138075,7 +143129,9 @@
     "x": 3055,
     "y": 1819
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эльмельрит — торговый городок на тракте. Живёт тем, что есть вокруг: кожи, соль. Городом заведует бургомистр Вильгельм Виттих. Здесь осели беженцы из Эшланда: они построили новую улицу и всё ещё называют её по старому городу.\n\n_черновик_",
+   "cityMapId": "map-city-elmelrit"
   },
   {
    "id": 1735,
@@ -138432,7 +143488,7 @@
   },
   {
    "id": 1743,
-   "name": "Норельхайм",
+   "name": "Манген",
    "px": 1232,
    "x": 2922,
    "y": 1836,
@@ -138463,11 +143519,13 @@
     ]
    ],
    "settlement": {
-    "type": "town",
+    "type": "city",
     "x": 2927,
     "y": 1837
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Манген — столица Графства Мангениум, старый город за двойной стеной у графского дворца. Тихий, опрятный и подчёркнуто имперский: те же вывески, чины и обращения, что были в Хауссере до войны. Правит граф Жан Наний Орнибуций, при нём заседает Совет Десяти. Стоит Мангенский собор, у которого Лавиния Орнибуция когда-то приняла первых беженцев.\n\n_черновик_",
+   "cityMapId": "map-city-mangen"
   },
   {
    "id": 1744,
@@ -138507,7 +143565,9 @@
     "x": 3287,
     "y": 1835
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Оберлаге — горный замок с небольшим гарнизоном. Живёт тем, что есть вокруг: овцы, уголь. Кастелян Феликс Виттих служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-oberlage"
   },
   {
    "id": 1745,
@@ -138866,7 +143926,9 @@
     "x": 2859,
     "y": 1833
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Геренберг — опрятная деревня у тракта. Живёт тем, что есть вокруг: лес на сплав, мёд. Старостой здесь Рудольф Граве.\n\n_черновик_",
+   "cityMapId": "map-city-gerenberg"
   },
   {
    "id": 1753,
@@ -139149,7 +144211,9 @@
     "x": 3125,
     "y": 1843
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Грисервейлер — опрятная деревня у тракта. Живёт тем, что есть вокруг: ячмень, лён. Старостой здесь Рудольф Ланг.\n\n_черновик_",
+   "cityMapId": "map-city-griserveiler"
   },
   {
    "id": 1760,
@@ -139233,7 +144297,9 @@
     "x": 3195,
     "y": 1841
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Кирхенрит — опрятная деревня у тракта. Живёт тем, что есть вокруг: железная руда. Старостой здесь Теодор Граве.\n\n_черновик_",
+   "cityMapId": "map-city-kirhenrit"
   },
   {
    "id": 1762,
@@ -139438,7 +144504,9 @@
     "x": 2747,
     "y": 1825
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Тирдорф — деревня с каменной церковью. Живёт тем, что есть вокруг: камень. Старостой здесь Каспар Лихт. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-tirdorf"
   },
   {
    "id": 1767,
@@ -139869,7 +144937,9 @@
     "x": 3385,
     "y": 1855
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Лауельхайм — деревня с каменной церковью. Живёт тем, что есть вокруг: уголь, железная руда. Старостой здесь Николас Шульц.\n\n_черновик_",
+   "cityMapId": "map-city-lauelhaim"
   },
   {
    "id": 1777,
@@ -140408,7 +145478,9 @@
     "x": 2807,
     "y": 1859
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Нейельвейлер — торговый городок на тракте. Живёт тем, что есть вокруг: дуб, дичь. Городом заведует бургомистр Рудольф Пфайль.\n\n_черновик_",
+   "cityMapId": "map-city-neielveiler"
   },
   {
    "id": 1789,
@@ -140570,7 +145642,9 @@
     "x": 2753,
     "y": 1871
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Линерфельд — опрятная деревня у тракта. Живёт тем, что есть вокруг: мёд. Старостой здесь Николас Дорн.\n\n_черновик_",
+   "cityMapId": "map-city-linerfeld"
   },
   {
    "id": 1793,
@@ -140651,7 +145725,9 @@
     "x": 2987,
     "y": 1875
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эрельведель — храмовый городок с монастырём. Живёт тем, что есть вокруг: мёд, дичь. Настоятелем здесь отец Теодор Дорн. Прошлым летом приезжал ревизор из Хауссера. Его хорошо накормили и ничего особенного не показали.\n\n_черновик_",
+   "cityMapId": "map-city-erelvedel"
   },
   {
    "id": 1795,
@@ -140808,7 +145884,9 @@
     "x": 3331,
     "y": 1883
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ульинфельд — сторожевой замок на тракте. Живёт тем, что есть вокруг: овцы, железная руда. Кастелян Филипп Энгель служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-ulinfeld"
   },
   {
    "id": 1799,
@@ -141242,7 +146320,9 @@
     "x": 3055,
     "y": 1879
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Дорненхаузен — тихая деревня среди полей. Живёт тем, что есть вокруг: дичь, дуб. Старостой здесь Каспар Бауэр.\n\n_черновик_",
+   "cityMapId": "map-city-dornenhauzen"
   },
   {
    "id": 1809,
@@ -141282,7 +146362,9 @@
     "x": 3413,
     "y": 1899
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Висинберг — опрятная деревня у тракта. Живёт тем, что есть вокруг: овцы, уголь. Старостой здесь Гуго Хольц. Над дверью трактира всё ещё висит старый имперский герб, и никто его не снимает.\n\n_черновик_",
+   "cityMapId": "map-city-visinberg"
   },
   {
    "id": 1810,
@@ -141514,7 +146596,9 @@
     "x": 2855,
     "y": 1921
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Касерштадт — рыбацкая деревня у пристани. Живёт тем, что есть вокруг: смола, мёд. Старостой здесь Эмиль Кессель. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-kasershtadt"
   },
   {
    "id": 1815,
@@ -141553,7 +146637,9 @@
     "x": 3217,
     "y": 1889
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Кирхенвейлер — опрятная деревня у тракта. Живёт тем, что есть вокруг: дичь, лес на сплав. Старостой здесь Роланд Рихтер. Здесь осели беженцы из Эшланда: они построили новую улицу и всё ещё называют её по старому городу.\n\n_черновик_",
+   "cityMapId": "map-city-kirhenveiler"
   },
   {
    "id": 1816,
@@ -141731,7 +146817,9 @@
     "x": 3269,
     "y": 1901
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ведельвейлер — деревня с каменной церковью. Живёт тем, что есть вокруг: камень, железная руда. Старостой здесь Антон Вебер.\n\n_черновик_",
+   "cityMapId": "map-city-vedelveiler"
   },
   {
    "id": 1820,
@@ -141763,7 +146851,9 @@
     "x": 2453,
     "y": 1877
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Штайнмюнде — небольшой порт с графской таможней. Живёт тем, что есть вокруг: уголь, овцы. Портом заведует таможенный мастер Николас Шульц.\n\n_черновик_",
+   "cityMapId": "map-city-shtainmyunde"
   },
   {
    "id": 1821,
@@ -141802,7 +146892,9 @@
     "x": 3165,
     "y": 1897
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Кирхенхайм — деревня с каменной церковью. Живёт тем, что есть вокруг: скот, пшеница. Старостой здесь Феликс Кессель.\n\n_черновик_",
+   "cityMapId": "map-city-kirhenhaim"
   },
   {
    "id": 1822,
@@ -142031,7 +147123,9 @@
     "x": 2907,
     "y": 1933
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Норельштадт — рыбацкая деревня у пристани. Живёт тем, что есть вокруг: смола, дичь. Старостой здесь Каспар Ланге.\n\n_черновик_",
+   "cityMapId": "map-city-norelshtadt"
   },
   {
    "id": 1827,
@@ -142292,7 +147386,9 @@
     "x": 3113,
     "y": 1901
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Брасинталь — тихая деревня среди полей. Живёт тем, что есть вокруг: кожи, овцы. Старостой здесь Эмиль Лихт. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-brasintal"
   },
   {
    "id": 1833,
@@ -142926,7 +148022,9 @@
     "x": 2801,
     "y": 1929
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Хагельхайм — рыбацкий посёлок с низкими домами. Живёт тем, что есть вокруг: виноград. Старостой здесь Якоб Ланге.\n\n_черновик_",
+   "cityMapId": "map-city-hagelhaim"
   },
   {
    "id": 1848,
@@ -142999,7 +148097,9 @@
     "x": 2959,
     "y": 1923
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Тальельвейлер — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: мёд, дичь. Старостой здесь Гуго Пфайль. Дорогу здесь чинят вовремя: за этим следит министр дорог.\n\n_черновик_",
+   "cityMapId": "map-city-talelveiler"
   },
   {
    "id": 1850,
@@ -143169,7 +148269,9 @@
     "x": 3361,
     "y": 1931
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эшдорф — деревня с каменной церковью. Живёт тем, что есть вокруг: смола. Старостой здесь Юлиан Майер.\n\n_черновик_",
+   "cityMapId": "map-city-eshdorf"
   },
   {
    "id": 1854,
@@ -143541,7 +148643,9 @@
     "x": 3065,
     "y": 1941
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Брасельрит — деревня с каменной церковью. Живёт тем, что есть вокруг: мёд. Старостой здесь Каспар Пфайль.\n\n_черновик_",
+   "cityMapId": "map-city-braselrit"
   },
   {
    "id": 1863,
@@ -143654,7 +148758,9 @@
     "x": 3001,
     "y": 1957
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Остельведель — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: смола, дуб. Старостой здесь Лоренц Штерн.\n\n_черновик_",
+   "cityMapId": "map-city-ostelvedel"
   },
   {
    "id": 1866,
@@ -144198,7 +149304,9 @@
     "x": 3135,
     "y": 1945
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Фальенхаузен — опрятная деревня у тракта. Живёт тем, что есть вокруг: ячмень, пшеница. Старостой здесь Филипп Ланг. Здесь осели беженцы из Эшланда: они построили новую улицу и всё ещё называют её по старому городу.\n\n_черновик_",
+   "cityMapId": "map-city-falenhauzen"
   },
   {
    "id": 1878,
@@ -144237,7 +149345,9 @@
     "x": 3189,
     "y": 1951
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Норинбург — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: ячмень, огороды. Старостой здесь Гуго Виттих.\n\n_черновик_",
+   "cityMapId": "map-city-norinburg"
   },
   {
    "id": 1879,
@@ -144277,7 +149387,9 @@
     "x": 3315,
     "y": 1959
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Марерштейн — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: лес на сплав, дичь. Старостой здесь Стефан Кессель.\n\n_черновик_",
+   "cityMapId": "map-city-marershtein"
   },
   {
    "id": 1880,
@@ -144675,7 +149787,8 @@
     "x": 3249,
     "y": 1955
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Кельельфельд — развалины старого замка. Пустует со времён Лесной войны; местные растаскивают камень на постройки.\n\n_черновик_"
   },
   {
    "id": 1889,
@@ -145461,7 +150574,9 @@
     "x": 2767,
     "y": 1959
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Моренгард — рыбацкая деревня у пристани. Живёт тем, что есть вокруг: лес на сплав. Старостой здесь Лоренц Бауэр.\n\n_черновик_",
+   "cityMapId": "map-city-morengard"
   },
   {
    "id": 1908,
@@ -145583,7 +150698,9 @@
     "x": 2849,
     "y": 1963
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Альтенхаузен — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: дичь, мёд. Старостой здесь Филипп Лихт.\n\n_черновик_",
+   "cityMapId": "map-city-altenhauzen"
   },
   {
    "id": 1911,
@@ -145857,7 +150974,9 @@
     "x": 2891,
     "y": 1979
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Кельфельд — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: пшеница, лён. Старостой здесь Гуго Ланг.\n\n_черновик_",
+   "cityMapId": "map-city-kelfeld"
   },
   {
    "id": 1918,
@@ -146034,7 +151153,9 @@
     "x": 3099,
     "y": 1981
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Росгард — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: огороды, пшеница. Старостой здесь Вильгельм Ланг.\n\n_черновик_",
+   "cityMapId": "map-city-rosgard"
   },
   {
    "id": 1922,
@@ -146073,7 +151194,9 @@
     "x": 3157,
     "y": 1989
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Альтенвейлер — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: лён, ячмень. Старостой здесь Теодор Дорн.\n\n_черновик_",
+   "cityMapId": "map-city-altenveiler"
   },
   {
    "id": 1923,
@@ -146113,7 +151236,9 @@
     "x": 3375,
     "y": 1995
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Бадинрит — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: дуб, лес на сплав. Старостой здесь Гуго Кессель. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-badinrit"
   },
   {
    "id": 1924,
@@ -146447,7 +151572,9 @@
     "x": 2957,
     "y": 1989
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Нейенштейн — рыбацкая деревня у пристани. Живёт тем, что есть вокруг: ячмень. Старостой здесь Лоренц Лихт. Прошлым летом приезжал ревизор из Хауссера. Его хорошо накормили и ничего особенного не показали.\n\n_черновик_",
+   "cityMapId": "map-city-neienshtein"
   },
   {
    "id": 1932,
@@ -146652,7 +151779,9 @@
     "x": 3213,
     "y": 2003
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ведбург — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: ячмень, скот. Старостой здесь Николас Энгель. Над дверью трактира всё ещё висит старый имперский герб, и никто его не снимает.\n\n_черновик_",
+   "cityMapId": "map-city-vedburg"
   },
   {
    "id": 1937,
@@ -146845,7 +151974,9 @@
     "x": 3033,
     "y": 2003
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Ульенхайм — опрятная деревня у тракта. Живёт тем, что есть вокруг: дичь. Старостой здесь Юлиан Дорн.\n\n_черновик_",
+   "cityMapId": "map-city-ulenhaim"
   },
   {
    "id": 1942,
@@ -147001,7 +152132,9 @@
     "x": 2769,
     "y": 2017
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Остенталь — торговый городок на тракте. Живёт тем, что есть вокруг: пшеница. Городом заведует бургомистр Роланд Бауэр.\n\n_черновик_",
+   "cityMapId": "map-city-ostental"
   },
   {
    "id": 1946,
@@ -147040,7 +152173,9 @@
     "x": 3267,
     "y": 2017
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эрервейлер — опрятная деревня у тракта. Живёт тем, что есть вокруг: лён, огороды. Старостой здесь Юлиан Граве. Здесь осели беженцы из Эшланда: они построили новую улицу и всё ещё называют её по старому городу.\n\n_черновик_",
+   "cityMapId": "map-city-ererveiler"
   },
   {
    "id": 1947,
@@ -147214,7 +152349,7 @@
   },
   {
    "id": 1951,
-   "name": "Оберенмюнде",
+   "name": "Ним",
    "px": 1003,
    "x": 2839,
    "y": 2003,
@@ -147246,11 +152381,13 @@
     ]
    ],
    "settlement": {
-    "type": "town",
+    "type": "city",
     "x": 2837,
     "y": 2007
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ним — второй город графства, тёплый и людный город на равнине. Именно сюда едет большинство беженцев: здесь стоит Дом принятых, а половина лавок принадлежит бывшим жителям Эшланда и столицы. На улицах можно услышать выговор всех бывших провинций Империи.\n\n_черновик_",
+   "cityMapId": "map-city-nim"
   },
   {
    "id": 1952,
@@ -147813,7 +152950,9 @@
     "x": 3327,
     "y": 2013
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Росенвейлер — деревня с каменной церковью. Живёт тем, что есть вокруг: огороды, лён. Старостой здесь Гуго Пфайль. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-rosenveiler"
   },
   {
    "id": 1965,
@@ -148050,7 +153189,9 @@
     "x": 2915,
     "y": 2021
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Амрит — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: смола, дичь. Старостой здесь Симон Ланг.\n\n_черновик_",
+   "cityMapId": "map-city-amrit"
   },
   {
    "id": 1971,
@@ -148808,7 +153949,9 @@
     "x": 3103,
     "y": 2033
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Унтердорф — деревня с каменной церковью. Живёт тем, что есть вокруг: пшеница. Старостой здесь Вильгельм Майер.\n\n_черновик_",
+   "cityMapId": "map-city-unterdorf"
   },
   {
    "id": 1990,
@@ -149087,7 +154230,9 @@
     "x": 2703,
     "y": 2049
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Линау — рыбацкий посёлок с низкими домами. Живёт тем, что есть вокруг: железная руда. Старостой здесь Стефан Ланг.\n\n_черновик_",
+   "cityMapId": "map-city-linau"
   },
   {
    "id": 1997,
@@ -149124,7 +154269,9 @@
     "x": 2969,
     "y": 2043
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Вальинберг — тихая деревня среди полей. Живёт тем, что есть вокруг: ячмень, огороды. Старостой здесь Теодор Ланге.\n\n_черновик_",
+   "cityMapId": "map-city-valinberg"
   },
   {
    "id": 1998,
@@ -149231,7 +154378,9 @@
     "x": 2871,
     "y": 2051
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эберельхольм — опрятная деревня у тракта. Живёт тем, что есть вокруг: лес на сплав. Старостой здесь Рудольф Пфайль. Над дверью трактира всё ещё висит старый имперский герб, и никто его не снимает.\n\n_черновик_",
+   "cityMapId": "map-city-eberelholm"
   },
   {
    "id": 2001,
@@ -149444,7 +154593,9 @@
     "x": 3155,
     "y": 2043
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Грюнау — деревня с каменной церковью. Живёт тем, что есть вокруг: лес на сплав, дичь. Старостой здесь Рудольф Майер.\n\n_черновик_",
+   "cityMapId": "map-city-gryunau"
   },
   {
    "id": 2006,
@@ -149617,7 +154768,9 @@
     "x": 3223,
     "y": 2053
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ротерталь — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: скот, огороды. Старостой здесь Теодор Ланге. Дорогу здесь чинят вовремя: за этим следит министр дорог.\n\n_черновик_",
+   "cityMapId": "map-city-rotertal"
   },
   {
    "id": 2010,
@@ -149852,7 +155005,9 @@
     "x": 3049,
     "y": 2049
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Лауинведель — тихая деревня среди полей. Живёт тем, что есть вокруг: ячмень, огороды. Старостой здесь Матиас Шульц.\n\n_черновик_",
+   "cityMapId": "map-city-lauinvedel"
   },
   {
    "id": 2016,
@@ -149939,7 +155094,9 @@
     "x": 2795,
     "y": 2067
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Зигинталь — деревня с каменной церковью. Живёт тем, что есть вокруг: лён. Старостой здесь Гуго Рихтер.\n\n_черновик_",
+   "cityMapId": "map-city-zigintal"
   },
   {
    "id": 2018,
@@ -150021,7 +155178,9 @@
     "x": 3337,
     "y": 2063
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ротиндорф — опрятная деревня у тракта. Живёт тем, что есть вокруг: железная руда, камень. Старостой здесь Феликс Виттих. Отставной сержант Короны учит мальчишек строю по воскресеньям: говорит, что для порядка.\n\n_черновик_",
+   "cityMapId": "map-city-rotindorf"
   },
   {
    "id": 2020,
@@ -150398,7 +155557,9 @@
     "x": 3285,
     "y": 2069
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ройштадт — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: огороды, пшеница. Старостой здесь Матиас Виттих. Здесь осели беженцы из Эшланда: они построили новую улицу и всё ещё называют её по старому городу.\n\n_черновик_",
+   "cityMapId": "map-city-roishtadt"
   },
   {
    "id": 2029,
@@ -150604,7 +155765,9 @@
     "x": 2839,
     "y": 2091
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Грюнельштадт — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: пшеница, огороды. Старостой здесь Рудольф Вебер. Над дверью трактира всё ещё висит старый имперский герб, и никто его не снимает.\n\n_черновик_",
+   "cityMapId": "map-city-gryunelshtadt"
   },
   {
    "id": 2034,
@@ -150642,7 +155805,9 @@
     "x": 3083,
     "y": 2087
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Зонельвальд — замок старого кастеляна. Живёт тем, что есть вокруг: железная руда. Кастелян Лоренц Пфайль служит графу, как его предки служили императорам.\n\n_черновик_",
+   "cityMapId": "map-city-zonelvald"
   },
   {
    "id": 2035,
@@ -150977,7 +156142,9 @@
     "x": 2913,
     "y": 2079
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Шёнердорф — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: дичь, лес на сплав. Старостой здесь Гуго Кессель. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-shenerdorf"
   },
   {
    "id": 2043,
@@ -151135,7 +156302,9 @@
     "x": 3011,
     "y": 2083
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Геринфельд — рыбацкий посёлок с низкими домами. Живёт тем, что есть вокруг: дичь, смола. Старостой здесь Антон Майер. Над дверью трактира всё ещё висит старый имперский герб, и никто его не снимает.\n\n_черновик_",
+   "cityMapId": "map-city-gerinfeld"
   },
   {
    "id": 2047,
@@ -151218,7 +156387,9 @@
     "x": 3169,
     "y": 2091
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Эльмштадт — опрятная деревня у тракта. Живёт тем, что есть вокруг: смола, дуб. Старостой здесь Теодор Ротхе. Староста раз в год ездит в Манген на День прошений и всякий раз возвращается довольным.\n\n_черновик_",
+   "cityMapId": "map-city-elmshtadt"
   },
   {
    "id": 2049,
@@ -151300,7 +156471,9 @@
     "x": 2735,
     "y": 2095
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Ведервальд — тихая деревня среди полей. Живёт тем, что есть вокруг: финики, овцы. Старостой здесь Якоб Ланге. Прошлым летом приезжал ревизор из Хауссера. Его хорошо накормили и ничего особенного не показали.\n\n_черновик_",
+   "cityMapId": "map-city-vedervald"
   },
   {
    "id": 2051,
@@ -152216,7 +157389,9 @@
     "x": 3221,
     "y": 2109
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Кирхерлаге — тихая деревня среди полей. Живёт тем, что есть вокруг: соль, финики. Старостой здесь Бернард Рихтер. Отставной сержант Короны учит мальчишек строю по воскресеньям: говорит, что для порядка.\n\n_черновик_",
+   "cityMapId": "map-city-kirherlage"
   },
   {
    "id": 2073,
@@ -152256,7 +157431,9 @@
     "x": 3275,
     "y": 2117
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Ротинберг — сторожевой замок на тракте. Живёт тем, что есть вокруг: уголь, железная руда. Кастелян Гуго Штерн служит графу, как его предки служили императорам. Прошлым летом приезжал ревизор из Хауссера. Его хорошо накормили и ничего особенного не показали.\n\n_черновик_",
+   "cityMapId": "map-city-rotinberg"
   },
   {
    "id": 2074,
@@ -152471,7 +157648,9 @@
     "x": 2879,
     "y": 2119
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Дальинталь — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: дуб. Старостой здесь Рудольф Майер.\n\n_черновик_",
+   "cityMapId": "map-city-dalintal"
   },
   {
    "id": 2080,
@@ -152510,7 +157689,9 @@
     "x": 2943,
     "y": 2125
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Фрейельхольм — тихая деревня среди полей. Живёт тем, что есть вокруг: смола, дичь. Старостой здесь Вильгельм Энгель. Здесь осели беженцы из Эшланда: они построили новую улицу и всё ещё называют её по старому городу.\n\n_черновик_",
+   "cityMapId": "map-city-freielholm"
   },
   {
    "id": 2081,
@@ -152991,7 +158172,9 @@
     "x": 3013,
     "y": 2133
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Корталь — опрятная деревня у тракта. Живёт тем, что есть вокруг: дуб, смола. Старостой здесь Феликс Бауэр.\n\n_черновик_",
+   "cityMapId": "map-city-kortal"
   },
   {
    "id": 2093,
@@ -153111,7 +158294,9 @@
     "x": 2795,
     "y": 2133
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Морельфельд — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: пшеница, лён. Старостой здесь Николас Рихтер.\n\n_черновик_",
+   "cityMapId": "map-city-morelfeld"
   },
   {
    "id": 2096,
@@ -153620,7 +158805,9 @@
     "x": 3069,
     "y": 2151
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Кирхенберг — рыбацкая деревня у пристани. Живёт тем, что есть вокруг: камень. Старостой здесь Теодор Лихт. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-kirhenberg"
   },
   {
    "id": 2109,
@@ -153906,7 +159093,9 @@
     "x": 3167,
     "y": 2145
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Фрейхольм — тихая деревня среди полей. Живёт тем, что есть вокруг: уголь, железная руда. Старостой здесь Вильгельм Дорн.\n\n_черновик_",
+   "cityMapId": "map-city-freiholm"
   },
   {
    "id": 2116,
@@ -154375,7 +159564,9 @@
     "x": 2765,
     "y": 2167
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Острит — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: овцы, железная руда. Старостой здесь Матиас Кессель. Староста раз в год ездит в Манген на День прошений и всякий раз возвращается довольным.\n\n_черновик_",
+   "cityMapId": "map-city-ostrit"
   },
   {
    "id": 2128,
@@ -154413,7 +159604,9 @@
     "x": 3233,
     "y": 2149
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Грислаге — тихая деревня среди полей. Живёт тем, что есть вокруг: уголь, овцы. Старостой здесь Антон Рихтер.\n\n_черновик_",
+   "cityMapId": "map-city-grislage"
   },
   {
    "id": 2129,
@@ -154723,7 +159916,9 @@
     "x": 2989,
     "y": 2173
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Эшервейлер — тихая деревня среди полей. Живёт тем, что есть вокруг: дуб, дичь. Старостой здесь Гуго Штерн. В старом амбаре за околицей ночует больше людей, чем значится в описи.\n\n_черновик_",
+   "cityMapId": "map-city-esherveiler"
   },
   {
    "id": 2137,
@@ -154935,7 +160130,9 @@
     "x": 2827,
     "y": 2211
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Фрейбах — небольшой порт с графской таможней. Живёт тем, что есть вокруг: железная руда. Портом заведует таможенный мастер Филипп Вебер.\n\n_черновик_",
+   "cityMapId": "map-city-freibah"
   },
   {
    "id": 2142,
@@ -155138,7 +160335,9 @@
     "x": 2899,
     "y": 2169
    },
-   "coastal": false
+   "coastal": false,
+   "description": "Дорненталь — тихая деревня среди полей. Живёт тем, что есть вокруг: лён, огороды. Старостой здесь Роланд Кессель. Сюда приехала вдова имперского чиновника и учит детей грамоте.\n\n_черновик_",
+   "cityMapId": "map-city-dornental"
   },
   {
    "id": 2147,
@@ -156920,7 +162119,9 @@
     "x": 2939,
     "y": 2199
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Зондорф — обычная имперская деревня с прямой улицей. Живёт тем, что есть вокруг: овцы, железная руда. Старостой здесь Антон Рихтер.\n\n_черновик_",
+   "cityMapId": "map-city-zondorf"
   },
   {
    "id": 2192,
@@ -157719,7 +162920,9 @@
     "x": 2881,
     "y": 2217
    },
-   "coastal": true
+   "coastal": true,
+   "description": "Амендорф — деревня, отстроенная принятыми после войны. Живёт тем, что есть вокруг: железная руда, камень. Старостой здесь Стефан Вебер.\n\n_черновик_",
+   "cityMapId": "map-city-amendorf"
   },
   {
    "id": 2212,
@@ -231056,7 +236259,7 @@
   {
    "id": "a-296",
    "level": "area",
-   "name": "Округ Норельхайм",
+   "name": "Округ Манген",
    "parentId": "r-37",
    "culture": "imperial"
   },
@@ -231091,7 +236294,7 @@
   {
    "id": "a-301",
    "level": "area",
-   "name": "Округ Оберенмюнде",
+   "name": "Округ Ним",
    "parentId": "r-13",
    "culture": "imperial"
   },
@@ -231133,7 +236336,7 @@
   {
    "id": "a-307",
    "level": "area",
-   "name": "Округ Тальбах",
+   "name": "Округ Нарни",
    "parentId": "r-37",
    "culture": "imperial"
   },
@@ -239494,6 +244697,59 @@
       [
        4153,
        1103
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lore-army-man-gates",
+   "name": "Графская стража — маршал Аларих Штальберг",
+   "mapId": "world",
+   "stateId": "db02c283-8",
+   "color": "#5a3a1a",
+   "waypoints": [
+    {
+     "x": 2927,
+     "y": 1837,
+     "date": 488475
+    },
+    {
+     "x": 3243,
+     "y": 1761,
+     "date": 488560,
+     "path": [
+      [
+       2927,
+       1837
+      ],
+      [
+       2968,
+       1864
+      ],
+      [
+       3000,
+       1864
+      ],
+      [
+       3080,
+       1768
+      ],
+      [
+       3128,
+       1768
+      ],
+      [
+       3160,
+       1736
+      ],
+      [
+       3208,
+       1736
+      ],
+      [
+       3243,
+       1761
       ]
      ]
     }
@@ -257352,7 +262608,7 @@
     {
      "id": "empire-council-b73",
      "date": 491448,
-     "title": "Заём графини Мангениум",
+     "title": "Заём графа Мангениум",
      "kind": "договор",
      "w": [
       0,
@@ -257365,7 +262621,7 @@
      "sponsor": "",
      "sponsorEntry": "",
      "sponsorFaction": "constit",
-     "summary": "Казна берёт заём у графини Мангениум под залог пошлин.",
+     "summary": "Казна берёт заём у графа Мангениум под залог пошлин.",
      "key": false,
      "outcome": "отклонён",
      "votes": "y  y  n  y nn a  nnan ann n ynaa-n-na aannna n nyyyyyyyyyyyyy-yyyyyyyyyyyyy yyyy yyyyy-yyyyyyyyyyyyyyyyyy- y-y  -yyny an aaa aa aaaa aanyaan  aaaa aaaananayn y  --n n anaannnnnaaaaaaan aanan  yaaa nnnnaa   aaa a n-   n- nn  nnnnnn nnnnn-nnn n-n nn   nn nnnn- nnayyyyyynaann-a-naaa-aaaynaaannnaaaaaaanaa-                                                                                                                                                                                                                                                       a        y                          a   n                                     ",
@@ -262860,7 +268116,7 @@
     {
      "id": "empire-council-b277",
      "date": 503600,
-     "title": "Заём графини Мангениум",
+     "title": "Заём графа Мангениум",
      "kind": "договор",
      "w": [
       0,
@@ -262873,7 +268129,7 @@
      "sponsor": "",
      "sponsorEntry": "",
      "sponsorFaction": "constit",
-     "summary": "Казна берёт у Мангениума заём под залог соляных пошлин. Половина совета теперь должна Изабелле Мангениум лично.",
+     "summary": "Казна берёт у Мангениума заём под залог соляных пошлин. Граф дал дёшево: лишний друг в совете дороже процента.",
      "key": true,
      "outcome": "принят",
      "votes": "yyyyynnnnynan-        n                          y    y      y   y   - y      yy y     y    y              y        a a      n                       a                             a     n       a     aa           n       n   n        n  -        n         -n  n n     y  y a    ann n   aa   n y    a   a n  n           -yy -aa  yany n-aa   -ann   n  n n  yyy yy   y yyyy yy y   a a y  a aa  aany  na  nnn  n    n y yyyyyyyyyy n   a  a an nnnn   nnna-ayyyyy- yynnnaany yya -aa-n a ay aan-nnnnn-annaanyyyyyyyyyyyyyynaynnnayaya-naaaaaannnnnaa-nnaa-n       y   y          y  aa  a  -  n a    a a    n  n  y   a  y  n na     n  n na  ",
@@ -421248,7 +426504,7 @@
       "rivals": [
        "roty"
       ],
-      "secret": "Дом Мангениум считает Вексельный дом смешным — и уже дважды брал у него деньги через подставных.",
+      "secret": "Граф Мангениум считает Вексельный дом позором Империи — и уже дважды брал у него деньги через подставных.",
       "draft": true
      }
     },

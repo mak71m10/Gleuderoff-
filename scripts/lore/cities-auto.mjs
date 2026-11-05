@@ -98,7 +98,7 @@ export async function autoCities(world, handmade) {
   const taken = new Set(handmade.map((c) => c.province).filter(Boolean))
   const takenSlugs = new Set(handmade.map((c) => c.slug))
   const out = []
-  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES, 'Графство Штирия']) {
+  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES, 'Графство Штирия', 'Графство Мангениум']) {
     const st = world.states.find((s) => s.base.name === sn)
     for (const p of world.provinces) {
       const s = p.settlement
@@ -114,7 +114,8 @@ export async function autoCities(world, handmade) {
       const seed = hash(slug)
       const type = castra ? 'castra' : s.type
       const sty = sn === 'Графство Штирия'
-      const capital = (south && world.places.find((x) => x.id === `lore-${south}-capital` && x.base.name === p.name)) || (sty && world.places.find((x) => x.id === 'lore-sty-capital' && x.base.name === p.name))
+      const man = sn === 'Графство Мангениум'
+      const capital = (south && world.places.find((x) => x.id === `lore-${south}-capital` && x.base.name === p.name)) || (sty && world.places.find((x) => x.id === 'lore-sty-capital' && x.base.name === p.name)) || (man && world.places.find((x) => x.id === 'lore-man-capital' && x.base.name === p.name))
       const coast = (type === 'port' || p.coastal) && nearSea(s.x, s.y)
       const river = nearRiver(s.x, s.y)
       const nest = /гнездо/.test(text)
@@ -132,11 +133,15 @@ export async function autoCities(world, handmade) {
       out.push({
         slug, name: p.name, province: p.name, state: sn, auto: true, ...(holy ? { roof: MARBLE } : {}), ...(sty ? { roof: SLATE } : {}), ...(['village', 'fishing', 'castle', 'temple'].includes(type) ? { px: 1 } : {}), ...(capital ? { place: capital.id } : {}),
         forest: p.terrain === 2 ? 0.25 : 0.1, hills: p.terrain === 3 || undefined, rocky: p.terrain >= 4 || undefined,
-        citadelName: sty ? (capital ? 'Чёрный замок' : 'Замок кастеляна') : holy ? 'Соборный двор' : castra ? 'Кастра' : nest ? 'Замковая гора' : south ? (kalt ? 'Дом капитанов' : capital ? 'Палаццо' : 'Кастелло') : 'Замок',
+        citadelName: man ? (capital ? 'Графский дворец' : p.name === 'Граднец' ? 'Цитадель Граднеца' : 'Замок кастеляна') : sty ? (capital ? 'Чёрный замок' : 'Замок кастеляна') : holy ? 'Соборный двор' : castra ? 'Кастра' : nest ? 'Замковая гора' : south ? (kalt ? 'Дом капитанов' : capital ? 'Палаццо' : 'Кастелло') : 'Замок',
         gen, districts: [...wet.slice(0, 1), ...dry.slice(0, 2), ...wet.slice(1), ...dry.slice(2)],
         landmarks: [
           ...(capital && sty ? [['Чёрный замок', 'castle', 'citadel', 'Здесь живёт граф Конрад и заседает Ночной совет.'], ['Немая палата', 'assembly', 'center', 'Канцелярия его сиятельства: сюда не заходят по своей воле.'], ['Вексельный дом', 'landmark', 'big', 'Банк Штирии — прикрытие Ночного рынка.'], ['Ночной рынок', 'landmark', 'plaza', 'Ночной ряд: при свечах и в масках.']] : []),
-          ...(capital && !sty ? (() => { const r = SOUTH.find((x) => x.key === south); return [[r.hall.split(',')[0], 'assembly', 'citadel', `Здесь заседает ${r.chamber} и живёт ${r.rulerTitle.toLowerCase()}.`]] })() : []),
+          ...(man && p.name === 'Ним' ? [['Дом принятых', 'assembly', 'center', 'Сюда едут те, кому нельзя жить в Республике и не хочется жить при совете.']] : []),
+          ...(man && p.name === 'Нарни' ? [['Амбары Нарни', 'landmark', 'big', 'Запасы зерна, которыми кормятся все принятые графства.']] : []),
+          ...(man && p.name === 'Граднец' ? [['Цитадель Граднеца', 'castle', 'citadel', 'Штаб Графской стражи и капитан Север Орнибуций.'], ['Казармы Графской стражи', 'landmark', 'edge', 'Устав и выучка здесь взяты у старых легионов.'], ['Склады Граднеца', 'landmark', 'big', 'На бумаге здесь хранится соль и овечья шерсть.']] : []),
+          ...(capital && man ? [['Графский дворец', 'castle', 'citadel', 'Здесь живёт граф Жан Наний и заседает Совет Десяти.'], ['Мангенский собор', 'temple', 'temple', 'Построен при Гийоме Постном; здесь Лавиния Орнибуция приняла первых беженцев.'], ['Вторая канцелярия', 'landmark', 'center', 'На вывеске архив; о том, что внутри, не спрашивают.']] : []),
+          ...(capital && !sty && !man ? (() => { const r = SOUTH.find((x) => x.key === south); return [[r.hall.split(',')[0], 'assembly', 'citadel', `Здесь заседает ${r.chamber} и живёт ${r.rulerTitle.toLowerCase()}.`]] })() : []),
           ...landmarksFrom(p.name, type, text, sn).map((l) => (south && l[2] === 'temple' ? [kalt ? 'Храм клана' : `Церковь ${pickN(['Сан-Микеле', 'Санта-Лучия', 'Сан-Бартоло', 'Санта-Агна', 'Сан-Доменико', 'Санта-Клара'], 1, seed)[0]}`, l[1], l[2], l[3]] : l))
         ].slice(0, 7)
       })
