@@ -77,6 +77,15 @@ export const EMBLEMS: Record<string, { label: string; draw: (fg: string, bg: str
   },
   star: { label: 'Звезда', draw: (fg) => <path fill={fg} d="M50 8l11 30h32L67 57l10 31-27-19-27 19 10-31L7 38h32z" /> },
   moon: { label: 'Полумесяц', draw: (fg) => <path fill={fg} d="M62 10a40 40 0 100 80 32 32 0 010-80z" /> },
+  sun: {
+    label: 'Солнце',
+    draw: (fg) => (
+      <g fill={fg}>
+        <circle cx="50" cy="50" r="17" />
+        {Array.from({ length: 12 }, (_, i) => <path key={i} d="M47 26 L50 8 L53 26 z" transform={`rotate(${i * 30} 50 50)`} />)}
+      </g>
+    )
+  },
   skull: {
     label: 'Череп',
     draw: (fg, bg) => (

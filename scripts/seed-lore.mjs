@@ -17,6 +17,7 @@ import exilesLore from './lore/exiles.mjs'
 import northLore from './lore/north.mjs'
 import kreitLore from './lore/kreit.mjs'
 import farvolLore from './lore/farvol.mjs'
+import highlandLore from './lore/highland.mjs'
 import geo from './lore/geo.mjs'
 
 const WORLD = 'resources/default-world/world.json'
@@ -48,7 +49,8 @@ const E = (id, kind, name, f = {}) => {
       ...(f.stavka ? { stavka: f.stavka } : {}),
       ...(f.ting ? { ting: f.ting } : {}),
       ...(f.brood ? { brood: f.brood } : {}),
-      ...(f.vault ? { vault: f.vault } : {})
+      ...(f.vault ? { vault: f.vault } : {}),
+      ...(f.heights ? { heights: f.heights } : {})
     },
     history: [],
     from: f.from ?? null,
@@ -151,7 +153,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 30
+world.version = 31
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })
@@ -164,6 +166,7 @@ exilesLore({ E, Y, world })
 northLore({ E, Y, world })
 kreitLore({ E, Y, world })
 farvolLore({ E, Y, world })
+highlandLore({ E, Y, world })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })
 

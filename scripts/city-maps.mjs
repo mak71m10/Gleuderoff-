@@ -282,6 +282,8 @@ ${text(W / 2, 64, c.name, 58, '#2a1d12', 'font-weight="bold" letter-spacing="6"'
     if (rule === 'gate' && roads.length) return biggest(by((b) => dist(b.c, roads[0].r[0]), 10))
     if (rule === 'edge') return biggest(by((b) => -dist(b.c, ce), Math.max(10, pool.length >> 3)))
     if (rule === 'center') return biggest(by((b) => dist(b.c, ce), 20))
+    // ring — на кольце вокруг середины (города на вершинах: середину занимает скала с дворцом)
+    if (rule === 'ring') { const far = Math.max(...pool.map((b) => dist(b.c, ce))); const r = pool.filter((b) => dist(b.c, ce) > far * 0.32 && dist(b.c, ce) < far * 0.6); if (r.length) return biggest(r) }
     return biggest(pool)
   }
   const marks = []

@@ -68,6 +68,10 @@ export const STYLES: Record<string, Style> = {
   exile: { plaster: ['#b8b4aa', '#a9a59a', '#c4c0b6', '#9d998e'], roof: ['#5a2626', '#4a2222', '#3f3d44', '#6a2c2a', '#47434a'], timber: '#2e2420', stone: '#76726a', wall: '#8a867c', shutter: ['#5a1414', '#2e2a28'], pitch: 1.25, framed: false, floors: 0, grass: '#6a7a52', grass2: '#74845a', dirt: '#9a8f74', pave: '#8f897a', lit: 0.3, conifer: 0.9, tower: '#3e2a2a' },
   // Фарвольская лига, дварфы: серый гранит, плоские каменные крыши, горны; deep — то же под сводом пещеры
   dwarf: { plaster: ['#8d8579', '#7d766c', '#9a9184', '#867c6e'], roof: ['#5b5550', '#4f4a45', '#625a52', '#56504a'], timber: '#3a2e24', stone: '#6a645c', wall: '#7a746a', shutter: ['#3b3633'], pitch: 0.5, framed: false, floors: 0, grass: '#6a7454', grass2: '#737c5a', dirt: '#8a8070', pave: '#7a756c', lit: 0.45, conifer: 0.95, tower: '#4a4440' },
+  // Высокогорное Княжество: альпийские дома — белёный камень внизу, тёмное дерево наверху, широкие крыши из тёмного гонта;
+  // kranz — то же на каменной платформе вокруг вершины (Венец), alpine — замки и городки людей ниже
+  alpine: { plaster: ['#efe9dc', '#e6dccb', '#f3eee4', '#d9cfbd', '#e9e1d0'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#6a4a34', '#46434a'], timber: '#3a2416', stone: '#8a877e', wall: '#a8a49a', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#6f8f4e', grass2: '#7a9a56', dirt: '#9a8a6a', pave: '#9a958a', lit: 0.4, conifer: 1, tower: '#3f4a5a' },
+  kranz: { plaster: ['#f4f0e8', '#ebe5d8', '#f7f4ee', '#e2dacb', '#efe8da'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#3a3a42', '#46434a'], timber: '#3a2416', stone: '#a9a598', wall: '#c8c3b6', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#a6a294', grass2: '#b0ac9e', dirt: '#b8b2a2', pave: '#c4bfb2', lit: 0.4, conifer: 1, tower: '#2a3a5a' },
   deep: { plaster: ['#7d766c', '#8a8276', '#70695f', '#958c7e'], roof: ['#4f4a45', '#5b5149', '#463f3a'], timber: '#3a2e24', stone: '#5e5850', wall: '#6a645a', shutter: ['#3b3633'], pitch: 0.5, framed: false, floors: 0, grass: '#4a4a3c', grass2: '#525040', dirt: '#5a5246', pave: '#6a645a', lit: 0.75, conifer: 0, tower: '#3a3532' },
   // гномы: пёстрая штукатурка, медные и позеленевшие крыши, высокие узкие дома с башенками
   gnome: { plaster: ['#d9c27a', '#c97a5a', '#7aa3a0', '#e0d0b0', '#b8c9a0', '#d99a6a', '#c9b0d0'], roof: ['#4f8a78', '#5a9a86', '#a8552f', '#3f6a8a', '#8a3a3a', '#b8783a'], timber: '#4a3222', stone: '#8f8a7e', wall: '#a9a394', shutter: ['#2f5a6a', '#8a3a2a', '#d8b040'], pitch: 1.4, framed: false, floors: 1, grass: '#7a9a4c', grass2: '#86a654', dirt: '#b0a07a', pave: '#a89c80', lit: 0.5, conifer: 0.7, tower: '#4f8a78' },
@@ -270,6 +274,17 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const allPts = plan.buildings.flatMap((b) => ringOf(b, k, 2))
   const center: P2 = allPts.length ? centerOf(allPts) : [W / 2, H / 2]
   const radius = Math.max(30, Math.sqrt(allPts.reduce((m, p) => Math.max(m, (p[0] - center[0]) ** 2 + (p[1] - center[1]) ** 2), 0)))
+  // город на вершине (Высокогорное Княжество): платформа радиуса RP вокруг скалы R0, ниже края — обрыв на DROP
+  const kranz = S.style === 'kranz'
+  // край платформы — по плотной застройке (хутора и пашни за ней остаются на склонах внизу или убираются)
+  const coreR = (() => {
+    const d = plan.buildings.map((b) => { const c = centerOf(ringOf(b, k, 2)); return Math.hypot(c[0] - center[0], c[1] - center[1]) }).sort((a, b) => a - b)
+    return d.length ? d[Math.floor(d.length * 0.82)] : radius
+  })()
+  const RP = Math.min(radius, coreR) + 12
+  const DROP = Math.min(330, Math.max(180, RP * 1.1))
+  const R0 = Math.max(16, RP * 0.24)
+  const PEAK = Math.max(60, RP * 0.75)
 
   // на плане дома стоят почти вплотную: в 3D чуть уже, чтобы между ними появились проходы и улицы
   const inset = (r: P2[]): P2[] => {
@@ -281,7 +296,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const blds = plan.buildings.map((b) => { const r = ringOf(b, k, 2); return { d: b[0], special: b[1] === 1, r: b[1] === 1 ? r : inset(r) } })
   const dists = S.dist.map((f) => ringOf(f, k))
   const waters = S.water.map((f) => ringOf(f, k))
-  const fields = S.fields.map((f) => ringOf(f, k))
+  const fields = kranz ? [] : S.fields.map((f) => ringOf(f, k))
   const greens = S.greens.map((f) => ringOf(f, k))
   const squares = S.squares.map((f) => ringOf(f, k))
   const lines = (l: PlanLine[]): { r: P2[]; w: number }[] => l.map((q) => ({ r: ringOf(q.r, k), w: q.w / k }))
@@ -347,7 +362,17 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const edge = Math.max(0, Math.max(-x, x - W, -z, z - H)) / margin
     const land = 1.1 + (n1(x * 0.02, z * 0.02) - 0.5) * 0.6 + Math.max(0, hill - 0.3) * 1.7 * hillAmp * out * (0.45 + edge)
     const w = waterAt(x, z)
-    return land * (1 - smooth(0.12, 0.5, w)) - 3 * smooth(0.3, 0.75, w)
+    const h = land * (1 - smooth(0.12, 0.5, w)) - 3 * smooth(0.3, 0.75, w)
+    if (!kranz) return h
+    const r = Math.hypot(x - center[0], z - center[1])
+    // скала вершины посреди платформы
+    if (r < R0) return h + PEAK * Math.pow(1 - r / R0, 1.25) * (0.86 + 0.28 * n1(x * 0.08 + 11, z * 0.08))
+    if (r <= RP) return h
+    // за краем платформы — стена, под ней склоны горы до дна долины, с гребнями и осыпями
+    const t = r - RP
+    const ridge = n1(x * 0.006 + 30, z * 0.006) * 0.6 + n1(x * 0.02, z * 0.02 + 50) * 0.4
+    const u = Math.min(1, t / (DROP * 1.5))
+    return -24 - (DROP - 24) * (1 - Math.pow(1 - u, 2.6)) * (0.72 + ridge * 0.5) + (n1(x * 0.05, z * 0.05) - 0.5) * 10 * smooth(0, 40, t)
   }
   const GN = opts.mobile ? 180 : EW > 2500 ? 384 : 256
   const GM = Math.round((GN * EH) / EW)
@@ -516,6 +541,10 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     if (marks.has(i)) return
     const c = centerOf(b.r)
     if (mons.some((m) => inRect(m, c[0], c[1], 1.5))) removed[i] = 1
+    // на вершине — скала и дворец, домов там нет
+    if (kranz && Math.hypot(c[0] - center[0], c[1] - center[1]) < R0 * 1.08) removed[i] = 1
+    // за краем платформы — обрыв, домов там нет
+    if (kranz && Math.hypot(c[0] - center[0], c[1] - center[1]) > RP - 5) removed[i] = 1
   })
   blds.forEach((b, i) => { if (!removed[i]) fillPoly(b.r, i + 1) })
   const monAt = new Map<number, Mon>(mons.map((m) => [m.i, m]))
@@ -766,6 +795,18 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         pos[q * 3] = x; pos[q * 3 + 1] = y; pos[q * 3 + 2] = z
         uv[q * 2] = i / GN; uv[q * 2 + 1] = 1 - j / GM
         tmp.copy(white)
+        if (kranz) {
+          const r = Math.hypot(x - center[0], z - center[1])
+          if (r < R0) { tmp.lerp(rock, 0.9); if (y > PEAK * 0.55) tmp.setRGB(1.55, 1.58, 1.65) }
+          else if (r > RP) {
+            // крутые склоны — голый камень, пологие — луга и снег пятнами
+            const sl = Math.abs((hgrid[q + 1] ?? y) - y) + Math.abs((hgrid[q + GN + 1] ?? y) - y)
+            tmp.setRGB(0.74, 1.06, 0.62).lerp(rock, Math.min(1, (sl / (EW / GN)) * 0.7))
+            if (y > -70 && n1(x * 0.03 + 5, z * 0.03) > 0.55) tmp.lerp(new THREE.Color(1.5, 1.52, 1.6), 0.55)
+          }
+          col[q * 3] = tmp.r; col[q * 3 + 1] = tmp.g; col[q * 3 + 2] = tmp.b
+          continue
+        }
         if (y > 12) tmp.lerp(rock, smooth(12, 30, y) * 0.85)
         if (y < 0.55 && hasWater) tmp.lerp(shore, 0.75 * smooth(0.55, 0.1, y))
         if (y < -0.3) tmp.multiplyScalar(0.55)
@@ -1620,7 +1661,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const z = far ? center[1] + (R() - 0.5) * Math.min(EH, radius * 7) : R() * H
     if (x < x0 || z < z0 || x > x0 + EW || z > z0 + EH) continue
     const y = heightAt(x, z)
-    if (y < 0.5 || y > 34 || gridAt(x, z) !== 0) continue
+    // город на вершине: ели только на склонах под платформой
+    if (kranz ? Math.hypot(x - center[0], z - center[1]) < RP + 8 || y > -30 : y < 0.5 || y > 34 || gridAt(x, z) !== 0) continue
     const inPlan = x >= 0 && z >= 0 && x <= W && z <= H
     if (inPlan && paved(x, z) > 0.25) continue
     const d = Math.hypot(x - center[0], z - center[1]) / radius
@@ -2036,6 +2078,139 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     waterUni.uFar.value = fog.far
   }
 
+  // ---------- город на вершине (Высокогорное Княжество): стена платформы, скала с дворцом, подъёмники, Подошва, облака ----------
+  const gondolas: { mesh: THREE.Mesh; a: THREE.Vector3; b: THREE.Vector3; sag: number; ph: number; sp: number }[] = []
+  if (kranz) {
+    const kr = rng(hashOf(seedName) + 1337)
+    const wallB = new Bucket(), roofB = new Bucket(), lit = new Bucket(), huts = new Bucket(), cableB = new Bucket()
+    const stone = mixHex(st.stone, '#7a766c', 0.3), stone2 = mixHex(st.stone, '#ffffff', 0.18)
+    const at = (a: number, r: number): [number, number] => [center[0] + Math.cos(a) * r, center[1] + Math.sin(a) * r]
+    // стена платформы: от склона до парапета, с контрфорсами и зубцами
+    const SEG = 180
+    for (let i = 0; i < SEG; i++) {
+      const a0 = (i / SEG) * Math.PI * 2, a1 = ((i + 1) / SEG) * Math.PI * 2
+      const [x0w, z0w] = at(a0, RP + 1), [x1w, z1w] = at(a1, RP + 1)
+      const [xi0, zi0] = at(a0, RP - 1.4), [xi1, zi1] = at(a1, RP - 1.4)
+      const top = Math.max(heightAt(...at(a0, RP - 3)), heightAt(...at(a1, RP - 3))) + 1.5
+      const bot0 = heightAt(...at(a0, RP + 7)) - 4, bot1 = heightAt(...at(a1, RP + 7)) - 4
+      wallB.quad([x0w, bot0, z0w], [x1w, bot1, z1w], [x1w, top, z1w], [x0w, top, z0w], i % 2 ? stone : stone2, 0.9)
+      wallB.quad([xi0, top - 1.6, zi0], [xi1, top - 1.6, zi1], [xi1, top, zi1], [xi0, top, zi0], stone, 1)
+      wallB.quad([x0w, top, z0w], [x1w, top, z1w], [xi1, top, zi1], [xi0, top, zi0], stone2, 1.05)
+      if (i % 3 === 0) { const [cx, cz] = at((a0 + a1) / 2, RP); wallB.box(cx, top, cz, 1.4, 0.9, 2.4, stone2, -(a0 + a1) / 2) }
+      if (i % 10 === 0) {
+        // контрфорс уходит в склон
+        const [bx, bz] = at(a0, RP + 4), b = heightAt(bx, bz) - 6
+        wallB.box(bx, b, bz, 6, top - b - 2, 3.4, stone, -a0 + Math.PI / 2)
+      }
+    }
+    // скала вершины: каменные зубья, а на макушке — дворец князя или храм Света
+    for (let i = 0; i < 26; i++) {
+      const a = kr() * Math.PI * 2, d = R0 * (0.25 + kr() * 0.7)
+      const [x, z] = at(a, d), g = heightAt(x, z)
+      wallB.cyl(x, g - 4, z, 3 + kr() * 5, 8 + kr() * PEAK * 0.3, 5, mixHex('#7d7a70', '#9a968a', kr()), 0, false, kr() * 3)
+    }
+    const topY = heightAt(center[0], center[1])
+    const capital = N > 220
+    const keep = (x: number, z: number, w: number, h: number, roofH: number, col: string, rot = 0): void => {
+      wallB.box(x, topY - 6, z, w, h + 6, w, col, rot)
+      roofB.cyl(x, topY + h, z, w * 0.78, roofH, 4, st.roof[0], 0, false, rot + Math.PI / 4)
+      for (let k = 0; k < 4; k++) lit.box(x + Math.cos(rot + k * 1.571) * (w / 2 + 0.05), topY + h * 0.62, z + Math.sin(rot + k * 1.571) * (w / 2 + 0.05), 0.9, 1.5, 0.15, '#ffffff', rot + k * 1.571 + 1.571)
+    }
+    if (capital) {
+      // дворец Адлерхорнов: главная башня, четыре угловые и выше всех — Орлиная
+      wallB.box(center[0], topY - 1, center[1], 30, 6, 30, stone2)
+      keep(center[0], center[1], 13, 18, 14, '#efeae0')
+      for (let k = 0; k < 4; k++) { const a = Math.PI / 4 + k * 1.571; const [x, z] = at(a, 11); keep(x, z, 5.5, 22, 11, '#e8e2d4', a) }
+      keep(center[0] + 3, center[1] - 3, 4.5, 34, 13, '#f4f0e8')
+    } else {
+      // храм Света: белая башня, огонь на шпиле
+      keep(center[0], center[1], 7, 15, 12, '#f4f0e8')
+      lit.cyl(center[0], topY + 27, center[1], 0.6, 2.5, 6, '#ffffff', 0.1)
+    }
+    // подъёмники: верхняя станция у края платформы, нижняя — в долине; канаты провисают, бадьи ходят вверх и вниз
+    const LIFTS = capital ? 4 : 2
+    const cableMat = new THREE.MeshBasicMaterial({ color: '#2a2622', fog: true, side: THREE.DoubleSide })
+    const gondGeo = new THREE.BoxGeometry(4.2, 3.6, 5.4)
+    const gondMat = new THREE.MeshLambertMaterial({ color: '#6a4a30' })
+    disposable.push(cableMat, gondGeo, gondMat)
+    for (let l = 0; l < LIFTS; l++) {
+      const a = (l / LIFTS) * Math.PI * 2 + kr() * 0.6 + 0.3
+      const [tx, tz] = at(a, RP - 6), ty = heightAt(tx, tz)
+      const far = RP + DROP * (1.15 + kr() * 0.35)
+      const [bx, bz] = at(a + (kr() - 0.5) * 0.3, far), by = heightAt(bx, bz)
+      // станции: каменный низ, деревянный верх, большое колесо
+      for (const [x, z, y, big] of [[tx, tz, ty, true], [bx, bz, by, false]] as [number, number, number, boolean][]) {
+        huts.box(x, y - 2, z, 9, 7, 7, stone, -a)
+        huts.box(x, y + 5, z, 9.4, 4, 7.4, st.timber, -a)
+        roofB.cyl(x, y + 9, z, 7.2, 4, 4, st.roof[1], 0, false, -a + Math.PI / 4)
+        huts.cyl(x - Math.sin(a) * 3.8, y + 3, z + Math.cos(a) * 3.8, 3.4, 0.5, 14, '#3a2a1e', 3.4, true)
+        if (big) lit.box(x, y + 2, z, 1, 1.4, 7.6, '#ffffff', -a)
+      }
+      // два каната с провисом
+      for (const off of [-1.4, 1.4]) {
+        const ox = -Math.sin(a) * off, oz = Math.cos(a) * off
+        const A = new THREE.Vector3(tx + ox, ty + 7, tz + oz), B = new THREE.Vector3(bx + ox, by + 7, bz + oz)
+        const sag = A.distanceTo(B) * 0.06
+        const STEPS = 28
+        const P = (t: number): THREE.Vector3 => new THREE.Vector3().lerpVectors(A, B, t).add(new THREE.Vector3(0, -sag * 4 * t * (1 - t), 0))
+        for (let k = 0; k < STEPS; k++) {
+          const p = P(k / STEPS), q = P((k + 1) / STEPS)
+          cableB.quad([p.x, p.y, p.z], [q.x, q.y, q.z], [q.x, q.y + 0.6, q.z], [p.x, p.y + 0.6, p.z], '#2a2622')
+        }
+        // бадьи: по четыре на канат, по одному канату вверх, по другому вниз
+        for (let k = 0; k < 4; k++) {
+          const m = new THREE.Mesh(gondGeo, gondMat)
+          m.castShadow = true
+          m.rotation.y = -a
+          scene.add(m)
+          gondolas.push({ mesh: m, a: A, b: B, sag, ph: k / 4 + (off > 0 ? 0.125 : 0), sp: (off > 0 ? 1 : -1) * 0.012 })
+        }
+      }
+      // в Подошве у нижней станции — рудник: хижины подгорников, отвалы, вход в штольню
+      const hutN = 7 + Math.floor(kr() * 6)
+      for (let k = 0; k < hutN; k++) {
+        const ha = a + (kr() - 0.5) * 0.5, hr = far + (kr() - 0.3) * 70
+        const [hx, hz] = at(ha, hr), hy = heightAt(hx, hz), w = 4 + kr() * 3, d = 3.5 + kr() * 2.5, rot = kr() * 3
+        huts.box(hx, hy - 1.5, hz, w, 4.5, d, mixHex('#7d766c', '#958c7e', kr()), rot)
+        huts.box(hx, hy + 3, hz, w + 0.6, 0.6, d + 0.6, '#5b5550', rot)
+        if (kr() < 0.5) lit.box(hx + Math.cos(rot) * (w / 2 + 0.05), hy + 1.2, hz + Math.sin(rot) * (w / 2 + 0.05), 0.8, 1, 0.1, '#ffffff', rot + 1.571)
+      }
+      for (let k = 0; k < 3; k++) {
+        const [hx, hz] = at(a + (kr() - 0.5) * 0.4, far + 30 + kr() * 50), hy = heightAt(hx, hz)
+        huts.cyl(hx, hy - 2, hz, 9 + kr() * 8, 6 + kr() * 7, 7, '#6e6a62', 0, false, kr() * 3)
+      }
+      const [mx, mz] = at(a + 0.12, far - 18), my = heightAt(mx, mz)
+      huts.box(mx, my - 2, mz, 6, 7, 3, '#4a4038', -a)
+      huts.box(mx, my - 2, mz, 3.6, 5, 3.4, '#0e0c0a', -a)
+      lit.box(mx + 2.6, my + 2.4, mz, 0.6, 0.9, 0.6, '#ffffff')
+    }
+    for (const [b, m, sh] of [[wallB, solidMat, true], [roofB, roofMat, true], [huts, solidMat, true], [lit, glowMat, false], [cableB, cableMat, false]] as [Bucket, THREE.Material, boolean][]) {
+      const g = b.geometry()
+      if (!g) continue
+      const mesh = new THREE.Mesh(g, m)
+      mesh.castShadow = sh
+      mesh.receiveShadow = sh
+      scene.add(mesh)
+      disposable.push(g)
+    }
+    // облака ниже платформы: город над облаками
+    const lowMat = new THREE.SpriteMaterial({ map: dot, color: '#ffffff', transparent: true, opacity: 0.7, depthWrite: false, fog: false })
+    disposable.push(lowMat)
+    for (let i = 0; i < (opts.mobile ? 30 : 70); i++) {
+      const a = kr() * Math.PI * 2, d = RP + 40 + kr() * DROP * 1.6
+      const sp = new THREE.Sprite(lowMat)
+      const [x, z] = at(a, d)
+      sp.position.set(x, -DROP * (0.35 + kr() * 0.25), z)
+      const w = 70 + kr() * 120
+      sp.scale.set(w, w * 0.3, 1)
+      clouds.add(sp)
+    }
+    fog.near = Math.max(fog.near, RP * 1.4)
+    fog.far = Math.max(fog.far, (RP + DROP * 2) * 2.2)
+    waterUni.uNear.value = fog.near
+    waterUni.uFar.value = fog.far
+  }
+
   const KEY = {
     day: { top: '#5a9bd8', hor: '#d5e6ea', sun: '#fff0d8', sunK: 2.9, hemiK: 1.55, sky: '#d6e6ff', gnd: '#8a9a68' },
     gold: { top: '#465f96', hor: '#f4b37c', sun: '#ffa564', sunK: 2.4, hemiK: 0.95, sky: '#d8c0c0', gnd: '#6a5a4a' },
@@ -2119,7 +2294,12 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const tmpFocus = new THREE.Vector3(), tmpDir = new THREE.Vector3()
   const tick = (dt: number, t: number, cam: THREE.Camera): void => {
     waterUni.uT.value = t
-    clouds.position.x = ((t * 1.1) % 800) - 400
+    clouds.position.x = kranz ? Math.sin(t * 0.01) * 30 : ((t * 1.1) % 800) - 400
+    for (const g of gondolas) {
+      const u = (((g.ph + t * g.sp) % 1) + 1) % 1
+      g.mesh.position.lerpVectors(g.a, g.b, u)
+      g.mesh.position.y -= g.sag * 4 * u * (1 - u) + 3.4
+    }
     sky.position.copy(cam.position)
     stars.position.copy(cam.position)
     const camH = cam.position.y - heightAt(cam.position.x, cam.position.z)

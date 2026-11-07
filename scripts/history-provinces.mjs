@@ -373,6 +373,7 @@ const northAll = provs.filter((p) => NORTH.has(nameOf(p)) || MOUNTAIN.has(nameOf
   seeds.forEach((s, i) => (s.rebelStart = 976.0 + i * 0.12))
   SEEDS.north = seeds[0]
   for (const p of northAll) {
+    if (nameOf(p) === 'Высокогорное Княжество') continue
     let best = Infinity
     for (const s of seeds) best = Math.min(best, s.rebelStart + dist(p, s) / 2600)
     at(p, Math.min(977.4, best), northRebels)
@@ -380,11 +381,22 @@ const northAll = provs.filter((p) => NORTH.has(nameOf(p)) || MOUNTAIN.has(nameOf
   // восставшие складываются в нынешние северные государства
   const byState = new Map()
   for (const p of northAll) {
-    if (nameOf(p) === 'Имперские Изгнанники') continue
+    if (nameOf(p) === 'Имперские Изгнанники' || nameOf(p) === 'Высокогорное Княжество') continue
     if (!byState.has(p.state)) byState.set(p.state, [])
     byState.get(p.state).push(p)
   }
   for (const list of byState.values()) sweep(list, 977.5 + rnd() * 0.6, 0.25, list[0].state, centroid(list))
+  // Высокогорное Княжество (scripts/lore/highland.mjs): маркграф Зигмунд объявляет княжество с Венца в 976 г.;
+  // в 977 г. III легион Совета берёт рудники Подошвы, сорок дней стоит под Химмельскранцем и уходит
+  {
+    const high = provs.filter((p) => nameOf(p) === 'Высокогорное Княжество')
+    const kranz = high.find((p) => p.id === 989) ?? high[0]
+    sweep(high, 976.4, 0.35, kranz.state, kranz)
+    const foot = high.filter((p) => p.terrain <= 2 || (p.settlement?.type === 'village' && dist(p, kranz) > 220))
+    const fromSouth = foot.reduce((a, b) => (a.y > b.y ? a : b))
+    sweep(foot, 977.25, 0.1, pact, fromSouth)
+    sweep(foot, 977.6, 0.1, kranz.state, kranz)
+  }
   // радикальные монархисты бегут на крайний север
   const exiles = provs.filter((p) => nameOf(p) === 'Имперские Изгнанники')
   sweep(exiles, 980.12, 0.3, exiles[0].state, haussler)

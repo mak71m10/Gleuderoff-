@@ -24,6 +24,7 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const HIGHLAND_STYLE = 'oil painting, alpine noble portrait, cold clear mountain light, snowy peaks and pale sky behind, dark wood panelling, visible brush strokes, detailed face, half-length portrait'
 const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge light and brass lamps, carved stone pillars, dark background, visible brush strokes, detailed face, half-length portrait'
 const KREIT_STYLE = 'oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
@@ -39,6 +40,23 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  // Высокогорное Княжество: альпийская знать (тёмная шерсть, мех, белое и лазурь), подгорники — рудокопы и механики
+  'hl-sigmund': 'stern old prince with a short white beard and cold blue eyes, fur-lined dark blue mantle, silver eagle brooch, a coil of cut rope on the table, hard proud face',
+  'hl-albrecht': 'tall proud prince in his forties, dark blond hair, trimmed beard, white and blue embroidered doublet with silver eagle, standing on a high gallery, arrogant gaze',
+  'hl-max': 'young prince in his twenties, clean-shaven, ash-blond hair, thoughtful grey eyes, plain dark blue coat with a silver eagle pin, no jewellery, earnest look',
+  'hl-kunigunde': 'elegant widowed princess in her forties, pale skin, ash-blond hair under a white veil, black velvet gown with a silver key on a chain, cold beautiful face, faint smile',
+  'hl-eberhard': 'cold calm nobleman in his fifties, grey hair combed back, clean-shaven, dark grey coat, a heavy ring of twelve iron keys on his belt, measuring gaze',
+  'hl-rotger': 'weathered mountain guard captain in his forties, short brown hair, scarred cheek, steel breastplate over a red and gold tabard, crossbow on his shoulder, honest tired eyes',
+  'hl-anselm': 'cruel old mine lord in his sixties, bald with grey side hair, fleshy face, rich green coat with fur, heavy gold chain, a whip in his belt, contemptuous look',
+  'hl-leonora': 'clever young noblewoman in her twenties, dark blond hair in a braided crown, sharp grey eyes, deep blue gown, silver scales pendant, ledger in hand, confident half-smile',
+  'hl-valentin': 'self-made nobleman in his forties, broad shoulders, short dark hair, trimmed beard, white marble dust on his sleeves, rich but plain grey coat, ambitious eyes',
+  'hl-benedikt': 'old priest of the Light in his sixties, thin white hair, kind sad eyes, white and gold vestments, small bronze bell in his hands, warm candle light',
+  'hl-gottfried': 'old judge in his fifties, grey beard, spectacles, black judge robe with a white collar, scroll in hand, careful fair face',
+  'hl-dietrich': 'fallen nobleman in his fifties, unkempt grey-blond hair and beard, worn noble coat patched with leather, mine lamp at his belt, defiant intelligent eyes, mine village behind',
+  'hl-quirin': '(no hat:1.3), (tiny old gnome, white hair, white beard:1.5), old gnome mechanic with a huge round nose, big ears, white spiky hair and a short white beard, leather apron, big brass wrench, gears and thick ropes of a giant winch behind, sly proud smile',
+  'hl-brodar': '(ancient dwarf miner:1.4), very old dwarf with a long grey beard grey with stone dust, coughing, leather miner helmet with a lamp, pickaxe, bitter tired eyes',
+  'hl-hilda': '(female dwarf miner, woman, no beard:1.5), stout dwarf woman with thick copper-red braids, soot on her face, miner clothes, holding a bell rope, fierce grieving eyes',
+  'hl-ebert':'grizzled imperial legion legate in his fifties, close-cropped grey hair, scarred face, steel cuirass with wolf emblem, red cloak, snowy mountains behind, calculating eyes',
   // Фарвольская лига: гномы (маленькие, большой нос, светлые глаза, торчащие русые волосы, расчёсанная бородка) и дварфы
   'fv-gildarts': '(no hat:1.3), (scarred veteran gnome warrior:1.3), small sturdy gnome in his prime with a big nose, bright light-grey eyes, spiky sandy hair and a neatly combed short beard, dented dwarven steel breastplate over an embroidered dark coat, iron hammer, a deep scar across the cheek, stern kind eyes, dark mine tunnel with lamps behind',
   'fv-ortwin': '(no hat:1.3), old gnome ruler with a big nose, thin white combed beard in braids, spectacles, rich embroidered dark green coat with gold buttons, ledger in hands, cautious tired eyes',
@@ -313,7 +331,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -327,7 +345,8 @@ for (const e of chars) {
   const north = e.base.tags.includes('Земли Севера')
   const kreit = e.base.tags.includes('Креит')
   const farvol = e.base.tags.includes('Фарвольская лига')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol
+  const highland = e.base.tags.includes('Высокогорное Княжество')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -344,7 +363,11 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
-  const prompt = farvol
+  const prompt = highland && (dwarfR || gnomeR)
+    ? `${FARVOL_STYLE.replace('warm forge light and brass lamps, carved stone pillars', 'mine lamp light, rough rock walls, ore carts')}, ${dwarfR ? `portrait of an (${age > 120 ? 'ancient' : 'adult'} dwarf${female ? ' woman, female, no beard' : ''}:1.45), (short stout broad-shouldered dwarf, huge nose, heavy brow, ruddy weathered european skin:1.35), ` : `portrait of a (short ${female ? 'woman' : 'man'}, fantasy tinkerer, bareheaded:1.35), (big round nose, light eyes, ruddy european skin:1.25), `}${CUSTOM[id] ?? subject}`
+    : highland
+    ? `${HIGHLAND_STYLE}, ${banner}portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, alpine german features, pale skin:1.25), ${CUSTOM[id] ?? subject}`
+    : farvol
     ? `${FARVOL_STYLE}, ${banner}${dwarfR ? `portrait of an (old dwarf${female ? ' woman, female' : ''}:1.45), (short stout broad-shouldered dwarf, huge nose, heavy brow, ruddy weathered european skin:1.35), ` : gnomeR ? `portrait of a (short ${female ? 'woman' : 'man'}, fantasy tinkerer, bareheaded:1.35), (big round nose, slightly large ears, bright light eyes, spiky sandy hair, ruddy tanned european skin:1.3), ` : `portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, pale skin:1.2), `}${CUSTOM[id] ?? subject}`
     : kreit
     ? `${KREIT_STYLE}, ${banner}portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (norwegian, pale weathered skin:1.2), ${CUSTOM[id] ?? subject}`
@@ -361,7 +384,7 @@ for (const e of chars) {
   }
   await startSd()
   const t0 = Date.now()
-  const negative = farvol ? `${NEG}, (garden gnome, pointy hat, conical hat, figurine, statue, toy, ceramic, doll:1.6), (crown, tiara:1.4)` : rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5), (picture frame, gilded frame, border:1.4)` : NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG
+  const negative = farvol || (highland && (dwarfR || gnomeR)) ? `${NEG}, (garden gnome, pointy hat, conical hat, figurine, statue, toy, ceramic, doll:1.6), (crown, tiara:1.4)` : rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5), (picture frame, gilded frame, border:1.4)` : NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG
   // 448×560, а не 512×640: на 512×640 модель не влезает в 4 ГБ видеопамяти и шаг в 5 раз медленнее; потом увеличиваем
   const png = await txt2img({ prompt, negative, width: 448, height: 560, steps: 7, cfg: 1.8, seed: seedOf(id) + Number(process.env.SEED_OFFSET ?? 0) })
   // республиканцев любит рисовать в раме — обрезаем края
