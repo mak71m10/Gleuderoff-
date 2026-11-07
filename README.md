@@ -43,6 +43,8 @@ npm run dist       # собрать установщик в release/ (упако
 
 Версия для телефона: `npm run build:web` → папка `out-web` (плитки до z=1), публикуется закрытой страницей на claude.ai.
 
+Приложение для Android: `npm run android` → `release/Gleuderoff-<версия>.apk` (Capacitor 6, проект в `android/`, только альбомная ориентация, во весь экран). Инструменты вне проекта, в `E:\Android` (переменная `ANDROID_TOOLS`): JDK 17, Android SDK (platform 34, build-tools 34), консоль Capacitor в `capcli`, кэш Gradle. APK подписан отладочным ключом и ставится на телефон напрямую. Иконки программы, приложения и заставка — из `build/logo.jpg`: `node scripts/app-icons.mjs`. Интерфейс телефона в альбомной ориентации — блок «телефон в альбомной ориентации» в конце `styles.css` (меню-полоса значков, свойства справа, шкала времени в одну строку).
+
 Портреты: `node scripts/portraits.mjs` (персонажи) и `node scripts/deputy-portraits.mjs` (члены собраний Республики) — stable-diffusion.cpp с DreamShaper 8 (`tools/sd`, не в git) через `scripts/sd.mjs`: модель один раз грузится в `sd-server` и держится в памяти, декодер TAESD. Персонажи — LCM-LoRA, 7 шагов, 448×560 (на 512×640 не хватает 4 ГБ видеопамяти и шаг в 5 раз медленнее) с увеличением — ~20 с; депутаты — Hyper-SD (2-step LoRA на силе 0,6, сэмплер TCD, 3 шага) — ~5,5 с. `SD_FAST=1` включает быстрый режим и для персонажей (~7 с, но без отрицательного запроса).
 
 Подробный план карты — [MAP_PLAN.md](MAP_PLAN.md).

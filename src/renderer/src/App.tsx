@@ -1,3 +1,4 @@
+import logoUrl from './assets/logo.webp'
 import { useEffect, useState } from 'react'
 import { useStore, type View } from './store'
 import { KINDS, KIND_ORDER } from './constants'
@@ -63,7 +64,7 @@ export default function App() {
       <div className="nav-backdrop" onClick={() => setNavOpen(false)} />
       <nav className="sidebar">
         <div className="brand">
-          <span className="brand-mark">G</span>
+          <img className="brand-logo" src={logoUrl} alt="" />
           <span className="brand-name">Gleuderoff</span>
         </div>
         <div className="nav-items">
@@ -71,6 +72,7 @@ export default function App() {
             <button
               key={n.view}
               className={`nav-item ${view === n.view ? 'active' : ''}`}
+              title={n.label}
               onClick={() => {
                 setView(n.view)
                 setNavOpen(false)

@@ -1,0 +1,6 @@
+{
+  "appId": "ru.gleuderoff.app",
+  "appName": "Gleuderoff",
+  "webDir": "out-web",
+  "android": { "backgroundColor": "#0d0f13" }
+}

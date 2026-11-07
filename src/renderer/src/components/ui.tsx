@@ -3,6 +3,7 @@ import { Icon, type IconName } from './Icon'
 import { useStore } from '../store'
 import { formatDate, fromParts, toParts } from '../calendar'
 import type { WorldDate } from '../types'
+import { renderBody } from './prose'
 
 /** Значки кнопок, которые что-то меняют в мире — их прячет режим игрока */
 const EDIT_ICONS = new Set<IconName>(['trash', 'plus', 'image', 'pen', 'shield', 'brush'])
@@ -43,10 +44,38 @@ export function TextField({
   className?: string
 }) {
   const [draft, setDraft] = useState(value ?? '')
+  const [editing, setEditing] = useState(false)
   const ro = useStore((s) => !s.masterMode)
+  const world = useStore((s) => s.world)
   useEffect(() => setDraft(value ?? ''), [value])
   const commit = (): void => {
+    setEditing(false)
     if (draft !== (value ?? '')) onChange(draft)
+  }
+  // многострочный текст показываем с разметкой (**жирный**, списки, заголовки, [[ссылки]]), а правим — по нажатию
+  if (multiline && !editing && draft.trim() && world) {
+    const goto = (eid: string): void => {
+      const st = useStore.getState()
+      const target = st.world?.entries.find((e) => e.id === eid)
+      if (!target) return
+      st.setView(target.kind)
+      st.select({ type: 'entry', id: eid })
+    }
+    return (
+      <div className={`field ${className ?? ''}`}>
+        {label && <span className="field-label">{label}</span>}
+        <div
+          className={`field-text prose${ro ? '' : ' editable'}`}
+          title={ro ? undefined : 'Нажмите, чтобы править'}
+          onClick={(e) => {
+            if (ro || (e.target as HTMLElement).closest('button')) return
+            setEditing(true)
+          }}
+        >
+          {renderBody(draft, world, goto)}
+        </div>
+      </div>
+    )
   }
   return (
     <label className={`field ${className ?? ''}`}>
@@ -56,6 +85,7 @@ export function TextField({
           value={draft}
           readOnly={ro}
           rows={rows}
+          autoFocus={editing}
           placeholder={placeholder}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={commit}

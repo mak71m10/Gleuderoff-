@@ -51,7 +51,7 @@ const CUSTOM = {
   'no-e-ingrid': 'old norse woman whaler with grey braids, sealskin clothes, harpoon resting on her shoulder, weathered tough face',
   'no-e-hrolf': 'huge old norse warrior with a grey beard and bald head, bear fur, stone-like stern face',
   'no-e-steinar': 'silent grim norse elder with a black and grey beard, dark furs, heavy brow, closed mouth',
-  'no-e-durnir': 'very old dwarf with an enormous white braided beard reaching the belt, iron rings in the beard, leather apron over chainmail, forge glow behind',
+  'no-e-durnir': '(snow white beard and white eyebrows:1.4), oil painting, dwarf elder with an enormous thick white beard braided into many plaits with iron rings, bald head with runic tattoos, massive arms, leather smith apron over chainmail, iron hammer on the shoulder, glowing forge and anvil in a stone hall behind',
   'no-e-egil': 'old norse sea raider covered in many scars, grey braided beard, missing ear, chainmail and seal fur, sea behind',
   'no-svein': 'norse warrior in his forties with raven black hair and beard, black feather in the hair, chainmail, round shield with a black raven',
   'no-oddvar': 'norse fisherman chieftain in his forties with black hair and beard, sealskin cloak, weathered face, fjord behind',
@@ -297,7 +297,7 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const prompt = north
-    ? `${NORTH_STYLE}, ${banner}portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), ${/Дварф/.test(race) ? '(dwarf:1.3), ' : '(scandinavian, pale weathered skin:1.2), '}${CUSTOM[id] ?? subject}`
+    ? `${NORTH_STYLE}, ${banner}${/Дварф/.test(race) ? `portrait of an (ancient dwarf:1.5), (short stout broad-shouldered dwarf, huge bulbous nose, heavy brow, deep-set eyes, ruddy weathered skin:1.4), ` : `portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (scandinavian, pale weathered skin:1.2), `}${CUSTOM[id] ?? subject}`
     : sty
     ? `oil painting, dark gothic medieval portrait, candlelight, deep shadows, black background, visible brush strokes, detailed face, half-length portrait, ${banner}portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european:1.15), ${stHouse ? `(snow white skin, jet black hair:1.35), ${female ? 'black velvet gown' : 'black velvet doublet'} with a silver crescent, cold eyes` : /немая|скита/.test(e.base.title) ? 'grim hooded figure in grey robe, ink-stained hands' : /Капитан/.test(e.base.title) ? 'scarred mercenary general in worn black armor' : /Кастелян/.test(e.base.title) ? 'impoverished nobleman in a patched old doublet, tired face' : /Епископ/.test(e.base.title) ? 'bored bishop in shabby white robes with a golden sun pendant' : /Мастер|Управляющий/.test(e.base.title) ? 'shady merchant in black clothes with rings, sly look' : subject}`
     : rp

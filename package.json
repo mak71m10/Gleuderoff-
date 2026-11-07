@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@capacitor/android": "^6.2.3",
+    "@capacitor/core": "^6.2.3",
     "@fontsource/alegreya-sans": "^5.1.0",
     "@fontsource/cormorant-garamond": "^5.1.0",
     "@fontsource/cormorant-sc": "^5.1.0",
@@ -34,7 +36,7 @@
   },
   "name": "gleuderoff",
   "productName": "Gleuderoff",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "description": "Gleuderoff вЂ” СЂРµРґР°РєС‚РѕСЂ РјРёСЂР°",
   "main": "out/main/index.js",
   "author": "Gleuderoff",
@@ -45,6 +47,7 @@
     "dist": "electron-vite build && electron-builder --win",
     "upscale": "node scripts/upscale-map.mjs",
     "web": "vite --config vite.web.config.ts",
+    "android": "node scripts/build-android.mjs",
     "build:web": "vite build --config vite.web.config.ts && node scripts/prune-web.mjs"
   }
 }

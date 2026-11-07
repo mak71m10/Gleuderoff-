@@ -126,7 +126,7 @@ const PANEL_POS_KEY = 'gleuderoff.layersPanel'
 
 function loadPanelState(): { x: number | null; y: number | null; open: boolean } {
   // на телефоне панель стоит на месте и по умолчанию свёрнута
-  const phone = window.innerWidth <= 760
+  const phone = window.matchMedia('(max-width: 760px), (max-height: 520px) and (orientation: landscape)').matches
   try {
     const saved = JSON.parse(localStorage.getItem(PANEL_POS_KEY) || '{}')
     return phone ? { x: null, y: null, open: false } : { x: null, y: null, open: true, ...saved }
