@@ -879,7 +879,8 @@ export function MapView() {
         setHoverKey((k) => (k === key ? k : key))
         const tip = tipRef.current
         if (!tip) return
-        if (!id) {
+        // на телефоне подсказки под пальцем нет: касание не уводит «мышь», и подсказка зависала бы на экране
+        if (!id || coarse) {
           tip.style.display = 'none'
           return
         }
@@ -909,6 +910,7 @@ export function MapView() {
     const onUp = (): void => {
       painting = false
     }
+    const coarse = window.matchMedia('(pointer: coarse)').matches
     map.on('mousemove', onMove)
     map.on('mouseout', onOut)
     map.on('mousedown', onDown)
@@ -919,6 +921,9 @@ export function MapView() {
       map.off('mousedown', onDown)
       window.removeEventListener('mouseup', onUp)
       cancelAnimationFrame(raf)
+      // ушли с карты мира (например, открыли план города) — подсказка с названием провинции не должна остаться висеть
+      if (tipRef.current) tipRef.current.style.display = 'none'
+      setHoverKey(null)
     }
   }, [provinces, mapDef.id])
 

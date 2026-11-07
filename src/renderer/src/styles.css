@@ -1702,5 +1702,22 @@ button.pw-chip:hover { background: var(--panel-2); }
   /* круги власти (Каменный круг, ставка) целиком помещаются по высоте экрана */
   .ting-stage { max-width: min(760px, calc((100dvh - 64px) * 720 / 520)); }
   .stavka-stage { max-width: min(760px, calc((100dvh - 64px) * 720 / 500)); }
+
+  /* парламент: полукруг зала целиком по высоте экрана, описание — под залом */
+  .pw-main { display: flex; flex-direction: column; padding: 6px 10px 24px; }
+  .pw-desc { order: 3; margin-top: 8px; }
+  .pw-hall { overflow: visible; order: 1; }
+  .pw-hemi { width: 100%; height: auto; max-height: calc(100dvh - 64px - env(safe-area-inset-bottom)); max-width: none; }
+  .pw-hall-note { order: 2; }
+}
+/* телефон: всё, что листается, листается до конца — запас снизу под жестовую полосу, полотна не съедают весь экран */
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .panzoom { height: min(480px, 58dvh); }
+  .vault-scales { max-height: calc(100dvh - 150px); }
+  .inspector, .pw-main, .pw-side, .pw-body-one, .codex-list, .codex-detail, .page, .modal, .sc-content, .tool-menu, .tl-picker, .layers-panel, .nav-items, .book-stage {
+    overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
+  .inspector-body, .pw-side, .pw-body-one, .entry, .page, .sc-content { padding-bottom: calc(56px + env(safe-area-inset-bottom)) !important; }
+  .codex-list > :last-child { margin-bottom: calc(40px + env(safe-area-inset-bottom)); }
 }
 @keyframes slide-in { from { transform: translateX(30px); opacity: 0; } }

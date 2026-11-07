@@ -309,6 +309,15 @@ function ProvinceInspector({ id }: { id: number }) {
     setView(e.kind)
     select({ type: 'entry', id: eid })
   }
+  const placePlans = world.places
+    .filter((pl) => pl.mapId === 'world' && pl.innerMapId && (world.maps.find((m) => m.id === pl.innerMapId)?.kind === 'city'))
+    .filter((pl) => {
+      // метка относится к ближайшей провинции
+      let best = Infinity, bestId: number | null = null
+      for (const q of world.provinces ?? []) { const d = (q.x - pl.x) ** 2 + (q.y - pl.y) ** 2; if (d < best) { best = d; bestId = q.id } }
+      return bestId === p.id
+    })
+    .map((pl) => pl.innerMapId!)
   const renameAdmin = (aid: string, name: string): void =>
     mutate((w) => {
       const a = w.adminRegions?.find((x) => x.id === aid)
@@ -344,6 +353,8 @@ function ProvinceInspector({ id }: { id: number }) {
         </div>
       </div>
       {p.cityMapId && <CityMapButton mapId={p.cityMapId} />}
+      {/* столицы и порты (Хауссер, Аурхафен…) стоят меткой на карте мира: их план — у метки, показываем его и в провинции */}
+      {placePlans.filter((m) => m !== p.cityMapId).map((m) => <CityMapButton key={m} mapId={m} />)}
       {world.legislatures?.filter((l) => l.provinceId === p.id).map((l) => <PowerButton key={l.id} legislature={l} title={`${l.name} — городской парламент`} />)}
       {p.settlement && (
         <div className="inspector-block">
