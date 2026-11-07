@@ -11,6 +11,9 @@ import { CoatOfArms, Flag, defaultHeraldry } from './Heraldry'
 import { SuccessionCouncilView } from './Council'
 import { Fullscreen, PanZoom } from './PanZoom'
 import { BookReader } from './BookReader'
+import { TingView } from './Ting'
+import { StavkaView } from './Stavka'
+import { AdvisorsGrid } from './Advisors'
 import { PowerView } from './PowerView'
 import { bookTheme } from '../books'
 import type { Entry, EntryFields, EntryKind, WorldData } from '../types'
@@ -318,21 +321,9 @@ function EntryEditor({ id }: { id: string }) {
               <TextField label="Тайное — знание мастера (не видно в режиме игрока)" multiline rows={4} value={f.secret ?? ''} onChange={(secret) => set({ secret })} />
             </div>
           )}
-          {f.advisors && f.advisors.length > 0 && (
-            <div className="advisors">
-              {f.advisors.map((a) => {
-                const m = world.entries.find((x) => x.id === a.id)
-                if (!m) return null
-                return (
-                  <button key={a.id} className="tree-node" onClick={() => goto(a.id)}>
-                    <span className="tn-portrait">{m.base.image ? <img src={assetUrl(m.base.image)} alt="" /> : <Icon name="user" size={18} />}</span>
-                    <span className="tn-name">{m.base.name}</span>
-                    <span className="tn-years">{a.office}</span>
-                  </button>
-                )
-              })}
-            </div>
-          )}
+          {f.stavka && <StavkaView data={f.stavka} onOpen={goto} />}
+          {f.ting && <TingView data={f.ting} onOpen={goto} />}
+          {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}
         </div>

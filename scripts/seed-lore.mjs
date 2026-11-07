@@ -13,6 +13,8 @@ import southLore from './lore/south.mjs'
 import churchLore from './lore/church.mjs'
 import styriaLore from './lore/styria.mjs'
 import mangeniumLore from './lore/mangenium.mjs'
+import exilesLore from './lore/exiles.mjs'
+import northLore from './lore/north.mjs'
 import geo from './lore/geo.mjs'
 
 const WORLD = 'resources/default-world/world.json'
@@ -40,7 +42,9 @@ const E = (id, kind, name, f = {}) => {
       ...(f.secret ? { secret: f.secret } : {}),
       ...(f.heraldry ? { heraldry: f.heraldry } : {}),
       ...(f.council ? { council: f.council } : {}),
-      ...(f.advisors ? { advisors: f.advisors } : {})
+      ...(f.advisors ? { advisors: f.advisors } : {}),
+      ...(f.stavka ? { stavka: f.stavka } : {}),
+      ...(f.ting ? { ting: f.ting } : {})
     },
     history: [],
     from: f.from ?? null,
@@ -143,7 +147,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 25
+world.version = 28
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })
@@ -152,6 +156,8 @@ southLore({ E, Y, world })
 churchLore({ E, Y, world })
 styriaLore({ E, Y, world })
 mangeniumLore({ E, Y, world })
+exilesLore({ E, Y, world })
+northLore({ E, Y, world })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })
 

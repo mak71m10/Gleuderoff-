@@ -81,6 +81,10 @@ const TABLES: Record<string, W> = {
   church: { imperials: 60, gladry: 18, yarmoly: 5, dwarves: 3, gnomes: 2, 'high-elves': 3, eluins: 5, gordols: 1, nargi: 2, momits: 1 },
   // Корона Аргус: Цепной народ всех рас, сребролистые эльфы, горцы-фьяли
   argus: { imperials: 40, gladry: 16, 'high-elves': 8, 'wood-elves': 5, orcs: 6, gremlins: 5, dwarves: 4, nords: 4, ogres: 1, goliaths: 1, nargi: 2, gnomes: 2, lizardfolk: 1, roma: 1, dalorians: 0.5, skugga: 1 },
+  // Имперские изгнанники: ветераны легионов и их семьи над нордскими деревнями
+  // Земли Севера: норды, в Гарских копях — дварфы и гномы старой Империи гор
+  norse: { nords: 84, dwarves: 5, gnomes: 4, goliaths: 3, imperials: 2, orcs: 1, gladry: 1 },
+  exile: { imperials: 46, nords: 34, gladry: 6, dwarves: 4, gnomes: 2, goliaths: 2, skugga: 2, orcs: 1.5, ogres: 0.8 },
   // Штирия: нищие местные, наёмники всех мастей, покупатели Ночного рынка
   styria: { imperials: 62, gladry: 12, orcs: 5, ogres: 2, goliaths: 2, skugga: 4, vampires: 2, 'dark-elves': 2, dukulites: 2, tieflings: 1.5, 'reig': 0.8, roma: 2, dwarves: 2, gremlins: 2, demons: 0.2 },
   // Республика: эшландцы, веринцы, беглецы из-за перевалов — всех рас; дварфы доков

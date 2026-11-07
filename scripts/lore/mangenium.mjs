@@ -182,7 +182,7 @@ export default function mangenium({ E, Y, world }) {
     Object.assign(st.base, {
       fullName: 'Графство Мангениум', motto: '«Ключ не отдают»', heraldry: { layout: 'bicolor-h', colors: ['#5a3a1a', '#c9a45c'], emblem: 'key', emblemColor: '#1a1a1a' },
       ruler: 'Граф Жан Наний Орнибуций', rulerTitle: 'Граф', rulerId: 'lore-mangenium-now', dynastyId: 'lore-house-mangenium',
-      government: 'Наследственное графство, прямой вассал Империи; на деле автономия. Парламента нет: граф и Совет Десяти, как у императоров',
+      government: 'Графство без парламента: граф и Совет Десяти',
       ideology: 'Верность старым устоям Империи и прямой ветви Монстаргов; вслух — лояльность совету',
       religion: 'Дом Света', religionId: 'lore-house-light', culture: 'Имперцы: обычная имперская культура без ярких особенностей, старые обычаи двора', languages: 'Общий имперский',
       population: 'Около 900 тысяч, из них около 140 тысяч принятых беженцев и их детей', capitalId: 'lore-man-capital',

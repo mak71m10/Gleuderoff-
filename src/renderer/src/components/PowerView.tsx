@@ -8,6 +8,7 @@ import { Icon } from './Icon'
 import type { Bill, Legislature, LegislatureMember } from '../types'
 import { CabinetView, ElectionsView } from './Elections'
 import { PartyTile, PartyView } from './Party'
+import { Charter } from './Charter'
 
 type Tab = 'hall' | 'bills' | 'chronicle' | 'factions' | 'elections' | 'cabinet'
 const VOTE = { y: { label: 'За', color: '#5f9a4f' }, n: { label: 'Против', color: '#b8433a' }, a: { label: 'Воздержался', color: '#a99c80' }, '-': { label: 'Отсутствовал', color: '#3a3f4a' } } as const
@@ -56,6 +57,7 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
   const [member, setMember] = useState<string | null>(null)
   const [billId, setBillId] = useState<string | null>(null)
   const [partyId, setPartyId] = useState<string | null>(null)
+  const [charter, setCharter] = useState<Bill | null>(null)
   const [q, setQ] = useState('')
   const entry = (id: string) => world.entries.find((e) => e.id === id)
   const fac = useMemo(() => new Map(L.factions.map((f) => [f.id, f])), [L])
@@ -213,6 +215,9 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
         <span className="pw-sub">Внёс: {sponsorName(b)}</span>
       </div>
       <p className="pw-bio">{b.summary}</p>
+      <button className="pw-charter-btn" onClick={() => setCharter(b)}>
+        <Icon name="scroll" size={14} /> Открыть грамоту
+      </button>
       {tallyBar(b.tally)}
       {b.tally && (
         <>
@@ -377,6 +382,7 @@ export function PowerView({ legislature: L, onClose }: { legislature: Legislatur
 
   return createPortal(
     <div className="power">
+      {charter && <Charter L={L} bill={charter} number={L.bills.indexOf(charter) + 1} sponsor={sponsorName(charter)} onClose={() => setCharter(null)} />}
       <header className="pw-head">
         <div className="pw-title">
           <span>

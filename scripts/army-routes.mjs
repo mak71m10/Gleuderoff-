@@ -95,9 +95,13 @@ function astar(a, b) {
   g[start] = 0
   from[start] = -1
   push(h(start), start)
+  // цель за морем: посуху до неё не дойти — не перебирать весь материк, а сдаться (поход пойдёт напрямую, флотом)
+  const limit = h(start) * 7 + 60
+  let pops = 0
   while (heap.length) {
     const [f, i] = pop()
     if (i === target) break
+    if (++pops > 4e6 || f > limit) return null
     if (f - h(i) > g[i] + 1e-6) continue
     const x = i % GW, y = (i / GW) | 0
     for (const [dx, dy, d] of DIRS) {

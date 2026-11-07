@@ -1,10 +1,16 @@
 import L from 'leaflet'
 import { getSprite, SETTLEMENT_MIN_PX, SETTLEMENT_SCALE, SPRITE_LOGICAL, type SettlementType } from '../settlements3d'
+import { getMiniSprite } from '../settlementPlans'
+import type { CityPlan } from '../city3d'
+import { loadPlan } from './ui'
 
 /**
  * WebGL-слой провинций в духе Paradox: каждый пиксель берёт номер провинции из текстуры карты провинций,
- * цвет — из маленькой таблицы (меняется мгновенно при смене даты или режима), границы и свечение
+ * цвет — из маленькой таблицы (меняется при смене даты или режима), границы и свечение
  * считаются в шейдере сравнением соседних пикселей.
+ * Войны: таблица знает, когда и у кого провинцию отняли. Между шагами даты время течёт непрерывно (uShift),
+ * захваченная провинция перекрашивается «чернилами» за uTrans дней, граница с прежним владельцем первый
+ * год рисуется линией фронта, а свежезахваченная земля — штриховкой в цвет прежнего хозяина.
  */
 
 const VERT = `#version 300 es
@@ -26,6 +32,9 @@ uniform float uBorders;     // 1 — рисовать границы
 uniform float uProvLines;   // 0..1 — тонкие линии провинций
 uniform float uGlowPx;      // ширина свечения у границы, пиксели экрана
 uniform float uPixel;       // пикселей холста на пиксель экрана
+uniform float uShift;       // дней от даты таблицы до показываемого момента (во время перехода между датами < 0)
+uniform float uTrans;       // за сколько дней захваченная провинция перекрашивается
+uniform float uFront;       // сколько дней после захвата держится линия фронта и штриховка
 out vec4 outColor;
 
 int idAt(vec2 rp) {
@@ -36,6 +45,29 @@ int idAt(vec2 rp) {
 }
 vec4 lut(int id, int row) { return texelFetch(uLut, ivec2(id, row), 0); }
 float keyOf(int id, int row) { if (id == 0) return -1.0; vec4 v = lut(id, row); return v.r * 255.0 + v.g * 255.0 * 256.0; }
+// дней с последней смены владельца на показываемый момент (огромное — смены не было)
+float ageOf(int id) {
+  if (id == 0) return 1e6;
+  vec4 v = lut(id, 4);
+  float d = floor(v.r * 255.0 + 0.5) + floor(v.g * 255.0 + 0.5) * 256.0;
+  if (d >= 32768.0) d -= 65536.0;
+  if (d <= -32767.0) return 1e6;
+  return uShift - d;
+}
+float prevKeyOf(int id) { vec4 v = lut(id, 4); return floor(v.b * 255.0 + 0.5) + floor(v.a * 255.0 + 0.5) * 256.0; }
+// группа провинции на показываемый момент: до середины перехода — прежний владелец
+float grpOf(int id) {
+  if (id == 0) return -1.0;
+  float age = ageOf(id);
+  if (age < uTrans * 0.5) return prevKeyOf(id);
+  return keyOf(id, 1);
+}
+float hash2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash2(i), hash2(i + vec2(1.0, 0.0)), u.x), mix(hash2(i + vec2(0.0, 1.0)), hash2(i + vec2(1.0, 1.0)), u.x), u.y);
+}
 
 // «голосование» соседних точек: принадлежность пикселя считается по кругу вокруг него —
 // границы получаются плавными кривыми без ступенек растра, а доля голосов даёт расстояние до границы
@@ -61,7 +93,7 @@ void main() {
   float total = 0.0, land = 0.0;
   for (int i = 0; i < NS; i++) {
     ids[i] = idAt(rp + DISK[i] * rad);
-    grp[i] = keyOf(ids[i], 1);
+    grp[i] = grpOf(ids[i]);
     total += wOf(i);
     if (ids[i] != 0) land += wOf(i);
   }
@@ -103,7 +135,7 @@ void main() {
         int n = idAt(rp + o);
         if (n == 0) continue;
         cnt += 1.0;
-        if (keyOf(n, 1) != bestKey) foreign += 1.0;
+        if (grpOf(n) != bestKey) foreign += 1.0;
       }
     }
     glow = cnt > 0.0 ? smoothstep(0.0, 0.5, foreign / cnt) : 0.0;
@@ -115,8 +147,22 @@ void main() {
   }
   vec4 fill = lut(id, 0);
   vec4 meta = lut(id, 1);
+  // захват: новый цвет растекается пятнами, как чернила, за uTrans дней
+  float age = ageOf(id);
+  vec4 prevFill = lut(id, 3);
+  if (age < uTrans) {
+    float n = vnoise(logical / 26.0) * 0.65 + vnoise(logical / 7.0) * 0.35;
+    float p = clamp(age / uTrans, 0.0, 1.0) * 1.3 - 0.15;
+    fill = mix(prevFill, fill, smoothstep(n - 0.12, n + 0.12, p));
+  }
   vec3 col = fill.rgb;
   float a = uOpacity * fill.a;
+  // свежезахваченная земля — косая штриховка в цвет прежнего владельца, гаснет за uFront дней
+  float fresh = age >= 0.0 && age < uFront ? 1.0 - age / uFront : 0.0;
+  if (fresh > 0.0 && age >= uTrans) {
+    float stripe = smoothstep(0.42, 0.5, abs(fract((frag.x + frag.y) / (11.0 * uPixel)) - 0.5) * 2.0);
+    col = mix(col, prevFill.rgb, stripe * 0.4 * fresh);
+  }
   bool selected = meta.b > 0.5;
   bool hovered = meta.a > 0.5;
   if (hovered) { a += 0.07; col = mix(col, vec3(1.0), 0.1); }
@@ -139,6 +185,25 @@ void main() {
     // граница владельцев (в режимах культур и т. п. — страны)
     float lo = 1.0 - smoothstep(0.6 * px, 1.4 * px, abs(dOwn));
     vec3 dark = mix(fill.rgb, vec3(0.04, 0.03, 0.02), 0.72);
+    // линия фронта: граница с тем, у кого провинцию недавно отняли (или кто отнял у соседа)
+    float front = 0.0;
+    if (abs(dGrp) < 4.0 * px) {
+      for (int i = 1; i < NS; i++) {
+        if (ids[i] == 0 || grp[i] == bestKey) continue;
+        float ai = ageOf(ids[i]);
+        if (fresh > 0.0 && prevKeyOf(id) == grp[i]) front = max(front, fresh);
+        if (ai >= 0.0 && ai < uFront && prevKeyOf(ids[i]) == bestKey) front = max(front, 1.0 - ai / uFront);
+      }
+    }
+    if (front > 0.0) {
+      float fl = 1.0 - smoothstep(0.9 * px, 2.1 * px, abs(dGrp));
+      float fg = 1.0 - smoothstep(1.5 * px, 6.0 * px, abs(dGrp));
+      vec3 red = vec3(0.62, 0.09, 0.07);
+      col = mix(col, red, fg * 0.35 * front);
+      a = max(a, fg * 0.4 * front);
+      lg = max(lg, fl * front);
+      dark = mix(dark, red, front);
+    }
     col = mix(col, dark, sh * 0.35);
     a = max(a, sh * 0.32);
     float line = max(lg, lo);
@@ -197,7 +262,7 @@ export const ProvinceRenderer = L.Renderer.extend({
     gl.enableVertexAttribArray(loc)
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
     const u: Uniforms = {}
-    for (const n of ['uProv', 'uLut', 'uOrigin', 'uScale', 'uMapSize', 'uRaster', 'uHeight', 'uOpacity', 'uBorders', 'uProvLines', 'uGlowPx', 'uPixel'])
+    for (const n of ['uProv', 'uLut', 'uOrigin', 'uScale', 'uMapSize', 'uRaster', 'uHeight', 'uOpacity', 'uBorders', 'uProvLines', 'uGlowPx', 'uPixel', 'uShift', 'uTrans', 'uFront'])
       u[n] = gl.getUniformLocation(prog, n)
     this._u = u
     const tex = (unit: number): WebGLTexture => {
@@ -225,15 +290,34 @@ export const ProvinceRenderer = L.Renderer.extend({
     this._gl = null
   },
 
-  /** Новая таблица цветов (при смене даты, режима, выделения) */
-  setLut(this: any, data: Uint8Array, width: number) {
+  /**
+   * Новая таблица цветов (при смене даты, режима, выделения). date — дата таблицы: если она недалеко от прежней,
+   * показываемое время плавно доезжает до неё за долю секунды, и захваты растекаются, а не прыгают.
+   */
+  setLut(this: any, data: Uint8Array, width: number, rows: number, date: number) {
     const gl = this._gl as WebGL2RenderingContext
     if (!gl) return
     gl.activeTexture(gl.TEXTURE1)
     gl.bindTexture(gl.TEXTURE_2D, this._lutTex)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, 3, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, rows, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
     this._lutReady = true
-    this._draw()
+    const from = this._now ?? date
+    this._lutDate = date
+    cancelAnimationFrame(this._raf ?? 0)
+    if (Math.abs(date - from) > 400 || date === from) {
+      this._now = date
+      this._draw()
+      return
+    }
+    // шаг проигрывания (0,12 с) — доезжаем чуть дольше, чтобы между шагами не было остановок
+    const t0 = performance.now(), dur = 160
+    const step = (): void => {
+      const k = Math.min(1, (performance.now() - t0) / dur)
+      this._now = from + (date - from) * k
+      this._draw()
+      if (k < 1) this._raf = requestAnimationFrame(step)
+    }
+    step()
   },
 
   setView(this: any, view: Partial<ProvinceView>) {
@@ -288,12 +372,15 @@ export const ProvinceRenderer = L.Renderer.extend({
     gl.uniform1f(u.uProvLines, v.provLines)
     gl.uniform1f(u.uGlowPx, v.glowPx)
     gl.uniform1f(u.uPixel, this._dpr)
+    gl.uniform1f(u.uShift, (this._now ?? this._lutDate ?? 0) - (this._lutDate ?? 0))
+    gl.uniform1f(u.uTrans, 45)
+    gl.uniform1f(u.uFront, 420)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
   }
 }) as unknown as new (mapW: number, mapH: number, image: HTMLImageElement, options?: L.RendererOptions) => L.Renderer & {
-  setLut: (data: Uint8Array, width: number) => void
+  setLut: (data: Uint8Array, width: number, rows: number, date: number) => void
   setView: (v: Partial<ProvinceView>) => void
 }
 
@@ -392,6 +479,10 @@ export interface SettlementItem {
   key?: string
   /** множитель размера (в горах селения мельче) */
   scale?: number
+  /** план поселения: миниатюра строится по нему, как в 3D-виде */
+  plan?: string
+  /** местность провинции: цвет поляны под поселением */
+  terrain?: number
 }
 
 export const SettlementRenderer = L.Renderer.extend({
@@ -463,7 +554,8 @@ export const SettlementRenderer = L.Renderer.extend({
       const y = (pt.y - b.min!.y) * dpr
       const s = size * dpr
       if (x < -s || y < -s || x > W + s || y > H + s) continue
-      const sp = getSprite(it.type, it.culture, it.variant)
+      // пока миниатюра строится — старый значок, чтобы поселение не пропадало
+      const sp = getMiniSprite(it, (rel) => loadPlan<CityPlan>(rel)) ?? getSprite(it.type, it.culture, it.variant)
       if (!sp) continue
       // плавное появление при приближении
       ctx.globalAlpha = Math.min(1, (size - SETTLEMENT_MIN_PX[it.type]) / 18)

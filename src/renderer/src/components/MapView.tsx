@@ -8,8 +8,9 @@ import { assetUrl, loadPlan } from './ui'
 import { City3D, type View3D } from './City3D'
 import { GlowRenderer, type GlowOptions } from './glowRenderer'
 import { ProvinceRenderer, SettlementRenderer, TextRenderer, type SettlementItem, type TextLabel } from './provinceRenderer'
+import { onPlanSpritesReady } from '../settlementPlans'
 import { onSpritesReady, SETTLEMENT_SCALE, SPRITE_LOGICAL, type SettlementType } from '../settlements3d'
-import { buildLut, computeStateLabels as provinceStateLabels, loadRaster, ownerAt, provinceAt, type ProvinceRaster } from '../provinces'
+import { buildLut, LUT_ROWS, computeStateLabels as provinceStateLabels, loadRaster, ownerAt, provinceAt, type ProvinceRaster } from '../provinces'
 import type { MapDef, Region, WorldData, WorldDate } from '../types'
 
 type XY = [number, number]
@@ -607,18 +608,32 @@ export function MapView() {
       armyLayer.current = null
     }
   }, [mapDef.id])
+  // армии не пересоздаются на каждом шаге даты, а сдвигаются: при проигрывании истории знамя едет плавно
+  const armyShapes = useRef(new Map<string, { route: L.Polyline; shadow: L.Polyline; done: L.Polyline; marker: L.Marker; html: string }>())
+  useEffect(() => {
+    armyShapes.current.clear()
+  }, [mapDef.id, layers.armies, world.armies])
   useEffect(() => {
     const layer = armyLayer.current
     if (!layer) return
-    layer.clearLayers()
-    if (!layers.armies) return
+    const shapes = armyShapes.current
+    if (!layers.armies) {
+      layer.clearLayers()
+      shapes.clear()
+      return
+    }
+    const box = mapRef.current?.getContainer()
+    box?.classList.add('army-glide')
+    const glide = setTimeout(() => box?.classList.remove('army-glide'), 400)
     const ll = (p: { x: number; y: number }): L.LatLngExpression => [-p.y, p.x]
+    const seen = new Set<string>()
     for (const a of world.armies ?? []) {
       if (a.mapId !== mapDef.id || a.waypoints.length < 2) continue
       const wp = a.waypoints
       const first = wp[0].date, last = wp[wp.length - 1].date
       // знамя видно от выступления до месяца после прихода
       if (date < first || date > last + 60) continue
+      seen.add(a.id)
       let i = 0
       while (i < wp.length - 2 && date >= wp[i + 1].date) i++
       const t = Math.max(0, Math.min(1, (date - wp[i].date) / Math.max(1, wp[i + 1].date - wp[i].date)))
@@ -635,24 +650,42 @@ export function MapView() {
       const f = lens[j] ? Math.min(1, left / lens[j]) : 0
       const pos = { x: cur[j].x + (cur[j + 1].x - cur[j].x) * f, y: cur[j].y + (cur[j + 1].y - cur[j].y) * f }
       const done = [wp[0], ...wp.slice(1, i + 1).flatMap((_, k) => leg(k + 1).slice(1)), ...cur.slice(1, j + 1), pos]
-      L.polyline(route.map(ll), { pane: 'armies', color: a.color, weight: 2, opacity: 0.55, dashArray: '6 7', interactive: false }).addTo(layer)
-      L.polyline(done.map(ll), { pane: 'armies', color: '#120d08', weight: 7, opacity: 0.45, interactive: false }).addTo(layer)
-      L.polyline(done.map(ll), { pane: 'armies', color: a.color, weight: 4, opacity: 0.95, interactive: false }).addTo(layer)
       // направление движения — по ходу пути
       const nx = date > last ? route[route.length - 1] : cur[j + 1]
       const prev = date > last ? route[route.length - 2] : cur[j]
       const ang = (Math.atan2(nx.y - prev.y, nx.x - prev.x) * 180) / Math.PI
       const marching = date <= last
-      L.marker(ll(pos), {
-        pane: 'armies',
-        interactive: false,
-        icon: L.divIcon({
-          className: 'army-wrap',
-          iconSize: [0, 0],
-          html: `<div class="army ${marching ? 'army-marching' : ''}" style="--c:${a.color}"><div class="army-arrow" style="transform:rotate(${ang}deg)"></div><div class="army-banner"></div><div class="army-name">${escapeHtml(a.name)}</div></div>`
-        })
-      }).addTo(layer)
+      const html = `<div class="army ${marching ? 'army-marching' : ''}" style="--c:${a.color}"><div class="army-arrow" style="transform:rotate(${Math.round(ang)}deg)"></div><div class="army-banner"></div><div class="army-name">${escapeHtml(a.name)}</div></div>`
+      let s = shapes.get(a.id)
+      if (!s) {
+        s = {
+          route: L.polyline(route.map(ll), { pane: 'armies', color: a.color, weight: 2, opacity: 0.55, dashArray: '6 7', interactive: false }).addTo(layer),
+          shadow: L.polyline(done.map(ll), { pane: 'armies', color: '#120d08', weight: 7, opacity: 0.45, interactive: false }).addTo(layer),
+          done: L.polyline(done.map(ll), { pane: 'armies', color: a.color, weight: 4, opacity: 0.95, interactive: false }).addTo(layer),
+          marker: L.marker(ll(pos), { pane: 'armies', interactive: false, icon: L.divIcon({ className: 'army-wrap', iconSize: [0, 0], html }) }).addTo(layer),
+          html
+        }
+        shapes.set(a.id, s)
+        continue
+      }
+      s.shadow.setLatLngs(done.map(ll))
+      s.done.setLatLngs(done.map(ll))
+      s.marker.setLatLng(ll(pos))
+      if (s.html !== html) {
+        // стрелку поворачиваем, не пересоздавая значок, — иначе пропадёт плавный сдвиг
+        const el = s.marker.getElement()
+        const arrow = el?.querySelector<HTMLElement>('.army-arrow')
+        if (arrow) arrow.style.transform = `rotate(${Math.round(ang)}deg)`
+        el?.querySelector('.army')?.classList.toggle('army-marching', marching)
+        s.html = html
+      }
     }
+    for (const [id, s] of shapes)
+      if (!seen.has(id)) {
+        for (const l of [s.route, s.shadow, s.done, s.marker]) l.remove()
+        shapes.delete(id)
+      }
+    return () => clearTimeout(glide)
   }, [world.armies, date, layers.armies, mapDef.id])
 
   // --- объёмные поселения ---
@@ -667,6 +700,7 @@ export function MapView() {
     settleLayer.current = new SettlementRenderer({ pane: 'settlements' })
     map.addLayer(settleLayer.current)
     onSpritesReady(() => settleLayer.current?.redraw())
+    onPlanSpritesReady(() => settleLayer.current?.redraw())
     return () => {
       if (settleLayer.current) map.removeLayer(settleLayer.current)
       settleLayer.current = null
@@ -680,6 +714,7 @@ export function MapView() {
       return
     }
     const items: SettlementItem[] = []
+    const planOf = new Map(world.maps.filter((m) => m.plan).map((m) => [m.id, m.plan!]))
     for (const p of provinces ?? [])
       if (p.settlement)
         items.push({
@@ -689,6 +724,8 @@ export function MapView() {
           culture: p.culture,
           variant: p.id,
           key: `prov:${p.id}`,
+          plan: p.cityMapId ? planOf.get(p.cityMapId) : undefined,
+          terrain: p.terrain,
           // в горах и снегах — маленькие хутора
           scale: p.terrain === 4 || p.terrain === 5 ? 0.72 : 1
         })
@@ -699,7 +736,11 @@ export function MapView() {
       const type = (pl.model as SettlementType | undefined) ?? PLACE_MODEL[resolve(pl, date).type]
       if (!type) continue
       const pid = raster ? provinceAt(raster, mapDef.width, mapDef.height, pl.x, pl.y) : 0
-      items.push({ x: pl.x, y: pl.y, type, culture: byId.get(pid)?.culture ?? 'imperial', variant: pl.id.length * 7 + pl.id.charCodeAt(0), key: `place:${pl.id}` })
+      // столица или город на месте поселения провинции — та же миниатюра по плану
+      const pv = byId.get(pid)
+      const near = pv?.settlement && pv.cityMapId && Math.hypot(pv.settlement.x - pl.x, pv.settlement.y - pl.y) < 40 ? pv.cityMapId : undefined
+      const plan = planOf.get(pl.innerMapId ?? '') ?? (near ? planOf.get(near) : undefined)
+      items.push({ x: pl.x, y: pl.y, type, culture: pv?.culture ?? 'imperial', variant: pl.id.length * 7 + pl.id.charCodeAt(0), key: `place:${pl.id}`, plan, terrain: pv?.terrain })
     }
     layer.setItems(items)
   }, [rasterTick, provinces, world.places, date, layers.models, mapDef.id])
@@ -719,8 +760,8 @@ export function MapView() {
       owners
     )
     lutKeys.current = keys
-    provLayer.current.setLut(data, width)
-  }, [rasterTick, ownersKey, world.states, mapMode, selection, hoverKey, provinces])
+    provLayer.current.setLut(data, width, LUT_ROWS, date)
+  }, [rasterTick, date, world.states, mapMode, selection, hoverKey, provinces])
 
   // вид слоя: заливка, границы, линии провинций при приближении
   useEffect(() => {

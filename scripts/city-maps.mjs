@@ -93,6 +93,8 @@ const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;')
 // облик построек в 3D-виде (src/renderer/src/city3d.ts) по государству
 const styleOf = (state) =>
   state === 'Графство Штирия' ? 'styria'
+    : state === 'Имперские Изгнанники' ? 'exile'
+    : state === 'Земли Севера' ? 'norse'
     : state === 'Кальтранская Республика' ? 'kalt'
       : ['Тоскана', 'Вуфинская Республика', 'Республика Шеша'].includes(state) ? 'south'
         : state === 'Святая церковь' || String(state).startsWith('Архиепархия') ? 'church'

@@ -613,6 +613,8 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; letter-spac
 }
 
 /* походы армий */
+/* при проигрывании истории знамёна армий едут, а не прыгают; при приближении карты — без задержки */
+.army-glide .army-wrap { transition: transform 0.16s linear; }
 .army-wrap { pointer-events: none; }
 .army { position: relative; width: 0; height: 0; }
 .army-arrow { position: absolute; left: -20px; top: -20px; width: 40px; height: 40px; }
@@ -1351,4 +1353,127 @@ button.pw-chip:hover { background: var(--panel-2); }
   .city3d-met { bottom: 150px; }
   .city3d-mini { width: 96px; max-height: 130px; right: 8px; bottom: 8px; }
   .city3d-unclean { top: 58px; left: 8px; }
+}
+
+/* ---------- грамота: закон, договор, указ, булла на пергаменте ---------- */
+.charter-wrap { position: fixed; inset: 0; z-index: 3000; background: rgba(10, 8, 6, 0.72); display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 32px 12px; }
+.charter {
+  position: relative; width: min(720px, 100%); padding: 46px 58px 120px; color: #2b1d10; font-family: var(--serif);
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 250, 230, 0.55), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(120, 80, 30, 0.22), transparent 60%),
+    radial-gradient(ellipse at 50% 50%, #efe0b8 0%, #e2cc95 70%, #c9ac6c 100%);
+  box-shadow: inset 0 0 60px rgba(100, 60, 20, 0.45), inset 0 0 8px rgba(80, 50, 10, 0.5), 0 18px 50px rgba(0, 0, 0, 0.6);
+  border-radius: 3px 8px 4px 10px;
+}
+.charter::before { content: ''; position: absolute; inset: 16px; border: 2px solid rgba(110, 70, 25, 0.55); outline: 1px solid rgba(110, 70, 25, 0.35); outline-offset: 5px; pointer-events: none; }
+.charter-close { position: absolute; top: 10px; right: 14px; background: none; border: none; font-size: 30px; color: #6a4a24; cursor: pointer; }
+.charter header { text-align: center; }
+.charter-arms { display: flex; justify-content: center; margin-bottom: 6px; filter: sepia(0.25) drop-shadow(0 2px 2px rgba(60, 30, 0, 0.35)); }
+.charter-state { font-family: var(--sc); letter-spacing: 3px; font-size: 15px; color: #5a3a18; }
+.charter-body-name { font-style: italic; font-size: 15px; color: #6a4a24; }
+.charter h1 { font-family: var(--sc); font-size: 44px; letter-spacing: 8px; margin: 10px 0 2px; color: #4a1e10; text-transform: uppercase; }
+.charter-no { font-size: 14px; color: #6a4a24; font-style: italic; }
+.charter h2 { font-size: 24px; margin: 14px 0 18px; color: #3a2210; }
+.charter-preamble { font-size: 18px; line-height: 1.55; }
+.charter-preamble::first-letter { font-family: var(--sc); font-size: 46px; float: left; line-height: 0.85; margin: 4px 8px 0 0; color: #7a1f14; }
+.charter-articles { list-style: none; padding: 0; margin: 14px 0; font-size: 17px; line-height: 1.55; }
+.charter-articles li { margin: 8px 0; text-indent: 2em; }
+.charter-articles b { color: #5a1a10; }
+.charter-vote { margin-top: 18px; font-style: italic; font-size: 16px; color: #4a3018; border-top: 1px solid rgba(110, 70, 25, 0.4); padding-top: 12px; }
+.charter-signs { display: flex; justify-content: space-between; gap: 30px; margin-top: 34px; }
+.charter-signs div { display: flex; flex-direction: column; align-items: center; min-width: 200px; }
+.charter-ink { font-family: 'Segoe Script', 'Brush Script MT', 'Kurale', cursive; font-size: 24px; color: #1e2a4a; transform: rotate(-3deg); border-bottom: 1px solid rgba(60, 40, 20, 0.6); padding: 0 10px 2px; }
+.charter-signs small { font-size: 13px; color: #6a4a24; margin-top: 4px; }
+.charter-seal {
+  position: absolute; right: 64px; bottom: 26px; width: 96px; height: 96px; border-radius: 47% 53% 50% 48%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--seal) 70%, #fff 30%), var(--seal) 45%, color-mix(in srgb, var(--seal) 60%, #000 40%) 100%);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.45), inset 0 -4px 8px rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center;
+}
+.charter-seal > * { opacity: 0.55; filter: grayscale(0.4) contrast(0.8); mix-blend-mode: multiply; }
+.charter-seal.lead { --seal: #8a8a90 !important; border-radius: 50%; }
+.charter-ribbon { position: absolute; right: 100px; bottom: -14px; width: 26px; height: 70px; background: var(--seal); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); z-index: -1; }
+.charter-stamp {
+  position: absolute; right: 50px; bottom: 40px; transform: rotate(-14deg); border: 4px double #a3201a; color: #a3201a; font-family: var(--sc);
+  font-size: 30px; letter-spacing: 4px; padding: 6px 16px; text-transform: uppercase; opacity: 0.78; mix-blend-mode: multiply;
+}
+.charter-stamp.wait { border-color: #6a5a20; color: #6a5a20; }
+.pw-charter-btn { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 10px; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--gold-dim); background: var(--panel-2); color: var(--gold-2); cursor: pointer; }
+@media (max-width: 700px) {
+  .charter { padding: 34px 26px 120px; }
+  .charter h1 { font-size: 32px; letter-spacing: 4px; }
+  .charter-signs { flex-direction: column; align-items: center; gap: 18px; }
+  .charter-seal { right: 24px; }
+}
+
+/* ---------- Сабельная ставка: генералы вокруг Пустого трона ---------- */
+.stavka { margin: 16px 0; padding: 14px; border: 1px solid var(--gold-dim); border-radius: 10px; background: radial-gradient(ellipse at 50% 40%, #241210, #0f0907 75%); }
+.stavka-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-family: var(--serif); color: var(--text); }
+.stavka-head b { color: var(--gold-2); font-size: 20px; }
+.stavka-locum { color: #f0d898; font-style: italic; }
+.stavka-stage { position: relative; width: 100%; max-width: 760px; margin: 6px auto; }
+.stavka-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stavka-throne-label { fill: #c9a45c; font-family: var(--sc); font-size: 13px; letter-spacing: 2px; }
+.stavka-gen { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: none; cursor: pointer; color: var(--text); width: 110px; }
+.stavka-face { width: 54px; height: 54px; border-radius: 50%; overflow: hidden; border: 2px solid #8a3a2e; background: #2a1612; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 22px; color: var(--gold-2); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6); }
+.stavka-face img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
+.stavka-gen.locum .stavka-face { width: 66px; height: 66px; border: 3px solid #e2c27a; box-shadow: 0 0 14px rgba(226, 194, 122, 0.55); }
+.stavka-name { font-family: var(--serif); font-size: 13px; line-height: 1.1; text-align: center; text-shadow: 0 1px 3px #000; }
+.stavka-sabres { font-size: 11px; color: #e09a8a; }
+.stavka-gen:hover .stavka-face { border-color: var(--gold-2); }
+.stavka-year { width: 100%; margin: 6px 0 10px; accent-color: #8a3a2e; }
+.stavka-raid { font-size: 14px; margin: 4px 0; color: var(--text); }
+.stavka-raid b { color: var(--gold-2); margin-right: 4px; }
+.stavka-raid span { color: var(--muted, #a99c80); }
+.stavka-raid i { color: #e09a8a; font-style: normal; margin-left: 4px; }
+@media (max-width: 700px) { .stavka-gen { width: 76px; } .stavka-face { width: 38px; height: 38px; } .stavka-gen.locum .stavka-face { width: 46px; height: 46px; } .stavka-name { font-size: 11px; } }
+/* в узкой колонке карточки — генералы мельче, чтобы не налезали друг на друга */
+.stavka { container-type: inline-size; }
+@container (max-width: 560px) {
+  .stavka-gen { width: 70px; }
+  .stavka-face { width: 34px; height: 34px; font-size: 15px; }
+  .stavka-gen.locum .stavka-face { width: 44px; height: 44px; }
+  .stavka-name { font-size: 10px; }
+  .stavka-sabres { font-size: 9px; }
+}
+/* органы власти во вкладке «Власть и законы» */
+.sc-organ { margin: 18px 0; padding: 14px 16px; border: 1px solid var(--gold-dim); border-radius: 10px; background: var(--panel); }
+.sc-organ-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.sc-organ-head h3 { margin: 0; font-family: var(--serif); font-size: 22px; color: var(--gold-2); }
+
+/* Каменный круг Земель Севера */
+.ting { margin: 16px 0; padding: 14px; border: 1px solid #4a5a50; border-radius: 10px; background: radial-gradient(ellipse at 50% 40%, #1c2620, #0b0f0d 75%); container-type: inline-size; }
+.ting-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-family: var(--serif); color: var(--text); }
+.ting-head b { color: #d8d2c4; font-size: 20px; }
+.ting-how { color: #b9c9b0; font-style: italic; }
+.ting-stage { position: relative; width: 100%; max-width: 760px; margin: 6px auto; }
+.ting-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ting-rune { fill: #2a2c28; font-size: 15px; font-weight: bold; }
+.ting-label { fill: #c9b88a; font-family: var(--sc); font-size: 13px; letter-spacing: 2px; }
+.ting-elder { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 1px; background: none; border: none; cursor: pointer; color: var(--text); width: 104px; }
+.ting-face { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 2px solid var(--clan, #5f6158); background: #1c2228; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 20px; color: #d8d2c4; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6); }
+.ting-face img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
+.ting-elder.lit .ting-face { border-color: #f0d898; box-shadow: 0 0 12px rgba(240, 216, 152, 0.55); }
+.ting-name { font-family: var(--serif); font-size: 12px; line-height: 1.1; text-align: center; text-shadow: 0 1px 3px #000; }
+.ting-clan { font-size: 10px; color: #9fb4a0; }
+.ting-king { position: absolute; transform: translate(-50%, -50%); background: none; border: none; cursor: pointer; padding: 0; }
+.ting-face.king { width: 74px; height: 74px; border: 3px solid #e2c27a; box-shadow: 0 0 16px rgba(226, 194, 122, 0.5); }
+.ting-year { width: 100%; margin: 6px 0 10px; accent-color: #6a8a6a; }
+.ting-event { font-size: 14px; margin: 4px 0 10px; color: var(--text); }
+.ting-event b { color: #e2c27a; }
+.ting-event.denied b { color: #a9a9a9; }
+.ting-event span { color: var(--muted, #a99c80); }
+.ting-list { display: flex; flex-direction: column; gap: 2px; }
+.ting-row { display: flex; gap: 6px; align-items: baseline; text-align: left; background: none; border: none; color: var(--text); cursor: pointer; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
+.ting-row:hover, .ting-row.active { background: rgba(120, 150, 120, 0.15); }
+.ting-row b { color: #d8d2c4; }
+.ting-row.denied { color: var(--muted, #a99c80); }
+.ting-row i { margin-left: auto; font-style: normal; color: #c9b88a; letter-spacing: 1px; white-space: nowrap; }
+@container (max-width: 560px) {
+  .ting-elder { width: 68px; }
+  .ting-face { width: 32px; height: 32px; font-size: 14px; }
+  .ting-face.king { width: 48px; height: 48px; }
+  .ting-name { font-size: 9px; }
+  .ting-clan { display: none; }
+  .ting-row i { display: none; }
 }

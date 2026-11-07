@@ -77,6 +77,9 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
         renderer.shadowMap.type = THREE.PCFSoftShadowMap
         renderer.shadowMap.autoUpdate = false
         renderer.outputColorSpace = THREE.SRGBColorSpace
+        // киношная цветокоррекция, как в «Семиземье»: мягкие света, плотные тени, тёплые середины
+        renderer.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.toneMappingExposure = 0.92
         el.appendChild(renderer.domElement)
         const w = useStore.getState().world!
         // чьё поселение: состав жителей зависит от государства и культуры

@@ -21,6 +21,8 @@ const RP_STYLE = 'oil painting, dutch golden age style, renaissance old master, 
 const SOUTH_STYLE = 'oil painting, spanish and italian renaissance court portrait, velazquez and titian style, chiaroscuro lighting, dark background, visible brush strokes, detailed face, half-length portrait'
 // Святая церковь: папский двор эпохи Возрождения, белое с золотом
 const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael and titian style, warm golden light, dark background, visible brush strokes, detailed face, half-length portrait'
+// Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
+const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
 // цвета домов -> слова для одежды
@@ -34,6 +36,39 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  // Земли Севера (норды: чаще всего чёрные волосы цвета вороньего крыла; на северо-западе — светлые и рыжие)
+  'no-torvald': 'grim old viking chieftain with a long grey beard and raven black hair streaked with grey, huge scarred hands, bear fur cloak, iron arm rings',
+  'no-ulf': 'wild berserker warrior with black braided hair and beard, bear skin over bare shoulders, wolf fang necklace, fierce eyes, war paint',
+  'no-astrid': 'fierce shieldmaiden with long black braids, round wooden shield on her back, chainmail and fur, scar on the chin, sea behind',
+  'no-harald': 'rich old norse chieftain with a white beard, fine embroidered tunic, silver brooches and many silver arm rings, tired cunning eyes',
+  'no-ragnar': 'strong viking king in his thirties with raven black hair braided at the sides and a short black beard, red-stained bearded axe on his shoulder, wolf fur cloak, chainmail',
+  'no-e-gunnhild': 'very old norse matriarch with white braided hair, deep wrinkles, piercing pale eyes, dark wool shawl with an amber brooch, holding a carved rune stone',
+  'no-e-oyvind': 'old one-eyed norse whaler with a grey beard, eyepatch, sealskin coat, weathered face',
+  'no-e-borge': 'old one-armed norse warrior with a grey beard and black braids, empty sleeve pinned, fur cloak, grim face',
+  'no-e-kolbein': 'very old norse shepherd lawman with a long white beard, sheepskin cloak, wooden staff with carved runes',
+  'no-e-audun': 'ancient wise norse elder with a long white beard, dark blue wool robe, silver arm ring, calm eyes',
+  'no-e-gisli': 'portly old norse merchant with a groomed grey beard, fine fur-trimmed coat, heavy silver chains and rings, scales on the table',
+  'no-e-ingrid': 'old norse woman whaler with grey braids, sealskin clothes, harpoon resting on her shoulder, weathered tough face',
+  'no-e-hrolf': 'huge old norse warrior with a grey beard and bald head, bear fur, stone-like stern face',
+  'no-e-steinar': 'silent grim norse elder with a black and grey beard, dark furs, heavy brow, closed mouth',
+  'no-e-durnir': 'very old dwarf with an enormous white braided beard reaching the belt, iron rings in the beard, leather apron over chainmail, forge glow behind',
+  'no-e-egil': 'old norse sea raider covered in many scars, grey braided beard, missing ear, chainmail and seal fur, sea behind',
+  'no-svein': 'norse warrior in his forties with raven black hair and beard, black feather in the hair, chainmail, round shield with a black raven',
+  'no-oddvar': 'norse fisherman chieftain in his forties with black hair and beard, sealskin cloak, weathered face, fjord behind',
+  'no-arn': 'young norse warrior with black hair tied back, short beard, leather armor and a hunting bow, pine forest behind',
+  'no-torbjorn': 'norse highland chieftain with a very long black and grey beard braided in three plaits, ram horn drinking cup, sheepskin cloak',
+  'no-bjarni': 'proud norse chieftain in his forties with dark hair and a trimmed beard, rich bear fur cloak, gold arm rings, resentful eyes',
+  'no-ingvar': 'norse sea captain in his forties with black hair and a salt-and-pepper beard, sealskin coat, longship prow behind',
+  'no-signy': 'tall powerful norse woman warrior with black braids, bear skin over her shoulders, war axe, stern face',
+  'no-gardi': 'norse miner chieftain with black hair and soot on the face, leather apron, iron pick, mine lanterns behind',
+  'no-hakon': 'norse sea raider chieftain with black braided hair and beard, chainmail, red cloak, dragon-headed longship behind',
+  'no-sigrid': 'beautiful young norse woman with long blond braided hair, blue wool dress with tortoise brooches and amber beads, calm eyes',
+  'no-ketil': 'norse boy of ten with black hair, small fur cloak, wooden toy sword',
+  'no-eyvind': 'old norse lawspeaker with a long grey beard, dark wool cloak, standing on a rock, hand raised as if speaking',
+  'no-helga': 'mysterious norse seeress with grey streaked black hair, ash on her face, dark hooded cloak with beads and bones, staff, fire smoke',
+  'no-brand': 'norse skald in his forties with black hair and beard, embroidered tunic, holding a drinking horn, many silver rings, smiling',
+  'no-kolbjorn': 'young norse champion with black hair and beard, chainmail, round shield with a bear, strong jaw',
+
   'teyber-1': 'stern powerful germanic warlord emperor like a medieval king of the holy roman empire in his fifties, very broad shoulders, thick black beard, short black hair, cold hard grey eyes, square jaw, massive black and crimson plate armor with dragon motifs, heavy golden imperial crown, faint fire glow in his palm, symbol of the empire',
   sandra: 'beautiful proud archmage empress, flowing red hair, fiery eyes, crimson and gold robes, flames swirling around her hands, confident smile',
   robert: 'gentle wise old emperor with long white beard, kind tired eyes, scholarly crimson robes, holding a scroll of laws, golden crown',
@@ -67,6 +102,14 @@ const CUSTOM = {
   'kaya-head': 'smiling rich merchant patriarch, golden chains and rings, black velvet, coins and ships behind',
   'styria-now': 'gaunt count, black velvet, moonlight, unsettling eyes',
   'man-zhan-mal': 'small boy in a simple brown and gold tunic, small iron key on a cord, serious eyes',
+  'ex-hagen': 'old grim one-eyed legate with white beard, battered steel breastplate, fur cloak, crimson banner with a portrait of a tyrant emperor behind',
+  'ex-strelitz': 'hard-faced general of common birth, close-cropped grey hair, scar across the cheek, crimson uniform with black dragon, fur collar, holding a marshal baton',
+  'ex-ulrika': 'stern woman general in her forties, braided dark hair, steel gorget, crimson coat with fur, snowy fjord behind',
+  'ex-korn': 'arrogant general with a golden chain, crimson uniform, sitting on a throne covered with red cloth',
+  'ex-ramm': 'stocky old fortress commander with a grey moustache, heavy fur coat over armor, stone fortress walls behind',
+  'ex-halvdan': 'nordic jarl with a crooked nose, braided red beard, fur and mail, axe on shoulder, snowy fjord behind',
+  'ex-graun': 'old army chaplain in white and gold robes over a crimson tabard, sun pendant, snowy chapel behind',
+  'ex-kaiserling': 'young ambitious officer of thirty, sharp features, polished breastplate, crimson cloak, impatient eyes',
   'mangenium-now': 'restrained grey-haired count, plain dark brown coat with gold trim, iron key on a chain around the neck, calm patient eyes',
   'man-kassiy-2': 'aging nobleman, keeper of the seal, brown and gold robes, heavy wax seal on a chain, thoughtful',
   'man-c-chancellor': 'elderly imperial chancellor, black official robes with a gold chain of office, holding papers, shrewd tired eyes',
@@ -225,7 +268,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -235,7 +278,9 @@ for (const e of chars) {
   const southern = e.base.tags.includes('южные республики')
   const sty = e.base.tags.includes('Графство Штирия') || id === 'styria-now'
   const man = e.base.tags.includes('Графство Мангениум')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man
+  const exile = e.base.tags.includes('Имперские Изгнанники')
+  const north = e.base.tags.includes('Земли Севера')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -251,10 +296,12 @@ for (const e of chars) {
   const age = Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
-  const prompt = sty
+  const prompt = north
+    ? `${NORTH_STYLE}, ${banner}portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), ${/Дварф/.test(race) ? '(dwarf:1.3), ' : '(scandinavian, pale weathered skin:1.2), '}${CUSTOM[id] ?? subject}`
+    : sty
     ? `oil painting, dark gothic medieval portrait, candlelight, deep shadows, black background, visible brush strokes, detailed face, half-length portrait, ${banner}portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european:1.15), ${stHouse ? `(snow white skin, jet black hair:1.35), ${female ? 'black velvet gown' : 'black velvet doublet'} with a silver crescent, cold eyes` : /немая|скита/.test(e.base.title) ? 'grim hooded figure in grey robe, ink-stained hands' : /Капитан/.test(e.base.title) ? 'scarred mercenary general in worn black armor' : /Кастелян/.test(e.base.title) ? 'impoverished nobleman in a patched old doublet, tired face' : /Епископ/.test(e.base.title) ? 'bored bishop in shabby white robes with a golden sun pendant' : /Мастер|Управляющий/.test(e.base.title) ? 'shady merchant in black clothes with rings, sly look' : subject}`
     : rp
-    ? `${holy ? CHURCH_STYLE : southern ? SOUTH_STYLE : RP_STYLE}, ${holy ? '' : banner}portrait of a (${age} year old ${age < 14 ? (e.base.props?.gender === 'Женский' ? 'girl' : 'boy') : e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${holy ? `(european:1.1), ${/Папа/.test(e.base.title) ? 'pope in white and gold papal vestments with a tall white mitre, golden sun pendant' : /паладин|магистр|Командор|Маршал/i.test(e.base.title) ? 'paladin knight in polished white plate armor with a golden sun emblem on the chest, white cloak' : 'archbishop in white and gold robes with a mitre and a golden crozier, golden sun pendant'}, ` : southern ? (/Кальтран/.test(race) ? '(celtic european, pale weathered skin, braided hair:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : imperial ? '(northern european, pale skin:1.15), ' : ''}${holy ? '' : subject}`
+    ? `${holy ? CHURCH_STYLE : southern ? SOUTH_STYLE : RP_STYLE}, ${holy ? '' : banner}portrait of a (${age} year old ${age < 14 ? (e.base.props?.gender === 'Женский' ? 'girl' : 'boy') : e.base.props?.gender === 'Женский' ? 'woman' : 'man'}:1.35), ${holy ? `(european:1.1), ${/Папа/.test(e.base.title) ? 'pope in white and gold papal vestments with a tall white mitre, golden sun pendant' : /паладин|магистр|Командор|Маршал/i.test(e.base.title) ? 'paladin knight in polished white plate armor with a golden sun emblem on the chest, white cloak' : 'archbishop in white and gold robes with a mitre and a golden crozier, golden sun pendant'}, ` : southern ? (/Кальтран/.test(race) ? '(celtic european, pale weathered skin, braided hair:1.15), ' : '(southern european, mediterranean, olive skin, dark hair:1.2), ') : imperial ? '(northern european, pale skin:1.15), ' : ''}${holy ? '' : subject}${exile && !CUSTOM[id] ? ', wearing a fur cloak over a dark crimson imperial uniform with a black dragon, snowy northern fortress behind' : ''}`
     : `${STYLE}, ${banner}portrait of a ${imperial ? (id === 'oktavian-2' ? '(pale european baby:1.2), ' : '(northern european, germanic features, pale skin, deep-set eyes, strong brow ridge, prominent straight nose:1.3), ') : ''}${subject}`
   if (process.env.DRY) {
     console.log(`${e.base.name}: ${prompt.slice(STYLE.length + 2)}`)

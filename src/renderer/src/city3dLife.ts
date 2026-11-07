@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { Bucket } from './city3d'
 import type { Streets } from './city3dStreets'
 import type { Feat, Race } from './city3dRaces'
+import { createPeople, type Look } from './city3dPeople'
 
 type P2 = [number, number]
 const enum K { Man, Woman, Child, Guard, Vendor }
@@ -29,6 +30,11 @@ interface Person {
   y: number
   /** Бродит сам по себе, а не идёт по маршруту: иначе все сходятся на главную улицу */
   wander: boolean
+  /** Где нарисован на этом кадре (со сдвигом от оси улицы) и идёт ли */
+  dx: number
+  dz: number
+  moving: boolean
+  look: Look | null
 }
 export interface PersonInfo { race: Race; role: string }
 
@@ -93,7 +99,7 @@ export function createLife(o: {
   const guaranteed: Race[] = N > 150 ? o.population.map((q) => q.race).slice(0, Math.min(o.population.length, 60)) : o.population.filter((q) => q.weight / total > 0.02).map((q) => q.race)
   const add = (kind: K, x: number, z: number, a: number, race = drawRace()): Person => {
     const small = kind === K.Child
-    const p: Person = { kind, x, z, a, ph: R() * 6.28, speed: (1 + R() * 0.55) * (0.75 + race.h * 0.3), side: (R() - 0.5) * (N > 150 ? 3.6 : 1.7), scale: small ? 0.62 : 0.94 + R() * 0.12, path: null, seg: 0, along: 0, rest: 0, home: [x, z], inside: false, race, slots: [], shown: true, y: 0, wander: false }
+    const p: Person = { kind, x, z, a, ph: R() * 6.28, speed: (1 + R() * 0.55) * (0.75 + race.h * 0.3), side: (R() - 0.5) * (N > 150 ? 3.6 : 1.7), scale: small ? 0.62 : 0.94 + R() * 0.12, path: null, seg: 0, along: 0, rest: 0, home: [x, z], inside: false, race, slots: [], shown: true, y: 0, wander: false, dx: x, dz: z, moving: false, look: null }
     if (small) p.speed *= 1.25
     people.push(p)
     return p
@@ -241,6 +247,8 @@ export function createLife(o: {
     // ноги: у чешуйчатых, пушистых и древесных — в цвет кожи
     const legC = r.feats?.some((f) => f === 'snout' || f === 'beak' || f === 'crab' || f === 'leaves') || r.id === 'tabaxi' ? skin : (r.id === 'orcs' || r.id === 'ogres' || r.id === 'goliaths') ? '#2e2620' : '#3a332c'
     if (!skirted(p)) { leg2.set(p, lIdx); legs.setColorAt(lIdx++, col.set(legC)); legs.setColorAt(lIdx++, col.set(legC)) }
+    const role = p.kind === K.Woman ? 'woman' : p.kind === K.Child ? 'child' : p.kind === K.Guard ? 'guard' : p.kind === K.Vendor ? 'vendor' : 'man'
+    p.look = { race: r, role, skin, hair: hc, cloth: c0, legs: legC, skirt: null, seed: (i * 2654435761) >>> 0 }
     p.slots = featOf(p).map((f) => {
       const slot = featUsed.get(f) ?? 0
       featUsed.set(f, slot + 1)
@@ -252,7 +260,16 @@ export function createLife(o: {
       return [featList.indexOf(f), slot] as [number, number]
     })
   })
-  women.forEach((p, i) => skirt.setColorAt(i, col.set(p.race.cloth ? pick(p.race.cloth) : pick(clothes))))
+  women.forEach((p, i) => {
+    const c = p.race.cloth ? pick(p.race.cloth) : pick(clothes)
+    skirt.setColorAt(i, col.set(c))
+    if (p.look) p.look.skirt = c
+  })
+  // самые близкие к камере жители — подробные модели с лицом, причёской и суставами
+  const DETAIL = o.mobile ? 6 : 16
+  const detailed = createPeople(scene, DETAIL)
+  let near: Person[] = []
+  let nearCheck = 0
   longHaired.forEach((p, i) => longM.setColorAt(i, col.set(hairOf.get(p)!)))
   guards.forEach((_, i) => gear.setColorAt(i, col.set('#ffffff')))
   const skirtIdx = new Map(women.map((p, i) => [p, i]))
@@ -347,7 +364,18 @@ export function createLife(o: {
   const ID = new THREE.Quaternion()
   const groundY = (x: number, z: number): number => heightAt(x, z)
 
-  const tick = (dt: number, _t: number, night: number, focus: THREE.Vector3, boost: number): void => {
+  const hideProxy = (i: number, p: Person): void => {
+    torso.setMatrixAt(i, ZERO); head.setMatrixAt(i, ZERO); hair.setMatrixAt(i, ZERO)
+    const si = skirtIdx.get(p), li = longIdx.get(p), gi = gearIdx.get(p), l2 = leg2.get(p)
+    if (si !== undefined) skirt.setMatrixAt(si, ZERO)
+    if (li !== undefined) longM.setMatrixAt(li, ZERO)
+    if (l2 !== undefined) { legs.setMatrixAt(l2, ZERO); legs.setMatrixAt(l2 + 1, ZERO) }
+    if (gi !== undefined) gear.setMatrixAt(gi, ZERO)
+    for (const [m, s] of p.slots) featMeshes.get(featList[m])!.setMatrixAt(s, ZERO)
+  }
+  const index = new Map(people.map((p, i) => [p, i]))
+
+  const tick = (dt: number, t: number, night: number, focus: THREE.Vector3, boost: number): void => {
     focusNow.copy(focus)
     // сверху фигуры лишь чуть крупнее настоящих, чтобы не вырастали выше домов; заметными издали их делают круги режима «Расы»
     const body = 1 + (boost - 1) * 0.1
@@ -434,6 +462,9 @@ export function createLife(o: {
       const x = p.x + (p.path ? Math.sin(sa) * p.side : 0), z = p.z + (p.path ? Math.cos(sa) * p.side : 0)
       const y = groundY(x, z) + (moving ? Math.abs(Math.sin(p.ph)) * 0.04 : 0)
       p.y = y
+      p.dx = x
+      p.dz = z
+      p.moving = moving
       Q.setFromAxisAngle(UP, p.a)
       const sh = p.scale * p.race.h * body, sw = p.scale * p.race.w * body
       Sc.set(sw, sh, sw)
@@ -467,6 +498,17 @@ export function createLife(o: {
         discs.setMatrixAt(i, M)
       }
     }
+    // подробные модели: только когда камера низко, для ближайших к ней видимых жителей
+    nearCheck -= dt
+    if (nearCheck <= 0) {
+      nearCheck = 0.25
+      near = boost < 2.2
+        ? people.filter((p) => p.shown && p.look && (p.dx - focus.x) ** 2 + (p.dz - focus.z) ** 2 < 45 * 45).sort((a, b) => (a.dx - focus.x) ** 2 + (a.dz - focus.z) ** 2 - ((b.dx - focus.x) ** 2 + (b.dz - focus.z) ** 2)).slice(0, DETAIL)
+        : []
+    }
+    const live = near.filter((p) => p.shown)
+    for (const p of live) hideProxy(index.get(p)!, p)
+    detailed.show(live.map((p) => ({ key: p, look: p.look!, x: p.dx, y: groundY(p.dx, p.dz), z: p.dz, a: p.a, scale: p.scale, moving: p.moving, ph: p.ph })), t)
     if (discs.visible) discs.instanceMatrix.needsUpdate = true
     longM.instanceMatrix.needsUpdate = true
     for (const m of featMeshes.values()) m.instanceMatrix.needsUpdate = true
@@ -534,7 +576,8 @@ export function createLife(o: {
         if (!p.shown) continue
         torso.getMatrixAt(i, M)
         Sc.setFromMatrixScale(M)
-        const h = Sc.y * 1.7, cx = p.x, cy = p.y + h / 2, cz = p.z
+        // подробная модель рядом с камерой: её фигурка спрятана, рост берём у самого жителя
+        const h = (Sc.y || p.scale * p.race.h) * 1.7, cx = p.dx, cy = p.y + h / 2, cz = p.dz
         const dx = cx - ro.x, dy = cy - ro.y, dz = cz - ro.z
         const t = dx * rd.x + dy * rd.y + dz * rd.z
         if (t < 0 || t > bt) continue
@@ -545,6 +588,7 @@ export function createLife(o: {
       return best ? { race: best.race, role: ROLE[best.kind] } : null
     },
     dispose: () => {
+      detailed.dispose()
       meshes.forEach((m) => m.dispose())
       disposable.forEach((d) => d.dispose())
     }

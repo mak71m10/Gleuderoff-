@@ -231,6 +231,9 @@ export interface EntryFields {
   council?: SuccessionCouncil
   /** Советники при правителе: карточки с портретами на странице органа власти */
   advisors?: { id: string; office: string }[]
+  /** Сабельная ставка (Имперские изгнанники): сабли генералов по годам, местоблюстители, набеги */
+  stavka?: { years: number[]; members: { id: string; name: string; sabres: number[] }[]; locum: { id: string; from: number; to: number | null }[]; raids: { year: number; title: string; by: string; target: string; loot: number; note: string }[] }
+  ting?: { years: number[]; need: number; clans: { key: string; name: string; nick: string; seat: string; color: string; light: string; elders: { id: string; from: number; to: number | null }[] }[]; heads: { id: string; from: number; to: number | null; clan: string; how: string }[]; challenges: { year: number; by: string | null; against: string | null; stones: string[]; kind: 'election' | 'duel' | 'denied'; winner: string | null; note: string }[] }
 }
 
 /** Кресло в совете рода: кто сидит, сколько голосов, за кого голосует и кто его второй выбор */

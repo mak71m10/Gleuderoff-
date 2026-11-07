@@ -55,6 +55,22 @@ export function ownerAt(p: Province, date: WorldDate): string | null {
   return o
 }
 
+/** Последняя смена владельца не позже даты: когда и у кого провинция была до неё (для плавной смены и фронтов) */
+export function lastChange(p: Province, date: WorldDate): { at: WorldDate | null; prev: string | null } {
+  let at: WorldDate | null = null
+  let prev: string | null = null
+  let cur: string | null = null
+  for (const [d, s] of p.owners) {
+    if (d !== null && d > date) break
+    if (d !== null && s !== cur) {
+      at = d
+      prev = cur
+    }
+    cur = s
+  }
+  return { at, prev }
+}
+
 // ---------- растр провинций (номер под каждым пикселем) ----------
 export interface ProvinceRaster {
   width: number
@@ -121,16 +137,25 @@ export interface LutInput {
   hoverKey: string | null
 }
 
+/** Строк в таблице цветов провинций */
+export const LUT_ROWS = 5
+/** Смена владельца давнее этого (в днях) таблице не нужна */
+const NO_CHANGE = -32767
+
 /**
- * Таблица шириной (число провинций + 1), три строки:
+ * Таблица шириной (число провинций + 1), пять строк:
  * 0 — цвет заливки и её сила, 1 — ключ группы (страна/область/культура…) для границ + флаги подсветки,
- * 2 — ключ владельца (для толстых границ стран во всех режимах).
+ * 2 — ключ владельца (для толстых границ стран во всех режимах),
+ * 3 — цвет прежнего владельца, 4 — дней от даты таблицы до последней смены владельца (int16) и ключ группы прежнего
+ * владельца: по ним шейдер плавно перекрашивает захваченные провинции и рисует линии фронта.
  */
 export function buildLut(inp: LutInput, owners: (string | null)[]): { data: Uint8Array; width: number; keys: (string | null)[] } {
   const { world, date, mode } = inp
   const provs = world.provinces ?? []
   const width = provs.length + 1
-  const data = new Uint8Array(width * 3 * 4)
+  const data = new Uint8Array(width * LUT_ROWS * 4)
+  // смена владельца видна в политическом режиме и в режиме религий; в остальных (культуры, местность…) её нет
+  const changes = mode === 'political' || mode === 'religions'
   const keyIds = new Map<string, number>()
   const keyNum = (k: string | null): number => {
     if (k === null) return 0
@@ -215,6 +240,23 @@ export function buildLut(inp: LutInput, owners: (string | null)[]): { data: Uint
     const r2 = (width * 2 + id) * 4
     data[r2] = ok & 255
     data[r2 + 1] = (ok >> 8) & 255
+    const ch = changes ? lastChange(p, date) : null
+    const prevKey = ch?.at != null ? (mode === 'religions' ? (ch.prev ? stateRel.get(ch.prev) || 'none' : 'none') : ch.prev) : null
+    const prevColor: [number, number, number] =
+      mode === 'religions' ? hex(RELIGION_COLOR[ch?.prev ? stateRel.get(ch.prev) ?? '' : ''] ?? '#77736a') : ch?.prev ? stateColor.get(ch.prev) ?? [110, 110, 110] : [110, 110, 110]
+    const r3 = (width * 3 + id) * 4
+    data[r3] = prevColor[0]
+    data[r3 + 1] = prevColor[1]
+    data[r3 + 2] = prevColor[2]
+    data[r3 + 3] = ch?.prev ? 255 : 60
+    const delta = ch?.at != null ? Math.max(NO_CHANGE, Math.round(ch.at - date)) : NO_CHANGE
+    const r4 = (width * 4 + id) * 4
+    const u = delta & 0xffff
+    data[r4] = u & 255
+    data[r4 + 1] = (u >> 8) & 255
+    const pk = prevKey !== null ? keyNum(prevKey) : 0
+    data[r4 + 2] = pk & 255
+    data[r4 + 3] = (pk >> 8) & 255
   }
   return { data, width, keys }
 }

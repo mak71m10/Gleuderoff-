@@ -41,7 +41,7 @@ export interface CityPlan {
   scene?: PlanScene
 }
 
-interface Style {
+export interface Style {
   plaster: string[]
   roof: string[]
   timber: string
@@ -59,7 +59,11 @@ interface Style {
   conifer: number
   tower: string
 }
-const STYLES: Record<string, Style> = {
+export const STYLES: Record<string, Style> = {
+  // Земли Севера: тёмное смолёное дерево, дерновые крыши, крутые скаты, крашеные ставни, ели
+  norse: { plaster: ['#5a4232', '#4e3a2c', '#634a38', '#463427', '#6b5240'], roof: ['#5b7340', '#4f6638', '#66784a', '#6d6a4a', '#4a5a36', '#5a4a36'], timber: '#2a1e16', stone: '#6e6c66', wall: '#5a4a3a', shutter: ['#7a2a22', '#2f4a6a', '#3a5a3a'], pitch: 1.3, framed: false, floors: 0, grass: '#6a7f4e', grass2: '#748a56', dirt: '#8a7a5e', pave: '#7f7668', lit: 0.32, conifer: 0.9, tower: '#3a2e26' },
+  // Имперские изгнанники: серый северный камень, тёмно-алые и сланцевые крыши под снег, крутые скаты
+  exile: { plaster: ['#b8b4aa', '#a9a59a', '#c4c0b6', '#9d998e'], roof: ['#5a2626', '#4a2222', '#3f3d44', '#6a2c2a', '#47434a'], timber: '#2e2420', stone: '#76726a', wall: '#8a867c', shutter: ['#5a1414', '#2e2a28'], pitch: 1.25, framed: false, floors: 0, grass: '#6a7a52', grass2: '#74845a', dirt: '#9a8f74', pave: '#8f897a', lit: 0.3, conifer: 0.9, tower: '#3e2a2a' },
   empire: { plaster: ['#e9dcc0', '#dccca8', '#efe5cf', '#d8c9a6'], roof: ['#a8452f', '#9c3f2c', '#b4553a', '#8f3a2a', '#a04a30', '#6d7d3c'], timber: '#4a3222', stone: '#8f8a7e', wall: '#a9a394', shutter: ['#3f6a4a', '#2f5570', '#7a3b2e'], pitch: 0.95, framed: true, floors: 0, grass: '#6f9b46', grass2: '#7fa84f', dirt: '#b9a57c', pave: '#b1a384', lit: 0.4, conifer: 0.3, tower: '#5c5a78' },
   argus: { plaster: ['#c9c2b0', '#bdb6a4', '#d3ccba', '#b2ab99'], roof: ['#7c3b2e', '#6d3a30', '#874536', '#5d4a3e'], timber: '#33261d', stone: '#7a766c', wall: '#8c867a', shutter: ['#3a3a3a', '#4a3226'], pitch: 0.9, framed: false, floors: 0, grass: '#6a8d47', grass2: '#789a50', dirt: '#a8976f', pave: '#9c9078', lit: 0.3, conifer: 0.35, tower: '#4b4b58' },
   styria: { plaster: ['#8a858f', '#7b7682', '#96919b', '#6f6b76'], roof: ['#3f3d44', '#4a4650', '#38363e', '#524d55', '#45424a'], timber: '#1e1a20', stone: '#3b3840', wall: '#4a4750', shutter: ['#221d22', '#2d2528'], pitch: 1.35, framed: true, floors: 1, grass: '#55683f', grass2: '#4d5e3c', dirt: '#6f675a', pave: '#5b5650', lit: 0.24, conifer: 0.85, tower: '#26222c' },
@@ -142,13 +146,13 @@ function noise2(seed: number): (x: number, y: number) => number {
 }
 
 type P2 = [number, number]
-const ringOf = (flat: number[], k: number, from = 0): P2[] => {
+export const ringOf = (flat: number[], k: number, from = 0): P2[] => {
   const out: P2[] = []
   for (let i = from; i + 1 < flat.length; i += 2) out.push([flat[i] / k, flat[i + 1] / k])
   return out
 }
-const areaOf = (r: P2[]): number => r.reduce((s, [x, y], i) => { const [u, v] = r[(i + 1) % r.length]; return s + x * v - u * y }, 0) / 2
-const centerOf = (r: P2[]): P2 => { let x = 0, y = 0; for (const p of r) { x += p[0]; y += p[1] } return [x / r.length, y / r.length] }
+export const areaOf = (r: P2[]): number => r.reduce((s, [x, y], i) => { const [u, v] = r[(i + 1) % r.length]; return s + x * v - u * y }, 0) / 2
+export const centerOf = (r: P2[]): P2 => { let x = 0, y = 0; for (const p of r) { x += p[0]; y += p[1] } return [x / r.length, y / r.length] }
 
 /** Отрезать часть контура по прямой v = 0: оставить sign·v ≥ 0 (контур в координатах u, v) */
 function clipHalf(r: P2[], sign: number): P2[] {
@@ -850,6 +854,47 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
   }
   for (const m of mons) tops[m.i] = buildMonument(m.kind, chunkAt(m.x, m.z), m.x, m.z, m.rot, m.L, m.W, heightAt(m.x, m.z), monStyle, monOut)
+  // кварталы народов: где живут дварфы, эльфы или орки, часть кварталов строится в их духе — так каждый город свой
+  const population = populationFor({ state: opts.state, culture: opts.culture, style: S.style, forest: S.forest, hills: !!S.hills, rocky: !!S.rocky, water: hasWater, buildings: N })
+  const popTotal = population.reduce((s, q) => s + q.weight, 0) || 1
+  const shareOf = (ids: string[]): number => population.filter((q) => ids.includes(q.race.id)).reduce((s, q) => s + q.weight, 0) / popTotal
+  const CULT_SHARE = { dwarf: shareOf(['dwarves', 'gnomes']), elf: shareOf(['high-elves', 'wood-elves', 'sylva', 'eleons', 'eluins']), orc: shareOf(['orcs', 'ogres', 'goliaths', 'tsions']) }
+  type Cult = 'human' | keyof typeof CULT_SHARE
+  const pickCult = (u: number, k: number): Cult => {
+    let acc = 0
+    for (const [c, s] of Object.entries(CULT_SHARE) as [Cult, number][]) {
+      acc += s * k
+      if (u < acc) return c
+    }
+    return 'human'
+  }
+  const distRnd = rng(hashOf(seedName) + 4049)
+  const distCult = S.dist.map(() => pickCult(distRnd(), 1.6))
+  const houseCult = (idx: number, u: number): Cult => {
+    const dc = distCult[blds[idx].d] ?? 'human'
+    if (dc !== 'human') return u < 0.75 ? dc : 'human'
+    return pickCult(u, 0.35)
+  }
+  const CULT_LOOK = {
+    dwarf: { wall: ['#8d8579', '#7d766c', '#9a9184', '#867c6e'], roof: ['#4f4a45', '#5b5149', '#463f3a', '#5e5048'], shutter: '#3b3633', pitch: 0.55, eave: -0.3 },
+    elf: { wall: ['#eef0e4', '#e2e9dc', '#f2eee0', '#dfe6d6'], roof: ['#4f7a5a', '#3f6b66', '#5c7f4a', '#6a8a6a'], shutter: '#5d7f5a', pitch: 1.75, eave: 0.9 },
+    orc: { wall: ['#6b5136', '#5c4630', '#74583a', '#4f3c2a'], roof: ['#7d6a4a', '#6a5a3c', '#857150', '#5f5238'], shutter: '', pitch: 0.85, eave: -0.2 }
+  }
+  const FLOWERS = ['#c0504d', '#d9a441', '#8e5ea2', '#e07a9a', '#f0d36a']
+  // у каждого поселения своё лицо: оттенок штукатурки, тон крыш, крутизна скатов, ставни, сколько цветов и дворов
+  const TR = rng(hashOf(seedName) + 77)
+  const town = {
+    tint: ['#ffffff', '#f3e3c4', '#e6eee6', '#f6e8dc', '#ece0d4', '#f0efe0'][Math.floor(TR() * 6)],
+    tintK: 0.1 + TR() * 0.22,
+    roofTone: ['#7a3a2a', '#5d4a3e', '#8a5a30', '#4a5a6a', '#6a6a3a', '#9a4a2a'][Math.floor(TR() * 6)],
+    roofK: TR() * 0.3,
+    pitchK: 0.85 + TR() * 0.35,
+    shutters: [['#3f6a4a', '#2f4f6a'], ['#8a3a2a', '#3a3a3a'], ['#4a6a8a', '#d8c9a0'], ['#5a7a3a', '#8a6a3a'], ['#2a4a6a', '#6a2a2a']][Math.floor(TR() * 5)],
+    flowers: 0.5 + TR() * 1.0,
+    // дворы с огородами: в деревне почти у каждого дома, в большом городе — только на окраинах
+    yard: N < 80 ? 0.85 : N < 300 ? 0.45 : 0.12
+  }
+  const AWNINGS = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a', '#c97a3a', '#e8e0c8']
   // один дом заданной детальности; случайность своя у каждого дома, поэтому при достройке он остаётся тем же
   const buildHouse = (idx: number, ch: Chunk, detail: number, first: boolean): void => {
     const b = blds[idx]
@@ -886,13 +931,17 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     let floors = 1 + (area > 55 ? 1 : 0) + (area > 110 && rv() < 0.55 ? 1 : 0)
     if (rv() < 0.25) floors = Math.max(1, floors - 1)
     if (N > 200 && dists.length) floors += st.floors
-    const plaster = st.plaster[Math.floor(rv() * st.plaster.length)]
-    const pal = S.droof[b.d] ?? S.roof ?? st.roof
-    const roofCol = kind === 'temple' ? st.tower : kind === 'keep' ? mixHex(st.stone, '#000', 0.2) : pal[Math.floor(rv() * pal.length)]
+    const cult: Cult = kind ? 'human' : houseCult(idx, rng(hashOf(seedName) + idx * 104729)())
+    const look = cult === 'human' ? null : CULT_LOOK[cult]
+    if (cult === 'dwarf' || cult === 'orc') floors = Math.max(1, floors - 1)
+    const plaster = look ? look.wall[Math.floor(rv() * look.wall.length)] : mixHex(st.plaster[Math.floor(rv() * st.plaster.length)], town.tint, town.tintK)
+    const pal = look ? look.roof : S.droof[b.d] ?? S.roof ?? st.roof
+    const roofCol = kind === 'temple' ? st.tower : kind === 'keep' ? mixHex(st.stone, '#000', 0.2) : look ? pal[Math.floor(rv() * pal.length)] : mixHex(pal[Math.floor(rv() * pal.length)], town.roofTone, town.roofK * rv())
     const stoneBody = kind === 'temple' || kind === 'keep' || kind === 'civic'
     const wallCol = stoneBody ? mixHex(st.wall, st.plaster[0], 0.3) : plaster
-    const eave = kind === 'temple' ? Math.min(16, 8 + Math.sqrt(area) * 0.2) : kind === 'keep' ? Math.min(22, 11 + Math.sqrt(area) * 0.3) : kind === 'civic' ? 3.3 * Math.max(floors, 3) : 0.5 + floors * 3
-    const rise = Math.min(hw * st.pitch, kind === 'keep' ? 0 : hw > 8 ? 7 : 99)
+    const eave = kind === 'temple' ? Math.min(16, 8 + Math.sqrt(area) * 0.2) : kind === 'keep' ? Math.min(22, 11 + Math.sqrt(area) * 0.3) : kind === 'civic' ? 3.3 * Math.max(floors, 3) : 0.5 + floors * 3 + (look?.eave ?? 0)
+    // эльфы строят высокие крутые крыши, дварфы — низкие каменные, орки — приземистые
+    const rise = Math.min(hw * st.pitch * (look?.pitch ?? 1) * (kind ? 1 : town.pitchK), kind === 'keep' ? 0 : hw > 8 ? (cult === 'elf' ? 11 : 7) : 99)
     const pitch = rise / hw
     const topAt = (p: P2): number => { const v = Math.abs(toUV(p)[1]); return base + eave + Math.max(-1.5, rise - v * pitch) }
     tops[idx] = base + eave + rise
@@ -915,10 +964,10 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const mx = (a[0] + c[0]) / 2 + nx * 1.1, mz = (a[1] + c[1]) / 2 + nz * 1.1
       const other = gridAt(mx, mz)
       edges.push({ a, b: c, n: [nx, nz], len: l, hidden: other > 0 && other !== idx + 1 })
-      // цоколь
+      // цоколь; у дварфов — высокий, из тёмного камня
       if (detail >= 1 && !edges[edges.length - 1].hidden) {
-        const off = 0.07
-        ch.solid.quad([a[0] + nx * off, base - 0.5, a[1] + nz * off], [c[0] + nx * off, base - 0.5, c[1] + nz * off], [c[0] + nx * off, base + 0.55, c[1] + nz * off], [a[0] + nx * off, base + 0.55, a[1] + nz * off], st.stone)
+        const off = 0.07, ph = cult === 'dwarf' ? 1.5 : 0.55, pc = cult === 'dwarf' ? mixHex(st.stone, '#000', 0.25) : st.stone
+        ch.solid.quad([a[0] + nx * off, base - 0.5, a[1] + nz * off], [c[0] + nx * off, base - 0.5, c[1] + nz * off], [c[0] + nx * off, base + ph, c[1] + nz * off], [a[0] + nx * off, base + ph, a[1] + nz * off], pc)
       }
     }
 
@@ -959,7 +1008,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
 
     // окна, двери, фахверк
-    const shutter = st.shutter[Math.floor(rv() * st.shutter.length)]
+    const shutter = look ? look.shutter : rv() < 0.5 ? town.shutters[Math.floor(rv() * 2)] : st.shutter[Math.floor(rv() * st.shutter.length)]
+    // ящики с цветами под окнами первого этажа — у людей и эльфов, не у каждого дома
+    const flowers = !kind && cult !== 'dwarf' && cult !== 'orc' && S.style !== 'styria' && rv() < (cult === 'elf' ? 0.7 : 0.35) * town.flowers
     const litHere = kind === 'temple' ? 0.9 : st.lit
     const wq = (e: (typeof edges)[number], t0: number, t1: number, y0: number, y1: number, off: number): [V3, V3, V3, V3] => {
       const ax = e.a[0] + (e.b[0] - e.a[0]) * t0 + e.n[0] * off, az = e.a[1] + (e.b[1] - e.a[1]) * t0 + e.n[1] * off
@@ -991,17 +1042,34 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
             const ce = (i * 2 + fl) % 3 === 0 && count > 1 && detail < 2
             if (ce) continue
             if (detail >= 2 && !kind) {
-              ch.solid.quad(...wq(e, c - hwn - 0.08 / e.len, c + hwn + 0.08 / e.len, wy - 0.08, wy + wh + 0.08, 0.05), st.timber)
-              ch.solid.quad(...wq(e, c - hwn - 0.42 / e.len, c - hwn - 0.08 / e.len, wy - 0.02, wy + wh + 0.02, 0.06), shutter)
-              ch.solid.quad(...wq(e, c + hwn + 0.08 / e.len, c + hwn + 0.42 / e.len, wy - 0.02, wy + wh + 0.02, 0.06), shutter)
+              ch.solid.quad(...wq(e, c - hwn - 0.08 / e.len, c + hwn + 0.08 / e.len, wy - 0.08, wy + wh + 0.08, 0.05), cult === 'elf' ? '#b59a6a' : st.timber)
+              if (shutter) {
+                ch.solid.quad(...wq(e, c - hwn - 0.42 / e.len, c - hwn - 0.08 / e.len, wy - 0.02, wy + wh + 0.02, 0.06), shutter)
+                ch.solid.quad(...wq(e, c + hwn + 0.08 / e.len, c + hwn + 0.42 / e.len, wy - 0.02, wy + wh + 0.02, 0.06), shutter)
+              }
+              if (flowers && fl === 0) {
+                const fx = e.a[0] + (e.b[0] - e.a[0]) * c + e.n[0] * 0.22, fz = e.a[1] + (e.b[1] - e.a[1]) * c + e.n[1] * 0.22
+                const rot = Math.atan2(e.b[1] - e.a[1], e.b[0] - e.a[0])
+                ch.solid.box(fx, wy - 0.3, fz, 1.0, 0.24, 0.3, '#6b4a2c', rot)
+                ch.solid.box(fx, wy - 0.06, fz, 0.92, 0.16, 0.26, FLOWERS[Math.floor(rv() * FLOWERS.length)], rot)
+              }
             }
             const q = wq(e, c - hwn, c + hwn, wy, wy + wh, 0.08)
             if (lit) ch.glow.quad(...q, '#ffffff')
             else ch.solid.quad(...q, '#2b333b')
+            // вблизи у окна есть глубина: каменный подоконник, перемычка и деревянный переплёт крестом
+            if (detail >= 2 && !kind && cult !== 'orc') {
+              const mx = e.a[0] + (e.b[0] - e.a[0]) * c + e.n[0] * 0.1, mz = e.a[1] + (e.b[1] - e.a[1]) * c + e.n[1] * 0.1
+              const rot = Math.atan2(e.b[1] - e.a[1], e.b[0] - e.a[0]), ww = hwn * 2 * e.len
+              ch.solid.box(mx, wy - 0.16, mz, ww + 0.34, 0.1, 0.26, cult === 'elf' ? '#d8d2c0' : st.stone, rot)
+              if (!st.framed || cult !== 'human') ch.solid.box(mx, wy + wh + 0.04, mz, ww + 0.26, 0.12, 0.16, cult === 'elf' ? '#b59a6a' : mixHex(st.stone, '#000', 0.12), rot)
+              ch.solid.quad(...wq(e, c - 0.035 / e.len, c + 0.035 / e.len, wy, wy + wh, 0.1), st.timber)
+              ch.solid.quad(...wq(e, c - hwn, c + hwn, wy + wh * 0.55 - 0.035, wy + wh * 0.55 + 0.035, 0.1), st.timber)
+            }
           }
         }
         // фахверк: балки между этажами, стойки, раскосы верхнего этажа
-        if (detail >= 2 && st.framed && !kind) {
+        if (detail >= 2 && st.framed && !kind && cult === 'human') {
           for (let fl = 1; fl <= floors; fl++) {
             const y = base + 0.5 + fl * fh
             if (y > base + eave + 0.05) break
@@ -1033,13 +1101,112 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       }
     }
     // дымоход
-    if (!kind && detail >= 1 && rv() < 0.55 && hw < 7) {
+    // у дварфов трубы есть всегда и толще: дома с горнами
+    if (!kind && detail >= 1 && cult !== 'elf' && (cult === 'dwarf' || rv() < 0.55) && hw < 7) {
       const u = u0 + (u1 - u0) * (0.2 + rv() * 0.6), v = (rv() - 0.5) * hw * 0.5
       const [cx, cz] = fromUV(u, v)
       const y = base + eave + rise - Math.abs(v) * pitch - 0.4
-      ch.solid.box(cx, y, cz, 0.75, 1.9, 0.75, st.stone, Math.atan2(uz, ux))
-      ch.solid.box(cx, y + 1.9, cz, 0.95, 0.16, 0.95, mixHex(st.stone, '#000', 0.3), Math.atan2(uz, ux))
+      const cw = cult === 'dwarf' ? 1.15 : 0.75
+      ch.solid.box(cx, y, cz, cw, 1.9, cw, st.stone, Math.atan2(uz, ux))
+      ch.solid.box(cx, y + 1.9, cz, cw + 0.2, 0.16, cw + 0.2, mixHex(st.stone, '#000', 0.3), Math.atan2(uz, ux))
       if (first && chimneys.length < 400) chimneys.push([cx, y + 2.1, cz])
+    }
+    // двор по месту: у воды — рыбацкий, на людной улице — лавка, иногда мастерская, в деревне — огород за плетнём
+    if (!kind && detail >= 2 && door) {
+      const dx = (door.a[0] + door.b[0]) / 2, dz = (door.a[1] + door.b[1]) / 2, [nx, nz] = door.n
+      const rot = Math.atan2(door.b[1] - door.a[1], door.b[0] - door.a[0]), co = Math.cos(rot), si = Math.sin(rot)
+      const free = (x: number, z: number): boolean => gridAt(x, z) === 0 && waterAt(x, z) < 0.2 && roadAt(x, z) < 0.3
+      const at = (along: number, out: number): P2 => [dx + co * along + nx * out, dz + si * along + nz * out]
+      const ground = (p: P2): number => heightAt(p[0], p[1])
+      const water = hasWater && [4, 7, 10].some((d) => waterAt(dx + nx * d, dz + nz * d) > 0.4)
+      const busy = roadAt(dx + nx * 3, dz + nz * 3) > 0.5
+      const kindRoll = rv()
+      if (water) {
+        // сушилка для сетей, перевёрнутая лодка, бочка с уловом
+        const p = at(2.4, 2.2)
+        if (free(...p)) {
+          const y = ground(p)
+          for (const s of [-1.2, 1.2]) ch.solid.box(p[0] + co * s, y, p[1] + si * s, 0.1, 1.9, 0.1, st.timber)
+          ch.solid.box(p[0], y + 1.75, p[1], 2.6, 0.06, 0.06, st.timber, rot)
+          ch.solid.quad([p[0] - co * 1.2, y + 1.75, p[1] - si * 1.2], [p[0] + co * 1.2, y + 1.75, p[1] + si * 1.2], [p[0] + co * 1.2 + nx * 0.05, y + 0.5, p[1] + si * 1.2 + nz * 0.05], [p[0] - co * 1.2 + nx * 0.05, y + 0.5, p[1] - si * 1.2 + nz * 0.05], '#8a7a58')
+        }
+        const q = at(-2.2, 2.6)
+        if (free(...q)) {
+          const y = ground(q)
+          ch.solid.box(q[0], y + 0.05, q[1], 3.2, 0.42, 1.05, '#5a4026', rot)
+          ch.solid.box(q[0], y + 0.47, q[1], 2.6, 0.12, 0.8, '#6e4e30', rot)
+          ch.solid.cyl(...([q[0] + nx * 1.2, y, q[1] + nz * 1.2] as V3), 0.32, 0.8, 7, '#6e4a2c')
+        }
+      } else if (busy && N > 40 && kindRoll < 0.35) {
+        // лавка: полосатый навес над входом, ящики и корзины с товаром
+        const awn = AWNINGS[Math.floor(rv() * AWNINGS.length)], wdt = Math.min(3.6, door.len * 0.8)
+        const a0: V3 = [dx - co * wdt / 2 + nx * 0.1, base + 2.7, dz - si * wdt / 2 + nz * 0.1], a1: V3 = [dx + co * wdt / 2 + nx * 0.1, base + 2.7, dz + si * wdt / 2 + nz * 0.1]
+        const b1: V3 = [a1[0] + nx * 1.7, base + 2.05, a1[2] + nz * 1.7], b0: V3 = [a0[0] + nx * 1.7, base + 2.05, a0[2] + nz * 1.7]
+        const stripes = 5
+        for (let i = 0; i < stripes; i++) {
+          const f0 = i / stripes, f1 = (i + 1) / stripes, L = (A: V3, B: V3, f: number): V3 => [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f, A[2] + (B[2] - A[2]) * f]
+          ch.solid.quad(L(a0, a1, f0), L(a0, a1, f1), L(b0, b1, f1), L(b0, b1, f0), i % 2 ? awn : '#efe8d6')
+        }
+        for (const s of [-1, 1]) ch.solid.box(dx + co * s * (wdt / 2 - 0.1) + nx * 1.75, base, dz + si * s * (wdt / 2 - 0.1) + nz * 1.75, 0.08, 2.05, 0.08, st.timber)
+        for (let i = 0; i < 3; i++) {
+          const p = at(-wdt / 2 + 0.5 + i * 0.9, 1.0)
+          ch.solid.box(p[0], base, p[1], 0.7, 0.45, 0.6, '#8a6a42', rot)
+          ch.solid.box(p[0], base + 0.45, p[1], 0.6, 0.14, 0.5, ['#c9843a', '#8fa04a', '#c94a3a', '#d8c070', '#7a4a8a'][Math.floor(rv() * 5)], rot)
+        }
+      } else if (kindRoll > 0.93 && N > 20) {
+        // мастерская: поленница у стены, наковальня на чурбаке, колесо у двери
+        const p = at(door.len * 0.35, 0.7)
+        if (free(...p)) {
+          const y = ground(p)
+          for (let row = 0; row < 3; row++) ch.solid.box(p[0], y + row * 0.3, p[1], 2.2, 0.3, 0.6, row % 2 ? '#7a5a38' : '#8a6a42', rot)
+        }
+        const q = at(-1.6, 1.8)
+        if (free(...q)) {
+          const y = ground(q)
+          ch.solid.cyl(q[0], y, q[1], 0.35, 0.6, 8, '#6e4a2c')
+          ch.solid.box(q[0], y + 0.6, q[1], 0.6, 0.26, 0.26, '#3a3a40', rot)
+        }
+      }
+      // огород за плетнём с задней стороны дома, стог или поленница
+      if (rv() < town.yard) {
+        const bx = ctr[0] - nx * (hw + 4.2), bz = ctr[1] - nz * (hw + 4.2)
+        if (free(bx, bz) && free(bx + co * 3, bz + si * 3) && free(bx - co * 3, bz - si * 3) && free(bx - nx * 2.4, bz - nz * 2.4)) {
+          const y = heightAt(bx, bz), fw = 6.4, fd = 4.2
+          const corner = (u: number, v: number): P2 => [bx + co * u - nx * v, bz + si * u - nz * v]
+          const posts: P2[] = [corner(-fw / 2, -fd / 2), corner(fw / 2, -fd / 2), corner(fw / 2, fd / 2), corner(-fw / 2, fd / 2)]
+          for (let s = 0; s < 4; s++) {
+            const A = posts[s], B = posts[(s + 1) % 4], len = Math.hypot(B[0] - A[0], B[1] - A[1]), rr = Math.atan2(B[1] - A[1], B[0] - A[0])
+            const n = Math.max(2, Math.round(len / 0.9))
+            for (let i = 0; i < n; i++) { const f = i / n; ch.solid.box(A[0] + (B[0] - A[0]) * f, y, A[1] + (B[1] - A[1]) * f, 0.07, 0.95, 0.07, '#7a5e3c') }
+            for (const h of [0.35, 0.75]) ch.solid.box((A[0] + B[0]) / 2, y + h, (A[1] + B[1]) / 2, len, 0.06, 0.05, '#6a4e30', rr)
+          }
+          // грядки: тёмная земля и зелень рядами
+          for (let i = 0; i < 4; i++) {
+            const v = -fd / 2 + 0.7 + i * 0.95, p = corner(0, v)
+            ch.solid.box(p[0], y, p[1], fw - 1.0, 0.14, 0.55, '#5a4430', rot)
+            ch.solid.box(p[0], y + 0.14, p[1], fw - 1.4, 0.16, 0.32, ['#5f8a3a', '#6f9a40', '#8aa04a', '#4f7a34'][Math.floor(rv() * 4)], rot)
+          }
+          const hp = corner(fw / 2 + 1.4, 0)
+          if (free(...hp)) {
+            if (rv() < 0.5) ch.solid.cyl(hp[0], y, hp[1], 1.1, 1.9, 9, '#c9b06a', 0.15)
+            else for (let row = 0; row < 3; row++) ch.solid.box(hp[0], y + row * 0.28, hp[1], 1.8, 0.28, 0.55, row % 2 ? '#7a5a38' : '#8a6a42', rot + 1.57)
+          }
+        }
+      }
+    }
+    // эльфийский конёк: тонкие резные шпили на концах
+    if (cult === 'elf' && detail >= 2) {
+      for (const u of [u0 - 0.2, u1 + 0.2]) {
+        const [px, pz] = fromUV(u, 0)
+        ch.solid.cyl(px, base + eave + rise - 0.1, pz, 0.12, 1.6, 6, '#b59a6a', 0.02)
+      }
+    }
+    // орочьи дома: клыки-колья по углам кровли
+    if (cult === 'orc' && detail >= 2) {
+      for (const u of [u0 - 0.25, u1 + 0.25]) {
+        const [px, pz] = fromUV(u, 0)
+        ch.solid.cyl(px, base + eave + rise - 0.6, pz, 0.16, 1.9, 5, '#d8cfb4', 0.02)
+      }
     }
     // башня с шатром у храма, башенка с часами у ратуши, крылья у мельницы
     if (kind === 'temple') {
@@ -1494,7 +1661,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   scene.add(clouds)
 
   // ---------- люди ----------
-  const life = createLife({ scene, streets, heightAt, gridAt, doors, pois, gates: gatePts, vendors, center, radius, size: [W, H], style: S.style, buildings: N, mobile: opts.mobile, rnd: R, dot, population: populationFor({ state: opts.state, culture: opts.culture, style: S.style, forest: S.forest, hills: !!S.hills, rocky: !!S.rocky, water: hasWater, buildings: N }) })
+  const life = createLife({ scene, streets, heightAt, gridAt, doors, pois, gates: gatePts, vendors, center, radius, size: [W, H], style: S.style, buildings: N, mobile: opts.mobile, rnd: R, dot, population })
   let marksOn = false
 
   // ---------- дым из труб ----------
@@ -1587,6 +1754,14 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   sun.shadow.bias = -0.0006
   sun.shadow.normalBias = 0.25
   scene.add(sun, sun.target)
+  // ночью у ближайших к камере фонарей горят настоящие огни: тёплые пятна света на стенах и мостовой
+  const lampLights: THREE.PointLight[] = []
+  for (let i = 0; i < (opts.mobile ? 0 : 6); i++) {
+    const l = new THREE.PointLight('#ffb866', 0, 30, 2)
+    scene.add(l)
+    lampLights.push(l)
+  }
+  let lampCheck = 0
   scene.fog = new THREE.Fog('#ffffff', 300, 1500)
   const fog = scene.fog as THREE.Fog
   fog.near = Math.max(280, radius * 1.1)
@@ -1645,6 +1820,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     cloudMat.color.set(k.hor).lerp(new THREE.Color('#ffffff'), 0.65 * (1 - nightK))
     cloudMat.opacity = 0.62 - nightK * 0.46
     nightNow = nightK
+    for (const l of lampLights) l.intensity = nightK * 45
     smokeMat.color.set(nightK > 0.5 ? '#50566a' : '#cfcfcf')
   }
 
@@ -1656,6 +1832,28 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     sky.position.copy(cam.position)
     stars.position.copy(cam.position)
     const camH = cam.position.y - heightAt(cam.position.x, cam.position.z)
+    // огни переставляем к ближайшим фонарям раз в полсекунды и только ночью
+    lampCheck -= dt
+    if (lampLights.length && nightNow > 0.2 && lampCheck <= 0 && glows.length) {
+      lampCheck = 0.5
+      // вокруг точки, куда смотрит камера (с прошлого кадра)
+      const fx = tmpFocus.x || cam.position.x, fz = tmpFocus.z || cam.position.z
+      const near: [number, number][] = []
+      for (let i = 0; i < glows.length; i += 3) {
+        const d = (glows[i] - fx) ** 2 + (glows[i + 2] - fz) ** 2
+        if (near.length < lampLights.length) near.push([d, i])
+        else {
+          let w = 0
+          for (let k = 1; k < near.length; k++) if (near[k][0] > near[w][0]) w = k
+          if (d < near[w][0]) near[w] = [d, i]
+        }
+      }
+      lampLights.forEach((l, k) => {
+        const n = near[k]
+        l.visible = !!n && camH < 260
+        if (n) l.position.set(glows[n[1]], glows[n[1] + 1] + 0.2, glows[n[1] + 2])
+      })
+    }
     // с высоты людей видно плохо: чем выше камера, тем крупнее они нарисованы (как фишки на макете)
     const boost = Math.max(1, Math.min(6, camH / 22))
     tmpFocus.set(cam.position.x, 0, cam.position.z)

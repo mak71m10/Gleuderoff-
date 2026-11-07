@@ -99,6 +99,50 @@ export const BOOK_THEMES: Record<string, BookTheme> = {
   }
 }
 
+// книги, собранные из лора (scripts/lore/books.mjs)
+Object.assign(BOOK_THEMES, {
+  'lore-book-peoples': {
+    key: 'atlas', kind: 'Этнографический атлас', imprint: 'Хауссер · Посольская канцелярия · для писцов и послов',
+    cover: ['#3a4a2a', '#1a2412'], coverInk: '#e2d3a0', emblem: 'book', ornament: '❦',
+    illustrations: [
+      { at: 'title', file: 'peoples-0.webp', caption: 'Ярмарка, на которой встречаются все народы мира.', prompt: 'busy medieval fantasy market square with dwarves, elves, orcs, cat-folk, humans and horned tieflings trading, banners, stalls' },
+      { at: 'Глава I', file: 'peoples-1.webp', caption: 'Имперцы и гладры на улицах Хауссера.', prompt: 'crowd of medieval townsfolk, merchants, guards and peasants on a cobbled street of a timber-framed northern european city' },
+      { at: 'Глава II', file: 'peoples-2.webp', caption: 'Дварфийская кузня под горой.', prompt: 'bearded dwarves forging weapons in a great underground hall carved in stone, glowing forges, elven visitor watching' },
+      { at: 'Глава III', file: 'peoples-3.webp', caption: 'Дети тени: тифлинг и вампир в ночном переулке.', prompt: 'horned red-skinned tiefling and a pale vampire noble in a dark moonlit alley of a gothic city, lanterns' },
+      { at: 'Глава IV', file: 'peoples-4.webp', caption: 'Орочий стан и огры у костра.', prompt: 'green-skinned orc warriors with tusks and a huge ogre sitting around a campfire near hide tents, mountains' }
+    ]
+  },
+  'lore-book-houses': {
+    key: 'armorial', kind: 'Гербовник', imprint: 'Хауссер · Палата гербов Верховного совета',
+    cover: ['#4a1414', '#220808'], coverInk: '#e2c27a', emblem: 'crown', ornament: '⚜',
+    illustrations: [
+      { at: 'title', file: 'houses-0.webp', caption: 'Знамёна великих домов в зале совета.', prompt: 'great medieval hall hung with many heraldic banners and coats of arms, shields on walls, long table' },
+      { at: 'Дом Аргус', file: 'houses-1.webp', caption: 'Аргенфельс — гнездо Аргусов.', prompt: 'mountain castle on a cliff above a city with blue and silver banners, snowy peaks' },
+      { at: 'Дом Штирийский', file: 'houses-2.webp', caption: 'Чёрный замок Корбрука.', prompt: 'black gothic castle on a rock under a crescent moon, dark slate roofs, purple banners, night' },
+      { at: 'Дом Орнибуций', file: 'houses-3.webp', caption: 'Ключник у ворот Мангена.', prompt: 'old steward holding a large iron key before closed city gates, armored conqueror approaching, brown and gold banners' }
+    ]
+  },
+  'lore-book-war': {
+    key: 'chronicle', kind: 'Хроника', imprint: 'Составлено по летописям Империи, Республики, Короны и Церкви',
+    cover: ['#2a1a14', '#120a06'], coverInk: '#d9a45c', emblem: 'dragon', ornament: '✠',
+    illustrations: [
+      { at: 'title', file: 'war-0.webp', caption: 'Бойня на Мосту Короны.', prompt: 'soldiers fighting on a great stone bridge in front of a burning imperial palace, smoke, banners with black dragon' },
+      { at: '976 год', file: 'war-1.webp', caption: 'Вороньё поле.', prompt: 'two medieval armies clashing on an open field, cavalry charge, ravens circling in a grey sky' },
+      { at: '978 год', file: 'war-2.webp', caption: 'Ночь Ножниц.', prompt: 'revolutionary militia with torches arresting nobles in a city square at night, gallows, tense crowd' },
+      { at: '980 год', file: 'war-3.webp', caption: 'Переговоры в Чёрной комнате.', prompt: 'dark chamber with black walls, candlelit table, generals and a young emperor negotiating, documents and seals' }
+    ]
+  },
+  'lore-book-lands': {
+    key: 'guide', kind: 'Путеводитель', imprint: 'Для путешественников, купцов и послов · издание 1010 года',
+    cover: ['#1f3a4a', '#0e1c24'], coverInk: '#e2d3a8', emblem: 'star', ornament: '✺',
+    illustrations: [
+      { at: 'title', file: 'lands-0.webp', caption: 'Карта мира из посольской канцелярии.', prompt: 'old hand-drawn fantasy map of a continent on parchment with compass rose, sea monsters and ships' },
+      { at: 'Великие державы', file: 'lands-1.webp', caption: 'Хауссер, столица Империи.', prompt: 'panorama of a great walled medieval capital city on a river with cathedral spires and a palace, travelers on the road' },
+      { at: 'Прочие земли', file: 'lands-2.webp', caption: 'Корабли у дальних берегов.', prompt: 'merchant sailing ships approaching an exotic coastal city with domes and palm trees, sunset' }
+    ]
+  }
+} satisfies Record<string, BookTheme>)
+
 const DEFAULT_THEME: BookTheme = {
   key: 'manuscript', kind: 'Рукопись', imprint: '', cover: ['#4a3420', '#24180c'], coverInk: '#e2c27a', emblem: 'book', ornament: '❧', illustrations: []
 }

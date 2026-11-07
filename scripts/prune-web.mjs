@@ -86,6 +86,9 @@ if (existsSync(DEP)) {
   // Leaflet показывает их обычным <img>, браузер сам вырезает нужный кусок
   const TW = 768, PER = 16, COLS = 4
   mkdirSync(`${CD}/sheet`, { recursive: true })
+  // контуры зданий мелких планов — общими пачками по 8 листов: у страницы для телефона предел в 512 файлов
+  const BUNDLE = 8
+  const bundles = {}
   for (let s = 0; s * PER < small.length; s++) {
     const part = small.slice(s * PER, (s + 1) * PER)
     const tiles = await Promise.all(part.map(async (m) => { const { data, info } = await sharp(readFileSync(`${DIR}/${m.image}`), { limitInputPixels: false }).resize({ width: TW }).toBuffer({ resolveWithObject: true }); return { data, h: info.height } }))
@@ -98,7 +101,8 @@ if (existsSync(DEP)) {
       .webp({ quality: 78 }).toBuffer()
     const name = `maps/cities/sheet/${String(s).padStart(2, '0')}.svg`
     writeFileSync(`${DIR}/${name}`, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${TW * COLS}" height="${H}" viewBox="0 0 ${TW * COLS} ${H}"><image width="${TW * COLS}" height="${H}" xlink:href="data:image/webp;base64,${img.toString('base64')}"/></svg>`)
-    const sheetPlans = {}
+    const bundle = `maps/cities/sheet/plans-${String(Math.floor(s / BUNDLE)).padStart(2, '0')}.json`
+    const sheetPlans = (bundles[bundle] ??= {})
     part.forEach((m, i) => {
       rmSync(`${DIR}/${m.image}`)
       m.image = `${name}#svgView(viewBox(${(i % COLS) * TW},${rowY[Math.floor(i / COLS)]},${TW},${tiles[i].h}))`
@@ -107,11 +111,11 @@ if (existsSync(DEP)) {
       if (plans[slug]) {
         sheetPlans[slug] = plans[slug]
         delete plans[slug]
-        m.plan = `${name.replace(/\.svg$/, '.json')}#${slug}`
+        m.plan = `${bundle}#${slug}`
       }
     })
-    writeFileSync(`${DIR}/${name.replace(/\.svg$/, '.json')}`, JSON.stringify(sheetPlans))
   }
+  for (const [name, sheetPlans] of Object.entries(bundles)) writeFileSync(`${DIR}/${name}`, JSON.stringify(sheetPlans))
   writeFileSync(`${CD}/plans.json`, JSON.stringify(plans))
   console.log(`out-web: планы городов (${Object.keys(plans).length}) — одним файлом; мелкие (${small.length}) — в ${Math.ceil(small.length / PER)} листах, остальные — 2048 px`)
 }
