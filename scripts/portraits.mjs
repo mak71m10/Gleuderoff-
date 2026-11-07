@@ -23,6 +23,8 @@ const SOUTH_STYLE = 'oil painting, spanish and italian renaissance court portrai
 const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael and titian style, warm golden light, dark background, visible brush strokes, detailed face, half-length portrait'
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
+// Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const KREIT_STYLE = 'oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
 // цвета домов -> слова для одежды
@@ -36,6 +38,32 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  // Креит (креитские норды: русые, рыжие и пепельные волосы, светлые глаза; всё в серебре и мехах)
+  'kr-grimkel': 'grim old norwegian jarl with a long ash-blond beard turned grey, heavy silver arm rings and a silver torc, wolf fur cloak, cold pale eyes, smoke behind',
+  'kr-skardi': '(sandy blond hair:1.3), hard lean norwegian jarl in his thirties with sandy hair braided at the temples and a short beard, scarred cheek, silver arm rings, chainmail under a bear fur, wary eyes',
+  'kr-ingeborg': 'cold beautiful norwegian woman ruler in her twenties with pale ash-blond hair in tight war braids, silver circlet of raw ore, dark fur mantle over chainmail, a thin scar on the lip, calm merciless grey eyes',
+  'kr-torbrand': 'huge brutal norwegian warrior with a red beard and shaved head, burn scars, bearded axe, blood on the fur',
+  'kr-tora': 'fierce young norwegian shieldmaiden with copper-red braids, round shield, chainmail, defiant face',
+  'kr-ulv': '(dark blond hair, young:1.3), handsome norwegian sea captain in his twenties with tousled dark-blond hair and a short beard, salt-stained leather, silver earring, a bitter smile, sea behind',
+  'kr-solveig': '(long dark brown hair:1.4), young norwegian woman with long brown hair, gaunt face smudged with ore dust, iron slave collar, herbs in her hands, mine darkness behind',
+  'kr-tormod': 'proud young norwegian warrior with light brown hair and a thin beard, chainmail, spear, mountain pass with snow behind',
+  'kr-ragnhild': 'young norwegian woman warrior with honey-blond braids, stern face, short sword, torchlit stone hall',
+  'kr-egil': '(fair hair, ragged clothes:1.3), thin norwegian boy of fourteen with shaggy fair hair, ore dust on his face, iron slave collar, frightened brave eyes, mine tunnel behind',
+  'kr-hjalti': 'serious norwegian boy of seven with white-blond hair, small fur cloak, wooden practice sword, silver ring on a cord',
+  'kr-b1-ragnvald': 'old toothless norwegian slave foreman with a ragged grey beard, iron collar, ore dust, tired wise eyes, mine tunnel with torches',
+  'kr-vigdis': 'ancient blind norwegian shaman woman with milky white eyes, long white hair with silver beads, face painted with silver dust, ear pressed to a rock wall, deep cave',
+  'kr-ormar': '(dark blond hair:1.3), handsome sly norwegian shaman in his forties with dark-blond hair and silver dust in his beard, grey hooded robe with silver runes, ingratiating smile',
+  'kr-kolgrim': 'gaunt old norwegian shaman with one eye covered by a silver cataract, shaved head with rune tattoos, iron keys on his belt, dark mine tunnel',
+  'kr-gyrid': 'stern norwegian noblewoman in her forties with braided greying fair hair, heavy silver keys at her belt, dark wool dress with tortoise brooches',
+  'kr-erling': 'old norwegian warrior with a crooked broken nose and grey braided beard, scarred, holding a notched axe, mine overseer, fur and leather',
+  'kr-gudbrand': '(very fat, red beard:1.4), huge fat jolly cruel norwegian chieftain with a red beard, gold and silver rings, drinking horn, bear fur',
+  'kr-aslak': 'weathered norwegian pirate chieftain with salt-white blond hair, sea-tanned face, silver earrings, chainmail, dragon-prowed longships behind',
+  'kr-vemund': 'shrewd norwegian merchant chieftain with a brown beard, salt crystals on his fur collar, scales and silver coins on the table',
+  'kr-trond': '(dark blond hair:1.3), grim norwegian border chieftain with dark-blond hair and a weathered face, mountain fortress of logs behind, spear',
+  'kr-sigurd': '(bright red hair and big red beard:1.4), norwegian chieftain with a big red beard and sly eyes, embroidered tunic, silver arm rings',
+  'kr-hallbjorn': '(golden blond short beard:1.3), massive norwegian housecarl captain with a short blond beard, steel helmet with spectacle guard, huge war hammer, silver-trimmed chainmail',
+  'kr-hjorleiv': 'norwegian skald in his fifties with grey-blond hair, embroidered tunic, holding a lyre, many silver rings, sad smile',
+
   // Земли Севера (норды: чаще всего чёрные волосы цвета вороньего крыла; на северо-западе — светлые и рыжие)
   'no-torvald': 'grim old viking chieftain with a long grey beard and raven black hair streaked with grey, huge scarred hands, bear fur cloak, iron arm rings',
   'no-ulf': 'wild berserker warrior with black braided hair and beard, bear skin over bare shoulders, wolf fang necklace, fierce eyes, war paint',
@@ -268,7 +296,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -280,7 +308,8 @@ for (const e of chars) {
   const man = e.base.tags.includes('Графство Мангениум')
   const exile = e.base.tags.includes('Имперские Изгнанники')
   const north = e.base.tags.includes('Земли Севера')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north
+  const kreit = e.base.tags.includes('Креит')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -296,7 +325,9 @@ for (const e of chars) {
   const age = Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
-  const prompt = north
+  const prompt = kreit
+    ? `${KREIT_STYLE}, ${banner}portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (norwegian, pale weathered skin:1.2), ${CUSTOM[id] ?? subject}`
+    : north
     ? `${NORTH_STYLE}, ${banner}${/Дварф/.test(race) ? `portrait of an (ancient dwarf:1.5), (short stout broad-shouldered dwarf, huge bulbous nose, heavy brow, deep-set eyes, ruddy weathered skin:1.4), ` : `portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (scandinavian, pale weathered skin:1.2), `}${CUSTOM[id] ?? subject}`
     : sty
     ? `oil painting, dark gothic medieval portrait, candlelight, deep shadows, black background, visible brush strokes, detailed face, half-length portrait, ${banner}portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european:1.15), ${stHouse ? `(snow white skin, jet black hair:1.35), ${female ? 'black velvet gown' : 'black velvet doublet'} with a silver crescent, cold eyes` : /немая|скита/.test(e.base.title) ? 'grim hooded figure in grey robe, ink-stained hands' : /Капитан/.test(e.base.title) ? 'scarred mercenary general in worn black armor' : /Кастелян/.test(e.base.title) ? 'impoverished nobleman in a patched old doublet, tired face' : /Епископ/.test(e.base.title) ? 'bored bishop in shabby white robes with a golden sun pendant' : /Мастер|Управляющий/.test(e.base.title) ? 'shady merchant in black clothes with rings, sly look' : subject}`

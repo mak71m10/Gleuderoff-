@@ -95,6 +95,7 @@ const styleOf = (state) =>
   state === 'Графство Штирия' ? 'styria'
     : state === 'Имперские Изгнанники' ? 'exile'
     : state === 'Земли Севера' ? 'norse'
+    : state === 'Креит' ? 'viking'
     : state === 'Кальтранская Республика' ? 'kalt'
       : ['Тоскана', 'Вуфинская Республика', 'Республика Шеша'].includes(state) ? 'south'
         : state === 'Святая церковь' || String(state).startsWith('Архиепархия') ? 'church'

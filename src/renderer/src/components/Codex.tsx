@@ -12,6 +12,7 @@ import { SuccessionCouncilView } from './Council'
 import { Fullscreen, PanZoom } from './PanZoom'
 import { BookReader } from './BookReader'
 import { TingView } from './Ting'
+import { BroodView } from './Brood'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { renderBody } from './prose'
@@ -324,6 +325,7 @@ function EntryEditor({ id }: { id: string }) {
           )}
           {f.stavka && <StavkaView data={f.stavka} onOpen={goto} />}
           {f.ting && <TingView data={f.ting} onOpen={goto} />}
+          {f.brood && <BroodView data={f.brood} onOpen={goto} />}
           {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}

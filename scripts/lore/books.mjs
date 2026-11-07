@@ -61,13 +61,20 @@ export default function books({ E, entries, world }) {
       parts.push(lines.join('\n\n'))
     }
     // великие кланы Севера — отдельной главой: у них не дома, а кланы, и в войну 975–980 гг. они восставали против всех
-    const clans = lore('dynasty').filter((e) => e.base.tags.includes('кланы'))
+    const clanCard = (h) => [`## ${h.base.name}`, h.base.title ? `*${h.base.title}*` : '', `**Герб.** ${h.base.props?.arms ?? ''}`, strip(h.base.body).replace(/^## /gm, '**').replace(/^(\*\*[^*\n]+)$/gm, '$1.**')].filter(Boolean).join('\n\n')
+    const clans = lore('dynasty').filter((e) => e.base.tags.includes('кланы') && e.base.tags.includes('Земли Севера'))
     if (clans.length) {
       parts.push('# Великие кланы Севера', 'На севере нет великих домов: есть девять великих кланов, и каждый держит свою землю и свой город. Их щиты — северный крест на поле цвета клана.')
-      for (const h of clans) parts.push([`## ${h.base.name}`, h.base.title ? `*${h.base.title}*` : '', `**Герб.** ${h.base.props?.arms ?? ''}`, strip(h.base.body).replace(/^## /gm, '**').replace(/^(\*\*[^*\n]+)$/gm, '$1.**')].filter(Boolean).join('\n\n'))
+      for (const h of clans) parts.push(clanCard(h))
+    }
+    // этты Креита — своей главой: один правящий род и шесть родов, чьи дочери идут в жильные жёны ярла
+    const etts = lore('dynasty').filter((e) => e.base.tags.includes('кланы') && e.base.tags.includes('Креит'))
+    if (etts.length) {
+      parts.push('# Род Мальмгримов и этты Креита', 'В Креите правит один род — Мальмгримы, хозяева серебряной жилы. Шесть великих эттов держат земли и отдают ярлу своих дочерей. Их щиты — косой крест, как скрещённые доски на щипце длинного дома.')
+      for (const h of etts) parts.push(clanCard(h))
     }
     E('book-houses', 'note', 'Гербовник великих домов', {
-      title: 'Щиты, девизы и судьбы великих домов Империи', summary: `${houses.length} великих домов и ${clans.length} кланов Севера: гербы, девизы, сторона в гражданской войне.`,
+      title: 'Щиты, девизы и судьбы великих домов Империи', summary: `${houses.length} великих домов, ${clans.length} кланов Севера и ${etts.length} родов Креита: гербы, девизы, сторона в гражданской войне.`,
       body: parts.join('\n\n'), tags: ['книги', 'Великие дома']
     })
   }

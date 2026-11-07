@@ -62,6 +62,8 @@ export interface Style {
 export const STYLES: Record<string, Style> = {
   // Земли Севера: тёмное смолёное дерево, дерновые крыши, крутые скаты, крашеные ставни, ели
   norse: { plaster: ['#5a4232', '#4e3a2c', '#634a38', '#463427', '#6b5240'], roof: ['#5b7340', '#4f6638', '#66784a', '#6d6a4a', '#4a5a36', '#5a4a36'], timber: '#2a1e16', stone: '#6e6c66', wall: '#5a4a3a', shutter: ['#7a2a22', '#2f4a6a', '#3a5a3a'], pitch: 1.3, framed: false, floors: 0, grass: '#6a7f4e', grass2: '#748a56', dirt: '#8a7a5e', pave: '#7f7668', lit: 0.32, conifer: 0.9, tower: '#3a2e26' },
+  // Креит: всё из дерева — бревенчатые стены, тёмный смолёный гонт, крутые крыши почти до земли, драконьи коньки, частокол
+  viking: { plaster: ['#4a3626', '#553e2b', '#3f2e20', '#5c4430', '#47331f'], roof: ['#3a2e24', '#43352a', '#2f2620', '#4a3a2c', '#383028'], timber: '#1e140e', stone: '#5e5a54', wall: '#4a3828', shutter: ['#1e140e'], pitch: 1.7, framed: false, floors: 0, grass: '#5f7448', grass2: '#6a7e50', dirt: '#7a6a52', pave: '#6e6558', lit: 0.22, conifer: 0.95, tower: '#2e2219' },
   // Имперские изгнанники: серый северный камень, тёмно-алые и сланцевые крыши под снег, крутые скаты
   exile: { plaster: ['#b8b4aa', '#a9a59a', '#c4c0b6', '#9d998e'], roof: ['#5a2626', '#4a2222', '#3f3d44', '#6a2c2a', '#47434a'], timber: '#2e2420', stone: '#76726a', wall: '#8a867c', shutter: ['#5a1414', '#2e2a28'], pitch: 1.25, framed: false, floors: 0, grass: '#6a7a52', grass2: '#74845a', dirt: '#9a8f74', pave: '#8f897a', lit: 0.3, conifer: 0.9, tower: '#3e2a2a' },
   empire: { plaster: ['#e9dcc0', '#dccca8', '#efe5cf', '#d8c9a6'], roof: ['#a8452f', '#9c3f2c', '#b4553a', '#8f3a2a', '#a04a30', '#6d7d3c'], timber: '#4a3222', stone: '#8f8a7e', wall: '#a9a394', shutter: ['#3f6a4a', '#2f5570', '#7a3b2e'], pitch: 0.95, framed: true, floors: 0, grass: '#6f9b46', grass2: '#7fa84f', dirt: '#b9a57c', pave: '#b1a384', lit: 0.4, conifer: 0.3, tower: '#5c5a78' },
@@ -894,7 +896,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     // дворы с огородами: в деревне почти у каждого дома, в большом городе — только на окраинах
     yard: N < 80 ? 0.85 : N < 300 ? 0.45 : 0.12
   }
-  const AWNINGS = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a', '#c97a3a', '#e8e0c8']
+  const AWNINGS = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a', '#c97a3a', '#e8e0c8']
   // один дом заданной детальности; случайность своя у каждого дома, поэтому при достройке он остаётся тем же
   const buildHouse = (idx: number, ch: Chunk, detail: number, first: boolean): void => {
     const b = blds[idx]
@@ -903,7 +905,11 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const ctr = centerOf(r)
     const base = heightAt(ctr[0], ctr[1])
     const area = Math.abs(areaOf(r))
-    const kind = kindOf(idx)
+    const kind0 = kindOf(idx)
+    const vik = S.style === 'viking'
+    // у викингов цитадель и ратуша — не каменные башни, а большие длинные залы
+    const hall = vik && (kind0 === 'keep' || kind0 === 'civic')
+    const kind = hall ? '' : kind0
     const rv = rng(hashOf(seedName) + idx * 7919 + 13)
     const orient = areaOf(r) > 0 ? 1 : -1
 
@@ -934,14 +940,15 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const cult: Cult = kind ? 'human' : houseCult(idx, rng(hashOf(seedName) + idx * 104729)())
     const look = cult === 'human' ? null : CULT_LOOK[cult]
     if (cult === 'dwarf' || cult === 'orc') floors = Math.max(1, floors - 1)
+    if (vik) floors = 1
     const plaster = look ? look.wall[Math.floor(rv() * look.wall.length)] : mixHex(st.plaster[Math.floor(rv() * st.plaster.length)], town.tint, town.tintK)
     const pal = look ? look.roof : S.droof[b.d] ?? S.roof ?? st.roof
     const roofCol = kind === 'temple' ? st.tower : kind === 'keep' ? mixHex(st.stone, '#000', 0.2) : look ? pal[Math.floor(rv() * pal.length)] : mixHex(pal[Math.floor(rv() * pal.length)], town.roofTone, town.roofK * rv())
-    const stoneBody = kind === 'temple' || kind === 'keep' || kind === 'civic'
+    const stoneBody = !vik && (kind === 'temple' || kind === 'keep' || kind === 'civic')
     const wallCol = stoneBody ? mixHex(st.wall, st.plaster[0], 0.3) : plaster
-    const eave = kind === 'temple' ? Math.min(16, 8 + Math.sqrt(area) * 0.2) : kind === 'keep' ? Math.min(22, 11 + Math.sqrt(area) * 0.3) : kind === 'civic' ? 3.3 * Math.max(floors, 3) : 0.5 + floors * 3 + (look?.eave ?? 0)
+    const eave = vik && !kind ? (hall ? 4.4 : 2.7) : kind === 'temple' ? Math.min(16, 8 + Math.sqrt(area) * 0.2) : kind === 'keep' ? Math.min(22, 11 + Math.sqrt(area) * 0.3) : kind === 'civic' ? 3.3 * Math.max(floors, 3) : 0.5 + floors * 3 + (look?.eave ?? 0)
     // эльфы строят высокие крутые крыши, дварфы — низкие каменные, орки — приземистые
-    const rise = Math.min(hw * st.pitch * (look?.pitch ?? 1) * (kind ? 1 : town.pitchK), kind === 'keep' ? 0 : hw > 8 ? (cult === 'elf' ? 11 : 7) : 99)
+    const rise = Math.min(hw * st.pitch * (look?.pitch ?? 1) * (kind ? 1 : town.pitchK), kind === 'keep' ? 0 : hw > 8 ? (cult === 'elf' ? 11 : hall ? 12 : vik ? 9 : 7) : 99)
     const pitch = rise / hw
     const topAt = (p: P2): number => { const v = Math.abs(toUV(p)[1]); return base + eave + Math.max(-1.5, rise - v * pitch) }
     tops[idx] = base + eave + rise
@@ -986,7 +993,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         ch.solid.box(ctr[0] + 0.8, base + eave + 9.8, ctr[1], 1.6, 1, 0.05, S.style === 'styria' ? '#2a1a2a' : '#8f2f2f')
       }
     } else {
-      const over = grow(r, kind ? 0.5 : 0.35)
+      const over = grow(r, vik ? 0.8 : kind ? 0.5 : 0.35)
       const uv = over.map(toUV)
       const LIFT = 0.02
       for (const sgn of [1, -1]) {
@@ -1005,12 +1012,40 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         const a = fromUV(u0 - 0.3, 0), c = fromUV(u1 + 0.3, 0), y = base + eave + rise + 0.02
         ch.solid.box((a[0] + c[0]) / 2, y - 0.08, (a[1] + c[1]) / 2, Math.hypot(c[0] - a[0], c[1] - a[1]), 0.18, 0.28, mixHex(roofCol, '#000', 0.35), Math.atan2(c[1] - a[1], c[0] - a[0]))
       }
+      // Креит: на щипцах — скрещённые доски, концы которых вырезаны драконьими головами
+      if (vik && detail >= 1 && kind !== 'keep') {
+        const top = base + eave + rise
+        const ov = 0.8
+        const strip = (u: number, v0: number, y0: number, v1: number, y1: number, w: number, col: string): void => {
+          const dv = v1 - v0, dy = y1 - y0, l = Math.hypot(dv, dy) || 1
+          const nv = (-dy / l) * (w / 2), ny = (dv / l) * (w / 2)
+          const P = (v: number, y: number): V3 => { const p = fromUV(u, v); return [p[0], y, p[1]] }
+          const A = P(v0 + nv, y0 + ny), B = P(v1 + nv, y1 + ny), Cq = P(v1 - nv, y1 - ny), Dq = P(v0 - nv, y0 - ny)
+          ch.solid.quad(A, B, Cq, Dq, col)
+          ch.solid.quad(Dq, Cq, B, A, col)
+        }
+        const board = mixHex(st.timber, '#7a5a3a', 0.45)
+        const head = hall ? '#6a2a1a' : mixHex(st.timber, '#5a3a22', 0.4)
+        const big = hall ? 1.5 : 1
+        for (const [u, out] of [[u0 - ov - 0.05, -1], [u1 + ov + 0.05, 1]] as [number, number][]) {
+          for (const s of [1, -1]) {
+            // доска идёт по краю ската от свеса к коньку и дальше за конёк, перекрещиваясь с другой
+            const vE = s * (hw + ov), yE = top - (hw + ov) * pitch
+            const vT = -s * 0.55 * big, yT = top + 0.55 * big * pitch
+            strip(u, vE, yE, vT, yT, 0.22, board)
+            // голова дракона: шея загибается наружу, морда смотрит вперёд
+            const vH = vT - s * 0.32 * big, yH = yT + 0.22 * big
+            strip(u, vT, yT, vH, yH, 0.22 * big, head)
+            strip(u + out * 0.01, vH, yH, vH - s * 0.22 * big, yH - 0.1 * big, 0.17 * big, head)
+          }
+        }
+      }
     }
 
     // окна, двери, фахверк
-    const shutter = look ? look.shutter : rv() < 0.5 ? town.shutters[Math.floor(rv() * 2)] : st.shutter[Math.floor(rv() * st.shutter.length)]
+    const shutter = vik ? '' : look ? look.shutter : rv() < 0.5 ? town.shutters[Math.floor(rv() * 2)] : st.shutter[Math.floor(rv() * st.shutter.length)]
     // ящики с цветами под окнами первого этажа — у людей и эльфов, не у каждого дома
-    const flowers = !kind && cult !== 'dwarf' && cult !== 'orc' && S.style !== 'styria' && rv() < (cult === 'elf' ? 0.7 : 0.35) * town.flowers
+    const flowers = !vik && !kind && cult !== 'dwarf' && cult !== 'orc' && S.style !== 'styria' && rv() < (cult === 'elf' ? 0.7 : 0.35) * town.flowers
     const litHere = kind === 'temple' ? 0.9 : st.lit
     const wq = (e: (typeof edges)[number], t0: number, t1: number, y0: number, y1: number, off: number): [V3, V3, V3, V3] => {
       const ax = e.a[0] + (e.b[0] - e.a[0]) * t0 + e.n[0] * off, az = e.a[1] + (e.b[1] - e.a[1]) * t0 + e.n[1] * off
@@ -1029,10 +1064,16 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const storeys = kind === 'temple' ? 1 : kind === 'keep' ? Math.floor(eave / 4) : kind === 'civic' ? 3 : floors
       const fh = kind === 'temple' ? eave - 1 : kind === 'keep' ? 4 : (eave - 0.5) / Math.max(1, storeys)
       for (const e of visible) {
-        const count = Math.max(0, Math.min(kind === 'temple' ? 6 : 6, Math.floor(e.len / (kind === 'temple' ? 3.4 : 2.7))))
+        const count = vik && !kind ? (e.len > 7 ? 1 : 0) : Math.max(0, Math.min(kind === 'temple' ? 6 : 6, Math.floor(e.len / (kind === 'temple' ? 3.4 : 2.7))))
+        // бревенчатые венцы: тёмные пазы между брёвнами
+        if (vik && detail >= 2 && !kind) {
+          for (let y = base + 0.62; y < base + eave - 0.12; y += 0.42) ch.solid.quad(...wq(e, 0, 1, y - 0.035, y + 0.035, 0.04), mixHex(wallCol, '#000', 0.45))
+          // торцы брёвен на углах
+          ch.solid.quad(...wq(e, 0, 0.12 / e.len, base + 0.4, base + eave, 0.06), mixHex(wallCol, '#c8a878', 0.25))
+        }
         for (let fl = 0; fl < storeys; fl++) {
           const wy = kind === 'temple' ? base + 2.2 : base + 0.5 + fl * fh + fh * 0.32
-          const wh = kind === 'temple' ? eave - 4 : Math.min(1.25, fh * 0.45)
+          const wh = kind === 'temple' ? eave - 4 : vik ? 0.5 : Math.min(1.25, fh * 0.45)
           if (wy + wh > base + eave - 0.2) continue
           for (let i = 0; i < count; i++) {
             const c = (i + 0.5) / count
@@ -1102,7 +1143,11 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
     // дымоход
     // у дварфов трубы есть всегда и толще: дома с горнами
-    if (!kind && detail >= 1 && cult !== 'elf' && (cult === 'dwarf' || rv() < 0.55) && hw < 7) {
+    if (vik && !kind && first && rv() < 0.6 && chimneys.length < 400) {
+      // у викингов не трубы, а дымовое отверстие в коньке
+      const [cx, cz] = fromUV((u0 + u1) / 2, 0)
+      chimneys.push([cx, base + eave + rise + 0.3, cz])
+    } else if (!vik && !kind && detail >= 1 && cult !== 'elf' && (cult === 'dwarf' || rv() < 0.55) && hw < 7) {
       const u = u0 + (u1 - u0) * (0.2 + rv() * 0.6), v = (rv() - 0.5) * hw * 0.5
       const [cx, cz] = fromUV(u, v)
       const y = base + eave + rise - Math.abs(v) * pitch - 0.4
@@ -1298,11 +1343,66 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
   }
 
+  // ---------- Креит: частокол из заострённых брёвен, деревянные вышки и надвратные башни под шатром ----------
+  const palisade = (r: P2[], isCit: boolean): void => {
+    const logH = isCit ? 5.2 : 4.4
+    const LOGS = ['#4a3828', '#3f2f21', '#55402c', '#46352a']
+    const roofW = mixHex(st.roof[0], '#000', 0.1)
+    const tower = (x: number, z: number, y: number, s: number, h: number, rot: number, ch: Chunk): void => {
+      ch.solid.box(x, y - 1.5, z, s, h + 1.5, s, mixHex(st.wall, '#000', 0.1), rot)
+      ch.solid.box(x, y + h, z, s + 0.6, 0.25, s + 0.6, st.timber, rot)
+      ch.solid.cyl(x, y + h + 0.25, z, (s + 0.9) * 0.72, 2.4, 4, roofW, 0, false, rot + Math.PI / 4)
+    }
+    for (let i = 0; i < r.length; i++) {
+      const a = r[i], b = r[(i + 1) % r.length]
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1])
+      if (len < 0.5) continue
+      const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len, nx = -uz, nz = ux
+      const gates = gatesOn(a, b, len)
+      for (const [s0, s1] of spansOf(gates, len)) {
+        const n = Math.max(1, Math.round((s1 - s0) / 0.85))
+        for (let j = 0; j <= n; j++) {
+          const f = s0 + ((s1 - s0) * j) / n
+          const x = a[0] + ux * f, z = a[1] + uz * f, y = heightAt(x, z), ch = chunkAt(x, z)
+          const h = logH + ((j * 7919) % 5) * 0.12
+          if (detail >= 1) {
+            const col = LOGS[(j + i) % LOGS.length]
+            ch.solid.cyl(x, y - 1.5, z, 0.44, h + 1.5, 6, col, 0.44, false)
+            ch.solid.cyl(x, y + h, z, 0.44, 0.85, 6, mixHex(col, '#c8a878', 0.2), 0)
+          } else if (j < n) {
+            // издалека — сплошная стена из брёвен
+            const f1 = s0 + ((s1 - s0) * (j + 1)) / n, x1 = a[0] + ux * f1, z1 = a[1] + uz * f1, y1 = heightAt(x1, z1)
+            ch.solid.quad([x + nx * 0.4, y - 1.5, z + nz * 0.4], [x1 + nx * 0.4, y1 - 1.5, z1 + nz * 0.4], [x1 + nx * 0.4, y1 + h, z1 + nz * 0.4], [x + nx * 0.4, y + h, z + nz * 0.4], st.wall)
+            ch.solid.quad([x1 - nx * 0.4, y1 - 1.5, z1 - nz * 0.4], [x - nx * 0.4, y - 1.5, z - nz * 0.4], [x - nx * 0.4, y + h, z - nz * 0.4], [x1 - nx * 0.4, y1 + h, z1 - nz * 0.4], mixHex(st.wall, '#000', 0.1))
+          }
+        }
+        // поперечный брус с внутренней стороны, на котором держится частокол
+        if (detail >= 1 && s1 - s0 > 1) {
+          const m = (s0 + s1) / 2, x = a[0] + ux * m - nx * 0.55, z = a[1] + uz * m - nz * 0.55
+          chunkAt(x, z).solid.box(x, heightAt(x, z) + logH * 0.62, z, s1 - s0, 0.28, 0.28, st.timber, Math.atan2(uz, ux))
+        }
+      }
+      // надвратные башни: две деревянные вышки под шатром и перекладина над проездом с черепами коней
+      for (const g0 of gates) {
+        const cx = a[0] + ux * g0, cz = a[1] + uz * g0, y = heightAt(cx, cz), ch = chunkAt(cx, cz), rot = Math.atan2(uz, ux)
+        for (const sd of [-1, 1]) tower(cx + ux * sd * 4, cz + uz * sd * 4, y, 2.6, logH + 2.6, rot, ch)
+        ch.solid.box(cx, y + logH + 0.6, cz, 8.6, 0.7, 1.2, st.timber, rot)
+        if (detail >= 1) for (const sd of [-1.4, 0, 1.4]) ch.solid.box(cx + ux * sd + nx * 0.7, y + logH - 0.1, cz + uz * sd + nz * 0.7, 0.42, 0.5, 0.6, '#d8d0bc', rot)
+      }
+      // угловые дозорные вышки — не на каждом углу
+      if (i % 3 === 0 || isCit) {
+        const y = heightAt(a[0], a[1])
+        tower(a[0], a[1], y, 3, logH + 3.4, Math.atan2(uz, ux), chunkAt(a[0], a[1]))
+      }
+    }
+  }
+
   // ---------- стены города: зубцы, башни, ворота там, где стену пересекает дорога ----------
   const wallColor = st.wall
   wallLines.forEach((w, wi) => {
     const r = w.r
     if (r.length < 2) return
+    if (S.style === 'viking') return palisade(r, wi === S.citadel)
     const isCit = wi === S.citadel
     const wh = (isCit ? 9 : 7) * (S.style === 'styria' ? 1.15 : 1)
     const th = Math.max(1.8, Math.min(3.2, w.w / 2))
@@ -1380,12 +1480,21 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
 
   // ---------- площади: колодец, прилавки ----------
   const vendors: { x: number; z: number; a: number }[] = []
-  const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
+  const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
     if (area > 500) {
-      // большая площадь: фонтан или памятник на постаменте
-      if (si % 2 === 0) {
+      // большая площадь: фонтан или памятник на постаменте; в гарде Креита — жертвенный камень, кострище и резные столбы богов
+      if (S.style === 'viking') {
+        ch.solid.box(cx, y, cz, 2.4, 1.2, 1.6, st.stone, si)
+        ch.solid.cyl(cx + 3.2, y, cz + 0.6, 1.2, 0.25, 9, '#3a3430')
+        ch.solid.cyl(cx + 3.2, y + 0.25, cz + 0.6, 0.7, 0.5, 6, '#c8642a', 0.1)
+        for (let i = 0; i < 3; i++) {
+          const a = si + (i / 3) * 6.283, px = cx + Math.cos(a) * 5.2, pz = cz + Math.sin(a) * 5.2
+          ch.solid.cyl(px, y, pz, 0.38, 4.2, 6, st.timber)
+          ch.solid.box(px, y + 3.3, pz, 0.9, 0.8, 0.9, '#6a2a1a', a)
+        }
+      } else if (si % 2 === 0) {
         ch.solid.cyl(cx, y, cz, 3.4, 0.8, 16, st.stone)
         ch.solid.cyl(cx, y + 0.8, cz, 3, 0.02, 16, '#3f7f96')
         ch.solid.cyl(cx, y, cz, 0.7, 2.8, 8, st.stone)
@@ -1396,6 +1505,12 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         ch.solid.cyl(cx, y + 5, cz, 0.42, 0.75, 8, '#6d7a70', 0.3)
       }
       fillLine([[cx, cz], [cx + 0.1, cz]], 7, N + 2 + si)
+    } else if (S.style === 'viking') {
+      // малая площадь гарда: колодец-сруб
+      ch.solid.box(cx, y, cz, 2.2, 0.9, 2.2, mixHex(st.plaster[0], '#000', 0.15))
+      fillLine([[cx, cz], [cx + 0.1, cz]], 3.4, N + 2 + si)
+      for (const s of [-1, 1]) ch.solid.box(cx + s * 1.0, y + 0.8, cz, 0.18, 2.1, 0.18, st.timber)
+      ch.solid.box(cx, y + 2.85, cz, 2.4, 0.18, 0.18, st.timber)
     } else {
       ch.solid.cyl(cx, y, cz, 1.3, 0.9, 10, st.stone)
       fillLine([[cx, cz], [cx + 0.1, cz]], 3.4, N + 2 + si)

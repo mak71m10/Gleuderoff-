@@ -84,6 +84,8 @@ const TABLES: Record<string, W> = {
   // Имперские изгнанники: ветераны легионов и их семьи над нордскими деревнями
   // Земли Севера: норды, в Гарских копях — дварфы и гномы старой Империи гор
   norse: { nords: 84, dwarves: 5, gnomes: 4, goliaths: 3, imperials: 2, orcs: 1, gladry: 1 },
+  // Креит: почти одни креитские норды; немного полона из Гарефорда и Фарвольской лиги
+  viking: { nords: 91, imperials: 3, gladry: 3, goliaths: 2, dwarves: 1 },
   exile: { imperials: 46, nords: 34, gladry: 6, dwarves: 4, gnomes: 2, goliaths: 2, skugga: 2, orcs: 1.5, ogres: 0.8 },
   // Штирия: нищие местные, наёмники всех мастей, покупатели Ночного рынка
   styria: { imperials: 62, gladry: 12, orcs: 5, ogres: 2, goliaths: 2, skugga: 4, vampires: 2, 'dark-elves': 2, dukulites: 2, tieflings: 1.5, 'reig': 0.8, roma: 2, dwarves: 2, gremlins: 2, demons: 0.2 },

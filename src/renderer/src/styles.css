@@ -1490,6 +1490,61 @@ button.pw-chip:hover { background: var(--panel-2); }
 .parchment .field-text { background: transparent; border-color: rgba(122, 100, 64, 0.35); font-size: 17px; }
 .parchment .field-text h2, .parchment .field-text h3 { color: #4a3417; }
 
+/* ================= Выводок и Жатва (Креит) ================= */
+.brood { margin: 16px 0; padding: 14px; border: 1px solid #5a5e66; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #2a2c33, #0e0f12 80%); container-type: inline-size; }
+.brood-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.brood-tabs button { padding: 6px 12px; border-radius: 8px; border: 1px solid #4a4e56; background: #17191e; color: #b8bcc6; font-family: var(--serif); font-size: 16px; font-weight: 700; cursor: pointer; }
+.brood-tabs button.on { border-color: #c4c8d0; color: #eef0f4; background: #2a2d34; box-shadow: 0 0 0 1px #8a8f9a; }
+.brood-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.brood-father { display: flex; align-items: center; gap: 10px; background: none; border: none; color: var(--text); cursor: pointer; text-align: left; padding: 0; }
+.brood-father small { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #9aa0ac; }
+.brood-father b { font-family: var(--serif); font-size: 20px; color: #e6e9ee; }
+.brood-count { font-family: var(--serif); font-size: 16px; color: #b8bcc6; }
+.brood-count b { font-size: 24px; color: #eef0f4; }
+.brood-face { width: 54px; height: 54px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex: none; background: #22252b; border: 2px solid var(--ett, #5a5e66); font-family: var(--serif); font-size: 22px; color: #d8dce4; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6); }
+.brood-face img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
+.brood-face.father { width: 60px; height: 60px; border-color: #c4c8d0; }
+/* серебряная стена: двенадцать ножей */
+.brood-wall { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; padding: 12px; border-radius: 10px;
+  background: linear-gradient(180deg, #3a3d44, #24262b); box-shadow: inset 0 0 0 1px #6a6f78, inset 0 0 30px rgba(0, 0, 0, 0.55); }
+.brood-knife { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px 7px; border-radius: 8px; cursor: pointer; color: var(--text);
+  background: linear-gradient(180deg, #2c2f35, #1d1f24); border: 1px solid #4a4e56; border-top: 4px solid var(--ett, #555); transition: opacity 0.25s, filter 0.25s, transform 0.15s; }
+.brood-knife:hover { transform: translateY(-2px); }
+.brood-name { font-family: var(--serif); font-weight: 700; font-size: 15px; line-height: 1.1; text-align: center; }
+.brood-born { font-size: 10.5px; color: #9aa0ac; text-align: center; line-height: 1.2; }
+.brood-fate { font-size: 11px; color: #c4c8d0; text-transform: uppercase; letter-spacing: 0.06em; }
+.brood-knife.killed { filter: grayscale(1) brightness(0.55); }
+.brood-knife.killed::after { content: ''; position: absolute; left: 10%; right: 10%; top: 50%; height: 3px; background: #a02a22; transform: rotate(-28deg); box-shadow: 0 0 6px rgba(160, 42, 34, 0.8); }
+.brood-knife.killed .brood-fate { color: #e0786e; }
+.brood-knife.given { filter: saturate(0.4) brightness(0.75); border-style: solid; }
+.brood-knife.given .brood-face { border-style: dotted; border-width: 3px; }
+.brood-knife.given .brood-fate { color: #c9a45c; }
+.brood-knife.given .brood-fate::before { content: '⛓ '; }
+.brood-knife.fled { opacity: 0.8; border-style: dashed; }
+.brood-knife.fled .brood-fate { color: #8fc0a0; }
+.brood-knife.winner { border-color: #e6e9ee; background: linear-gradient(180deg, #4a4e58, #2a2d34); box-shadow: 0 0 18px rgba(220, 226, 236, 0.35); }
+.brood-knife.winner .brood-face { border-color: #f2f4f8; box-shadow: 0 0 14px rgba(242, 244, 248, 0.6); }
+.brood-knife.winner .brood-fate { color: #f2f4f8; }
+.brood-knife.winner .brood-fate::before { content: '♛ '; }
+.brood-knife.last { outline: 2px solid #e0786e; outline-offset: 2px; }
+.brood-knife.empty { cursor: default; opacity: 0.35; border-style: dashed; border-top-style: dashed; }
+.brood-step { width: 100%; margin: 10px 0 6px; accent-color: #9aa0ac; }
+.brood-event { font-size: 14px; margin: 4px 0 10px; color: var(--text); line-height: 1.45; }
+.brood-event b { color: #e6e9ee; }
+.brood-event span { color: var(--muted, #a99c80); }
+.brood-list { display: flex; flex-direction: column; gap: 2px; }
+.brood-row { display: block; text-align: left; background: none; border: none; color: var(--text); cursor: pointer; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
+.brood-row:hover, .brood-row.active { background: rgba(200, 205, 215, 0.12); }
+.brood-row b { color: #c4c8d0; margin-right: 4px; }
+.brood-row.given { color: #d8c48c; }
+.brood-row.fled { color: #8fc0a0; }
+@container (max-width: 620px) {
+  .brood-wall { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 8px; gap: 6px; }
+  .brood-face { width: 44px; height: 44px; }
+  .brood-name { font-size: 13.5px; }
+}
+@container (max-width: 380px) { .brood-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
 /* ================= телефон в альбомной ориентации =================
    Основа — правила телефона выше (крупные касания, поля 16px, карточки во всю ширину). Здесь — то, что в альбомной
    ориентации иначе: меню — узкая полоса значков слева, свойства — панель справа на всю высоту, шкала времени — одна строка,
