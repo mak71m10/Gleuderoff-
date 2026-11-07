@@ -15,6 +15,7 @@ import { TingView } from './Ting'
 import { BroodView } from './Brood'
 import { VaultView } from './Vault'
 import { HeightsView } from './Heights'
+import { UrnView } from './Urn'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { renderBody } from './prose'
@@ -330,6 +331,7 @@ function EntryEditor({ id }: { id: string }) {
           {f.brood && <BroodView data={f.brood} onOpen={goto} />}
                 {f.vault && <VaultView data={f.vault} onOpen={goto} />}
                 {f.heights && <HeightsView data={f.heights} onOpen={goto} />}
+                {f.urn && <UrnView data={f.urn} onOpen={goto} />}
           {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}

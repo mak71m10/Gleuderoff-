@@ -305,6 +305,7 @@ export function hlRace(name, type, terrain) {
   if (HIGH.has(name)) return 'kranz'
   if (type === 'castle') return 'alpine'
   if (name === 'Грунзум') return 'gnome'
+  if (name === 'Ул-Зум') return 'dwarf'
   if (type === 'town' || type === 'temple') return 'dwarf'
   // долины (равнина, лес) — гномьи пашни; горы — рудники дварфов
   return terrain <= 2 ? 'gnome' : 'dwarf'

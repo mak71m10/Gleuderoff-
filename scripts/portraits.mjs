@@ -24,6 +24,7 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const CHEAFARAL_STYLE = 'oil painting, northern republic council portrait, dutch golden age style, candlelight, dark wood and grey stone hall behind, visible brush strokes, detailed face, half-length portrait'
 const HIGHLAND_STYLE = 'oil painting, alpine noble portrait, cold clear mountain light, snowy peaks and pale sky behind, dark wood panelling, visible brush strokes, detailed face, half-length portrait'
 const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge light and brass lamps, carved stone pillars, dark background, visible brush strokes, detailed face, half-length portrait'
 const KREIT_STYLE = 'oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
@@ -40,6 +41,31 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  // Республика Чеафарал: протекторы и Совет Двадцати — нордские и имперские лица, простая тёмная одежда, соль, шары, векселя
+  'ch-holm': '(no hat, bareheaded:1.4), stern grey-haired soldier in his sixties, short white beard, plain dark officer coat with old brass buttons, scar on the jaw, a pinch of white salt in his hand, tired honest eyes',
+  'ch-merta': 'proud elderly woman in her sixties, silver-blond hair in a tight braid crown, grey-blue eyes, heavy dark wool gown with a white salt-crystal brooch, firm wise face',
+  'ch-gottfried': 'plump banker in his sixties, thin grey hair, round spectacles, black velvet coat, heavy gold chain with a small key, ledger in his hands, worried eyes',
+  'ch-einar': 'unremarkable man in his late forties, thin face, short brown hair going grey, plain grey wool coat without any jewellery, calm watchful eyes, faint polite smile, a small white salt ball in his fingers',
+  'ch-ulrich': 'aristocratic man in his fifties, grey hair swept back, trimmed grey beard, old imperial order on a dark blue coat, haughty tired eyes',
+  'ch-astrid': 'very old nordic woman, white hair in a long braid, deeply lined face, sharp blue eyes, clay pipe in her mouth, heavy dark green wool dress with a silver clasp',
+  'ch-harald': 'jovial nordic nobleman in his late forties, ruddy face, messy blond beard, rumpled velvet coat with stains, a loose smile, worried eyes, a promissory note in his hand',
+  'ch-martin': 'handsome young man in his twenties, ash-blond hair, clean-shaven, elegant dark blue coat with silver buttons, earnest dreamy eyes',
+  'ch-ingrid-h': 'determined nordic widow in her thirties, blond hair in a tight braid, grey eyes, black mourning dress with a small military pin, firm jaw',
+  'ch-lisa': 'confident woman in her forties, light brown hair in a bun, grey-green eyes, cream-coloured gown with white salt crystals embroidered on the collar, regal calm expression',
+  'ch-torvald': 'heavy loud merchant in his sixties, huge grey beard, fur-trimmed coat, big hands, weather-beaten face, caravan scales behind',
+  'ch-jan': 'burly merchant in his forties, short brown hair, square jaw, leather vest over a white shirt, rolled sleeves, practical friendly look',
+  'ch-maria': 'cold elegant woman in her thirties, dark hair under a fur-edged cap, grey eyes, white fur collar, a ledger in her hands, assessing glance',
+  'ch-olof': 'plain-faced merchant in his fifties, thinning blond hair, simple brown coat, iron samples on the table, honest tired look',
+  'ch-hannes': 'pale banker in his late thirties, thin face, black coat with a gold watch chain, tight lips, bitter intelligent eyes, a broken seal in his hand',
+  'ch-vera': 'quiet smiling woman in her forties, dark hair parted in the middle, black and grey silk dress, a thin silver chain with a small moon pendant, calm kind eyes that give nothing away',
+  'ch-karl': 'old banker in his sixties, bald head with grey side hair, wire spectacles, abacus on the table, sour thoughtful face, black coat',
+  'ch-elsa': 'nervous young woman in her thirties, light brown hair, worried blue eyes, dark green dress, hands folded tightly',
+  'ch-peter': 'polite slender man in his thirties, dark hair slicked back, black coat, white gloves, very pleasant smile and very cold eyes',
+  'ch-ingvar': 'veteran general in his sixties, steel-grey short hair, scarred nordic face, battered steel breastplate over a red officer coat, sword hilt in hand, hard eyes',
+  'ch-sigurd': 'broad nordic colonel in his fifties, long red-blond beard braided with gold rings, scale armour over a leather coat, fur cloak, confident grin',
+  'ch-lukas': 'young colonel in his thirties, short light hair, clean-shaven, military dark red coat with silver braid, open honest eyes',
+  'ch-helge': 'tall young colonel in his late thirties, long blond hair tied back, trimmed beard, grey and red uniform, calm resolute eyes',
+  'ch-mira': 'strong woman captain in her late twenties, black braided hair, dark eyes, leather armour with a steel gorget, a short sword at her belt, fierce independent look',
   // Высокогорное Княжество: альпийская знать (тёмная шерсть, мех, белое и лазурь), подгорники — рудокопы и механики
   'hl-sigmund': 'stern old prince with a short white beard and cold blue eyes, fur-lined dark blue mantle, silver eagle brooch, a coil of cut rope on the table, hard proud face',
   'hl-albrecht': 'tall proud prince in his forties, dark blond hair, trimmed beard, white and blue embroidered doublet with silver eagle, standing on a high gallery, arrogant gaze',
@@ -331,7 +357,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -346,7 +372,8 @@ for (const e of chars) {
   const kreit = e.base.tags.includes('Креит')
   const farvol = e.base.tags.includes('Фарвольская лига')
   const highland = e.base.tags.includes('Высокогорное Княжество')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland
+  const cheaf = e.base.tags.includes('Республика Чеафарал')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -363,7 +390,9 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
-  const prompt = highland && (dwarfR || gnomeR)
+  const prompt = cheaf
+    ? `${CHEAFARAL_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, scandinavian features, pale skin:1.25), ${CUSTOM[id] ?? subject}`
+    : highland && (dwarfR || gnomeR)
     ? `${FARVOL_STYLE.replace('warm forge light and brass lamps, carved stone pillars', 'mine lamp light, rough rock walls, ore carts')}, ${dwarfR ? `portrait of an (${age > 120 ? 'ancient' : 'adult'} dwarf${female ? ' woman, female, no beard' : ''}:1.45), (short stout broad-shouldered dwarf, huge nose, heavy brow, ruddy weathered european skin:1.35), ` : `portrait of a (short ${female ? 'woman' : 'man'}, fantasy tinkerer, bareheaded:1.35), (big round nose, light eyes, ruddy european skin:1.25), `}${CUSTOM[id] ?? subject}`
     : highland
     ? `${HIGHLAND_STYLE}, ${banner}portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, alpine german features, pale skin:1.25), ${CUSTOM[id] ?? subject}`

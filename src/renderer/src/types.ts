@@ -238,6 +238,8 @@ export interface EntryFields {
   vault?: { chambers: { key: string; name: string; who: string; color: string; light: string }[]; counts: { year: number; title: string; seats: Record<string, number>; note: string }[]; elections: { year: number; title: string; winner: string; candidates: { id: string | null; name: string; race: string; votes: Record<string, number> }[]; note: string }[]; rules: string[] }
   /** Лестница Высот (Высокогорное Княжество): ранг дома — высота очага; голос в Совете Венца весит высоту */
   heights?: { peak: number; tiers: { key: string; name: string; from: number; to: number; who: string; color: string; rights: string }[]; houses: { key: string; id: string; name: string; colors: string[]; emblem: string; path: { year: number; h: number; note: string }[]; text: string }[]; decisions: { year: number; title: string; by: string; votes: Record<string, string>; result: string; note: string }[]; lifts: { name: string; from: string; holder: string; note: string }[]; rules: string[] }
+  /** Совет Двадцати и Соляная урна (Республика Чеафарал): члены по годам, выборы протектора по кругам белыми шарами */
+  urn?: { need: number; factions: { key: string; name: string; who: string; color: string; light: string }[]; members: { id: string | null; name: string; faction: string; from: number; to: number | null }[]; elections: { year: number; title: string; winner: string; note: string; candidates: { key: string; id: string | null; name: string; faction: string }[]; rounds: { votes: Record<string, Record<string, number>>; note: string }[] }[]; rules: string[] }
 }
 
 /** Кресло в совете рода: кто сидит, сколько голосов, за кого голосует и кто его второй выбор */

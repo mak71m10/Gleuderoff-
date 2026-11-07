@@ -72,6 +72,8 @@ export const STYLES: Record<string, Style> = {
   // kranz — то же на каменной платформе вокруг вершины (Венец), alpine — замки и городки людей ниже
   alpine: { plaster: ['#efe9dc', '#e6dccb', '#f3eee4', '#d9cfbd', '#e9e1d0'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#6a4a34', '#46434a'], timber: '#3a2416', stone: '#8a877e', wall: '#a8a49a', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#6f8f4e', grass2: '#7a9a56', dirt: '#9a8a6a', pave: '#9a958a', lit: 0.4, conifer: 1, tower: '#3f4a5a' },
   kranz: { plaster: ['#f4f0e8', '#ebe5d8', '#f7f4ee', '#e2dacb', '#efe8da'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#3a3a42', '#46434a'], timber: '#3a2416', stone: '#a9a598', wall: '#c8c3b6', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#a6a294', grass2: '#b0ac9e', dirt: '#b8b2a2', pave: '#c4bfb2', lit: 0.4, conifer: 1, tower: '#2a3a5a' },
+  // Республика Чеафарал: имперский фахверк на нордской земле — светлая штукатурка, тёмные нордские крыши, серый камень
+  chea: { plaster: ['#e6dcc4', '#d8cdb0', '#ece3cf', '#cfc4a8'], roof: ['#4a3a2e', '#3f3228', '#55453a', '#394048', '#4a4f54'], timber: '#3a2a1e', stone: '#7e7a72', wall: '#9c978a', shutter: ['#2f4a6a', '#6a2a22', '#3a5a3a'], pitch: 1.1, framed: true, floors: 0, grass: '#6a8348', grass2: '#748d50', dirt: '#a8997a', pave: '#a09886', lit: 0.36, conifer: 0.7, tower: '#3a3f58' },
   deep: { plaster: ['#7d766c', '#8a8276', '#70695f', '#958c7e'], roof: ['#4f4a45', '#5b5149', '#463f3a'], timber: '#3a2e24', stone: '#5e5850', wall: '#6a645a', shutter: ['#3b3633'], pitch: 0.5, framed: false, floors: 0, grass: '#4a4a3c', grass2: '#525040', dirt: '#5a5246', pave: '#6a645a', lit: 0.75, conifer: 0, tower: '#3a3532' },
   // гномы: пёстрая штукатурка, медные и позеленевшие крыши, высокие узкие дома с башенками
   gnome: { plaster: ['#d9c27a', '#c97a5a', '#7aa3a0', '#e0d0b0', '#b8c9a0', '#d99a6a', '#c9b0d0'], roof: ['#4f8a78', '#5a9a86', '#a8552f', '#3f6a8a', '#8a3a3a', '#b8783a'], timber: '#4a3222', stone: '#8f8a7e', wall: '#a9a394', shutter: ['#2f5a6a', '#8a3a2a', '#d8b040'], pitch: 1.4, framed: false, floors: 1, grass: '#7a9a4c', grass2: '#86a654', dirt: '#b0a07a', pave: '#a89c80', lit: 0.5, conifer: 0.7, tower: '#4f8a78' },
@@ -298,7 +300,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const waters = S.water.map((f) => ringOf(f, k))
   const fields = kranz ? [] : S.fields.map((f) => ringOf(f, k))
   const greens = S.greens.map((f) => ringOf(f, k))
-  const squares = S.squares.map((f) => ringOf(f, k))
+  // город на вершине: площади, что оказались на скале посреди платформы, не нужны — рынок и жителей там не будет
+  const squares = S.squares.map((f) => ringOf(f, k)).filter((r) => { if (!kranz) return true; const c = centerOf(r); return Math.hypot(c[0] - center[0], c[1] - center[1]) > R0 * 1.35 })
   const lines = (l: PlanLine[]): { r: P2[]; w: number }[] => l.map((q) => ({ r: ringOf(q.r, k), w: q.w / k }))
   const roads = lines(S.roads), rivers = lines(S.rivers), planks = lines(S.planks), wallLines = lines(S.walls)
 
@@ -351,7 +354,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     roads.forEach((q) => { trace(g, q.r, false); g.lineWidth = Math.max(8, q.w * 2); g.stroke() })
   }, 3, 14))
 
-  const margin = Math.max(350, Math.max(W, H) * 0.6)
+  // город на вершине: края карты должны скрывать горы, поэтому земля уходит далеко за платформу
+  const margin = Math.max(350, Math.max(W, H) * 0.6, kranz ? DROP * 3.2 : 0)
   const x0 = -margin, z0 = -margin, EW = W + margin * 2, EH = H + margin * 2
   const hillAmp = S.rocky ? 46 : S.hills ? 20 : 7
   const n1 = noise2(hashOf(seedName) + 3)
@@ -372,7 +376,11 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const t = r - RP
     const ridge = n1(x * 0.006 + 30, z * 0.006) * 0.6 + n1(x * 0.02, z * 0.02 + 50) * 0.4
     const u = Math.min(1, t / (DROP * 1.5))
-    return -24 - (DROP - 24) * (1 - Math.pow(1 - u, 2.6)) * (0.72 + ridge * 0.5) + (n1(x * 0.05, z * 0.05) - 0.5) * 10 * smooth(0, 40, t)
+    // вокруг платформы — горный массив: хребты и пики поднимаются из долины, самые дальние выше самой платформы
+    const fm = 1 / (DROP * 1.15)
+    const rg = 1 - Math.abs(2 * n1(x * fm + 200, z * fm + 300) - 1)
+    const peaks = Math.pow(Math.max(0, rg - 0.3) / 0.7, 1.5) * DROP * 1.5 * smooth(DROP * 0.3, DROP * 1.7, t)
+    return -24 - (DROP - 24) * (1 - Math.pow(1 - u, 2.6)) * (0.72 + ridge * 0.5) + peaks + (n1(x * 0.05, z * 0.05) - 0.5) * 12 * smooth(0, 40, t)
   }
   const GN = opts.mobile ? 180 : EW > 2500 ? 384 : 256
   const GM = Math.round((GN * EH) / EW)
@@ -497,7 +505,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
     return out
   }
-  const hubAim: P2 = squares[0] ? centerOf(squares[0]) : center
+  const at0 = (r: number, a: number): P2 => [center[0] + Math.cos(a) * r, center[1] + Math.sin(a) * r]
+  const hubAim: P2 = squares[0] ? centerOf(squares[0]) : kranz ? at0(R0 * 1.7, 0.6) : center
   const townScale = N < 60 ? 0.42 : N < 150 ? 0.62 : N < 500 ? 0.84 : 1
   interface Mon { i: number; kind: MonKind; x: number; z: number; rot: number; L: number; W: number }
   const mons: Mon[] = []
@@ -547,6 +556,13 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     if (kranz && Math.hypot(c[0] - center[0], c[1] - center[1]) > RP - 5) removed[i] = 1
   })
   blds.forEach((b, i) => { if (!removed[i]) fillPoly(b.r, i + 1) })
+  // скала посреди платформы и стена по краю — для жителей и улиц непроходимы
+  if (kranz) {
+    for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) {
+      const r = Math.hypot((i + 0.5) * cell - center[0], (j + 0.5) * cell - center[1])
+      if ((r < R0 * 1.12 || r > RP - 2) && grid[j * gw + i] === 0) grid[j * gw + i] = -1
+    }
+  }
   const monAt = new Map<number, Mon>(mons.map((m) => [m.i, m]))
   for (const m of mons) {
     const c = Math.cos(m.rot), n = Math.sin(m.rot)
@@ -799,10 +815,12 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           const r = Math.hypot(x - center[0], z - center[1])
           if (r < R0) { tmp.lerp(rock, 0.9); if (y > PEAK * 0.55) tmp.setRGB(1.55, 1.58, 1.65) }
           else if (r > RP) {
-            // крутые склоны — голый камень, пологие — луга и снег пятнами
+            // долина внизу — луга, выше — голый камень, на вершинах — снег; крутые склоны всегда камень
             const sl = Math.abs((hgrid[q + 1] ?? y) - y) + Math.abs((hgrid[q + GN + 1] ?? y) - y)
-            tmp.setRGB(0.74, 1.06, 0.62).lerp(rock, Math.min(1, (sl / (EW / GN)) * 0.7))
-            if (y > -70 && n1(x * 0.03 + 5, z * 0.03) > 0.55) tmp.lerp(new THREE.Color(1.5, 1.52, 1.6), 0.55)
+            const meadow = smooth(-DROP * 0.62, -DROP * 0.92, y) * (1 - Math.min(1, (sl / (EW / GN)) * 0.8))
+            tmp.setRGB(0.74, 1.06, 0.62).lerp(rock, 1 - meadow)
+            const snow = smooth(-DROP * 0.55, DROP * 0.02, y + (n1(x * 0.03 + 5, z * 0.03) - 0.5) * DROP * 0.3) * (1 - Math.min(1, (sl / (EW / GN)) * 0.35))
+            tmp.lerp(new THREE.Color(1.5, 1.52, 1.6), snow * 0.9)
           }
           col[q * 3] = tmp.r; col[q * 3 + 1] = tmp.g; col[q * 3 + 2] = tmp.b
           continue
@@ -1662,7 +1680,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     if (x < x0 || z < z0 || x > x0 + EW || z > z0 + EH) continue
     const y = heightAt(x, z)
     // город на вершине: ели только на склонах под платформой
-    if (kranz ? Math.hypot(x - center[0], z - center[1]) < RP + 8 || y > -30 : y < 0.5 || y > 34 || gridAt(x, z) !== 0) continue
+    if (kranz ? Math.hypot(x - center[0], z - center[1]) < RP + 8 || y > -DROP * 0.5 || y < -DROP * 1.1 : y < 0.5 || y > 34 || gridAt(x, z) !== 0) continue
     const inPlan = x >= 0 && z >= 0 && x <= W && z <= H
     if (inPlan && paved(x, z) > 0.25) continue
     const d = Math.hypot(x - center[0], z - center[1]) / radius
@@ -2364,14 +2382,26 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     size: [W, H],
     k,
     heightAt,
-    walkable: (x, z) => { const v = gridAt(x, z); return v === 0 || v === -3 },
+    // на вершине ходить можно только по платформе: ни на скалу в середине, ни за край стены
+    walkable: (x, z) => {
+      if (kranz) { const r = Math.hypot(x - center[0], z - center[1]); if (r < R0 * 1.08 || r > RP - 2) return false }
+      const v = gridAt(x, z)
+      return v === 0 || v === -3
+    },
     deckAt: (x, z) => (gridAt(x, z) === -3 ? DECK : null),
     pick,
     buildingTop: (i) => { const m = monAt.get(i); if (m) return [m.x, tops[i], m.z]; const b = blds[i]; if (!b) return null; const c = centerOf(b.r); return [c[0], tops[i], c[1]] },
     spawn: () => {
-      const s = squares[0] ? centerOf(squares[0]) : roads[0]?.r.length ? roads[0].r[Math.floor(roads[0].r.length / 2)] : center
+      const s = kranz ? at0(R0 * 1.5, 0) : squares[0] ? centerOf(squares[0]) : roads[0]?.r.length ? roads[0].r[Math.floor(roads[0].r.length / 2)] : center
       // свободное место с запасом вокруг, чтобы не начать прогулку носом в колодец или прилавок
       const clear = (x: number, z: number): boolean => { for (let i = 0; i < 8; i++) if (gridAt(x + Math.cos(i * 0.785) * 3, z + Math.sin(i * 0.785) * 3) !== 0) return false; return gridAt(x, z) === 0 && heightAt(x, z) > 0.2 }
+      // город на вершине: начинаем на платформе, на кольце вокруг скалы, а не на самой скале
+      if (kranz) {
+        for (let rad = R0 * 1.4; rad < RP - 8; rad += cell * 2) for (let i = 0; i < 24; i++) {
+          const x = center[0] + Math.cos((i / 24) * 6.283) * rad, z = center[1] + Math.sin((i / 24) * 6.283) * rad
+          if (clear(x, z)) return [x, z]
+        }
+      }
       for (let rad = 5; rad < radius * 2; rad += cell) for (let i = 0; i < 16; i++) {
         const x = s[0] + (Math.cos((i / 16) * 6.283) * rad), z = s[1] + (Math.sin((i / 16) * 6.283) * rad)
         if (clear(x, z)) return [x, z]
