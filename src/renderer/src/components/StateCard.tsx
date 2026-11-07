@@ -12,6 +12,7 @@ import { SuccessionCouncilView } from './Council'
 import { PowerButton } from './PowerView'
 import { TingView } from './Ting'
 import { BroodView } from './Brood'
+import { VaultView } from './Vault'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
@@ -74,7 +75,7 @@ function StateCardBody({ id }: { id: string }) {
   const dynastyEntry = world.entries.find((e) => e.id === f.dynastyId)
   const dynastyCouncil = dynastyEntry ? resolve(dynastyEntry, date).council : undefined
   // органы власти без парламента (Сабельная ставка, Совет Десяти графа): организации этой страны с пометкой «Государственный орган»
-  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
+  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.vault || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
   const religions = world.entries.filter((e) => e.kind === 'religion').map((e) => ({ id: e.id, name: e.base.name }))
   const otherStates = world.states.filter((s) => s.id !== id).map((s) => ({ id: s.id, name: resolve(s, date).name }))
   const places = world.places.filter((p) => existsAt(p, date) && resolve(p, date).stateId === id)
@@ -316,6 +317,7 @@ function StateCardBody({ id }: { id: string }) {
                 {of.stavka && <StavkaView data={of.stavka} onOpen={open} />}
                 {of.ting && <TingView data={of.ting} onOpen={open} />}
                 {of.brood && <BroodView data={of.brood} onOpen={open} />}
+                {of.vault && <VaultView data={of.vault} onOpen={open} />}
                 {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
               </section>
             )

@@ -10,6 +10,7 @@ import { SOUTH_PARTIES } from './lore/south-parties.mjs'
 import { SOUTH, SOUTH_NAMES } from './lore/south.mjs'
 import { STYRIA_BILLS, STYRIA_COUNCILS, STYRIA_COURT, STYRIA_FACTIONS, STYRIA_ISSUES, STYRIA_NAMES, STYRIA_PARTIES } from './lore/styria.mjs'
 import { southBodies } from './lore/south-power.mjs'
+import { CLANS as FV_CLANS, FV_BILLS, FV_COUNCILS, FV_FACTIONS, FV_ISSUES, FV_NAMES, FV_PARTIES, FV_PEOPLE } from './lore/farvol.mjs'
 import { CHURCH_BILLS, CHURCH_COUNCILS, CHURCH_FACTIONS, CHURCH_ISSUES, CHURCH_NAMES, CHURCH_PARTIES, CONTINENT_ARCHBISHOPS, HOLY_ARCHBISHOPS, ORDER_PEOPLE } from './lore/church.mjs'
 import { HOUSES } from './lore/empire.mjs'
 import { MINOR_HOUSES } from './lore/argus.mjs'
@@ -969,10 +970,44 @@ const styriaCouncil = build({
 ], [2, 4])
 styriaCouncil.head = { title: 'Граф', entryId: 'lore-styria-now' }
 
-world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities, ...southLegs, ...southCommittees, churchCouncil, styriaCouncil]
+
+// ---------- Фарвольская лига: Совет Свода (Палата Камня, Палата Шестерни, Скамья Поверхности) ----------
+const FV_GROUP = Object.fromEntries(FV_FACTIONS.map(([id, , group]) => [id, group]))
+const FV_TITLES = { old: 'Старейшина клана', shield: 'Сотник Глубинного Дозора', lamp: 'Выборный рудокопов', seal: 'Мастер Печати Железных', gear: 'Пайщик торгового дома', furrow: 'Выборный пахарей', surface: 'Барон Поверхности' }
+const FV_IN = { 'fv-tibor': [985.3, 999.2], 'fv-fenwick': [992.3], 'fv-pippa': [978.2], 'fv-nimmo': [999.8], 'fv-bertha': [999.8], 'fv-baldrek': [978.2], 'fv-helga': [1006.3], 'fv-torgrim': [999.8], 'fv-otto': [992.3], 'fv-ingrid': [1008.3] }
+const fvCouncil = build({
+  id: 'fv-council', state: 'Фарвольская лига', name: 'Совет Свода', entryId: 'lore-fv-council', chairTitle: 'Первый Молот', seats: 61, from: 978.2,
+  seatOrder: ['lamp', 'old', 'shield', 'surface', 'seal', 'gear', 'furrow'], groups: ['Палата Камня', 'Палата Шестерни', 'Скамья Поверхности'],
+  description: 'Шестьдесят одно место: Палата Камня (кланы дварфов, места по щитам), Палата Шестерни (дома гномов, места по долям) и Скамья Поверхности (пять гербов имперской знати). Раз в семь лет Перепись Наковальни пересчитывает места двух больших палат. Большинство — 31; с 999 г. его нет ни у дварфов, ни у гномов. Придумано по поручению автора — черновик.',
+  issues: FV_ISSUES,
+  factions: FV_FACTIONS.map(([id, name, group, color, ideology, stance]) => ({ id, name, group, color, ideology, stance, leader: '' })),
+  convocations: FV_COUNCILS.map(([year, name, seats, note]) => ({ year, name, seats, note })),
+  named: FV_PEOPLE.filter(([id]) => FV_IN[id]).map(([id, , , , , , title, , fac]) => [`lore-${id}`, fac, FV_GROUP[fac], FV_IN[id][0], FV_IN[id][1] ?? null, title]),
+  bills: FV_BILLS,
+  years: { 978: 'Железная хартия: лига и Совет Свода.', 985: 'Смерть Ульдриха, Выбор Ортвина.', 992: 'Перевальная война.', 994: 'Тёмная неделя.', 999: 'Чёрный Свод; Перепись 28 на 28.', 1002: 'Выбор Гилдартса и Зонгауская уступка.', 1004: 'Неделя без печатей и Насосный мир.', 1006: 'Шестерня впервые больше Камня.', 1010: 'До Переписи 1013 года — три года.' },
+  namer: (m) => {
+    const dw = ['old', 'shield', 'lamp'].includes(m.faction), hu = m.faction === 'surface'
+    const first = pick(hu ? (m.female ? FV_NAMES.humanWomen : FV_NAMES.humanMen) : dw ? (m.female ? FV_NAMES.dwarfWomen : FV_NAMES.dwarfMen) : (m.female ? FV_NAMES.gnomeWomen : FV_NAMES.gnomeMen))
+    const clan = pick(FV_CLANS)[1].replace('Клан ', '')
+    m.name = hu ? `${first} фон ${pick(FV_NAMES.humanNoble)}` : dw ? `${first} из клана ${clan}` : `${first} ${pick(FV_NAMES.gnomeHouses)}`
+    m.title = FV_TITLES[m.faction]
+    m.origin = hu ? pick(['Зонгау', 'Фьялская земля']) : dw ? `Клан ${clan}` : pick(['Грунский хребет', 'Норг-Бад', 'Барак-Ази', 'Эрен-Грим'])
+  }
+}, [
+  () => ({ title: `Подать Глубинному Дозору на ${pick(['Нижние врата', 'заставы Кхаз-Гунда', 'заставы Гронд-Гунда', 'новые щиты'])}`, kind: 'закон', w: { depth: 1.2, count: -0.3 }, sponsor: pick(['shield', 'old']), summary: 'Дозор просит денег; Шестерня спрашивает, почему опять.' }),
+  () => ({ title: `Печать на ${pick(['паровой подъёмник', 'новую лампу Глиммеров', 'часовой замок', 'рудодробилку', 'насос малых штолен'])}`, kind: 'указ', w: { count: 0.6, gates: 0.3 }, sponsor: pick(['gear', 'seal']), summary: 'Палата Печатей записывает изобретение; дом получит долю с каждого применения.' }),
+  () => ({ title: `Пошлина ${pick(['Фьяльских', 'Зонгауских', 'Гарефордских'])} ворот`, kind: 'закон', w: { gates: rnd() < 0.5 ? 1.2 : -1.2, surface: 0.4 }, sponsor: pick(['gear', 'surface', 'old']), summary: 'Спор о том, сколько платит чужая повозка на тиббальдовых весах.' }),
+  () => ({ title: `Шахтный долг рудокопов ${pick(['Кхаза', 'Гронда', 'нижних ярусов Норга', 'Азга'])}`, kind: 'закон', w: { debt: rnd() < 0.5 ? 1 : -1 }, sponsor: pick(['lamp', 'old']), summary: 'Сколько лет отрабатывать броню и место в чертоге.' }),
+  () => ({ title: `Аренда пашни ${pick(['Зонгау', 'Фьялской земли', 'Грунских террас'])}`, kind: 'закон', w: { surface: 0.8, debt: 0.3 }, sponsor: pick(['surface', 'furrow']), summary: 'Люди Поверхности поднимают аренду; Борозда требует её заморозить.' }),
+  () => ({ title: `Привратная грамота для ${pick(['аргусских купцов', 'штирийских возчиков', 'гарефордских плотогонов', 'северных нордов'])}`, kind: 'указ', w: { gates: 1 }, sponsor: pick(['gear', 'surface']), summary: 'Пускать ли чужих дальше ярмарки.' }),
+  () => ({ title: `Ремонт сводов ${pick(['Норг-Бада', 'Азг-Кара', 'Торзума', 'Дургн-Адума', 'Грондгунда'])}`, kind: 'закон', w: { depth: 0.5, hammer: 0.3 }, sponsor: pick(['shield', 'seal']), summary: 'Торы просят камня и денег; казна просит подождать.' })
+], [2, 4])
+fvCouncil.head = { title: 'Первый Молот', entryId: 'lore-fv-gildarts' }
+
+world.legislatures = [empireLeg, senateLeg, assembly, workers, ...cities, ...southLegs, ...southCommittees, churchCouncil, styriaCouncil, fvCouncil]
 // история, манифест и устройство партий (городские парламенты берут партии Народного собрания)
 for (const L of world.legislatures) {
-  const lore = PARTIES[L.id] ?? SOUTH_PARTIES[L.id] ?? (L.id === 'ch-council' ? CHURCH_PARTIES : L.id === 'sty-council' ? STYRIA_PARTIES : null)
+  const lore = PARTIES[L.id] ?? SOUTH_PARTIES[L.id] ?? (L.id === 'ch-council' ? CHURCH_PARTIES : L.id === 'sty-council' ? STYRIA_PARTIES : L.id === 'fv-council' ? FV_PARTIES : null)
   const ids = new Set(L.factions.map((f) => f.id))
   if (lore) for (const f of L.factions) if (lore[f.id]) f.party = { ...lore[f.id], allies: (lore[f.id].allies ?? []).filter((x) => ids.has(x)), rivals: (lore[f.id].rivals ?? []).filter((x) => ids.has(x)), draft: true }
 }

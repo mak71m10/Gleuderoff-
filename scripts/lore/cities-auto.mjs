@@ -4,6 +4,7 @@
 // Придумано по поручению автора (02.11.2026), тег «черновик». Особые города — вручную в cities.mjs, они главнее.
 import sharp from 'sharp'
 import { SOUTH } from './south.mjs'
+import { CLANS as FV_CLANS, HOUSES as FV_HOUSES, SURFACE as FV_SURFACE, fvRace } from './farvol.mjs'
 
 const TR = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'i', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }
 export const slugOf = (name) => [...name.toLowerCase()].map((c) => TR[c] ?? (/[a-z0-9]/.test(c) ? c : '')).join('')
@@ -48,6 +49,13 @@ const KREIT_SEATS = { 'Хейдегард': 'Фростэтта', 'Гунеха�
 const NORSE_SEATS = { 'Фьялдален': 'Хравнингов', 'Мюрос': 'Селингов', 'Бьёрехольм': 'Гаупингов', 'Исфьорд': 'Хрутингов', 'Ётеланд': 'Бьярмунгов', 'Ётфьорд': 'Хвалингов', 'Вагефелль': 'Ётунгов', 'Сваребю': 'Смидингов', 'Сигравик': 'Сигрунгов' }
 export const SLATE = ['#3f3d44', '#4a4650', '#38363e', '#524d55', '#45424a']
 const SLAVE = ['Невольничий двор', 'Цепная слобода']
+// Фарвольская лига: подгорные чертоги, каменные твердыни дварфов, гномьи долины, усадьбы Поверхности
+const FV_DEEP_DRY = ['Верхний ярус', 'Нижний ярус', 'Кузни', 'Чертог старейшин', 'Рудный двор', 'Насосный чертог', 'Ламповый ряд', 'Столбовой зал', 'Казармы Дозора', 'Шахтный спуск', 'Грибные гроты', 'Стена павших']
+const FV_DWARF_DRY = ['Кузнечный двор', 'Рудный двор', 'Каменный ряд', 'Старый чертог', 'Плавильни', 'Шахтный спуск', 'Щитовой двор', 'Двор долга', 'Горн Магнуса', 'Рудомойни', 'Камнетёсный двор']
+const FV_GNOME_DRY = ['Шестерёнчатый ряд', 'Часовая площадь', 'Медный конец', 'Мельничный двор', 'Террасы', 'Ламповый конец', 'Пружинная слобода', 'Конторский ряд', 'Сырный двор', 'Насосная', 'Стекольный двор']
+const FV_HUMAN_DRY = ['Баронский двор', 'Привратная ярмарка', 'Конюшенный двор', 'Церковная сторона', 'Гномья слобода', 'Возчицкий двор', 'Хлебный ряд', 'Старый город']
+const FV_WET = { deep: ['Подземное озеро', 'Водяные колёса'], dwarf: ['Рудомойни', 'Плотина'], gnome: ['Мельничный берег', 'Колёсный ручей'], human: ['Мельничный берег', 'Брод'] }
+export const FV_STYLE = { deep: 'deep', dwarf: 'dwarf', gnome: 'gnome', human: 'fvhuman' }
 
 /** Факты из описания провинции → примечательные места [название, тип метки, правило, текст] */
 function landmarksFrom(name, type, text, state) {
@@ -111,7 +119,8 @@ export async function autoCities(world, handmade) {
   const taken = new Set(handmade.map((c) => c.province).filter(Boolean))
   const takenSlugs = new Set(handmade.map((c) => c.slug))
   const out = []
-  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES, 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит']) {
+  const autoSlugs = new Set()
+  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES, 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига']) {
     const st = world.states.find((s) => s.base.name === sn)
     for (const p of world.provinces) {
       const s = p.settlement
@@ -122,8 +131,11 @@ export async function autoCities(world, handmade) {
       // на юге — все поселения, включая деревни и рыбачьи посёлки (кроме развалин)
       // всё, кроме развалин: города, городки, порты, кастры, замки, храмы, деревни и рыбачьи посёлки
       if (s.type === 'ruins') continue
-      const slug = slugOf(p.name)
+      let slug = slugOf(p.name)
       if (takenSlugs.has(slug)) continue
+      // «Драм-Кар» и «Драмкар» дают один и тот же slug — второму добавляем 2
+      if (autoSlugs.has(slug)) slug += '2'
+      autoSlugs.add(slug)
       const seed = hash(slug)
       const type = castra ? 'castra' : s.type
       const sty = sn === 'Графство Штирия'
@@ -131,31 +143,46 @@ export async function autoCities(world, handmade) {
       const ex = sn === 'Имперские Изгнанники'
       const no = sn === 'Земли Севера'
       const kr = sn === 'Креит'
+      const fv = sn === 'Фарвольская лига'
+      const fvLand = fv ? world.adminRegions.find((a) => a.id === world.adminRegions.find((b) => b.id === p.areaId)?.parentId)?.name ?? '' : ''
+      const fr = fv ? fvRace(p.name, s.type, fvLand) : null
+      const fvClan = fv ? FV_CLANS.find((c) => c[2] === p.name) : null
+      const fvHouse = fv ? FV_HOUSES.find((c) => c[2] === p.name) : null
+      const fvNoble = fv ? FV_SURFACE.find((c) => c[2] === p.name) : null
       const seatOf = no ? NORSE_SEATS[p.name] : kr ? KREIT_SEATS[p.name] : null
       const mine = kr && /рудничный борг|Сердце Жилы/.test(text)
-      const capital = (south && world.places.find((x) => x.id === `lore-${south}-capital` && x.base.name === p.name)) || (sty && world.places.find((x) => x.id === 'lore-sty-capital' && x.base.name === p.name)) || (man && world.places.find((x) => x.id === 'lore-man-capital' && x.base.name === p.name)) || (ex && world.places.find((x) => x.id === 'lore-ex-capital' && x.base.name === p.name)) || (no && world.places.find((x) => x.id === 'lore-no-ting' && x.base.name === p.name)) || (kr && world.places.find((x) => x.id === 'lore-kr-capital' && x.base.name === p.name))
+      const capital = (south && world.places.find((x) => x.id === `lore-${south}-capital` && x.base.name === p.name)) || (sty && world.places.find((x) => x.id === 'lore-sty-capital' && x.base.name === p.name)) || (man && world.places.find((x) => x.id === 'lore-man-capital' && x.base.name === p.name)) || (ex && world.places.find((x) => x.id === 'lore-ex-capital' && x.base.name === p.name)) || (no && world.places.find((x) => x.id === 'lore-no-ting' && x.base.name === p.name)) || (kr && world.places.find((x) => x.id === 'lore-kr-capital' && x.base.name === p.name)) || (fv && world.places.find((x) => x.id === 'lore-fv-capital' && x.base.name === p.name))
       const coast = (type === 'port' || p.coastal) && nearSea(s.x, s.y)
       const river = nearRiver(s.x, s.y)
       const nest = /гнездо/.test(text)
-      const size = kr ? (capital ? 18 : { town: 9 + (seed % 6), port: 10 + (seed % 6), castle: 6, temple: 8, village: 6 + (seed % 3), fishing: 5 + (seed % 2), tower: 5 }[type]) : capital ? 22 + (seed % 8) : { city: 30 + (seed % 7), town: 10 + (seed % 9), port: 14 + (seed % 8), castra: 8 + (seed % 3), village: 7 + (seed % 3), fishing: 6 + (seed % 2), temple: 10, castle: 7, tower: 5 }[type]
+      const size = fv ? (capital ? 26 : fr === 'deep' ? { town: 14, castle: 9, village: 7 + (seed % 3) }[type] ?? 8 : fr === 'gnome' ? { town: 12, temple: 9, village: 6 + (seed % 3) }[type] ?? 7 : fr === 'human' ? { town: 13, castle: 7 }[type] ?? 7 : { town: 15, castle: 7, tower: 5, village: 6 + (seed % 3) }[type] ?? 6) : kr ? (capital ? 18 : { town: 9 + (seed % 6), port: 10 + (seed % 6), castle: 6, temple: 8, village: 6 + (seed % 3), fishing: 5 + (seed % 2), tower: 5 }[type]) : capital ? 22 + (seed % 8) : { city: 30 + (seed % 7), town: 10 + (seed % 9), port: 14 + (seed % 8), castra: 8 + (seed % 3), village: 7 + (seed % 3), fishing: 6 + (seed % 2), temple: 10, castle: 7, tower: 5 }[type]
       const gen = {
-        size, walls: capital ? 1 : ['village', 'fishing'].includes(type) ? 0 : type === 'town' ? (/стен/.test(text) || nest || seed % 3 === 0 ? 1 : 0) : 1,
+        size, walls: fr === 'deep' || fr === 'gnome' ? 0 : capital ? 1 : ['village', 'fishing'].includes(type) ? 0 : type === 'town' ? (/стен/.test(text) || nest || seed % 3 === 0 ? 1 : 0) : 1,
         citadel: capital || castra || nest || type === 'city' || type === 'castle' || (kr && seatOf) ? 1 : 0, plaza: ['village', 'fishing'].includes(type) ? 0 : 1, temple: type === 'castra' || (kr && !capital && type !== 'temple') ? 0 : 1, river: river ? 1 : 0,
-        coast: coast ? 1 : 0, shantytown: !kr && (type === 'city' || capital) ? 1 : 0, greens: south ? (seed % 2) : seed % 4 === 0 ? 1 : 0
+        coast: coast ? 1 : 0, shantytown: !kr && !fv && (type === 'city' || capital) ? 1 : 0, greens: south ? (seed % 2) : seed % 4 === 0 ? 1 : 0
       }
       const extra = [...(/рудник|копи/.test(text) ? MINE : []), ...(sn === 'Корона Аргус' && /раб|невольн/.test(text) ? SLAVE : [])]
       const kalt = south === 'kal'
       const holy = CHURCH_STATES.includes(sn)
-      const dry = kr ? pickN(KREIT_DRY, 11, seed) : no ? pickN(NORSE_DRY, 11, seed) : ex ? pickN(EXILE_DRY, 11, seed) : sty ? pickN(STYRIA_DRY, 11, seed) : holy ? pickN(CHURCH_DRY, 11, seed) : south ? pickN(kalt ? KALT_DRY : SOUTH_DRY, 12, seed) : [...extra.slice(0, 1), ...pickN(DRY, 12, seed)]
-      const wet = coast || river ? pickN(kr ? KREIT_WET : no ? NORSE_WET : ex ? EXILE_WET : sty ? STYRIA_WET : holy ? CHURCH_WET : south ? (kalt ? KALT_WET : SOUTH_WET) : WET, coast ? (south ? 2 : 3) : 2, seed + 1).map((n) => `~${n}`) : []
+      const dry = fv ? pickN({ deep: FV_DEEP_DRY, dwarf: FV_DWARF_DRY, gnome: FV_GNOME_DRY, human: FV_HUMAN_DRY }[fr], 11, seed) : kr ? pickN(KREIT_DRY, 11, seed) : no ? pickN(NORSE_DRY, 11, seed) : ex ? pickN(EXILE_DRY, 11, seed) : sty ? pickN(STYRIA_DRY, 11, seed) : holy ? pickN(CHURCH_DRY, 11, seed) : south ? pickN(kalt ? KALT_DRY : SOUTH_DRY, 12, seed) : [...extra.slice(0, 1), ...pickN(DRY, 12, seed)]
+      const wet = coast || river ? pickN(fv ? FV_WET[fr] : kr ? KREIT_WET : no ? NORSE_WET : ex ? EXILE_WET : sty ? STYRIA_WET : holy ? CHURCH_WET : south ? (kalt ? KALT_WET : SOUTH_WET) : WET, coast ? (south ? 2 : 3) : 2, seed + 1).map((n) => `~${n}`) : []
       out.push({
-        slug, name: p.name, province: p.name, state: sn, auto: true, ...(RESEED[slug] ? { seed: seed + RESEED[slug] } : {}), ...(holy ? { roof: MARBLE } : {}), ...(sty ? { roof: SLATE } : {}), ...(['village', 'fishing', 'castle', 'temple'].includes(type) ? { px: 1 } : {}), ...(capital ? { place: capital.id } : {}),
-        forest: p.terrain === 2 ? 0.25 : 0.1, hills: p.terrain === 3 || undefined, rocky: p.terrain >= 4 || undefined,
-        citadelName: kr ? (capital ? 'Длинный дом Мальмгримов' : seatOf ? `Длинный дом ${seatOf}` : mine ? 'Рудничный борг' : type === 'castle' ? 'Борг' : 'Длинный дом хёвдинга') : no ? (capital ? 'Каменный круг' : seatOf ? `Длинный дом ${seatOf}` : type === 'castle' ? 'Борг' : 'Дом хёвдинга') : ex ? (capital ? 'Цитадель Ставки' : castra ? 'Кастра Последней клятвы' : type === 'castle' ? 'Имперская твердыня' : 'Комендатура') : man ? (capital ? 'Графский дворец' : p.name === 'Граднец' ? 'Цитадель Граднеца' : 'Замок кастеляна') : sty ? (capital ? 'Чёрный замок' : 'Замок кастеляна') : holy ? 'Соборный двор' : castra ? 'Кастра' : nest ? 'Замковая гора' : south ? (kalt ? 'Дом капитанов' : capital ? 'Палаццо' : 'Кастелло') : 'Замок',
+        slug, name: p.name, province: p.name, state: sn, auto: true, ...(fv ? { style: FV_STYLE[fr] } : {}), ...(RESEED[slug] ? { seed: seed + RESEED[slug] } : {}), ...(holy ? { roof: MARBLE } : {}), ...(sty ? { roof: SLATE } : {}), ...(['village', 'fishing', 'castle', 'temple'].includes(type) ? { px: 1 } : {}), ...(capital ? { place: capital.id } : {}),
+        forest: fr === 'deep' ? 0 : p.terrain === 2 ? 0.25 : 0.1, hills: p.terrain === 3 || undefined, rocky: p.terrain >= 4 || undefined,
+        citadelName: fv ? (capital ? 'Железный чертог' : fvClan ? `Чертог ${fvClan[1].replace('Клан ', 'клана ')}` : fvHouse ? fvHouse[1] : fvNoble ? `Замок ${fvNoble[1].replace('Дом ', 'Дома ')}` : fr === 'deep' ? 'Чертог старейшины' : fr === 'dwarf' ? 'Каменная твердыня' : fr === 'human' ? 'Баронский замок' : 'Дом старосты') : kr ? (capital ? 'Длинный дом Мальмгримов' : seatOf ? `Длинный дом ${seatOf}` : mine ? 'Рудничный борг' : type === 'castle' ? 'Борг' : 'Длинный дом хёвдинга') : no ? (capital ? 'Каменный круг' : seatOf ? `Длинный дом ${seatOf}` : type === 'castle' ? 'Борг' : 'Дом хёвдинга') : ex ? (capital ? 'Цитадель Ставки' : castra ? 'Кастра Последней клятвы' : type === 'castle' ? 'Имперская твердыня' : 'Комендатура') : man ? (capital ? 'Графский дворец' : p.name === 'Граднец' ? 'Цитадель Граднеца' : 'Замок кастеляна') : sty ? (capital ? 'Чёрный замок' : 'Замок кастеляна') : holy ? 'Соборный двор' : castra ? 'Кастра' : nest ? 'Замковая гора' : south ? (kalt ? 'Дом капитанов' : capital ? 'Палаццо' : 'Кастелло') : 'Замок',
         gen, districts: [...wet.slice(0, 1), ...dry.slice(0, 2), ...wet.slice(1), ...dry.slice(2)],
         landmarks: [
           ...(capital && sty ? [['Чёрный замок', 'castle', 'citadel', 'Здесь живёт граф Конрад и заседает Ночной совет.'], ['Немая палата', 'assembly', 'center', 'Канцелярия его сиятельства: сюда не заходят по своей воле.'], ['Вексельный дом', 'landmark', 'big', 'Банк Штирии — прикрытие Ночного рынка.'], ['Ночной рынок', 'landmark', 'plaza', 'Ночной ряд: при свечах и в масках.']] : []),
           ...(no && capital ? [['Каменный круг', 'assembly', 'center', 'Девять камней Седых и Щит Хьяльмара: здесь выбирают конунга и бьются за него.'], ['Скала закона', 'landmark', 'edge', 'Отсюда законоговоритель говорит треть неписаных законов севера.'], ['Длинный дом хускарлов', 'castle', 'citadel', 'Дружина Круга, которая держит тингмир.']] : []),
+          ...(fv && capital ? [['Железный чертог', 'castle', 'citadel', 'Дворец рода Железных: здесь живёт Первый Молот Гилдартс.'], ['Зал Свода', 'assembly', 'center', 'Шестьдесят одно каменное кресло Совета Свода.'], ['Нижние врата', 'landmark', 'edge', 'За ними — Глубь; здесь стоит Глубинный Дозор.'], ['Стена павших', 'landmark', 'plaza', 'Имена воинов Дозора, павших у Нижних врат и в Чёрном Своде.'], ['Палата Печатей', 'landmark', 'big', 'Здесь записывают каждое изобретение лиги и хранят печати машин.']] : []),
+          ...(fv && p.name === 'Азг-Кар' ? [['Наковальня Магнуса', 'temple', 'temple', 'Святыня лиги: на ней куют Железный молот.'], ['Великие горны Азга', 'landmark', 'big', 'Сотни горнов клана Азг.']] : []),
+          ...(fv && p.name === 'Хаэ-Бад' ? [['Фьяльские ворота', 'landmark', 'gate', 'Главные ворота лиги: дальше — только с привратной грамотой.'], ['Контора Тиббальдов', 'landmark', 'big', 'Весы, грамоты и пошлины.'], ['Ярмарка', 'landmark', 'plaza', 'Серебро, сталь и гномьи часы.']] : []),
+          ...(fv && p.name === 'Барак-Ази' ? [['Привратный горн', 'temple', 'temple', 'Храм Магнуса у Гарефордских ворот: горновые благословляют караваны.'], ['Гарефордские ворота', 'landmark', 'gate', 'Лес, рыба и кожи Гарефорда.']] : []),
+          ...(fv && p.name === 'Кхаз-Адор' ? [['Зонгауские ворота', 'landmark', 'gate', 'Хлеб, соль, вино. Пошлина — Скамье Поверхности.']] : []),
+          ...(fv && p.name === 'Грондгунд' ? [['Большой насос', 'landmark', 'big', 'Машина Ниммо Брасселя; без неё Гронд утонет за неделю.']] : []),
+          ...(fv && p.name === 'Кхаз-Гунд' ? [['Спуск в Слепые штольни', 'landmark', 'edge', 'Запечатан Хельгой Дургн в 1010 г.'], ['Дом Красной лампы', 'assembly', 'center', 'Здесь собирается братство рудокопов.']] : []),
+          ...(fv && fvClan && !capital ? [[`Чертог ${fvClan[1].replace('Клан ', 'клана ')}`, 'castle', 'citadel', 'Родовой чертог одного из Семи Щитов.']] : []),
+          ...(fv && fvHouse ? [[fvHouse[1], 'castle', 'big', 'Усадьба одной из Пяти Шестерён: дом, мастерские, контора.']] : []),
           ...(kr && capital ? [['Длинный дом Мальмгримов', 'castle', 'citadel', 'Серебряный престол: здесь живёт ярл над Жилами и пирует Серебряный хирд.'], ['Волчий дом', 'landmark', 'big', 'Здесь вместе растут наречённые дети ярла — будущие враги.'], ['Серебряная казна', 'landmark', 'edge', 'Казна в скале под охраной хирда; ключи у матери ярла.'], ['Плавильни', 'landmark', 'big', 'Здесь серебро жилы становится креитской маркой.']] : []),
           ...(kr && seatOf ? [[`Длинный дом ${seatOf}`, 'castle', 'citadel', 'Пиршественный зал хёвдинга: сердце этта, его дружина и его жильные жёны.']] : []),
           ...(kr && p.name === 'Гримстад' ? [['Вход в Сердце Жилы', 'landmark', 'big', 'Самая богатая серебряная штольня континента. Ниже всех — Тихая штольня.'], ['Бараки трэлей', 'landmark', 'edge', 'Здесь спят те, кого отдали жиле.']] : []),
@@ -177,8 +204,8 @@ export async function autoCities(world, handmade) {
           ...(man && p.name === 'Нарни' ? [['Амбары Нарни', 'landmark', 'big', 'Запасы зерна, которыми кормятся все принятые графства.']] : []),
           ...(man && p.name === 'Граднец' ? [['Цитадель Граднеца', 'castle', 'citadel', 'Штаб Графской стражи и капитан Север Орнибуций.'], ['Казармы Графской стражи', 'landmark', 'edge', 'Устав и выучка здесь взяты у старых легионов.'], ['Склады Граднеца', 'landmark', 'big', 'На бумаге здесь хранится соль и овечья шерсть.']] : []),
           ...(capital && man ? [['Графский дворец', 'castle', 'citadel', 'Здесь живёт граф Жан Наний и заседает Совет Десяти.'], ['Мангенский собор', 'temple', 'temple', 'Построен при Гийоме Постном; здесь Лавиния Орнибуция приняла первых беженцев.'], ['Вторая канцелярия', 'landmark', 'center', 'На вывеске архив; о том, что внутри, не спрашивают.']] : []),
-          ...(capital && !sty && !man && !ex && !no && !kr ? (() => { const r = SOUTH.find((x) => x.key === south); return [[r.hall.split(',')[0], 'assembly', 'citadel', `Здесь заседает ${r.chamber} и живёт ${r.rulerTitle.toLowerCase()}.`]] })() : []),
-          ...landmarksFrom(p.name, type, text, sn).filter((l) => !(kr && (l[2] === 'temple' || /^Ратуша/.test(l[0])) && p.name === 'Кьярдален')).map((l) => ((no || kr) && l[2] === 'temple' ? ['Хоф', l[1], l[2], 'Капище предков: столбы богов, жертвенный огонь, пиршественный зал.'] : (no || kr) && /^Ратуша/.test(l[0]) ? ['Тинговый дом', l[1], l[2], 'Здесь собирается местный тинг бондов и решает споры.'] : south && l[2] === 'temple' ? [kalt ? 'Храм клана' : `Церковь ${pickN(['Сан-Микеле', 'Санта-Лучия', 'Сан-Бартоло', 'Санта-Агна', 'Сан-Доменико', 'Санта-Клара'], 1, seed)[0]}`, l[1], l[2], l[3]] : l))
+          ...(capital && !sty && !man && !ex && !no && !kr && !fv ? (() => { const r = SOUTH.find((x) => x.key === south); return [[r.hall.split(',')[0], 'assembly', 'citadel', `Здесь заседает ${r.chamber} и живёт ${r.rulerTitle.toLowerCase()}.`]] })() : []),
+          ...landmarksFrom(p.name, type, text, sn).filter((l) => !(fv && /^Ратуша/.test(l[0])) && !(kr && (l[2] === 'temple' || /^Ратуша/.test(l[0])) && p.name === 'Кьярдален')).map((l) => (fv && l[2] === 'temple' ? ['Горн Магнуса', l[1], l[2], 'Кузнечный храм Магнуса: горновые благословляют сталь и машины.'] : (no || kr) && l[2] === 'temple' ? ['Хоф', l[1], l[2], 'Капище предков: столбы богов, жертвенный огонь, пиршественный зал.'] : (no || kr) && /^Ратуша/.test(l[0]) ? ['Тинговый дом', l[1], l[2], 'Здесь собирается местный тинг бондов и решает споры.'] : south && l[2] === 'temple' ? [kalt ? 'Храм клана' : `Церковь ${pickN(['Сан-Микеле', 'Санта-Лучия', 'Сан-Бартоло', 'Санта-Агна', 'Сан-Доменико', 'Санта-Клара'], 1, seed)[0]}`, l[1], l[2], l[3]] : l))
         ].slice(0, 7)
       })
     }

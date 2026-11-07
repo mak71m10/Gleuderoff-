@@ -66,6 +66,11 @@ export const STYLES: Record<string, Style> = {
   viking: { plaster: ['#4a3626', '#553e2b', '#3f2e20', '#5c4430', '#47331f'], roof: ['#3a2e24', '#43352a', '#2f2620', '#4a3a2c', '#383028'], timber: '#1e140e', stone: '#5e5a54', wall: '#4a3828', shutter: ['#1e140e'], pitch: 1.7, framed: false, floors: 0, grass: '#5f7448', grass2: '#6a7e50', dirt: '#7a6a52', pave: '#6e6558', lit: 0.22, conifer: 0.95, tower: '#2e2219' },
   // Имперские изгнанники: серый северный камень, тёмно-алые и сланцевые крыши под снег, крутые скаты
   exile: { plaster: ['#b8b4aa', '#a9a59a', '#c4c0b6', '#9d998e'], roof: ['#5a2626', '#4a2222', '#3f3d44', '#6a2c2a', '#47434a'], timber: '#2e2420', stone: '#76726a', wall: '#8a867c', shutter: ['#5a1414', '#2e2a28'], pitch: 1.25, framed: false, floors: 0, grass: '#6a7a52', grass2: '#74845a', dirt: '#9a8f74', pave: '#8f897a', lit: 0.3, conifer: 0.9, tower: '#3e2a2a' },
+  // Фарвольская лига, дварфы: серый гранит, плоские каменные крыши, горны; deep — то же под сводом пещеры
+  dwarf: { plaster: ['#8d8579', '#7d766c', '#9a9184', '#867c6e'], roof: ['#5b5550', '#4f4a45', '#625a52', '#56504a'], timber: '#3a2e24', stone: '#6a645c', wall: '#7a746a', shutter: ['#3b3633'], pitch: 0.5, framed: false, floors: 0, grass: '#6a7454', grass2: '#737c5a', dirt: '#8a8070', pave: '#7a756c', lit: 0.45, conifer: 0.95, tower: '#4a4440' },
+  deep: { plaster: ['#7d766c', '#8a8276', '#70695f', '#958c7e'], roof: ['#4f4a45', '#5b5149', '#463f3a'], timber: '#3a2e24', stone: '#5e5850', wall: '#6a645a', shutter: ['#3b3633'], pitch: 0.5, framed: false, floors: 0, grass: '#4a4a3c', grass2: '#525040', dirt: '#5a5246', pave: '#6a645a', lit: 0.75, conifer: 0, tower: '#3a3532' },
+  // гномы: пёстрая штукатурка, медные и позеленевшие крыши, высокие узкие дома с башенками
+  gnome: { plaster: ['#d9c27a', '#c97a5a', '#7aa3a0', '#e0d0b0', '#b8c9a0', '#d99a6a', '#c9b0d0'], roof: ['#4f8a78', '#5a9a86', '#a8552f', '#3f6a8a', '#8a3a3a', '#b8783a'], timber: '#4a3222', stone: '#8f8a7e', wall: '#a9a394', shutter: ['#2f5a6a', '#8a3a2a', '#d8b040'], pitch: 1.4, framed: false, floors: 1, grass: '#7a9a4c', grass2: '#86a654', dirt: '#b0a07a', pave: '#a89c80', lit: 0.5, conifer: 0.7, tower: '#4f8a78' },
   empire: { plaster: ['#e9dcc0', '#dccca8', '#efe5cf', '#d8c9a6'], roof: ['#a8452f', '#9c3f2c', '#b4553a', '#8f3a2a', '#a04a30', '#6d7d3c'], timber: '#4a3222', stone: '#8f8a7e', wall: '#a9a394', shutter: ['#3f6a4a', '#2f5570', '#7a3b2e'], pitch: 0.95, framed: true, floors: 0, grass: '#6f9b46', grass2: '#7fa84f', dirt: '#b9a57c', pave: '#b1a384', lit: 0.4, conifer: 0.3, tower: '#5c5a78' },
   argus: { plaster: ['#c9c2b0', '#bdb6a4', '#d3ccba', '#b2ab99'], roof: ['#7c3b2e', '#6d3a30', '#874536', '#5d4a3e'], timber: '#33261d', stone: '#7a766c', wall: '#8c867a', shutter: ['#3a3a3a', '#4a3226'], pitch: 0.9, framed: false, floors: 0, grass: '#6a8d47', grass2: '#789a50', dirt: '#a8976f', pave: '#9c9078', lit: 0.3, conifer: 0.35, tower: '#4b4b58' },
   styria: { plaster: ['#8a858f', '#7b7682', '#96919b', '#6f6b76'], roof: ['#3f3d44', '#4a4650', '#38363e', '#524d55', '#45424a'], timber: '#1e1a20', stone: '#3b3840', wall: '#4a4750', shutter: ['#221d22', '#2d2528'], pitch: 1.35, framed: true, floors: 1, grass: '#55683f', grass2: '#4d5e3c', dirt: '#6f675a', pave: '#5b5650', lit: 0.24, conifer: 0.85, tower: '#26222c' },
@@ -612,7 +617,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   g.scale(pxPerM, pxPerM)
   g.lineCap = g.lineJoin = 'round'
   // поля: борозды по длинной стороне
-  const FIELD = S.style === 'styria' ? ['#7c7a58', '#6c6d4c', '#857a5a', '#5f6846'] : S.style === 'south' ? ['#c9b264', '#a9a85a', '#d0b878', '#8f9a50'] : ['#c7b35e', '#a8ab55', '#8fa24c', '#b99f58', '#7f9a48']
+  const FIELD = S.style === 'deep' ? ['#4a3f4a', '#3f4a3a', '#5a4a3a', '#46403a'] : S.style === 'styria' ? ['#7c7a58', '#6c6d4c', '#857a5a', '#5f6846'] : S.style === 'south' ? ['#c9b264', '#a9a85a', '#d0b878', '#8f9a50'] : ['#c7b35e', '#a8ab55', '#8fa24c', '#b99f58', '#7f9a48']
   fields.forEach((r, i) => {
     const col = FIELD[i % FIELD.length]
     g.save()
@@ -861,7 +866,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const popTotal = population.reduce((s, q) => s + q.weight, 0) || 1
   const shareOf = (ids: string[]): number => population.filter((q) => ids.includes(q.race.id)).reduce((s, q) => s + q.weight, 0) / popTotal
   const CULT_SHARE = { dwarf: shareOf(['dwarves', 'gnomes']), elf: shareOf(['high-elves', 'wood-elves', 'sylva', 'eleons', 'eluins']), orc: shareOf(['orcs', 'ogres', 'goliaths', 'tsions']) }
-  type Cult = 'human' | keyof typeof CULT_SHARE
+  type Cult = 'human' | 'gnome' | keyof typeof CULT_SHARE
+  const dwStyle = S.style === 'dwarf' || S.style === 'deep'
+  const gnStyle = S.style === 'gnome'
   const pickCult = (u: number, k: number): Cult => {
     let acc = 0
     for (const [c, s] of Object.entries(CULT_SHARE) as [Cult, number][]) {
@@ -873,6 +880,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const distRnd = rng(hashOf(seedName) + 4049)
   const distCult = S.dist.map(() => pickCult(distRnd(), 1.6))
   const houseCult = (idx: number, u: number): Cult => {
+    if (dwStyle) return 'dwarf'
+    if (gnStyle) return 'gnome'
     const dc = distCult[blds[idx].d] ?? 'human'
     if (dc !== 'human') return u < 0.75 ? dc : 'human'
     return pickCult(u, 0.35)
@@ -880,7 +889,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const CULT_LOOK = {
     dwarf: { wall: ['#8d8579', '#7d766c', '#9a9184', '#867c6e'], roof: ['#4f4a45', '#5b5149', '#463f3a', '#5e5048'], shutter: '#3b3633', pitch: 0.55, eave: -0.3 },
     elf: { wall: ['#eef0e4', '#e2e9dc', '#f2eee0', '#dfe6d6'], roof: ['#4f7a5a', '#3f6b66', '#5c7f4a', '#6a8a6a'], shutter: '#5d7f5a', pitch: 1.75, eave: 0.9 },
-    orc: { wall: ['#6b5136', '#5c4630', '#74583a', '#4f3c2a'], roof: ['#7d6a4a', '#6a5a3c', '#857150', '#5f5238'], shutter: '', pitch: 0.85, eave: -0.2 }
+    orc: { wall: ['#6b5136', '#5c4630', '#74583a', '#4f3c2a'], roof: ['#7d6a4a', '#6a5a3c', '#857150', '#5f5238'], shutter: '', pitch: 0.85, eave: -0.2 },
+    gnome: { wall: ['#d9c27a', '#c97a5a', '#7aa3a0', '#e0d0b0', '#b8c9a0', '#d99a6a', '#c9b0d0'], roof: ['#4f8a78', '#5a9a86', '#a8552f', '#3f6a8a', '#8a3a3a', '#b8783a'], shutter: '#2f5a6a', pitch: 1.45, eave: 0.4 }
   }
   const FLOWERS = ['#c0504d', '#d9a441', '#8e5ea2', '#e07a9a', '#f0d36a']
   // у каждого поселения своё лицо: оттенок штукатурки, тон крыш, крутизна скатов, ставни, сколько цветов и дворов
@@ -940,6 +950,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const cult: Cult = kind ? 'human' : houseCult(idx, rng(hashOf(seedName) + idx * 104729)())
     const look = cult === 'human' ? null : CULT_LOOK[cult]
     if (cult === 'dwarf' || cult === 'orc') floors = Math.max(1, floors - 1)
+    if (cult === 'gnome' && area < 140) floors += 1
+    // дварфы лиги: плоская каменная крыша с парапетом, на ней сушат руду
+    const flat = dwStyle && !kind && !hall
     if (vik) floors = 1
     const plaster = look ? look.wall[Math.floor(rv() * look.wall.length)] : mixHex(st.plaster[Math.floor(rv() * st.plaster.length)], town.tint, town.tintK)
     const pal = look ? look.roof : S.droof[b.d] ?? S.roof ?? st.roof
@@ -948,10 +961,10 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const wallCol = stoneBody ? mixHex(st.wall, st.plaster[0], 0.3) : plaster
     const eave = vik && !kind ? (hall ? 4.4 : 2.7) : kind === 'temple' ? Math.min(16, 8 + Math.sqrt(area) * 0.2) : kind === 'keep' ? Math.min(22, 11 + Math.sqrt(area) * 0.3) : kind === 'civic' ? 3.3 * Math.max(floors, 3) : 0.5 + floors * 3 + (look?.eave ?? 0)
     // эльфы строят высокие крутые крыши, дварфы — низкие каменные, орки — приземистые
-    const rise = Math.min(hw * st.pitch * (look?.pitch ?? 1) * (kind ? 1 : town.pitchK), kind === 'keep' ? 0 : hw > 8 ? (cult === 'elf' ? 11 : hall ? 12 : vik ? 9 : 7) : 99)
-    const pitch = rise / hw
+    const rise = flat ? 0 : Math.min(hw * st.pitch * (look?.pitch ?? 1) * (kind ? 1 : town.pitchK), kind === 'keep' ? 0 : hw > 8 ? (cult === 'elf' ? 11 : hall ? 12 : vik ? 9 : 7) : 99)
+    const pitch = flat ? 0 : rise / hw
     const topAt = (p: P2): number => { const v = Math.abs(toUV(p)[1]); return base + eave + Math.max(-1.5, rise - v * pitch) }
-    tops[idx] = base + eave + rise
+    tops[idx] = base + eave + rise + (flat ? 0.6 : 0)
 
     // стены: каждую сторону делим на коньке, чтобы щипец вышел ровным
     const edges: { a: P2; b: P2; n: P2; len: number; hidden: boolean }[] = []
@@ -979,7 +992,17 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
 
     // крыша: два ската по контуру со свесом; плоская — у цитадельных башен
-    if (kind === 'keep') {
+    if (flat) {
+      const tr = THREE.ShapeUtils.triangulateShape(r.map(([x, z]) => new THREE.Vector2(x, z)), [])
+      for (const [i, j, m] of tr) ch.solid.tri([r[i][0], base + eave, r[i][1]], [r[j][0], base + eave, r[j][1]], [r[m][0], base + eave, r[m][1]], mixHex(roofCol, '#000', 0.08))
+      // парапет из каменных плит по краю крыши
+      if (detail >= 1) for (const e of edges) {
+        const rot = Math.atan2(e.b[1] - e.a[1], e.b[0] - e.a[0])
+        ch.solid.box((e.a[0] + e.b[0]) / 2 - e.n[0] * 0.18, base + eave - 0.05, (e.a[1] + e.b[1]) / 2 - e.n[1] * 0.18, e.len + 0.36, 0.6, 0.36, mixHex(wallCol, '#000', 0.18), rot)
+      }
+      // руда и мешки на крыше
+      if (detail >= 2 && rv() < 0.4) ch.solid.box(ctr[0], base + eave, ctr[1], 1.2, 0.4, 0.9, rv() < 0.5 ? '#6a4a3a' : '#8a7a5a', rv() * 3)
+    } else if (kind === 'keep') {
       const flat = r.map(toUV)
       const tris = THREE.ShapeUtils.triangulateShape(flat.map(([u, v]) => new THREE.Vector2(u, v)), [])
       for (const [i, j, m] of tris) ch.solid.tri([r[i][0], base + eave, r[i][1]], [r[j][0], base + eave, r[j][1]], [r[m][0], base + eave, r[m][1]], roofCol)
@@ -1064,7 +1087,12 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const storeys = kind === 'temple' ? 1 : kind === 'keep' ? Math.floor(eave / 4) : kind === 'civic' ? 3 : floors
       const fh = kind === 'temple' ? eave - 1 : kind === 'keep' ? 4 : (eave - 0.5) / Math.max(1, storeys)
       for (const e of visible) {
-        const count = vik && !kind ? (e.len > 7 ? 1 : 0) : Math.max(0, Math.min(kind === 'temple' ? 6 : 6, Math.floor(e.len / (kind === 'temple' ? 3.4 : 2.7))))
+        const count = vik && !kind ? (e.len > 7 ? 1 : 0) : dwStyle && !kind ? Math.min(2, Math.floor(e.len / 5)) : Math.max(0, Math.min(kind === 'temple' ? 6 : 6, Math.floor(e.len / (kind === 'temple' ? 3.4 : 2.7))))
+        // дварфы: пояс рун под карнизом и каменные углы
+        if (dwStyle && detail >= 2 && !kind) {
+          ch.solid.quad(...wq(e, 0, 1, base + eave - 0.75, base + eave - 0.45, 0.05), mixHex(wallCol, '#000', 0.3))
+          for (const t0 of [0, 1 - 0.3 / e.len]) ch.solid.quad(...wq(e, t0, t0 + 0.3 / e.len, base + 1.5, base + eave - 0.75, 0.07), mixHex(wallCol, '#fff', 0.12))
+        }
         // бревенчатые венцы: тёмные пазы между брёвнами
         if (vik && detail >= 2 && !kind) {
           for (let y = base + 0.62; y < base + eave - 0.12; y += 0.42) ch.solid.quad(...wq(e, 0, 1, y - 0.035, y + 0.035, 0.04), mixHex(wallCol, '#000', 0.45))
@@ -1123,7 +1151,12 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           }
         }
       }
-      if (door && !stoneBody) {
+      if (door && !stoneBody && dwStyle) {
+        const hd = 0.7 / door.len
+        ch.solid.quad(...wq(door, 0.5 - hd - 0.35 / door.len, 0.5 + hd + 0.35 / door.len, base, base + 2.9, 0.06), mixHex(st.stone, '#000', 0.3))
+        ch.solid.quad(...wq(door, 0.5 - hd, 0.5 + hd, base, base + 2.3, 0.1), '#7a5a2a')
+        ch.solid.quad(...wq(door, 0.5 - hd, 0.5 + hd, base + 1.1, base + 1.25, 0.12), '#b8903a')
+      } else if (door && !stoneBody) {
         const hd = 0.55 / door.len
         ch.solid.quad(...wq(door, 0.5 - hd - 0.1 / door.len, 0.5 + hd + 0.1 / door.len, base, base + 2.2, 0.05), st.timber)
         ch.solid.quad(...wq(door, 0.5 - hd, 0.5 + hd, base, base + 2.1, 0.08), mixHex(st.timber, '#6b3f22', 0.5))
@@ -1154,6 +1187,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const cw = cult === 'dwarf' ? 1.15 : 0.75
       ch.solid.box(cx, y, cz, cw, 1.9, cw, st.stone, Math.atan2(uz, ux))
       ch.solid.box(cx, y + 1.9, cz, cw + 0.2, 0.16, cw + 0.2, mixHex(st.stone, '#000', 0.3), Math.atan2(uz, ux))
+      if (dwStyle) ch.glow.box(cx, y + 2.04, cz, cw * 0.6, 0.04, cw * 0.6, '#ffffff', Math.atan2(uz, ux))
       if (first && chimneys.length < 400) chimneys.push([cx, y + 2.1, cz])
     }
     // двор по месту: у воды — рыбацкий, на людной улице — лавка, иногда мастерская, в деревне — огород за плетнём
@@ -1236,6 +1270,40 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
             if (rv() < 0.5) ch.solid.cyl(hp[0], y, hp[1], 1.1, 1.9, 9, '#c9b06a', 0.15)
             else for (let row = 0; row < 3; row++) ch.solid.box(hp[0], y + row * 0.28, hp[1], 1.8, 0.28, 0.55, row % 2 ? '#7a5a38' : '#8a6a42', rot + 1.57)
           }
+        }
+      }
+    }
+    // гномы: башенка мастерской на углу, медная труба с паром, латунная шестерня на щипце
+    if (cult === 'gnome' && !kind && detail >= 1) {
+      if (rv() < 0.5 && r.length >= 4) {
+        const k = Math.floor(rv() * r.length), [tx, tz] = r[k]
+        const tr0 = Math.min(1.3, Math.max(0.8, hw * 0.35)), th = eave + rise * 0.7 + 1.6
+        ch.solid.cyl(tx, base - 0.5, tz, tr0, th + 0.5, 10, mixHex(wallCol, '#fff', 0.12))
+        ch.solid.cyl(tx, base + th, tz, tr0 + 0.35, 2.4 + tr0, 10, roofCol, 0)
+        ch.solid.cyl(tx, base + th + 2.4 + tr0, tz, 0.05, 0.9, 4, '#b8903a', 0.02)
+        for (let i = 0; i < 3; i++) { const a = i * 2.1 + 0.4; ch.glow.box(tx + Math.cos(a) * (tr0 + 0.02), base + th - 1.3, tz + Math.sin(a) * (tr0 + 0.02), 0.32, 0.42, 0.06, '#ffffff', a + Math.PI / 2) }
+        tops[idx] = Math.max(tops[idx], base + th + 3.3 + tr0)
+      }
+      if (rv() < 0.65) {
+        const [cx, cz] = fromUV(u0 + (u1 - u0) * (0.25 + rv() * 0.5), hw * 0.3)
+        const y = base + eave + rise - hw * 0.3 * pitch - 0.3
+        ch.solid.cyl(cx, y, cz, 0.24, 2.1, 7, '#b0703a')
+        ch.solid.cyl(cx, y + 2.1, cz, 0.36, 0.25, 7, '#7a8a5a')
+        if (first && chimneys.length < 400) chimneys.push([cx, y + 2.4, cz])
+      }
+      if (detail >= 2 && rise > 1.2) {
+        const gr = Math.min(hw * 0.42, 1.25), gy = base + eave + rise * 0.38
+        for (const [u, out] of [[u0 - 0.05, -1], [u1 + 0.05, 1]] as [number, number][]) {
+          const pts: V3[] = []
+          for (let i = 0; i < 20; i++) {
+            const a = (i / 20) * Math.PI * 2, rr = i % 2 ? gr : gr * 0.78
+            const w = fromUV(u + out * 0.02, Math.cos(a) * rr)
+            pts.push([w[0], gy + Math.sin(a) * rr, w[1]])
+          }
+          const c0 = fromUV(u + out * 0.02, 0), cc: V3 = [c0[0], gy, c0[1]]
+          for (let i = 0; i < 20; i++) { ch.solid.tri(cc, pts[i], pts[(i + 1) % 20], '#c9963a'); ch.solid.tri(cc, pts[(i + 1) % 20], pts[i], '#c9963a') }
+          const h0 = fromUV(u + out * 0.04, 0)
+          ch.solid.box(h0[0], gy - 0.18, h0[1], 0.36, 0.36, 0.36, '#5a4a2a')
         }
       }
     }
@@ -1884,6 +1952,90 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   waterUni.uNear.value = fog.near
   waterUni.uFar.value = fog.far
 
+  // ---------- подгорный город (Фарвольская лига): свод пещеры, сталактиты, столбы, кристаллы и фонари на цепях ----------
+  // свод рисуется только изнутри: сверху (в обзоре) видна дальняя стена пещеры, как в разрезе, а на прогулке — потолок
+  const deep = S.style === 'deep'
+  if (deep) {
+    const RX = radius * 1.12 + 40, RY = Math.max(60, Math.min(150, radius * 0.55 + 34))
+    const y0 = heightAt(center[0], center[1]) - 4
+    const cr = rng(hashOf(seedName) + 991)
+    const geo = new THREE.SphereGeometry(1, 72, 30, 0, Math.PI * 2, 0, Math.PI * 0.62)
+    const pos = geo.attributes.position
+    const cols: number[] = []
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i)
+      const k = 1 + Math.sin(x * 9 + z * 5) * 0.035 + Math.sin(z * 13 - y * 7) * 0.03 + Math.sin(x * 23 + y * 17) * 0.015
+      pos.setXYZ(i, center[0] + x * RX * k, y0 + y * RY * k, center[1] + z * RX * k)
+      const c = C(mixHex('#55493e', '#2c2520', (Math.sin(x * 31 + z * 27) + 1) / 2))
+      cols.push(c.r, c.g, c.b)
+    }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3))
+    geo.computeVertexNormals()
+    const caveMat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.BackSide })
+    const cave = new THREE.Mesh(geo, caveMat)
+    scene.add(cave)
+    disposable.push(geo, caveMat)
+    const domeY = (x: number, z: number): number => { const d = Math.hypot(x - center[0], z - center[1]) / RX; return y0 + RY * Math.sqrt(Math.max(0, 1 - d * d)) }
+    const rock = new Bucket(), crys = new Bucket(), lant = new Bucket()
+    const rockCol = (): string => mixHex('#4a4038', '#6e6252', cr())
+    // сталактиты, на концах некоторых — светящиеся кристаллы
+    for (let i = 0; i < 170; i++) {
+      const a = cr() * Math.PI * 2, d = Math.sqrt(cr()) * RX * 0.93
+      const x = center[0] + Math.cos(a) * d, z = center[1] + Math.sin(a) * d
+      const top = domeY(x, z) + 2, len = 5 + cr() * RY * 0.24, rr = 1.2 + cr() * 3.6
+      rock.cyl(x, top - len, z, 0, len, 6, rockCol(), rr, false)
+      if (i % 3 === 0) crys.cyl(x, top - len - 1.6, z, 0, 2.2, 5, '#ffffff', 0.7, false)
+    }
+    // кристаллы на полу у стен пещеры
+    for (let i = 0; i < 90; i++) {
+      const a = cr() * Math.PI * 2, d = RX * (0.75 + cr() * 0.2)
+      const x = center[0] + Math.cos(a) * d, z = center[1] + Math.sin(a) * d
+      if (gridAt(x, z) !== 0) continue
+      const g = heightAt(x, z), h = 1.5 + cr() * 4
+      crys.cyl(x, g - 0.3, z, 0.6 + cr() * 0.6, h, 5, '#ffffff', 0, false, cr() * 3)
+    }
+    // каменные столбы, что держат свод: только там, где нет домов и улиц
+    let made = 0
+    for (let i = 0; i < 160 && made < 10; i++) {
+      const a = cr() * Math.PI * 2, d = RX * (0.35 + cr() * 0.5)
+      const x = center[0] + Math.cos(a) * d, z = center[1] + Math.sin(a) * d, rr = 4 + cr() * 4
+      let ok = true
+      for (let k = 0; k < 8 && ok; k++) { const b = (k / 8) * Math.PI * 2; if (gridAt(x + Math.cos(b) * rr * 1.5, z + Math.sin(b) * rr * 1.5) !== 0 || roadAt(x + Math.cos(b) * rr, z + Math.sin(b) * rr) > 0.2) ok = false }
+      if (!ok || gridAt(x, z) !== 0) continue
+      const g = heightAt(x, z), top = domeY(x, z), col = rockCol()
+      rock.cyl(x, g - 2, z, rr * 1.5, 6, 9, col, rr, false)
+      rock.cyl(x, g + 4, z, rr, top - g - 12, 9, col, rr * 0.9, false)
+      rock.cyl(x, top - 8, z, rr * 0.9, 10, 9, col, rr * 2.2, false)
+      for (let k = 0; k < 4; k++) lant.box(x + Math.cos(k * 1.571) * (rr + 0.05), g + 6, z + Math.sin(k * 1.571) * (rr + 0.05), 0.8, 1.1, 0.2, '#ffffff', k * 1.571 + 1.571)
+      made++
+    }
+    // фонари на цепях над улицами
+    for (let i = 0; i < 40; i++) {
+      const a = cr() * Math.PI * 2, d = Math.sqrt(cr()) * radius * 0.85
+      const x = center[0] + Math.cos(a) * d, z = center[1] + Math.sin(a) * d
+      if (roadAt(x, z) < 0.3) continue
+      const g = heightAt(x, z), top = domeY(x, z), low = g + 16 + cr() * 10
+      if (top - low < 4) continue
+      rock.box(x, low + 1.2, z, 0.12, top - low - 1.2, 0.12, '#2a2420')
+      lant.box(x, low, z, 1.1, 1.3, 1.1, '#ffffff')
+      rock.box(x, low + 1.3, z, 1.4, 0.2, 1.4, '#3a3028')
+    }
+    const crysMat = new THREE.MeshBasicMaterial({ color: '#6fcfe8', toneMapped: false, fog: true })
+    for (const [b, m, sh] of [[rock, solidMat, true], [crys, crysMat, false], [lant, glowMat, false]] as [Bucket, THREE.Material, boolean][]) {
+      const g = b.geometry()
+      if (!g) continue
+      const mesh = new THREE.Mesh(g, m)
+      mesh.receiveShadow = sh
+      scene.add(mesh)
+      disposable.push(g)
+    }
+    disposable.push(crysMat)
+    fog.near = Math.max(60, radius * 0.45)
+    fog.far = RX * 2.4
+    waterUni.uNear.value = fog.near
+    waterUni.uFar.value = fog.far
+  }
+
   const KEY = {
     day: { top: '#5a9bd8', hor: '#d5e6ea', sun: '#fff0d8', sunK: 2.9, hemiK: 1.55, sky: '#d6e6ff', gnd: '#8a9a68' },
     gold: { top: '#465f96', hor: '#f4b37c', sun: '#ffa564', sunK: 2.4, hemiK: 0.95, sky: '#d8c0c0', gnd: '#6a5a4a' },
@@ -1891,6 +2043,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   }
   const lerpKey = (a: typeof KEY.day, b: typeof KEY.day, t: number): typeof KEY.day => ({ top: mixHex(a.top, b.top, t), hor: mixHex(a.hor, b.hor, t), sun: mixHex(a.sun, b.sun, t), sunK: a.sunK + (b.sunK - a.sunK) * t, hemiK: a.hemiK + (b.hemiK - a.hemiK) * t, sky: mixHex(a.sky, b.sky, t), gnd: mixHex(a.gnd, b.gnd, t) })
   const setTime = (hour: number, focus: THREE.Vector3): void => {
+    // под горой нет ни дня, ни ночи: свет сверху из зеркальных шахт, тени не бегают
+    if (deep) hour = 11.5
     const ph = ((hour - 6) / 14) * Math.PI
     const elev = Math.sin(ph) // > 0 — солнце над горизонтом (6:00–20:00)
     const k = elev > 0.28 ? KEY.day : elev > 0 ? lerpKey(KEY.gold, KEY.day, elev / 0.28) : elev > -0.2 ? lerpKey(KEY.night, KEY.gold, 1 + elev / 0.2) : KEY.night
@@ -1937,6 +2091,28 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     nightNow = nightK
     for (const l of lampLights) l.intensity = nightK * 45
     smokeMat.color.set(nightK > 0.5 ? '#50566a' : '#cfcfcf')
+    if (deep) {
+      skyUni.uTop.value.set('#0c0907')
+      skyUni.uHor.value.set('#1a120c')
+      skyUni.uSunK.value = 0
+      fog.color.set('#160f0a')
+      waterUni.uFog.value.copy(fog.color)
+      waterUni.uSky.value.set('#3a2a1c')
+      waterUni.uDeep.value.set('#0e1a20')
+      waterUni.uDay.value = 0.3
+      hemi.color.set('#c8a888')
+      hemi.groundColor.set('#4a3626')
+      hemi.intensity = 1.2
+      sun.color.set('#ffc890')
+      sun.intensity = 1.2
+      glowMat.color.set(new THREE.Color(1.0, 0.72, 0.36).multiplyScalar(1.5))
+      glowPts.opacity = 0.8
+      starMat.opacity = 0
+      cloudMat.opacity = 0
+      nightNow = 1
+      for (const l of lampLights) l.intensity = 45
+      smokeMat.color.set('#50566a')
+    }
   }
 
   // ---------- кадр ----------

@@ -1491,6 +1491,44 @@ button.pw-chip:hover { background: var(--panel-2); }
 .parchment .field-text h2, .parchment .field-text h3 { color: #4a3417; }
 
 /* ================= Выводок и Жатва (Креит) ================= */
+.vault { margin: 16px 0; padding: 14px; border: 1px solid #5c5040; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #2e2a24, #100e0c 80%); color: #e6dcc8; }
+.vault-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.vault-head small { display: block; color: #a8987c; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.vault-head b { font-family: var(--serif); font-size: 20px; }
+.vault-status { padding: 6px 12px; border-radius: 8px; background: #1c1916; border: 1px solid #4a4034; font-size: 14px; }
+.vault-status.surface { border-color: #b04a3a; background: #2a1612; box-shadow: 0 0 12px #8f2f2f55; }
+.vault-scales { width: 100%; max-height: 300px; display: block; margin: 6px auto 0; }
+.vault-post { fill: #3a3128; stroke: #8a7658; stroke-width: 3; }
+.vault-beam { fill: #6a5a44; stroke: #c9a46a; stroke-width: 1.5; transition: transform .5s; }
+.vault-scales g { transition: transform .5s ease; }
+.vault-pivot { fill: #c9a04a; stroke: #3a3128; stroke-width: 2; }
+.vault-rope { stroke: #8a7658; stroke-width: 1.4; }
+.vault-num { font-family: var(--serif); font-size: 22px; font-weight: 700; }
+.vault-num.small { font-size: 15px; }
+.vault-lbl { fill: #b8a888; font-size: 12px; paint-order: stroke; stroke: #14110e; stroke-width: 4px; }
+.vault-surf.hot path { filter: drop-shadow(0 0 6px #e05a3a); }
+.vault-note { color: #c4b8a0; font-size: 14px; margin: 6px 0; }
+.vault-cols { display: flex; gap: 4px; align-items: flex-end; margin-top: 10px; overflow-x: auto; padding-bottom: 2px; }
+.vault-col { flex: 1 0 34px; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: 1px solid transparent; border-radius: 6px; padding: 4px 2px; cursor: pointer; color: #a8987c; }
+.vault-col.on { border-color: #c9a04a; background: #2a241c; color: #f0e0c0; }
+.vault-bar { height: 70px; width: 16px; display: flex; flex-direction: column; justify-content: flex-end; }
+.vault-bar i { display: block; width: 100%; }
+.vault-mark { width: 8px; height: 8px; border-radius: 50%; }
+.vault-mark.stone { background: #6b5a4a; } .vault-mark.gear { background: #b8862e; } .vault-mark.surface { background: #e05a3a; box-shadow: 0 0 5px #e05a3a; }
+.vault-col small { font-size: 11px; }
+.vault-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 4px; font-size: 12px; color: #b8a888; }
+.vault-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.vault-h { font-family: var(--serif); margin: 14px 0 6px; font-size: 18px; color: #f0e0c0; }
+.vault-elect { border-top: 1px solid #3a3228; padding: 8px 0; }
+.vault-elect-head { font-family: var(--serif); font-size: 16px; margin-bottom: 4px; }
+.vault-cand { display: grid; grid-template-columns: minmax(120px, 30%) 1fr 44px; gap: 8px; align-items: center; margin: 3px 0; }
+.vault-cand.win .vault-cand-name { color: #f0d890; }
+.vault-cand-name small { display: block; color: #8a7c66; font-size: 11px; }
+.vault-votes { position: relative; display: flex; height: 18px; background: #1c1916; border-radius: 4px; overflow: hidden; }
+.vault-votes i { display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 11px; color: #fff; min-width: 14px; }
+.vault-votes em { position: absolute; top: 0; bottom: 0; width: 2px; background: #f0e0c0; opacity: .7; }
+.vault-sum { text-align: right; }
+.vault-rules { margin: 10px 0 0; padding-left: 18px; color: #b8a888; font-size: 13px; }
 .brood { margin: 16px 0; padding: 14px; border: 1px solid #5a5e66; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #2a2c33, #0e0f12 80%); container-type: inline-size; }
 .brood-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
 .brood-tabs button { padding: 6px 12px; border-radius: 8px; border: 1px solid #4a4e56; background: #17191e; color: #b8bcc6; font-family: var(--serif); font-size: 16px; font-weight: 700; cursor: pointer; }

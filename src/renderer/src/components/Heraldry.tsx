@@ -130,6 +130,25 @@ export const EMBLEMS: Record<string, { label: string; draw: (fg: string, bg: str
         <path d="M14 56h24l-12-24zM62 56h24L74 32z" />
       </g>
     )
+  },
+  cog: {
+    label: 'Шестерня',
+    draw: (fg, bg) => (
+      <g>
+        <path fill={fg} d={Array.from({ length: 10 }, (_, i) => { const a = (i / 10) * Math.PI * 2, b = a + 0.2, c = a + 0.43, d = a + 0.63, P = (r: number, t: number) => `${(50 + r * Math.cos(t)).toFixed(1)} ${(50 + r * Math.sin(t)).toFixed(1)}`; return `${i ? 'L' : 'M'}${P(30, a)}L${P(40, b)}L${P(40, c)}L${P(30, d)}` }).join('') + 'Z'} />
+        <circle cx="50" cy="50" r="11" fill={bg} />
+      </g>
+    )
+  },
+  wheat: {
+    label: 'Колос',
+    draw: (fg) => (
+      <g fill={fg}>
+        <path d="M48 30h4v60h-4z" />
+        {[0, 1, 2, 3].map((i) => <g key={i}><ellipse cx="42" cy={24 + i * 13} rx="5" ry="9" transform={`rotate(-30 42 ${24 + i * 13})`} /><ellipse cx="58" cy={24 + i * 13} rx="5" ry="9" transform={`rotate(30 58 ${24 + i * 13})`} /></g>)}
+        <ellipse cx="50" cy="14" rx="5" ry="9" />
+      </g>
+    )
   }
 }
 

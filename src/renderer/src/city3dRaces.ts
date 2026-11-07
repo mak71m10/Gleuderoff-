@@ -86,6 +86,11 @@ const TABLES: Record<string, W> = {
   norse: { nords: 84, dwarves: 5, gnomes: 4, goliaths: 3, imperials: 2, orcs: 1, gladry: 1 },
   // Креит: почти одни креитские норды; немного полона из Гарефорда и Фарвольской лиги
   viking: { nords: 91, imperials: 3, gladry: 3, goliaths: 2, dwarves: 1 },
+  // Фарвольская лига: в твердынях и рудничных посёлках — одни дварфы, в долинах — одни гномы; в подгорных чертогах — гномы при насосах
+  dwarf: { dwarves: 100 },
+  deep: { dwarves: 86, gnomes: 14 },
+  gnome: { gnomes: 100 },
+  fvhuman: { imperials: 72, gnomes: 22, dwarves: 6 },
   exile: { imperials: 46, nords: 34, gladry: 6, dwarves: 4, gnomes: 2, goliaths: 2, skugga: 2, orcs: 1.5, ogres: 0.8 },
   // Штирия: нищие местные, наёмники всех мастей, покупатели Ночного рынка
   styria: { imperials: 62, gladry: 12, orcs: 5, ogres: 2, goliaths: 2, skugga: 4, vampires: 2, 'dark-elves': 2, dukulites: 2, tieflings: 1.5, 'reig': 0.8, roma: 2, dwarves: 2, gremlins: 2, demons: 0.2 },

@@ -24,6 +24,7 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge light and brass lamps, carved stone pillars, dark background, visible brush strokes, detailed face, half-length portrait'
 const KREIT_STYLE = 'oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
@@ -38,6 +39,22 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  // Фарвольская лига: гномы (маленькие, большой нос, светлые глаза, торчащие русые волосы, расчёсанная бородка) и дварфы
+  'fv-gildarts': '(no hat:1.3), (scarred veteran gnome warrior:1.3), small sturdy gnome in his prime with a big nose, bright light-grey eyes, spiky sandy hair and a neatly combed short beard, dented dwarven steel breastplate over an embroidered dark coat, iron hammer, a deep scar across the cheek, stern kind eyes, dark mine tunnel with lamps behind',
+  'fv-ortwin': '(no hat:1.3), old gnome ruler with a big nose, thin white combed beard in braids, spectacles, rich embroidered dark green coat with gold buttons, ledger in hands, cautious tired eyes',
+  'fv-uldrich': '(no hat:1.3), ancient wise gnome founder with a big nose and a long white beard combed into strands, iron chain of office with a hammer and cog, fur-trimmed coat, determined eyes, forge glow',
+  'fv-tibor': '(no hat:1.3), cheerful young gnome warrior with a big nose, spiky sandy hair and a short beard, too-large dwarven helmet, bright reckless smile, lamp light',
+  'fv-fenwick': '(no hat:1.3), slender clever gnome nobleman with a big nose, sandy hair slicked back, neat goatee, brass monocle, rich purple coat with a seal on a chain, cold calculating smile, brass machinery behind',
+  'fv-pippa': 'elegant old gnome woman merchant with a big nose, silver-blond hair in an elaborate bun, light eyes, pearl earrings, rich dark green embroidered gown, golden key on a chain, gentle smile with cold eyes, ledgers and coins behind',
+  'fv-nimmo': '(no hat:1.3), gnome inventor with a big nose, wild spiky sandy hair, soot-smudged face, brass goggles pushed up on his forehead, leather apron with tools, copper pipes and pumps behind, enthusiastic eyes',
+  'fv-bertha': 'sturdy young gnome farm woman with a big nose, freckles, sandy braided hair, light eyes, plain linen dress with embroidered collar, sheaf of barley, determined smile, mountain terraces behind',
+  'fv-baldrek': '(ancient dwarf elder, huge snow-white beard:1.5), enormous snow-white beard braided with gold rings to his belt, bald head with runic tattoos, heavy stone-grey robe with fur, iron crown-band, hard suspicious eyes, stone hall',
+  'fv-helga': '(female dwarf warrior, woman, no beard:1.5), stout dwarf woman with thick copper-red braids, broad face with scars, steel helmet with a lamp, heavy plate armour, big round shield, grim loyal eyes, dark tunnel',
+  'fv-torgrim': '(dwarf miner:1.4), broad dwarf miner with a black braided beard, coal dust on his face, leather helmet with a red glass lamp, pickaxe, angry tired eyes, mine tunnel',
+  'fv-gudrun': '(old female dwarf priestess, grandmother, no beard:1.5), old dwarf woman with ash-grey braids, soot on her cheeks, smith apron over grey priest robes, holding a hammer, forge fire and anvil behind',
+  'fv-otto': 'calm grey-haired imperial baron in his fifties, northern european, trimmed grey beard, dark green velvet doublet with a fur collar, heavy gold chain, shrewd eyes',
+  'fv-ingrid': 'young northern european baroness in her twenties, pale skin, ash-blond hair in a braided crown, grey eyes, riding coat over light armour, sword at her belt, mountain pass with snow behind, resolute look',
+  'fv-irvald': '(dwarf in darkness:1.4), gaunt pale dwarf with a ragged grey beard and milky eyes, black hooded cloak, no lamp, face lit from below by a faint purple glow, darkness around, unsettling calm',
   // Креит (креитские норды: русые, рыжие и пепельные волосы, светлые глаза; всё в серебре и мехах)
   'kr-grimkel': 'grim old norwegian jarl with a long ash-blond beard turned grey, heavy silver arm rings and a silver torc, wolf fur cloak, cold pale eyes, smoke behind',
   'kr-skardi': '(sandy blond hair:1.3), hard lean norwegian jarl in his thirties with sandy hair braided at the temples and a short beard, scarred cheek, silver arm rings, chainmail under a bear fur, wary eyes',
@@ -309,7 +326,8 @@ for (const e of chars) {
   const exile = e.base.tags.includes('Имперские Изгнанники')
   const north = e.base.tags.includes('Земли Севера')
   const kreit = e.base.tags.includes('Креит')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit
+  const farvol = e.base.tags.includes('Фарвольская лига')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -325,7 +343,10 @@ for (const e of chars) {
   const age = Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
-  const prompt = kreit
+  const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
+  const prompt = farvol
+    ? `${FARVOL_STYLE}, ${banner}${dwarfR ? `portrait of an (old dwarf${female ? ' woman, female' : ''}:1.45), (short stout broad-shouldered dwarf, huge nose, heavy brow, ruddy weathered european skin:1.35), ` : gnomeR ? `portrait of a (short ${female ? 'woman' : 'man'}, fantasy tinkerer, bareheaded:1.35), (big round nose, slightly large ears, bright light eyes, spiky sandy hair, ruddy tanned european skin:1.3), ` : `portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, pale skin:1.2), `}${CUSTOM[id] ?? subject}`
+    : kreit
     ? `${KREIT_STYLE}, ${banner}portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (norwegian, pale weathered skin:1.2), ${CUSTOM[id] ?? subject}`
     : north
     ? `${NORTH_STYLE}, ${banner}${/Дварф/.test(race) ? `portrait of an (ancient dwarf:1.5), (short stout broad-shouldered dwarf, huge bulbous nose, heavy brow, deep-set eyes, ruddy weathered skin:1.4), ` : `portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (scandinavian, pale weathered skin:1.2), `}${CUSTOM[id] ?? subject}`
@@ -340,7 +361,7 @@ for (const e of chars) {
   }
   await startSd()
   const t0 = Date.now()
-  const negative = rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5), (picture frame, gilded frame, border:1.4)` : NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG
+  const negative = farvol ? `${NEG}, (garden gnome, pointy hat, conical hat, figurine, statue, toy, ceramic, doll:1.6), (crown, tiara:1.4)` : rp ? `${NEG}, (crown, tiara, circlet, diadem:1.5), (picture frame, gilded frame, border:1.4)` : NO_CROWN.has(id) ? `${NEG}, (crown, tiara, circlet, diadem:1.5)` : NEG
   // 448×560, а не 512×640: на 512×640 модель не влезает в 4 ГБ видеопамяти и шаг в 5 раз медленнее; потом увеличиваем
   const png = await txt2img({ prompt, negative, width: 448, height: 560, steps: 7, cfg: 1.8, seed: seedOf(id) + Number(process.env.SEED_OFFSET ?? 0) })
   // республиканцев любит рисовать в раме — обрезаем края
