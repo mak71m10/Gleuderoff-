@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import { useStore, applyTemporal, uid } from '../store'
-import { existsAt, regionOwner, resolve } from '../temporal'
+import { existsAt, placeVisible, regionOwner, resolve } from '../temporal'
 import { PLACE_TYPES } from '../constants'
 import { labelPoint, newPlace, ringArea } from '../model'
 import { assetUrl, loadPlan } from './ui'
@@ -732,7 +732,7 @@ export function MapView() {
     const raster = rasterRef.current
     const byId = new Map((provinces ?? []).map((p) => [p.id, p]))
     for (const pl of world.places) {
-      if (pl.mapId !== mapDef.id || !existsAt(pl, date)) continue
+      if (pl.mapId !== mapDef.id || !placeVisible(pl, date)) continue
       const type = (pl.model as SettlementType | undefined) ?? PLACE_MODEL[resolve(pl, date).type]
       if (!type) continue
       const pid = raster ? provinceAt(raster, mapDef.width, mapDef.height, pl.x, pl.y) : 0
@@ -976,7 +976,7 @@ export function MapView() {
     const seen = new Set<string>()
     const selPlace = selection?.type === 'place' ? selection.id : null
     for (const p of world.places) {
-      if (p.mapId !== mapDef.id || !existsAt(p, date)) continue
+      if (p.mapId !== mapDef.id || !placeVisible(p, date)) continue
       seen.add(p.id)
       const f = resolve(p, date)
       const meta = PLACE_TYPES[f.type] ?? PLACE_TYPES.landmark

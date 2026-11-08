@@ -21,6 +21,9 @@ export function Timeline() {
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState<Speed>('month')
   const [picker, setPicker] = useState(false)
+  // на телефоне по умолчанию — крупный ползунок по годам (дорожку с событиями можно включить кнопкой)
+  const compact = typeof window !== 'undefined' && window.matchMedia('(max-width: 760px), (max-height: 520px) and (orientation: landscape)').matches
+  const [slider, setSlider] = useState(compact)
 
   useEffect(() => {
     const ro = new ResizeObserver(([e]) => setWidth(e.contentRect.width))
@@ -168,7 +171,7 @@ export function Timeline() {
   const p = toParts(cal, date)
 
   return (
-    <div className="timeline">
+    <div className={`timeline ${slider ? 'tl-slider-mode' : ''}`}>
       <div className="tl-controls">
         <button onClick={step((d) => addYears(cal, d, -1))} title="Год назад">«Г</button>
         <button onClick={step((d) => addMonths(cal, d, -1))} title="Месяц назад">‹М</button>
@@ -197,6 +200,8 @@ export function Timeline() {
         <button className="tl-wide" onClick={() => setDate(cal.present)} title="Настоящее время лора">
           Сейчас
         </button>
+        <button className="tl-now" onClick={() => setDate(cal.present)} title="Настоящее время лора">★</button>
+        <button className="tl-mode" onClick={() => setSlider(!slider)} title={slider ? 'Показать шкалу с событиями' : 'Показать ползунок'}>{slider ? '◆' : '━'}</button>
         <span className="tl-zoom">
           <button onClick={() => zoomBy(1.6)} aria-label="Отдалить шкалу">−</button>
           <button onClick={() => zoomBy(0.6)} aria-label="Приблизить шкалу">+</button>
@@ -220,6 +225,20 @@ export function Timeline() {
             <button className="tl-picker-close" onClick={() => setPicker(false)}>Готово</button>
           </div>
         )}
+      </div>
+      <div className="tl-sliderbox">
+        <span>{formatYear(cal, cal.rangeFrom)}</span>
+        <input
+          type="range"
+          className="tl-slider"
+          min={cal.rangeFrom}
+          max={cal.rangeTo}
+          step={1}
+          value={Math.min(cal.rangeTo, Math.max(cal.rangeFrom, p.year))}
+          onChange={(e) => setDate(yearStart(cal, +e.target.value) + (date - yearStart(cal, p.year)))}
+          aria-label="Год"
+        />
+        <span>{formatYear(cal, cal.rangeTo)}</span>
       </div>
       <div
         ref={trackRef}

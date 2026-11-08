@@ -666,6 +666,18 @@ async function migrateWorld(dir: string): Promise<void> {
     const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))
     user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => isOurs(a) && !armyIds.has(a.id)))]
   }
+  if ((user.version ?? 1) < 36) {
+    // v36: большие родословные древа — новые люди (отцы, матери, жёны, мужья, дети, внуки) добавятся ниже вместе с остальными записями стартового мира;
+    // здесь — связи «отец», «мать», «супруг» у уже существующих людей (то, что заполнил пользователь, не трогается)
+    const defMap = new Map<string, Json>((def.entries ?? []).map((e: Json) => [e.id, e]))
+    for (const e of user.entries) {
+      if (e.kind !== 'character' || !String(e.id).startsWith('lore-')) continue
+      const d = defMap.get(e.id)
+      if (!d) continue
+      for (const k of ['father', 'mother', 'spouse', 'spouse2', 'spouse3']) if (d.base?.links?.[k] && !e.base.links?.[k]) e.base.links = { ...e.base.links, [k]: d.base.links[k] }
+      if (e.id === 'lore-cr-hildebrand') { e.base.body = d.base.body; e.base.summary = d.base.summary }
+    }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

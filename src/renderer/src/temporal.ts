@@ -33,3 +33,14 @@ export function changeDates<T>(t: Temporal<T>): WorldDate[] {
   if (t.to != null) out.push(t.to)
   return out
 }
+
+/** Сколько дней метка битвы остаётся на карте после её даты (2 года): старые сражения не загромождают современную карту. */
+export const BATTLE_MARK_DAYS = 1000
+
+/** Видно ли место на дату: существует ли оно, а метка битвы — только первые два года после сражения. */
+export function placeVisible(pl: { from?: WorldDate | null; to?: WorldDate | null; base: { type: string }; history: { date: WorldDate; patch: Record<string, unknown> }[] }, date: WorldDate): boolean {
+  if (!existsAt(pl, date)) return false
+  const type = (pl.history.filter((c) => c.date <= date).sort((a, b) => a.date - b.date).reduce<Record<string, unknown>>((acc, c) => ({ ...acc, ...c.patch }), { type: pl.base.type }).type as string) ?? pl.base.type
+  if (type === 'battle' && pl.from != null && date > pl.from + BATTLE_MARK_DAYS) return false
+  return true
+}

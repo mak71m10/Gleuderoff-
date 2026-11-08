@@ -1942,3 +1942,51 @@ button.pw-chip:hover { background: var(--panel-2); }
 .thr-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 8px 0 0; font-size: 12px; color: #a8a888; } .thr-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 .thr-rules { margin: 10px 0 0; padding-left: 18px; color: #b0b090; font-size: 13px; }
 @media (max-width: 560px) { .thr-main { grid-template-columns: 1fr !important; } }
+
+/* ---- Родословное древо (крупное) ---- */
+.ft-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin: 6px 0; font-size: 14px; color: var(--muted); }
+.ft-stats b { color: var(--gold-2); font-family: var(--serif); font-size: 18px; }
+.ft-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; } .ft-legend em { font-style: normal; font-size: 12px; } .ft-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.panzoom-inner .ftree { justify-content: flex-start; }
+.ftree, .ftree ul { display: flex; justify-content: center; padding: 0; margin: 0; position: relative; list-style: none; }
+.ftree li { display: flex; flex-direction: column; align-items: center; position: relative; padding: 34px 14px 0; }
+.ftree > li { padding-top: 0; }
+.ftree ul::before { content: ''; position: absolute; top: 0; left: 50%; height: 34px; border-left: 2px solid var(--bc); opacity: .85; }
+.ftree ul > li::before, .ftree ul > li::after { content: ''; position: absolute; top: 34px; width: 50%; border-top: 2px solid var(--bc); opacity: .85; }
+.ftree ul > li::before { right: 50%; } .ftree ul > li::after { left: 50%; }
+.ftree ul > li:first-child::before, .ftree ul > li:last-child::after { border: none; }
+.ftree ul > li:only-child::before { display: none; }
+.ftree ul > li > .ft-couple::before { content: ''; position: absolute; top: -34px; left: 50%; height: 34px; border-left: 2px solid var(--bc); opacity: .85; }
+.ftree ul > li { padding-top: 68px; }
+.ft-couple { position: relative; display: flex; gap: 0; align-items: center; }
+.ft-with { display: flex; align-items: center; }
+.ft-ring { position: relative; width: 36px; height: 24px; display: grid; place-items: center; color: var(--gold-2); font-size: 18px; z-index: 1; text-shadow: 0 0 6px #000; }
+.ft-ring::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px solid var(--bc); opacity: .7; z-index: -1; }
+.ft-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 168px; min-height: 196px; padding: 12px 10px 10px; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 14%, var(--panel-2)), var(--panel)); border: 2px solid color-mix(in srgb, var(--bc) 60%, #000); border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, .5); color: inherit; cursor: pointer; text-align: center; }
+.ft-card:hover { border-color: var(--bc); box-shadow: 0 0 0 2px color-mix(in srgb, var(--bc) 35%, transparent), 0 8px 22px rgba(0, 0, 0, .6); }
+.ft-card.spouse { border-style: dashed; background: linear-gradient(180deg, var(--panel-2), var(--panel)); }
+.ft-card.foreign { border-style: dotted; opacity: .92; }
+.ft-card.ruler { border-color: #d8b84a; box-shadow: 0 0 0 2px #d8b84a55, 0 6px 18px rgba(0, 0, 0, .5); }
+.ft-card.dead { filter: grayscale(.55) brightness(.9); }
+.ft-portrait { width: 104px; height: 128px; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: var(--panel-3); color: var(--gold); border: 2px solid color-mix(in srgb, var(--bc) 70%, #000); }
+.ft-card.fem .ft-portrait { border-radius: 52px 52px 10px 10px; }
+.ft-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.ft-name { font-family: var(--serif); font-weight: 700; font-size: 16px; line-height: 1.15; }
+.ft-years { font-size: 12px; color: var(--muted); }
+.ft-title { font-size: 11.5px; color: var(--gold); line-height: 1.2; }
+.ft-house { font-size: 11px; padding: 1px 8px; border-radius: 10px; background: color-mix(in srgb, var(--bc) 25%, transparent); color: var(--text); }
+.ft-tag { font-size: 10.5px; color: var(--muted); }
+.ft-gen { position: absolute; top: 6px; left: 8px; font-family: var(--serif); font-size: 11px; color: color-mix(in srgb, var(--bc) 80%, #fff); opacity: .8; }
+.ft-crown { position: absolute; top: 2px; right: 8px; font-size: 18px; color: #e8c860; text-shadow: 0 0 8px #e8c86088; }
+
+/* ---- таймлайн на телефоне: крупный ползунок по годам ---- */
+.tl-now, .tl-mode, .tl-sliderbox { display: none; }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .tl-now, .tl-mode { display: grid; place-items: center; }
+  .timeline.tl-slider-mode .tl-track { display: none; }
+  .timeline.tl-slider-mode .tl-sliderbox { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 0 14px; color: var(--muted); font-size: 11px; }
+  .tl-slider { flex: 1; min-width: 0; height: 36px; accent-color: var(--gold-2); touch-action: pan-y; background: transparent; cursor: pointer; }
+  .tl-slider::-webkit-slider-thumb { width: 30px; height: 30px; }
+  .tl-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #3a3426, #7a6a3a); }
+  .tl-controls > button.tl-now, .tl-controls > button.tl-mode { min-width: 34px; }
+}

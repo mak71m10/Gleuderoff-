@@ -10,6 +10,7 @@ import { Icon } from './Icon'
 import { CoatOfArms, Flag, defaultHeraldry } from './Heraldry'
 import { SuccessionCouncilView } from './Council'
 import { Fullscreen, PanZoom } from './PanZoom'
+import { DynastyTree } from './DynastyTree'
 import { BookReader } from './BookReader'
 import { TingView } from './Ting'
 import { BroodView } from './Brood'
@@ -409,103 +410,5 @@ function EntryEditor({ id }: { id: string }) {
         </aside>
       </div>
     </article>
-  )
-}
-
-export function DynastyTree({ dynastyId, onOpen }: { dynastyId: string; onOpen: (id: string) => void }) {
-  const world = useStore((s) => s.world!)
-  const date = useStore((s) => s.date)
-  const cal = world.calendar
-  const { roots, children, byId } = useMemo(() => {
-    const members = world.entries.filter((e) => e.kind === 'character' && e.base.links.dynasty === dynastyId)
-    const byId = new Map(members.map((m) => [m.id, m]))
-    const children = new Map<string, Entry[]>()
-    for (const m of members) {
-      const parent = [m.base.links.father, m.base.links.mother].find((p) => p && byId.has(p))
-      if (parent) children.set(parent, [...(children.get(parent) ?? []), m])
-    }
-    for (const list of children.values()) list.sort((a, b) => (a.from ?? 0) - (b.from ?? 0))
-    const isRoot = (m: Entry): boolean => ![m.base.links.father, m.base.links.mother].some((p) => p && byId.has(p))
-    const allRoots = members.filter(isRoot)
-    // супруг-корень из той же династии рисуется в паре, а не отдельным древом
-    const roots = allRoots.filter((m, i) => {
-      const sp = m.base.links.spouse
-      const j = allRoots.findIndex((r) => r.id === sp)
-      return !(j >= 0 && j < i)
-    })
-    return { roots, children, byId }
-  }, [world.entries, dynastyId])
-
-  const years = (e: Entry): string => {
-    const a = e.from != null ? formatYear(cal, toParts(cal, e.from).year) : '?'
-    const b = e.to != null ? formatYear(cal, toParts(cal, e.to).year) : ''
-    return b ? `${a} — ${b}` : `р. ${a}`
-  }
-
-  const node = (e: Entry, seen: Set<string>): ReactNode => {
-    if (seen.has(e.id)) return null
-    seen.add(e.id)
-    const f = resolve(e, date)
-    const spouse = world.entries.find((x) => x.id === f.links.spouse)
-    const kids = children.get(e.id) ?? []
-    return (
-      <li key={e.id}>
-        <div className="tree-couple">
-          <button className={`tree-node ${existsAt(e, date) ? '' : 'dead'}`} onClick={() => onOpen(e.id)}>
-            <span className="tn-portrait">{f.image ? <img src={assetUrl(f.image)} alt="" /> : <Icon name="user" size={18} />}</span>
-            <span className="tn-name">{f.name}</span>
-            <span className="tn-years">{years(e)}</span>
-            {f.title && <span className="tn-title">{f.title}</span>}
-          </button>
-          {spouse && !seen.has(spouse.id) && (seen.add(spouse.id), true) && (
-            <>
-              <span className="tree-ring">⚭</span>
-              <button className={`tree-node spouse ${byId.has(spouse.id) ? 'same-house' : ''}`} onClick={() => onOpen(spouse.id)}>
-                <span className="tn-portrait">
-                  {resolve(spouse, date).image ? <img src={assetUrl(resolve(spouse, date).image)} alt="" /> : <Icon name="user" size={18} />}
-                </span>
-                <span className="tn-name">{resolve(spouse, date).name}</span>
-                <span className="tn-years">{years(spouse)}</span>
-              </button>
-            </>
-          )}
-        </div>
-        {kids.length > 0 && <ul>{kids.map((k) => node(k, seen))}</ul>}
-      </li>
-    )
-  }
-
-  const [full, setFull] = useState(false)
-  const tree = (): ReactNode => {
-    const seen = new Set<string>()
-    return <ul className="tree">{roots.map((r) => node(r, seen))}</ul>
-  }
-  const dynName = world.entries.find((e) => e.id === dynastyId)?.base.name ?? ''
-  return (
-    <div className="dynasty-tree">
-      <div className="tree-head">
-        <div className="field-label">Родословное древо</div>
-        {roots.length > 0 && (
-          <Button icon="tree" variant="ghost" onClick={() => setFull(true)}>
-            На весь экран
-          </Button>
-        )}
-      </div>
-      {roots.length ? (
-        <>
-          <p className="hint">Тяните мышью, приближайте колесом с Ctrl или кнопками справа.</p>
-          <PanZoom inline resetKey={dynastyId}>
-            {tree()}
-          </PanZoom>
-          {full && (
-            <Fullscreen title={`Родословное древо — ${dynName}`} onClose={() => setFull(false)}>
-              <PanZoom resetKey={dynastyId}>{tree()}</PanZoom>
-            </Fullscreen>
-          )}
-        </>
-      ) : (
-        <p className="hint">Укажите у персонажей эту династию, а также отца и мать, и древо построится само.</p>
-      )}
-    </div>
   )
 }

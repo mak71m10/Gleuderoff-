@@ -477,7 +477,7 @@ for (const e of chars) {
     e.base.image = `portraits/${id}.webp`
     continue
   }
-  const subject = CUSTOM[id] ?? word(e)
+  const subject = CUSTOM[id] ?? e.base.props?.look ?? word(e)
   // европейская внешность — людям-гладрам; южанам, дварфам и прочим — нет
   const race = e.base.props?.race ?? ''
   const imperial = !['jakasta', 'durin-kald'].includes(id) && (!race || /гладр|имперец|^Человек$/.test(race))
