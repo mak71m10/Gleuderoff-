@@ -36,6 +36,30 @@ type Json = Record<string, any> // eslint-disable-line @typescript-eslint/no-exp
  * v1 -> v2: карта и государства перенесены из PSD (другая система координат), календарь «Реквием», статьи лора.
  * Метки пользователя пересчитываются в новые координаты, его записи справочника сохраняются.
  */
+/** Убирает пометки «черновик»: теги, строки «_черновик_», «(черновик)» (тот же код — scripts/strip-draft.mjs) */
+function stripDraft<T>(node: T): T {
+  if (Array.isArray(node)) {
+    const out: unknown[] = []
+    for (const v of node) { if (typeof v === 'string' && /^черновик$/i.test(v.trim())) continue; out.push(stripDraft(v)) }
+    return out as T
+  }
+  if (node && typeof node === 'object') {
+    const o = node as Record<string, unknown>
+    for (const k of Object.keys(o)) o[k] = stripDraft(o[k])
+    return node
+  }
+  if (typeof node === 'string' && /черновик/i.test(node)) {
+    return node
+      .replace(/\n*_[^_\n]*черновик[^_\n]*_/gi, '')
+      .replace(/ ?Придумано по поручению автора[^.]*черновик\.?/gi, '')
+      .replace(/ ?\([^()]*черновик[^()]*\)/gi, '')
+      .replace(/[ \t]*[—-][ \t]*черновик\b/gi, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\s+$/, '') as T
+  }
+  return node
+}
+
 async function migrateWorld(dir: string): Promise<void> {
   const file = join(dir, 'world.json')
   const user: Json = JSON.parse(await fs.readFile(file, 'utf8'))
@@ -556,6 +580,31 @@ async function migrateWorld(dir: string): Promise<void> {
     const cityMaps = (def.maps ?? []).filter((m: Json) => String(m.id).startsWith('map-city-') && !user.maps.some((u: Json) => u.id === m.id))
     user.maps = [...user.maps, ...structuredClone(cityMaps)]
     const isOurs = (x: Json) => String(x.id).startsWith('lore-ch-') || String(x.id).startsWith('lore-army-ch-') || cityMaps.some((m: Json) => x.mapId === m.id)
+    const placeIds = new Set((user.places ?? []).map((p: Json) => p.id))
+    user.places = [...(user.places ?? []), ...structuredClone((def.places ?? []).filter((p: Json) => isOurs(p) && !placeIds.has(p.id)))]
+    const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))
+    user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => isOurs(a) && !armyIds.has(a.id)))]
+  }
+  if ((user.version ?? 1) < 33) {
+    // v33: убраны пометки «черновик» отовсюду (по просьбе автора); дальше — Крайдонианская Лига
+    stripDraft(user)
+    // Крайдонианская Лига — Рейд и Верховный адмирал, дома, адмиралы, Коллегия Флагов; города только на берегу, внутри — рудничные посёлки;
+    // описания и планы 77 поселений
+    const ds = (def.states ?? []).find((s: Json) => s.base.name === 'Крайдонианская Лига')
+    const us = ds && user.states.find((s: Json) => s.id === ds.id)
+    if (us) { us.base = { ...us.base, ...structuredClone(ds.base) }; us.factions = structuredClone(ds.factions); us.history = structuredClone(ds.history ?? []) }
+    const isNew = (e: Json) => String(e.id).startsWith('lore-cr-') || ['lore-book-houses', 'lore-book-war', 'lore-book-lands'].includes(e.id)
+    const fresh = (def.entries ?? []).filter(isNew)
+    const ids = new Set(fresh.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !ids.has(e.id)), ...structuredClone(fresh)]
+    const defProvs = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProvs.get(p.id)
+      if (dp && ds && dp.owners?.at(-1)?.[1] === ds.id) { p.name = dp.name; p.settlement = structuredClone(dp.settlement ?? null); p.description = dp.description; if (dp.cityMapId) p.cityMapId = dp.cityMapId }
+    }
+    const cityMaps = (def.maps ?? []).filter((m: Json) => String(m.id).startsWith('map-city-') && !user.maps.some((u: Json) => u.id === m.id))
+    user.maps = [...user.maps, ...structuredClone(cityMaps)]
+    const isOurs = (x: Json) => String(x.id).startsWith('lore-cr-') || String(x.id).startsWith('lore-army-cr-') || cityMaps.some((m: Json) => x.mapId === m.id)
     const placeIds = new Set((user.places ?? []).map((p: Json) => p.id))
     user.places = [...(user.places ?? []), ...structuredClone((def.places ?? []).filter((p: Json) => isOurs(p) && !placeIds.has(p.id)))]
     const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))

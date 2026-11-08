@@ -74,6 +74,8 @@ export const STYLES: Record<string, Style> = {
   kranz: { plaster: ['#f4f0e8', '#ebe5d8', '#f7f4ee', '#e2dacb', '#efe8da'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#3a3a42', '#46434a'], timber: '#3a2416', stone: '#a9a598', wall: '#c8c3b6', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#a6a294', grass2: '#b0ac9e', dirt: '#b8b2a2', pave: '#c4bfb2', lit: 0.4, conifer: 1, tower: '#2a3a5a' },
   // Республика Чеафарал: имперский фахверк на нордской земле — светлая штукатурка, тёмные нордские крыши, серый камень
   chea: { plaster: ['#e6dcc4', '#d8cdb0', '#ece3cf', '#cfc4a8'], roof: ['#4a3a2e', '#3f3228', '#55453a', '#394048', '#4a4f54'], timber: '#3a2a1e', stone: '#7e7a72', wall: '#9c978a', shutter: ['#2f4a6a', '#6a2a22', '#3a5a3a'], pitch: 1.1, framed: true, floors: 0, grass: '#6a8348', grass2: '#748d50', dirt: '#a8997a', pave: '#a09886', lit: 0.36, conifer: 0.7, tower: '#3a3f58' },
+  // Крайдонианская Лига: береговой город элеонов — светлый известняк, сине-голубые крыши, тёмное дерево у воды
+  cray: { plaster: ['#efe9d8', '#e4ddc8', '#f3eee0', '#d9d2bc', '#e9e3d0'], roof: ['#2f4a78', '#3a5a8a', '#27405f', '#4a6a96', '#5a4a3a'], timber: '#3a2a1e', stone: '#9a968a', wall: '#b5b0a2', shutter: ['#1f3a6a', '#2f6a7a', '#6a2a22'], pitch: 0.9, framed: false, floors: 1, grass: '#7a9a56', grass2: '#86a45e', dirt: '#b8a888', pave: '#bdb7a6', lit: 0.4, conifer: 0.3, tower: '#2f4a78' },
   deep: { plaster: ['#7d766c', '#8a8276', '#70695f', '#958c7e'], roof: ['#4f4a45', '#5b5149', '#463f3a'], timber: '#3a2e24', stone: '#5e5850', wall: '#6a645a', shutter: ['#3b3633'], pitch: 0.5, framed: false, floors: 0, grass: '#4a4a3c', grass2: '#525040', dirt: '#5a5246', pave: '#6a645a', lit: 0.75, conifer: 0, tower: '#3a3532' },
   // гномы: пёстрая штукатурка, медные и позеленевшие крыши, высокие узкие дома с башенками
   gnome: { plaster: ['#d9c27a', '#c97a5a', '#7aa3a0', '#e0d0b0', '#b8c9a0', '#d99a6a', '#c9b0d0'], roof: ['#4f8a78', '#5a9a86', '#a8552f', '#3f6a8a', '#8a3a3a', '#b8783a'], timber: '#4a3222', stone: '#8f8a7e', wall: '#a9a394', shutter: ['#2f5a6a', '#8a3a2a', '#d8b040'], pitch: 1.4, framed: false, floors: 1, grass: '#7a9a4c', grass2: '#86a654', dirt: '#b0a07a', pave: '#a89c80', lit: 0.5, conifer: 0.7, tower: '#4f8a78' },
@@ -1844,6 +1846,110 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
     const bg = b.geometry()
     if (bg) { const bm = new THREE.Mesh(bg, solidMat); bm.castShadow = true; scene.add(bm); disposable.push(bg) }
+
+    // ---------- Крайдонианская Лига: флот у причалов, свайные кварталы над водой, маяк на молу ----------
+    if (S.style === 'cray') {
+      const nr = rng(hashOf(seedName) + 4242)
+      const hull = new Bucket(), sails = new Bucket(), pile = new Bucket(), stilt = new Bucket(), roofs = new Bucket(), lit = new Bucket()
+      const isW = (x: number, z: number): boolean => heightAt(x, z) < -0.9
+      // ближайшая суша: расстояние и направление к ней
+      const toLand = (x: number, z: number): { d: number; a: number } | null => {
+        let best: { d: number; a: number } | null = null
+        for (let k = 0; k < 16; k++) {
+          const a = (k / 16) * Math.PI * 2
+          for (let d = 4; d <= 70; d += 4) if (heightAt(x + Math.cos(a) * d, z + Math.sin(a) * d) > 0.3) { if (!best || d < best.d) best = { d, a }; break }
+        }
+        return best
+      }
+      const spots: { x: number; z: number; d: number; a: number }[] = []
+      // обход сеткой: вода, рядом с которой (до 56 м) есть суша
+      const step = opts.mobile ? 12 : 8
+      scan: for (let x = -30; x < W + 30; x += step) for (let z = -30; z < H + 30; z += step) {
+        if (!isW(x, z)) continue
+        let near = false
+        for (let k = 0; k < 8 && !near; k++) for (const dd of [10, 24, 40, 56]) if (heightAt(x + Math.cos(k * 0.785) * dd, z + Math.sin(k * 0.785) * dd) > 0.3) { near = true; break }
+        if (!near) continue
+        const l = toLand(x + (nr() - 0.5) * step, z + (nr() - 0.5) * step)
+        if (l) spots.push({ x, z, ...l })
+        if (spots.length > 4000) break scan
+      }
+      // корабль: корпус с полубаком и ютом, золотой планширь, орудийные порты, мачты с парусами и флагом Лиги
+      const mk = (x: number, z: number, rot: number, len: number): void => {
+        const wd = len * 0.24, hc = ['#4a3220', '#32281f', '#5a3e28'][Math.floor(nr() * 3)]
+        const fx = Math.cos(rot), fz = Math.sin(rot)
+        const P = (u: number): [number, number] => [x + fx * u, z + fz * u]
+        hull.box(x, -0.7, z, len * 0.76, 2.4, wd, hc, rot)
+        const [bx, bz] = P(len * 0.4)
+        hull.box(bx, -0.4, bz, len * 0.26, 2.0, wd * 0.55, hc, rot)
+        const [sx, sz] = P(-len * 0.36)
+        hull.box(sx, 1.6, sz, len * 0.26, 1.8, wd * 0.95, mixHex(hc, '#7a5a38', 0.35), rot)
+        hull.box(x, 1.6, z, len * 0.76, 0.18, wd * 1.02, '#c9a24a', rot)
+        for (let k = -2; k <= 2; k++) {
+          const [gx, gz] = P(k * len * 0.12)
+          hull.box(gx - fz * (wd / 2 + 0.05), 0.4, gz + fx * (wd / 2 + 0.05), 0.9, 0.7, 0.12, '#17120e', rot)
+          hull.box(gx + fz * (wd / 2 + 0.05), 0.4, gz - fx * (wd / 2 + 0.05), 0.9, 0.7, 0.12, '#17120e', rot)
+        }
+        const masts = len > 26 ? 3 : 2
+        for (let m = 0; m < masts; m++) {
+          const [mx, mz] = P((m - (masts - 1) / 2) * len * 0.26)
+          const mh = len * (m === 1 && masts === 3 ? 0.62 : 0.5)
+          pile.box(mx, 1.8, mz, 0.45, mh, 0.45, '#3a2a1e')
+          for (let yv = 0; yv < 2; yv++) sails.box(mx, 3.4 + yv * mh * 0.42, mz, 0.16, mh * 0.36, wd * 1.5 - yv * 1.2, '#efe6d0', rot)
+          if (m === 0) sails.box(mx + fx * 0.2, 1.8 + mh, mz + fz * 0.2, 0.08, 0.9, 1.7, '#2a3f8a', rot)
+        }
+      }
+      // корабли стоят вдоль берега
+      const placed: { x: number; z: number }[] = []
+      const nShips = Math.min(24, 5 + Math.floor(radius / 18))
+      const shipSpots = spots.filter((p) => p.d >= 16 && p.d <= 56).sort(() => nr() - 0.5)
+      for (const p of shipSpots) {
+        if (placed.length >= nShips) break
+        if (placed.some((q) => Math.hypot(q.x - p.x, q.z - p.z) < 28)) continue
+        placed.push(p)
+        mk(p.x, p.z, p.a + Math.PI / 2, 18 + nr() * 14)
+      }
+      // свайные кварталы: дома на помосте над самой водой, мостки к берегу
+      const stiltSpots = spots.filter((p) => p.d >= 5 && p.d <= 14).sort(() => nr() - 0.5)
+      const used: { x: number; z: number }[] = []
+      const nStilt = Math.min(48, 8 + Math.floor(radius / 8))
+      for (const p of stiltSpots) {
+        if (used.length >= nStilt) break
+        if (used.some((q) => Math.hypot(q.x - p.x, q.z - p.z) < 11)) continue
+        if (gridAt(p.x, p.z) > 0) continue
+        used.push(p)
+        const w = 6 + nr() * 3, d = 5 + nr() * 2.5, rot = p.a
+        stilt.box(p.x, DECK - 0.25, p.z, w + 2, 0.3, d + 2, '#6b4f33', rot)
+        for (const [ox, oz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+          const lxp = p.x + Math.cos(rot) * ox * (w / 2 + 0.6) - Math.sin(rot) * oz * (d / 2 + 0.6)
+          const lzp = p.z + Math.sin(rot) * ox * (w / 2 + 0.6) + Math.cos(rot) * oz * (d / 2 + 0.6)
+          pile.box(lxp, -3, lzp, 0.4, DECK + 3.2, 0.4, '#4a3522')
+        }
+        stilt.box(p.x, DECK + 0.05, p.z, w, 2.8, d, ['#efe9d8', '#e4ddc8', '#d8d2bc', '#c8d6e0'][Math.floor(nr() * 4)], rot)
+        roofs.cyl(p.x, DECK + 2.85, p.z, Math.max(w, d) * 0.72, 2.0, 4, ['#2f4a78', '#3a5a8a', '#27405f'][Math.floor(nr() * 3)], 0, false, rot + Math.PI / 4)
+        lit.box(p.x + Math.cos(rot) * (w / 2 + 0.05), DECK + 1.3, p.z + Math.sin(rot) * (w / 2 + 0.05), 0.12, 0.8, 0.9, '#ffffff', rot)
+        stilt.box(p.x + Math.cos(p.a) * p.d * 0.5, DECK - 0.2, p.z + Math.sin(p.a) * p.d * 0.5, p.d + 1.5, 0.2, 1.6, '#6b4f33', p.a)
+      }
+      // маяк на молу — на самой дальней от города кромке воды
+      const lh = spots.filter((p) => p.d >= 12 && p.d <= 30).sort((a, b) => Math.hypot(b.x - center[0], b.z - center[1]) - Math.hypot(a.x - center[0], a.z - center[1]))[0]
+      if (lh) {
+        stilt.box(lh.x + Math.cos(lh.a) * (lh.d / 2), 0.1, lh.z + Math.sin(lh.a) * (lh.d / 2), lh.d + 4, 1.4, 4.2, '#9a968a', lh.a)
+        stilt.box(lh.x, -2, lh.z, 8, 3.4, 8, '#8a867a')
+        roofs.cyl(lh.x, 1.3, lh.z, 3.4, 9, 8, '#f0eada', 2.6, true)
+        roofs.cyl(lh.x, 10.3, lh.z, 2.7, 4, 8, '#2f4a78', 2.7, true)
+        roofs.cyl(lh.x, 14.3, lh.z, 2.9, 0.6, 8, '#3a3a42', 2.9, true)
+        lit.cyl(lh.x, 14.9, lh.z, 1.5, 2.4, 8, '#ffffff', 1.5, true)
+        roofs.cyl(lh.x, 17.3, lh.z, 2.1, 2.6, 8, '#27405f', 0, false)
+      }
+      for (const [bk, m] of [[hull, solidMat], [sails, solidMat], [pile, solidMat], [stilt, solidMat], [roofs, roofMat], [lit, glowMat]] as [Bucket, THREE.Material][]) {
+        const g = bk.geometry()
+        if (!g) continue
+        const mesh = new THREE.Mesh(g, m)
+        mesh.castShadow = m !== glowMat
+        mesh.receiveShadow = m !== glowMat
+        scene.add(mesh)
+        disposable.push(g)
+      }
+    }
   }
 
   // ---------- небо, солнце, звёзды, облака ----------

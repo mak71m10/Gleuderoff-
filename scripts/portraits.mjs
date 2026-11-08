@@ -24,6 +24,7 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const CRYDON_STYLE = 'oil painting, naval admiralty portrait, dark navy uniform with gold braid, warm cabin lamp light, charts and a brass telescope behind, sea light through a window, visible brush strokes, detailed face, half-length portrait'
 const CHEAFARAL_STYLE = 'oil painting, northern republic council portrait, dutch golden age style, candlelight, dark wood and grey stone hall behind, visible brush strokes, detailed face, half-length portrait'
 const HIGHLAND_STYLE = 'oil painting, alpine noble portrait, cold clear mountain light, snowy peaks and pale sky behind, dark wood panelling, visible brush strokes, detailed face, half-length portrait'
 const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge light and brass lamps, carved stone pillars, dark background, visible brush strokes, detailed face, half-length portrait'
@@ -41,6 +42,25 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  // Крайдонианская Лига: элеоны — полуэльфы, чёрные или пепельные волосы, густые бороды у мужчин, морские мундиры
+  'cr-orelien': 'stern old admiral in his sixties, black hair streaked with grey, thick black beard, dark navy admiral coat with heavy gold braid, a rolled chart in his hand, hard honest eyes',
+  'cr-madlen': 'determined woman engineer-admiral in her fifties, black hair in a tight braid streaked with grey, sharp eyes, navy coat with gold braid, a brass dividers in her hand, shipyard blueprint behind',
+  'cr-cassian': 'quiet patient admiral in his sixties, ash-grey hair, short grey beard, thoughtful pale eyes, plain navy coat with silver braid, a ship model on the table',
+  'cr-baptiste': 'jovial merchant-admiral in his fifties, black hair and a thick black beard, laughing eyes, rich navy coat with gold buttons and a heavy gold chain, a purse and a ledger on the table, cunning smile',
+  'cr-kassian-r': 'very old admiral in his eighties, white beard, deep-set eyes, faded navy coat with medals, an old bronze ship compass on a chain in his hand, proud tired face',
+  'cr-ysolde': 'cold calculating woman admiral in her late thirties, black hair pinned tight, dark eyes, navy coat with a white lace collar, a ledger and a pen in hand, guarded expression',
+  'cr-theron': 'burly warlike admiral in his forties, thick black beard, scarred cheek, dark navy coat with gold braid, a sabre at his belt, impatient fierce eyes',
+  'cr-aurel': 'elegant admiral in his late fifties, silver-black hair combed back, trimmed beard, perfect navy coat with an old imperial order on the chest, smooth polite smile',
+  'cr-benedikt': 'young hot-headed shipwright admiral in his thirties, short black hair, stubble, rolled shirt sleeves under a navy coat, sketch of a giant ship in hand, eager eyes',
+  'cr-lysane': 'quiet young woman cartographer in her thirties, ash-black hair in a bun, grey eyes, plain navy dress with ink-stained cuffs, a roll of charts, a brass magnifier',
+  'cr-matteo': 'weathered boatswain in his late forties, short grey-black hair, broad face, a plain dark sailor jacket with one bosun whistle on a chain, rough hands, direct honest look',
+  'cr-agnes': 'stern young woman ship captain in her twenties, black hair in a sailor braid, dark eyes, blue captain coat, weathered skin, a spyglass in hand',
+  'cr-hildebrand': 'young naval captain in his thirties, black hair, light beard, navy officer coat, earnest eyes, a sword at his side',
+  'cr-pascal': 'thin precise treasurer in his forties, black hair, small neat beard, spectacles, navy coat with silver buttons, a ledger and an abacus in front of him',
+  'cr-ansel': 'old lighthouse priest of the Light in his sixties, white hair, kind sad eyes, white and navy vestments with a small golden lamp symbol, a candle in his hands',
+  'cr-ezra': 'weathered pilot in his forties, short brown hair (a human, not elven), clean-shaven, plain blue jacket, a sextant in hand, calm squinting eyes',
+  'cr-sabine': 'quiet young woman captain in her twenties, ash-black hair loose over her shoulders, thoughtful eyes, navy coat, an old chart and a compass in hand',
+  'cr-tibold': 'dry strict naval judge in his fifties, black hair thinning, narrow face, black judge robe with a white collar over navy, a book of the Statute, severe eyes',
   // Республика Чеафарал: протекторы и Совет Двадцати — нордские и имперские лица, простая тёмная одежда, соль, шары, векселя
   'ch-holm': '(no hat, bareheaded:1.4), stern grey-haired soldier in his sixties, short white beard, plain dark officer coat with old brass buttons, scar on the jaw, a pinch of white salt in his hand, tired honest eyes',
   'ch-merta': 'proud elderly woman in her sixties, silver-blond hair in a tight braid crown, grey-blue eyes, heavy dark wool gown with a white salt-crystal brooch, firm wise face',
@@ -357,7 +377,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -373,7 +393,8 @@ for (const e of chars) {
   const farvol = e.base.tags.includes('Фарвольская лига')
   const highland = e.base.tags.includes('Высокогорное Княжество')
   const cheaf = e.base.tags.includes('Республика Чеафарал')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf
+  const crydon = e.base.tags.includes('Крайдонианская Лига')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -390,7 +411,9 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
-  const prompt = cheaf
+  const prompt = crydon
+    ? `${CRYDON_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (half-elf, slightly elongated face, pale olive skin, ${id === 'cr-ezra' ? 'ordinary human' : female ? 'long black hair' : 'black hair, thick beard'}:1.2), ${CUSTOM[id] ?? subject}`
+    : cheaf
     ? `${CHEAFARAL_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, scandinavian features, pale skin:1.25), ${CUSTOM[id] ?? subject}`
     : highland && (dwarfR || gnomeR)
     ? `${FARVOL_STYLE.replace('warm forge light and brass lamps, carved stone pillars', 'mine lamp light, rough rock walls, ore carts')}, ${dwarfR ? `portrait of an (${age > 120 ? 'ancient' : 'adult'} dwarf${female ? ' woman, female, no beard' : ''}:1.45), (short stout broad-shouldered dwarf, huge nose, heavy brow, ruddy weathered european skin:1.35), ` : `portrait of a (short ${female ? 'woman' : 'man'}, fantasy tinkerer, bareheaded:1.35), (big round nose, light eyes, ruddy european skin:1.25), `}${CUSTOM[id] ?? subject}`

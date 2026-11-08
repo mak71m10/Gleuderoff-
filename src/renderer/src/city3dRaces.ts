@@ -93,6 +93,8 @@ const TABLES: Record<string, W> = {
   fvhuman: { imperials: 72, gnomes: 22, dwarves: 6 },
   // Высокогорное Княжество: на Венце — люди, днём — гномы-подъёмщики и слуги; в замках Горной стражи — люди и немного подгорников
   kranz: { imperials: 90, gnomes: 6, dwarves: 4 },
+  // Крайдонианская Лига: элеоны, люди и немного эльфов и прочих — порт, где бывают все
+  cray: { eleons: 58, imperials: 20, gladry: 6, 'high-elves': 5, 'wood-elves': 2, nords: 3, dwarves: 1.5, gnomes: 1.5, tabaxi: 0.8, roma: 1, goliaths: 0.7, dalorians: 2 },
   // Республика Чеафарал: смесь северных народов с имперцами; беженцы Дома Тьмы
   chea: { nords: 38, imperials: 36, gladry: 8, dwarves: 4, gnomes: 3, goliaths: 2, orcs: 1.5, 'dark-elves': 2, dukulites: 2, tieflings: 1.5, skugga: 1, roma: 1 },
   alpine: { imperials: 72, dwarves: 16, gnomes: 12 },

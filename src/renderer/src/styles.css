@@ -1621,6 +1621,52 @@ button.pw-chip:hover { background: var(--panel-2); }
 .urn-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 12px; color: #a89c84; }
 .urn-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 .urn-rules { margin: 10px 0 0; padding-left: 18px; color: #b8ae98; font-size: 13px; }
+.fleet { margin: 16px 0; padding: 14px; border: 1px solid #3a5070; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #1c2c44, #0a121c 80%); color: #e4ecf4; }
+.fleet-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fleet-head small { display: block; color: #8ea4bc; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.fleet-head b { font-family: var(--serif); font-size: 20px; }
+.fleet-status { padding: 6px 12px; border-radius: 8px; background: #14202e; border: 1px solid #34506e; font-size: 14px; }
+.fleet-status.calm { border-color: #8a7a4a; background: #241f14; }
+.fleet-status.storm { border-color: #7a4a8a; background: #201428; box-shadow: 0 0 12px #6a2a8a55; }
+.fleet-status.won { border-color: #c9a04a; background: #2a2418; box-shadow: 0 0 12px #c9a04a44; }
+.fleet-tabs, .fleet-watches { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.fleet-tabs button, .fleet-watches button { padding: 4px 9px; border-radius: 6px; border: 1px solid #34506e; background: #14202e; color: #b8c8da; cursor: pointer; font-size: 13px; }
+.fleet-tabs button small { color: #7a90aa; margin-right: 3px; }
+.fleet-tabs button.on, .fleet-watches button.on { border-color: #c9a04a; background: #2a2618; color: #f4e6b8; }
+.fleet-sea { margin-top: 10px; position: relative; }
+.fleet-svg { width: 100%; display: block; }
+.fleet-wave { fill: none; stroke: #3a6a96; stroke-opacity: .35; stroke-width: 1.2; }
+.fleet-ship { transition: transform 1s cubic-bezier(.5, 0, .3, 1); }
+.fleet-heads { display: grid; gap: 6px; margin-top: 6px; }
+.fleet-cand { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; border: 2px solid transparent; border-radius: 8px; background: color-mix(in srgb, var(--cc) 12%, #0a121c); color: #dfe8f2; cursor: pointer; text-align: center; border-color: color-mix(in srgb, var(--cc) 55%, transparent); }
+.fleet-cand:disabled { cursor: default; }
+.fleet-cand.won { border-color: var(--cc); box-shadow: 0 0 14px color-mix(in srgb, var(--cc) 60%, transparent); }
+.fleet-cand b { font-family: var(--serif); font-size: 14px; color: var(--cc); }
+.fleet-cand small { color: #8ea4bc; font-size: 11px; }
+.fleet-nums { font-size: 12px; color: #b8c8da; } .fleet-nums i { font-style: normal; font-weight: 700; color: #fff; }
+.fleet-face { width: 46px; height: 46px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #1c2c40; font-family: var(--serif); }
+.fleet-face.sm { width: 32px; height: 32px; } .fleet-face img { width: 100%; height: 100%; object-fit: cover; }
+.fleet-winds { margin-top: 10px; display: grid; gap: 6px; }
+.fleet-wind { display: grid; grid-template-columns: 110px 1fr 72px; gap: 8px; align-items: center; }
+.fleet-wind-name { color: #9fb4cc; font-size: 13px; } .fleet-wind small { color: #7a90aa; }
+.fleet-wind-bar { position: relative; display: flex; height: 22px; background: #0a121c; border-radius: 4px; overflow: hidden; }
+.fleet-wind-bar i { display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 11px; color: #0a121c; font-weight: 700; min-width: 0; overflow: hidden; }
+.fleet-wind-bar em { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; opacity: .85; }
+.fleet-note { margin: 10px 0 0; color: #d4dfec; font-size: 14px; }
+.fleet-final { margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid #c9a04a; background: #1a1f26; color: #f0e4c4; font-size: 14px; }
+.fleet-h { font-family: var(--serif); margin: 14px 0 6px; font-size: 18px; color: #f0f5fa; }
+.fleet-row { display: grid; grid-template-columns: 92px 1fr; gap: 8px; align-items: center; margin: 4px 0; }
+.fleet-row-name { color: #8ea4bc; font-size: 12px; }
+.fleet-row-seats { display: flex; flex-wrap: wrap; gap: 3px; }
+.fleet-seat { display: flex; flex-direction: column; align-items: center; gap: 1px; width: 54px; padding: 3px 1px; border: 2px solid var(--bc); border-radius: 6px; background: color-mix(in srgb, var(--bc) 15%, transparent); color: #d4dfec; cursor: pointer; }
+.fleet-seat:disabled { cursor: default; } .fleet-seat-name { font-size: 10px; line-height: 1.1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.fleet-chart { width: 100%; display: block; }
+.fleet-half { stroke: #e04a3a; stroke-dasharray: 5 5; stroke-opacity: .6; }
+.fleet-line { fill: none; stroke: #6a8ab0; stroke-width: 1.5; }
+.fleet-axis { fill: #7a90aa; font-size: 10px; }
+.fleet-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 12px; color: #8ea4bc; }
+.fleet-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.fleet-rules { margin: 10px 0 0; padding-left: 18px; color: #aebed0; font-size: 13px; }
 @media (max-width: 700px) { .urn-body { grid-template-columns: 1fr; } }
 .brood { margin: 16px 0; padding: 14px; border: 1px solid #5a5e66; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #2a2c33, #0e0f12 80%); container-type: inline-size; }
 .brood-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -1809,6 +1855,7 @@ button.pw-chip:hover { background: var(--panel-2); }
   .vault-scales { max-height: calc(100dvh - 150px); }
   .hts-mount { max-height: calc(100dvh - 120px); }
   .urn-stack { height: 150px; } .urn-ball { height: 7.5px; } .urn-face { width: 30px; height: 30px; }
+  .fleet-face { width: 34px; height: 34px; } .fleet-cand small { display: none; } .fleet-wind { grid-template-columns: 76px 1fr 56px; } .fleet-seat { width: 44px; } .fleet-row { grid-template-columns: 64px 1fr; }
   .inspector, .pw-main, .pw-side, .pw-body-one, .codex-list, .codex-detail, .page, .modal, .sc-content, .tool-menu, .tl-picker, .layers-panel, .nav-items, .book-stage {
     overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   }

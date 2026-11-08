@@ -16,6 +16,7 @@ import { BroodView } from './Brood'
 import { VaultView } from './Vault'
 import { HeightsView } from './Heights'
 import { UrnView } from './Urn'
+import { FleetView } from './Fleet'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { renderBody } from './prose'
@@ -257,7 +258,6 @@ function EntryEditor({ id }: { id: string }) {
             {meta.label}
             {!existsAt(entry, date) && <span className="badge danger">не существует на {formatDate(cal, date)}</span>}
             {age !== null && age >= 0 && <span className="badge">{age} лет</span>}
-            {f.tags.includes('черновик') && <span className="badge draft" title="Придумано составителем — проверьте">черновик</span>}
           </div>
           <TextField value={f.name} onChange={(name) => set({ name })} className="entry-name" />
           <TextField value={f.title} placeholder="Титул / подзаголовок" onChange={(title) => set({ title })} className="entry-title" />
@@ -332,6 +332,7 @@ function EntryEditor({ id }: { id: string }) {
                 {f.vault && <VaultView data={f.vault} onOpen={goto} />}
                 {f.heights && <HeightsView data={f.heights} onOpen={goto} />}
                 {f.urn && <UrnView data={f.urn} onOpen={goto} />}
+                {f.fleet && <FleetView data={f.fleet} onOpen={goto} />}
           {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}

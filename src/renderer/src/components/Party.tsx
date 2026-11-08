@@ -153,7 +153,6 @@ export function PartyView({
             {L.name}
             {f.group ? ` · ${f.group}` : ''}
             {parent ? ` · отделение партии` : ''}
-            {P?.draft && <span className="badge draft">черновик</span>}
           </div>
           <h2>{f.name}</h2>
           {P?.motto && <div className="pt-motto">{P.motto}</div>}

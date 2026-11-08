@@ -404,7 +404,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
               <em>{q.count}</em>
             </div>
           ))}
-          <small>Состав — черновик. Клик по жителю покажет, кто это.</small>
+          <small>Клик по жителю покажет, кто это.</small>
         </div>
       )}
       {met && (
