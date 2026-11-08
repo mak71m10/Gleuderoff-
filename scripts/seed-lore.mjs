@@ -20,6 +20,8 @@ import farvolLore from './lore/farvol.mjs'
 import highlandLore from './lore/highland.mjs'
 import cheafaralLore from './lore/cheafaral.mjs'
 import crydonLore from './lore/crydon.mjs'
+import garefordLore from './lore/gareford.mjs'
+import temeriaLore from './lore/temeria.mjs'
 import geo from './lore/geo.mjs'
 
 const WORLD = 'resources/default-world/world.json'
@@ -54,7 +56,9 @@ const E = (id, kind, name, f = {}) => {
       ...(f.vault ? { vault: f.vault } : {}),
       ...(f.heights ? { heights: f.heights } : {}),
       ...(f.urn ? { urn: f.urn } : {}),
-      ...(f.fleet ? { fleet: f.fleet } : {})
+      ...(f.fleet ? { fleet: f.fleet } : {}),
+      ...(f.lantern ? { lantern: f.lantern } : {}),
+      ...(f.threshold ? { threshold: f.threshold } : {})
     },
     history: [],
     from: f.from ?? null,
@@ -157,7 +161,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 33
+world.version = 35
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })
@@ -173,6 +177,8 @@ farvolLore({ E, Y, world })
 highlandLore({ E, Y, world })
 cheafaralLore({ E, Y, world })
 crydonLore({ E, Y, world })
+garefordLore({ E, Y, world })
+temeriaLore({ E, Y, world })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })
 

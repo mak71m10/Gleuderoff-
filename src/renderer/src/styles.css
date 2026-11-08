@@ -1855,6 +1855,8 @@ button.pw-chip:hover { background: var(--panel-2); }
   .vault-scales { max-height: calc(100dvh - 150px); }
   .hts-mount { max-height: calc(100dvh - 120px); }
   .urn-stack { height: 150px; } .urn-ball { height: 7.5px; } .urn-face { width: 30px; height: 30px; }
+  .thr-main { grid-template-columns: minmax(200px, 300px) 1fr; } .thr-vote-keys { gap: 3px; } .thr-face { width: 30px; height: 30px; } .thr-key { grid-template-columns: 18px 30px 1fr; padding: 3px 6px; }
+  .lan-main { grid-template-columns: minmax(200px, 300px) 1fr; } .lan-face { width: 56px; height: 56px; } .lan-candles { grid-template-columns: repeat(5, 1fr); row-gap: 6px; } .lan-card-text p { font-size: 12px; }
   .fleet-face { width: 34px; height: 34px; } .fleet-cand small { display: none; } .fleet-wind { grid-template-columns: 76px 1fr 56px; } .fleet-seat { width: 44px; } .fleet-row { grid-template-columns: 64px 1fr; }
   .inspector, .pw-main, .pw-side, .pw-body-one, .codex-list, .codex-detail, .page, .modal, .sc-content, .tool-menu, .tl-picker, .layers-panel, .nav-items, .book-stage {
     overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
@@ -1863,3 +1865,80 @@ button.pw-chip:hover { background: var(--panel-2); }
   .codex-list > :last-child { margin-bottom: calc(40px + env(safe-area-inset-bottom)); }
 }
 @keyframes slide-in { from { transform: translateX(30px); opacity: 0; } }
+
+/* ---- Круг Светоча (Княжества Гарефорда) ---- */
+.lan { margin: 16px 0; padding: 14px; border: 1px solid #5a5a3a; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #26301f, #0c110d 80%); color: #ece8d4; }
+.lan-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lan-head small { display: block; color: #a8a888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.lan-head b { font-family: var(--serif); font-size: 20px; display: block; }
+.lan-sub { color: #b8b898; font-size: 13px; }
+.lan-status { padding: 6px 12px; border-radius: 8px; background: #1a2016; border: 1px solid #5a6a3a; font-size: 14px; }
+.lan-status.pledge { border-color: #c9a24a; background: #262012; }
+.lan-status.dark { border-color: #a04a3a; background: #281612; box-shadow: 0 0 12px #8a2a1a55; }
+.lan-slider { display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; color: #a8a888; font-size: 13px; }
+.lan-slider input { flex: 1; accent-color: #e8b84a; }
+.lan-main { display: grid; grid-template-columns: minmax(240px, 380px) 1fr; gap: 14px; align-items: center; }
+.lan-wheel { width: 100%; max-width: 400px; display: block; margin: 0 auto; overflow: visible; }
+.lan-arc { cursor: pointer; } .lan-arc:hover path:first-child { filter: brightness(1.25); }
+.lan-crest { cursor: pointer; } .lan-seat-name { fill: #b8b898; font-size: 9px; font-family: var(--serif); }
+.lan-year { fill: #f4e6b8; font-size: 20px; font-family: var(--serif); font-weight: 700; } .lan-ring-name { fill: #9a9a7a; font-size: 9px; }
+.lan-flame { animation: lan-flick 1.2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+.lan-flame-glow { animation: lan-flick 1.6s ease-in-out infinite alternate; }
+@keyframes lan-flick { from { opacity: .75; } to { opacity: 1; } }
+.lan-card { display: flex; gap: 12px; align-items: flex-start; padding: 10px; border: 1px solid #4a5a3a; border-radius: 8px; background: #141a12; }
+.lan-face { flex: none; width: 76px; height: 76px; border-radius: 50%; overflow: hidden; border: 2px solid #c9a24a; background: #1c241a; color: #f4e6b8; font-family: var(--serif); font-size: 26px; cursor: pointer; padding: 0; }
+.lan-face:disabled { cursor: default; } .lan-face img { width: 100%; height: 100%; object-fit: cover; }
+.lan-card-text small { display: block; color: #a8a888; font-size: 12px; } .lan-card-text b { font-family: var(--serif); font-size: 17px; display: block; }
+.lan-years { display: block; color: #c8c0a0; font-size: 12px; } .lan-card-text p { margin: 6px 0 0; font-size: 13px; color: #d8d4be; }
+.lan-reset { margin-top: 6px; padding: 3px 8px; border: 1px solid #5a6a3a; border-radius: 6px; background: #1a2016; color: #d8d4be; cursor: pointer; font-size: 12px; }
+.lan-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 10px 0 0; font-size: 12px; color: #a8a888; }
+.lan-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.lan-key-chain { background: repeating-linear-gradient(90deg, #bbb 0 3px, transparent 3px 6px) !important; border: 1px solid #888; } .lan-key-skip { background: repeating-linear-gradient(45deg, #444 0 2px, #16161c 2px 4px) !important; } .lan-key-gold { background: #c9a24a !important; }
+.lan-h { font-family: var(--serif); margin: 14px 0 6px; font-size: 18px; color: #f6f2e0; }
+.lan-note { margin: 8px 0 0; color: #d8d4be; font-size: 14px; } .lan-pass { border-left: 3px solid #d0604a; padding-left: 8px; }
+.lan-final { margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid #c9a24a; background: #1a1c14; color: #f0e4c4; font-size: 14px; }
+.lan-pledges { display: grid; gap: 4px; }
+.lan-pledge { display: grid; grid-template-columns: 44px 1fr auto; gap: 2px 10px; padding: 6px 8px; border-radius: 6px; background: #141a12; border: 1px solid #333c28; cursor: pointer; font-size: 13px; }
+.lan-pledge:hover { border-color: #c9a24a; } .lan-pledge-y { font-family: var(--serif); color: #f4e6b8; grid-row: span 2; align-self: center; }
+.lan-pledge-w { color: #b8b898; } .lan-pledge-s { grid-row: span 2; align-self: center; padding: 1px 8px; border: 1px solid; border-radius: 10px; font-size: 12px; }
+.lan-pledge small { grid-column: 2; color: #8a8a70; }
+.lan-removal-tabs { display: flex; flex-wrap: wrap; gap: 4px; } .lan-removal-tabs button { padding: 4px 9px; border-radius: 6px; border: 1px solid #4a5a3a; background: #141a12; color: #c8c0a0; cursor: pointer; font-size: 13px; } .lan-removal-tabs button small { color: #8a8a70; margin-right: 3px; } .lan-removal-tabs button.on { border-color: #c9a24a; background: #262012; color: #f4e6b8; }
+.lan-candles { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; margin-top: 8px; }
+.lan-candle { display: flex; flex-direction: column; align-items: center; } .lan-candle small { font-size: 9px; color: #8a8a70; max-width: 100%; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.lan-candle.keep small { color: #e8dcb0; }
+.lan-rules { margin: 10px 0 0; padding-left: 18px; color: #b0b090; font-size: 13px; }
+@media (max-width: 560px) { .lan-main { grid-template-columns: 1fr !important; } }
+
+/* ---- Порог (Королевство Темерия) ---- */
+.thr { margin: 16px 0; padding: 14px; border: 1px solid #5a5a2a; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #2a2a16, #0e0e08 80%); color: #ece8d0; }
+.thr-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.thr-head small { display: block; color: #a8a888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; } .thr-head b { font-family: var(--serif); font-size: 20px; }
+.thr-status { padding: 6px 12px; border-radius: 8px; background: #1c1c10; border: 1px solid #5a5a2a; font-size: 14px; } .thr-status.hungry { border-color: #a04a3a; background: #281612; } .thr-status.big { border-color: #c9a24a; background: #262012; box-shadow: 0 0 12px #c9a24a44; }
+.thr-tabs, .thr-walk-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.thr-tabs button, .thr-walk-tabs button, .thr-decs button { padding: 4px 10px; border-radius: 6px; border: 1px solid #4a4a2a; background: #16160c; color: #c8c0a0; cursor: pointer; font-size: 13px; }
+.thr-tabs button.on, .thr-walk-tabs button.on, .thr-decs button.on { border-color: #c9a24a; background: #2a2412; color: #f4e6b8; }
+.thr-main { display: grid; grid-template-columns: minmax(240px, 400px) 1fr; gap: 14px; align-items: center; margin-top: 8px; }
+.thr-arch { width: 100%; max-width: 420px; display: block; margin: 0 auto; overflow: visible; }
+.thr-door-word { fill: #3a2410; font-family: var(--serif); font-size: 26px; font-weight: 700; } .thr-door-sub { fill: #5a3a18; font-size: 11px; }
+.thr-seat { fill: #b8b898; font-size: 9px; font-family: var(--serif); } .thr-hearth { cursor: pointer; }
+.thr-flame-glow { animation: thr-flick 1.5s ease-in-out infinite alternate; } .thr-hearth.doubt .thr-flame-glow { animation-duration: .5s; }
+@keyframes thr-flick { from { opacity: .5; } to { opacity: 1; } }
+.thr-keys { display: grid; gap: 6px; }
+.thr-key { display: grid; grid-template-columns: 22px 38px 1fr; gap: 8px; align-items: center; padding: 5px 8px; border: 1px solid color-mix(in srgb, var(--kc) 55%, transparent); border-radius: 8px; background: color-mix(in srgb, var(--kc) 10%, #0e0e08); color: #e4e0c8; cursor: pointer; text-align: left; }
+.thr-key:disabled { cursor: default; } .thr-key-text small { display: block; color: #a8a888; font-size: 11px; } .thr-key-text b { font-family: var(--serif); font-size: 14px; color: var(--kc); display: block; } .thr-key-text i { color: #8a8a70; font-size: 11px; font-style: normal; }
+.thr-face { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; background: #1c1c10; border: 1px solid #5a5a2a; display: flex; align-items: center; justify-content: center; font-family: var(--serif); } .thr-face img { width: 100%; height: 100%; object-fit: cover; }
+.thr-slider { display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; color: #a8a888; font-size: 13px; } .thr-slider input { flex: 1; accent-color: #e8b84a; }
+.thr-jar { display: grid; gap: 4px; } .thr-jar small { color: #8a8a70; }
+.thr-jar-bar { position: relative; display: block; height: 18px; background: #0a0a06; border-radius: 4px; overflow: hidden; border: 1px solid #3a3a1a; } .thr-jar-bar i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #8a6a24, #e8c860); }
+.thr-jar-bar em { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; opacity: .8; }
+.thr-h { font-family: var(--serif); margin: 14px 0 6px; font-size: 18px; color: #f6f2e0; }
+.thr-decs { display: flex; flex-wrap: wrap; gap: 4px; } .thr-decs small { color: #8a8a70; margin-right: 3px; }
+.thr-vote { margin-top: 8px; padding: 10px; border: 1px solid #3a3a1a; border-radius: 8px; background: #121208; } .thr-vote b { font-family: var(--serif); font-size: 16px; display: block; } .thr-vote > span { color: #a8a888; font-size: 12px; }
+.thr-vote-keys { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; } .thr-v { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px; border-radius: 6px; background: #181810; text-align: center; font-size: 11px; } .thr-v small { color: #8a8a70; } .thr-v span { color: #d8d4be; } .thr-v i { font-style: normal; font-weight: 700; }
+.thr-note { margin: 8px 0 0; color: #d8d4be; font-size: 14px; }
+.thr-doorlist { display: grid; gap: 4px; margin-top: 8px; } .thr-door-row { display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; align-items: center; padding: 4px 8px; border: 1px solid #3a3a1a; border-radius: 6px; background: #14140c; color: #e4e0c8; cursor: pointer; text-align: left; } .thr-door-row i { width: 12px; height: 12px; border-radius: 50%; } .thr-door-row small { color: #a8a888; }
+.thr-chart { width: 100%; display: block; } .thr-line { fill: none; stroke: #e8c860; stroke-width: 2; } .thr-line-th { stroke: #d0604a; stroke-dasharray: 4 4; stroke-opacity: .7; } .thr-axis { fill: #8a8a70; font-size: 9px; }
+.thr-share { display: grid; grid-template-columns: 46px 1fr 60px; gap: 8px; align-items: center; margin: 4px 0; font-size: 13px; } .thr-share-y { font-family: var(--serif); color: #f4e6b8; } .thr-share-bar { display: flex; height: 18px; border-radius: 4px; overflow: hidden; } .thr-share-bar i { display: block; height: 100%; }
+.thr-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 8px 0 0; font-size: 12px; color: #a8a888; } .thr-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.thr-rules { margin: 10px 0 0; padding-left: 18px; color: #b0b090; font-size: 13px; }
+@media (max-width: 560px) { .thr-main { grid-template-columns: 1fr !important; } }

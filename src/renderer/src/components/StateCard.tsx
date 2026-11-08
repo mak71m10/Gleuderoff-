@@ -16,6 +16,8 @@ import { VaultView } from './Vault'
 import { HeightsView } from './Heights'
 import { UrnView } from './Urn'
 import { FleetView } from './Fleet'
+import { LanternView } from './Lantern'
+import { ThresholdView } from './Threshold'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
@@ -78,7 +80,7 @@ function StateCardBody({ id }: { id: string }) {
   const dynastyEntry = world.entries.find((e) => e.id === f.dynastyId)
   const dynastyCouncil = dynastyEntry ? resolve(dynastyEntry, date).council : undefined
   // органы власти без парламента (Сабельная ставка, Совет Десяти графа): организации этой страны с пометкой «Государственный орган»
-  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.vault || e.base.heights || e.base.urn || e.base.fleet || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
+  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.vault || e.base.heights || e.base.urn || e.base.fleet || e.base.lantern || e.base.threshold || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
   const religions = world.entries.filter((e) => e.kind === 'religion').map((e) => ({ id: e.id, name: e.base.name }))
   const otherStates = world.states.filter((s) => s.id !== id).map((s) => ({ id: s.id, name: resolve(s, date).name }))
   const places = world.places.filter((p) => existsAt(p, date) && resolve(p, date).stateId === id)
@@ -324,6 +326,8 @@ function StateCardBody({ id }: { id: string }) {
                 {of.heights && <HeightsView data={of.heights} onOpen={open} />}
                 {of.urn && <UrnView data={of.urn} onOpen={open} />}
                 {of.fleet && <FleetView data={of.fleet} onOpen={open} />}
+                {of.lantern && <LanternView data={of.lantern} onOpen={open} />}
+                {of.threshold && <ThresholdView data={of.threshold} onOpen={open} />}
                 {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
               </section>
             )

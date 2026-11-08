@@ -93,6 +93,10 @@ const TABLES: Record<string, W> = {
   fvhuman: { imperials: 72, gnomes: 22, dwarves: 6 },
   // Высокогорное Княжество: на Венце — люди, днём — гномы-подъёмщики и слуги; в замках Горной стражи — люди и немного подгорников
   kranz: { imperials: 90, gnomes: 6, dwarves: 4 },
+  // Королевство Темерия: беглецы Империи — имперцы, лесные гладры и нерегулярные пришельцы
+  temer: { imperials: 84, gladry: 5, nords: 3, dwarves: 2, gnomes: 1.5, 'wood-elves': 1.5, roma: 1, dalorians: 1 },
+  // Княжества Гарефорда: горные имперцы, немного дварфов, гномов, нордов и гладров
+  garef: { imperials: 86, dwarves: 3, gnomes: 2, nords: 3, gladry: 3, dalorians: 1 },
   // Крайдонианская Лига: элеоны, люди и немного эльфов и прочих — порт, где бывают все
   cray: { eleons: 58, imperials: 20, gladry: 6, 'high-elves': 5, 'wood-elves': 2, nords: 3, dwarves: 1.5, gnomes: 1.5, tabaxi: 0.8, roma: 1, goliaths: 0.7, dalorians: 2 },
   // Республика Чеафарал: смесь северных народов с имперцами; беженцы Дома Тьмы

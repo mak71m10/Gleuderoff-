@@ -17,6 +17,8 @@ import { VaultView } from './Vault'
 import { HeightsView } from './Heights'
 import { UrnView } from './Urn'
 import { FleetView } from './Fleet'
+import { LanternView } from './Lantern'
+import { ThresholdView } from './Threshold'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { renderBody } from './prose'
@@ -333,6 +335,8 @@ function EntryEditor({ id }: { id: string }) {
                 {f.heights && <HeightsView data={f.heights} onOpen={goto} />}
                 {f.urn && <UrnView data={f.urn} onOpen={goto} />}
                 {f.fleet && <FleetView data={f.fleet} onOpen={goto} />}
+                {f.lantern && <LanternView data={f.lantern} onOpen={goto} />}
+                {f.threshold && <ThresholdView data={f.threshold} onOpen={goto} />}
           {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}

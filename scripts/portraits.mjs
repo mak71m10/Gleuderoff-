@@ -24,6 +24,8 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const TEMERIA_STYLE = 'oil painting, medieval forest kingdom portrait, warm hearth firelight in a half-timbered hall, an open oak door with a lantern glowing behind, green and gold accents, visible brush strokes, detailed face, half-length portrait'
+const GAREFORD_STYLE = 'oil painting, alpine mountain-prince portrait, candlelit stone hall with dark oak panelling, warm lantern glow, a small brass lantern flame in the background, visible brush strokes, detailed face, half-length portrait'
 const CRYDON_STYLE = 'oil painting, naval admiralty portrait, dark navy uniform with gold braid, warm cabin lamp light, charts and a brass telescope behind, sea light through a window, visible brush strokes, detailed face, half-length portrait'
 const CHEAFARAL_STYLE = 'oil painting, northern republic council portrait, dutch golden age style, candlelight, dark wood and grey stone hall behind, visible brush strokes, detailed face, half-length portrait'
 const HIGHLAND_STYLE = 'oil painting, alpine noble portrait, cold clear mountain light, snowy peaks and pale sky behind, dark wood panelling, visible brush strokes, detailed face, half-length portrait'
@@ -42,6 +44,80 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  // Королевство Темерия: беглецы Империи, северноевропейские лица
+  'tm-foltest': 'sturdy grey-haired king in his sixties, short grey beard, hoarse weathered face, green velvet coat with a gold door emblem, a plain gold circlet-free head, an oak door and a bowl of soup on the table, tired kind eyes',
+  'tm-berta': 'kind gray-haired queen-hostess in her sixties, a long grey braid, red work-worn hands, simple green gown with a gold brooch, ladling soup from a pot, warm calm face',
+  'tm-adelheid': 'clever young woman in her late twenties, dark blonde hair in a practical braid, green dress with ink on her fingers, ledgers and papers on a table, steady eyes',
+  'tm-richard': 'cheerful bold young man in his early twenties, tousled brown hair, clean shaven, green and gold surcoat, a long sword at his hip, bright reckless smile',
+  'tm-erich': 'thin clean-shaven chancellor in his late forties, brown hair combed flat, immaculate blue coat with a silver book badge, a quill and a neat seal, cool precise eyes',
+  'tm-lothar': 'huge loud marshal in his mid forties, brown beard, green tabard with crossed swords, mail shirt, big scarred hands, stubborn jaw',
+  'tm-gisela': 'quick sharp-tongued woman treasurer in her early forties, auburn hair pinned up, amber and brown dress with golden scales brooch, a ledger and coins, lively cynical eyes',
+  'tm-mathilde': 'tall dry woman in her early fifties, grey hair pulled back, colourless eyes, dark green dress with an oak leaf pin, a thick book under her arm',
+  'tm-konrad': 'broad-shouldered forest man in his mid fifties, grey stubble, brown leather doublet with a golden axe badge, mighty arms, rough weathered face',
+  'tm-alberich': 'elderly chancellor in his early seventies, white hair, thin face, dark blue robe with a book badge, a quill in hand, an unreadable guilty look',
+  'tm-siegfried': 'old war hero in his sixties, white beard, scar across his brow, green surcoat with crossed swords, medals, sitting in an armchair',
+  'tm-reinhold': 'upright old treasurer in his seventies, short white hair, red-brown coat with a broken chain pin, a key in his hand, proud honest eyes',
+  'tm-hildebrand': 'gentle old man in his seventies, wispy white hair, long green robe with an oak leaf, a candle and a book, wise tired smile',
+  'tm-ottokar': 'lean man in his mid fifties, thin grey hair, dark green hooded cloak, whispering sly look, a lantern with a hidden door behind him',
+  'tm-gudrun': 'proud woman in her mid sixties, grey hair in a tight braid, dark red dress, a single iron chain link on her wrist, hard unforgiving eyes',
+  'tm-ansgar': 'bald calm abbot in his seventies, grey monastic robe with a golden door badge, steady hands, mild face',
+  'tm-berengar': 'stout cheerful priest in his mid sixties, grey tonsure, grey robe with a golden door, a bowl of soup and a candle',
+  'tm-hedwig': 'ink-stained woman scribe in her late thirties, brown hair, ink smudge on her cheek, plain green dress, a ledger and quills, serious eyes',
+  'tm-wolfram': 'strong captain in his early forties, short brown hair, loud mouth open as if shouting, green tabard with a gold door, spear and a horn on his belt',
+  'tm-ilse': 'lean tough woman in her mid thirties, grey hood and cloak, dark hair, scar across her chin, a wolfish grin',
+  'tm-gerhard': 'polished ambassador in his fifty, well-groomed dark hair, black and silver coat, a thin polite smile, white gloves',
+  'tm-valerian': 'tough old ex-general in his mid sixties, grey crew cut, bare scarred face, plain linen shirt, holding a cabbage, calm veteran eyes',
+  'tm-hagen': 'round red-faced brewer in his late forties, brown beard, apron, a big tankard, laughing eyes',
+  'tm-jutta': 'weathered forest woman in her late thirties, long brown hair, leather hunting jacket, a bow on her back, sharp quiet eyes',
+  'tm-bruno': 'thin red-haired wandering priest in his late thirties, rough grey robe, a lantern, cheerful tired face, a bundle on his back',
+  'tm-clara': 'young woman cartographer in her mid twenties, dark hair tied back, blue sleeves, brass compasses and maps on the table, dreamy clever eyes',
+  'tm-dietrich': 'young scribe in his twenties, brown hair, fanatically neat, grey robe with a golden door, a pen and a scroll',
+  'tm-agnes': 'dry quick woman in her mid thirties, short dark hair, green tabard with crossed swords, mail, a watch-tower behind her',
+  'tm-gero': 'old village elder in his sixties, white stubble, rough brown jacket, blackened wooden post behind him, haunted calm eyes',
+  'tm-ottilie': 'strong young woman blacksmith in her late teens, short dark hair, soot on her cheek, a chain around her neck, leather apron, fierce eyes',
+  'tm-kasimir': 'young refugee man in his late twenties, thin face, brown hair, ragged coat, tired hopeful eyes, an open door behind him',
+  'tm-wilhelm': 'sad-faced chronicler in his early fifties, brown hair with grey, ink-stained fingers, dark green robe, a thick manuscript, steady hand',
+  // Княжества Гарефорда: горные имперцы, северноевропейские лица
+  'gf-ulrich1': 'stern mountain warlord in his early fifties, grey-streaked brown hair, thick beard, black eagle on a silver surcoat over chainmail, a small brass lantern in his hand, scar over one eye',
+  'gf-ulrich2': 'tall silent lord in his mid thirties, dark brown hair, short beard, black surcoat with a silver eagle, steel gorget, cold grey eyes, spear rack behind',
+  'gf-anselm': 'gentle scholarly prince-bishop in his sixties, thin white hair, mild face, ivory robe with golden flame embroidery, a candle in his hand',
+  'gf-hildegard': 'strict kind abbess in her late forties, grey hair under a plain white wimple, ivory and gold robes, a gold flame pendant, a candle and a thick ledger',
+  'gf-gertrud': 'thin upright old woman in her sixties, grey hair, grey robe with a golden flame on the chest, soot on the sleeves, tired hollow eyes, an oil lamp',
+  'gf-jakob': 'heavy shrewd banker in his sixties, grey hair, clean shaven, dark blue velvet coat with a golden key brooch, ledger and quill, calculating eyes',
+  'gf-ida': 'calm sharp woman in her early thirties, dark blonde hair in a braid, navy dress with a gold key brooch, pale face, steady cool eyes, a brass lantern on the table, ledgers behind',
+  'gf-bertold': 'hot-headed lord in his early forties, (bare head, uncovered red-brown hair, no cap, no hat:1.4), short beard, grey coat with a red hammer badge, soot-stained hands, bold but uncertain eyes',
+  'gf-hans': 'worried young lord in his early twenties, brown hair, clean shaven, grey coat with a red hammer badge, a mining lamp, tired eyes, mine plans behind',
+  'gf-otto': 'heavy grey-haired mountain prince in his fifties, thick grey moustache, green coat with a silver mountain brooch, a silver ring, stubborn proud face',
+  'gf-liutpold': 'battle-scarred border knight in his late thirties, dark hair, three scars on his cheek, dark green surcoat with a silver wolf, chainmail, grim face',
+  'gf-walter': 'young lord in his early thirties, dark hair, stubble, dark green coat with a silver wolf, worn and wronged expression, a sealed letter in his hand',
+  'gf-adela': 'hard-faced woman in her late twenties, dark hair in a tight braid, dark green leather jerkin with a silver wolf, scar on her chin, mountain pass behind',
+  'gf-gunther': 'weathered forester-prince in his late forties, brown hair, grey-brown beard, brown coat with a golden tree brooch, oak leaf in his hand, honest tired face',
+  'gf-konrad': 'gaunt man in his late thirties, brown hair, black ribbon on his sleeve, brown coat with a golden tree brooch, haunted resentful eyes',
+  'gf-margareta': 'shrewd merchant-princess in her fifties, silver-streaked auburn hair, blue gown with a white tower brooch, rings, scales and a ledger, sly clever smile',
+  'gf-elsbeth': 'bright young woman in her early twenties, auburn hair, blue dress, a sketchbook with towers drawn on it, lively eyes',
+  'gf-ruprecht': 'dry precise soldier in his late forties, short grey hair, grey moustache, steel gorget over a dark coat, a command baton, battle map behind',
+  'gf-hanna': 'loud sturdy woman in her late twenties, short brown hair, leather and mail, a signal horn on her belt, wind-burnt face, mountain tower behind',
+  'gf-ortwin': 'thin quiet chancellor in his sixties, grey hair, ink-stained fingers, black clerk robe with an iron chain, spectacles, stacks of ledgers',
+  'gf-leopold': 'round affable steward in his forties, brown hair, pleasant smile, dark blue coat with golden buttons, a ledger, calculating eyes',
+  'gf-gerwin': 'burly smith-master in his mid forties, brown beard, leather apron, soot on his face, a copper lantern frame in his hands, forge glow',
+  'gf-irmgard': 'curious novice nun in her late teens, brown hair under a white coif, grey robe with a small gold flame, a candle, wide eyes',
+  'gf-dietmar': 'broad hoarse timber merchant in his early forties, brown beard, leather vest, river rafts of logs behind, big hands',
+  'gf-brigitta': 'sharp harbour mistress in her mid thirties, dark hair tied back, weathered face, dark blue coat, a ring of keys, ships and docks behind',
+  'gf-baldur': 'tall officer in his early forties, short dark hair, a scar on his cheek, dark coat with a grey scarf at the neck, cold loyal eyes',
+  'gf-tilman': 'lean wandering preacher in his mid twenties, long brown hair, rough grey robe, a small lantern, fiery sincere eyes',
+  'gf-jorg': 'old miner foreman in his fifties, grey stubble, huge hands, a miner lamp, soot on his face',
+  'gf-mechtild': 'sharp-tongued young woman in her late teens, dark hair, black dress with a silver eagle brooch, haughty eyes, steel hairpins',
+  'gf-reinhard': 'nondescript man in his late thirties, mouse-brown hair, plain grey cloak, forgettable face, watchful eyes',
+  'gf-ursula': 'kind herbalist woman in her forties, brown hair with grey, green dress, herb bundles, gentle tired eyes',
+  'gf-albrecht': 'grumpy old master mason in his sixties, (bare white-haired head, no hat, no cap:1.4), tool belt, a plumb line and tower drawings, grey stone behind',
+  'gf-volker': 'stern castellan in his mid forties, short dark hair, blue tabard with a white tower, keys at his belt, loyal face',
+  'gf-eberhard': 'bookish monk-chronicler in his fifties, tonsure, grey robe, ink-stained fingers, a quill and a thick manuscript, candle',
+  'gf-sigmund': 'tough mercenary captain in his early thirties, short black hair, stubble, black coat, a notched sword, hard eyes',
+  'gf-luitgard': 'dignified herald woman in her fifties, grey hair, black and gold tabard with ten small shields, a white candle in her hand',
+  'gf-eyvind': '(norwegian norse hostage:1.3), young man in his late teens, long blond hair, pale freckled face, plain wool tunic with knotwork, proud wary eyes',
+  'gf-benedikt': 'severe judge in his late fifties, grey hair, black robes, a signet ring, never smiling, a heavy law book',
+  'gf-matthias': 'dreamy young painter in his late twenties, wavy brown hair, paint-stained fingers, dark blue coat, a sketch of towers',
+  'gf-kunigunde': 'sharp matron in her late forties, (bare head, uncovered grey-streaked brown hair, no hat, no cap:1.4), green dress with silver trim, a bunch of keys, mine ledgers, quiet cunning eyes',
   // Крайдонианская Лига: элеоны — полуэльфы, чёрные или пепельные волосы, густые бороды у мужчин, морские мундиры
   'cr-orelien': 'stern old admiral in his sixties, black hair streaked with grey, thick black beard, dark navy admiral coat with heavy gold braid, a rolled chart in his hand, hard honest eyes',
   'cr-madlen': 'determined woman engineer-admiral in her fifties, black hair in a tight braid streaked with grey, sharp eyes, navy coat with gold braid, a brass dividers in her hand, shipyard blueprint behind',
@@ -377,7 +453,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -394,7 +470,9 @@ for (const e of chars) {
   const highland = e.base.tags.includes('Высокогорное Княжество')
   const cheaf = e.base.tags.includes('Республика Чеафарал')
   const crydon = e.base.tags.includes('Крайдонианская Лига')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon
+  const gareford = e.base.tags.includes('Княжества Гарефорда')
+  const temeria = e.base.tags.includes('Королевство Темерия')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -411,7 +489,11 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
-  const prompt = crydon
+  const prompt = temeria
+    ? `${TEMERIA_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    : gareford
+    ? `${GAREFORD_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), ${id === 'gf-eyvind' ? '' : '(northern european, alpine german features, pale skin:1.25), '}${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    : crydon
     ? `${CRYDON_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (half-elf, slightly elongated face, pale olive skin, ${id === 'cr-ezra' ? 'ordinary human' : female ? 'long black hair' : 'black hair, thick beard'}:1.2), ${CUSTOM[id] ?? subject}`
     : cheaf
     ? `${CHEAFARAL_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, scandinavian features, pale skin:1.25), ${CUSTOM[id] ?? subject}`

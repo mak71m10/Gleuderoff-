@@ -70,6 +70,10 @@ export const STYLES: Record<string, Style> = {
   dwarf: { plaster: ['#8d8579', '#7d766c', '#9a9184', '#867c6e'], roof: ['#5b5550', '#4f4a45', '#625a52', '#56504a'], timber: '#3a2e24', stone: '#6a645c', wall: '#7a746a', shutter: ['#3b3633'], pitch: 0.5, framed: false, floors: 0, grass: '#6a7454', grass2: '#737c5a', dirt: '#8a8070', pave: '#7a756c', lit: 0.45, conifer: 0.95, tower: '#4a4440' },
   // Высокогорное Княжество: альпийские дома — белёный камень внизу, тёмное дерево наверху, широкие крыши из тёмного гонта;
   // kranz — то же на каменной платформе вокруг вершины (Венец), alpine — замки и городки людей ниже
+  // Княжества Гарефорда: горный фахверк — белёная штукатурка, тёмный дуб, крутые сланцевые и красно-бурые крыши, медно-зелёные шпили
+  garef: { plaster: ['#f1ece0', '#e8dfcc', '#f4efe4', '#ddd3bf', '#ece4d2'], roof: ['#4a4650', '#3e3a44', '#7a3a2a', '#5a4a40', '#6a3226'], timber: '#2f2014', stone: '#8c8a82', wall: '#a6a298', shutter: ['#2f5a3a', '#7a2a22', '#c8a040'], pitch: 1.05, framed: true, floors: 1, grass: '#6a8c4a', grass2: '#76984f', dirt: '#9a8a68', pave: '#9e988a', lit: 0.45, conifer: 0.8, tower: '#4f8a74' },
+  // Королевство Темерия: средневековый имперский фахверк — белёные стены на каменных низах, зелёные и тёмно-красные крыши
+  temer: { plaster: ['#f0e8d4', '#e6dcc0', '#f4ecdc', '#dccfb0', '#ece2c8'], roof: ['#3f6a4a', '#2f5a3c', '#6a2a22', '#7a3328', '#4a5a3a'], timber: '#3a2614', stone: '#8f8a7c', wall: '#a8a496', shutter: ['#2f5a3a', '#7a2a22', '#c8a040'], pitch: 0.98, framed: true, floors: 1, grass: '#6f9a4a', grass2: '#7aa650', dirt: '#b09a72', pave: '#a8a08a', lit: 0.45, conifer: 0.5, tower: '#3f7a54' },
   alpine: { plaster: ['#efe9dc', '#e6dccb', '#f3eee4', '#d9cfbd', '#e9e1d0'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#6a4a34', '#46434a'], timber: '#3a2416', stone: '#8a877e', wall: '#a8a49a', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#6f8f4e', grass2: '#7a9a56', dirt: '#9a8a6a', pave: '#9a958a', lit: 0.4, conifer: 1, tower: '#3f4a5a' },
   kranz: { plaster: ['#f4f0e8', '#ebe5d8', '#f7f4ee', '#e2dacb', '#efe8da'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#3a3a42', '#46434a'], timber: '#3a2416', stone: '#a9a598', wall: '#c8c3b6', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#a6a294', grass2: '#b0ac9e', dirt: '#b8b2a2', pave: '#c4bfb2', lit: 0.4, conifer: 1, tower: '#2a3a5a' },
   // Республика Чеафарал: имперский фахверк на нордской земле — светлая штукатурка, тёмные нордские крыши, серый камень
@@ -1610,9 +1614,11 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   // ---------- площади: колодец, прилавки ----------
   const vendors: { x: number; z: number; a: number }[] = []
   const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
+  // Гарефорд: Светочная башня всегда встаёт на самую большую площадь
+  const garefSq = (S.style === 'garef' || S.style === 'temer') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
-    if (area > 500) {
+    if (area > 500 || si === garefSq) {
       // большая площадь: фонтан или памятник на постаменте; в гарде Креита — жертвенный камень, кострище и резные столбы богов
       if (S.style === 'viking') {
         ch.solid.box(cx, y, cz, 2.4, 1.2, 1.6, st.stone, si)
@@ -1623,6 +1629,49 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           ch.solid.cyl(px, y, pz, 0.38, 4.2, 6, st.timber)
           ch.solid.box(px, y + 3.3, pz, 0.9, 0.8, 0.9, '#6a2a1a', a)
         }
+      } else if (si === garefSq && S.style === 'temer') {
+        // Очаг Крова Темерии: зал с вечно открытым порталом, фонарь над дверью, печная башня с огнём и скамьи приюта
+        ch.solid.box(cx, y, cz, 13, 1.0, 13, mixHex(st.stone, '#000', 0.1), si)
+        ch.solid.box(cx, y + 1.0, cz, 12, 5.2, 12, st.plaster[0], si)
+        ch.solid.box(cx, y + 4.1, cz, 12.3, 0.45, 12.3, st.timber, si)
+        for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) ch.solid.box(cx + dx * 6, y + 1.0, cz + dz * 6, 0.55, 5.2, 0.55, st.timber, si)
+        for (let k = -1; k <= 1; k++) { ch.solid.box(cx + k * 3.2, y + 1.0, cz - 6.02, 0.3, 5.2, 0.12, st.timber, si); ch.solid.box(cx - 6.02, y + 1.0, cz + k * 3.2, 0.12, 5.2, 0.3, st.timber, si) }
+        ch.roof.cyl(cx, y + 6.2, cz, 9.4, 5.6, 4, st.roof[0], 0, false, si + Math.PI / 4)
+        // портал: вечно открытая дверь, свет изнутри, лента-притолока и фонарь над дверью
+        ch.glow.box(cx + 6.03, y + 1.0, cz, 0.12, 3.6, 3.0, '#ffffff', si)
+        ch.solid.box(cx + 6.05, y + 4.6, cz, 0.5, 0.5, 4.4, st.timber, si)
+        for (const sz of [-1, 1]) ch.solid.box(cx + 6.05, y + 1.0, cz + sz * 2.0, 0.5, 3.6, 0.5, st.timber, si)
+        ch.solid.box(cx + 6.7, y + 3.6, cz, 0.4, 0.7, 0.4, '#2a2a30', si)
+        ch.glow.box(cx + 6.75, y + 3.75, cz, 0.28, 0.4, 0.28, '#ffffff', si)
+        // печная башня: камень, венец и огонь наверху
+        ch.solid.box(cx - 4.6, y + 1.0, cz - 4.6, 3, 14, 3, st.stone, si)
+        ch.solid.box(cx - 4.6, y + 14.6, cz - 4.6, 3.7, 0.6, 3.7, mixHex(st.stone, '#fff', 0.15), si)
+        ch.glow.box(cx - 4.6, y + 15.2, cz - 4.6, 1.6, 1.3, 1.6, '#ffffff', si)
+        // скамьи приюта вокруг
+        for (let k = 0; k < 6; k++) { const a = si + (k / 6) * 6.283, bx = cx + Math.cos(a) * 11, bz = cz + Math.sin(a) * 11; ch.solid.box(bx, y, bz, 3, 0.55, 0.8, st.timber, a + Math.PI / 2) }
+        fillLine([[cx, cz], [cx + 0.1, cz]], 9, N + 2 + si)
+      } else if (si === garefSq) {
+        // Светочная башня Гарефорда: каменный ствол, дубовая галерея, фонарная клеть с Пламенем, медный шпиль
+        const tw = 4.6, th = 20
+        ch.solid.box(cx, y, cz, 6.2, 1.1, 6.2, mixHex(st.stone, '#000', 0.12), si)
+        ch.solid.box(cx, y + 1.1, cz, tw, th - 1.1, tw, st.stone, si)
+        for (const hy of [4.6, 9.2, 14.2]) ch.solid.box(cx, y + hy, cz, tw + 0.35, 0.3, tw + 0.35, mixHex(st.stone, '#fff', 0.15), si)
+        for (let k = 0; k < 4; k++) {
+          const a = si + k * Math.PI / 2, ox = Math.cos(a) * (tw / 2 + 0.03), oz = Math.sin(a) * (tw / 2 + 0.03)
+          for (const hy of [3, 7.4, 11.8, 16.4]) ch.glow.box(cx + ox, y + hy, cz + oz, 0.7, 1.3, 0.06, '#ffffff', a + Math.PI / 2)
+        }
+        ch.solid.box(cx, y + th, cz, tw + 1.8, 0.35, tw + 1.8, st.timber, si)
+        for (let k = 0; k < 4; k++) for (let j = -2; j <= 2; j++) {
+          const a = si + k * Math.PI / 2, nx = Math.cos(a), nz = Math.sin(a), off = (tw + 1.6) / 2
+          ch.solid.box(cx + nx * off - nz * j * 1.2, y + th + 0.35, cz + nz * off + nx * j * 1.2, 0.14, 1.0, 0.14, st.timber)
+        }
+        ch.glow.box(cx, y + th + 0.4, cz, 2.5, 2.9, 2.5, '#ffffff', si)
+        for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) ch.solid.box(cx + dx * 1.32 * Math.cos(si) - dz * 1.32 * Math.sin(si), y + th + 0.35, cz + dx * 1.32 * Math.sin(si) + dz * 1.32 * Math.cos(si), 0.22, 3.0, 0.22, '#2a2a30')
+        ch.solid.box(cx, y + th + 3.3, cz, 3.3, 0.3, 3.3, '#2a2a30', si)
+        ch.roof.cyl(cx, y + th + 3.6, cz, 2.6, 6.2, 4, st.tower, 0, false, si + Math.PI / 4)
+        ch.solid.cyl(cx, y + th + 9.7, cz, 0.12, 1.4, 6, '#c9a24a')
+        ch.solid.cyl(cx, y + th + 11.1, cz, 0.34, 0.5, 8, '#c9a24a', 0.1)
+        fillLine([[cx, cz], [cx + 0.1, cz]], 7, N + 2 + si)
       } else if (si % 2 === 0) {
         ch.solid.cyl(cx, y, cz, 3.4, 0.8, 16, st.stone)
         ch.solid.cyl(cx, y + 0.8, cz, 3, 0.02, 16, '#3f7f96')
