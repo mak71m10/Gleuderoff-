@@ -1990,3 +1990,47 @@ button.pw-chip:hover { background: var(--panel-2); }
   .tl-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #3a3426, #7a6a3a); }
   .tl-controls > button.tl-now, .tl-controls > button.tl-mode { min-width: 34px; }
 }
+
+/* ---- Стена Трёх Тысяч (Протекторат Лирия) ---- */
+.wall { margin: 16px 0; padding: 14px; border: 1px solid #6a5a3a; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #2c261a, #0e0c08 80%); color: #ece4d0; }
+.wall-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wall-head small { display: block; color: #a8a088; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; } .wall-head b { font-family: var(--serif); font-size: 20px; }
+.wall-status { padding: 6px 12px; border-radius: 8px; background: #1c1810; border: 1px solid #5a4a2a; font-size: 14px; } .wall-status.passed { border-color: #6aaa7a; } .wall-status.failed { border-color: #a04a3a; background: #281612; } .wall-status.pending { border-color: #c9a24a; background: #262012; box-shadow: 0 0 12px #c9a24a44; }
+.wall-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.wall-tabs button, .wall-decs button { padding: 4px 10px; border-radius: 6px; border: 1px solid #4a4028; background: #16130c; color: #c8bea0; cursor: pointer; font-size: 13px; } .wall-tabs button.on, .wall-decs button.on { border-color: #c9a24a; background: #2a2412; color: #f4e6b8; }
+.wall-decs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; } .wall-decs small { color: #8a8068; margin-right: 3px; }
+.wall-svg { width: 100%; display: block; margin-top: 8px; } .wall-bg { fill: #14110a; stroke: #4a4028; } .wall-slab { cursor: pointer; } .wall-slab-bg { fill: #1c180e; stroke: #3a3220; } .wall-slab-bg.sel { stroke: #f4e6b8; stroke-width: 1.6; } .wall-slab:hover .wall-slab-bg { stroke: #c9a24a; }
+.wall-slab-n { fill: #8a8068; font-size: 8px; }
+.wall-slider { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; color: #a8a088; font-size: 13px; } .wall-slider input { flex: 1; accent-color: #e8b84a; }
+.wall-note { margin: 8px 0 0; color: #d8d0bc; font-size: 14px; }
+.wall-chart { width: 100%; display: block; margin-top: 8px; } .wall-line { fill: none; stroke: #e8c860; stroke-width: 2; } .wall-axis { fill: #8a8068; font-size: 9px; } .wall-ins { stroke: #6a90d0; stroke-width: 6; } .wall-ins.pending { stroke: #c9a24a; stroke-dasharray: 3 3; }
+.wall-inlist { display: grid; gap: 4px; margin-top: 6px; font-size: 13px; color: #d8d0bc; } .wall-inlist b { color: #f4e6b8; }
+.wall-card { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-top: 10px; padding: 10px; border: 1px solid #4a4028; border-radius: 8px; background: #14110a; }
+.wall-card-text small { display: block; color: #a8a088; font-size: 12px; } .wall-card-text b { font-family: var(--serif); font-size: 17px; display: block; } .wall-card-text span { display: block; color: #c8bea0; font-size: 12px; }
+.wall-leader { display: flex; gap: 8px; align-items: center; padding: 4px 8px; border: 1px solid #4a4028; border-radius: 8px; background: #1a160e; color: inherit; cursor: pointer; text-align: left; } .wall-leader:disabled { cursor: default; } .wall-leader small { display: block; color: #8a8068; font-size: 11px; } .wall-leader b { font-size: 13px; }
+.wall-face { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; background: #1c180e; border: 1px solid #6a5a3a; display: flex; align-items: center; justify-content: center; font-family: var(--serif); } .wall-face img { width: 100%; height: 100%; object-fit: cover; }
+.wall-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 10px 0 0; font-size: 12px; color: #a8a088; } .wall-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.wall-rules { margin: 10px 0 0; padding-left: 18px; color: #b0a888; font-size: 13px; }
+@media (max-width: 560px) { .wall-card { flex-direction: column; align-items: flex-start; } }
+
+/* ---- Воз Когалыма ---- */
+.cart { margin: 16px 0; padding: 14px; border: 1px solid #5a5a2a; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #28281a, #0e0e08 80%); color: #ece8d0; }
+.cart-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cart-head small { display: block; color: #a8a888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; } .cart-head b { font-family: var(--serif); font-size: 20px; }
+.cart-status { padding: 6px 12px; border-radius: 8px; background: #1a1a10; border: 1px solid #5a5a2a; font-size: 14px; } .cart-status.stalled, .cart-status.failed { border-color: #a04a3a; background: #281612; } .cart-status.go, .cart-status.passed { border-color: #6aaa7a; } .cart-status.pending { border-color: #c9a24a; background: #262012; box-shadow: 0 0 12px #c9a24a44; }
+.cart-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.cart-tabs button, .cart-decs button { padding: 4px 10px; border-radius: 6px; border: 1px solid #4a4a28; background: #16160c; color: #c8c0a0; cursor: pointer; font-size: 13px; } .cart-tabs button.on, .cart-decs button.on { border-color: #c9a24a; background: #2a2612; color: #f4e6b8; }
+.cart-decs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; } .cart-decs small { color: #8a8a68; margin-right: 3px; }
+.cart-svg { width: 100%; display: block; margin-top: 8px; } .cart-bg { fill: #14140a; stroke: #3a3a20; } .cart-road { fill: none; stroke: #4a4020; stroke-width: 3; opacity: .6; } .cart-rope { stroke: #a8885a; stroke-width: 2; }
+.cart-pull { animation: cart-bob .9s ease-in-out infinite alternate; } @keyframes cart-bob { from { transform: translateX(-1.5px); } to { transform: translateX(1.5px); } }
+.cart-named { cursor: pointer; } .cart-axis { fill: #8a8a68; font-size: 10px; }
+.cart-stuck { filter: saturate(.7) brightness(.85); } .cart-stamp { fill: #d0604a; font-family: var(--serif); font-size: 26px; font-weight: 700; opacity: .9; transform: rotate(-6deg); transform-origin: 550px 230px; }
+.cart-slider { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; color: #a8a888; font-size: 13px; } .cart-slider input { flex: 1; accent-color: #e8b84a; }
+.cart-note { margin: 8px 0 0; color: #d8d4bc; font-size: 14px; }
+.cart-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 0; font-size: 12px; color: #a8a888; } .cart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.cart-dots { width: 100%; display: block; margin-top: 8px; }
+.cart-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-top: 10px; }
+.cart-card { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border: 2px solid color-mix(in srgb, var(--bc) 55%, #000); border-radius: 8px; background: color-mix(in srgb, var(--bc) 10%, #0e0e08); color: #e8e4cc; cursor: pointer; text-align: center; } .cart-card:hover { border-color: var(--bc); } .cart-card b { font-family: var(--serif); font-size: 13px; line-height: 1.15; } .cart-card small { color: #a8a888; font-size: 11px; }
+.cart-face { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; background: #1c1c10; border: 2px solid var(--bc); display: flex; align-items: center; justify-content: center; font-family: var(--serif); } .cart-face img { width: 100%; height: 100%; object-fit: cover; }
+.cart-stick { width: 100%; height: 16px; }
+.cart-rules { margin: 10px 0 0; padding-left: 18px; color: #b0b090; font-size: 13px; }

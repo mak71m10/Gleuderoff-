@@ -93,6 +93,10 @@ const TABLES: Record<string, W> = {
   fvhuman: { imperials: 72, gnomes: 22, dwarves: 6 },
   // Высокогорное Княжество: на Венце — люди, днём — гномы-подъёмщики и слуги; в замках Горной стражи — люди и немного подгорников
   kranz: { imperials: 90, gnomes: 6, dwarves: 4 },
+  // Когалым: крестьяне-беглецы Империи: люди, немного гладров, нордов и пришлых
+  kogal: { imperials: 72, gladry: 18, nords: 3, roma: 3, dwarves: 1.5, gnomes: 1.5, 'wood-elves': 1 },
+  // Протекторат Лирия: лирийцы и имперцы, немного нордов и пришлых; полудворфская кровь в рудничных домах
+  lyria: { imperials: 50, gladry: 36, dwarves: 3, nords: 3, roma: 3, 'wood-elves': 2, gnomes: 1.5, goliaths: 1.5 },
   // Королевство Темерия: беглецы Империи — имперцы, лесные гладры и нерегулярные пришельцы
   temer: { imperials: 84, gladry: 5, nords: 3, dwarves: 2, gnomes: 1.5, 'wood-elves': 1.5, roma: 1, dalorians: 1 },
   // Княжества Гарефорда: горные имперцы, немного дварфов, гномов, нордов и гладров

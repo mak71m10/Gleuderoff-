@@ -24,6 +24,8 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const KOGALYM_STYLE = 'oil painting, rural commune portrait, timber meeting hall with a notched tally stick and a wooden cart behind, warm daylight, earthy tones, visible brush strokes, detailed face, half-length portrait'
+const LYRIA_STYLE = 'oil painting, mountain-roman ducal portrait, white marble hall with a wall of small glowing tablets behind, warm lamp light, terracotta and cream tones, visible brush strokes, detailed face, half-length portrait'
 const TEMERIA_STYLE = 'oil painting, medieval forest kingdom portrait, warm hearth firelight in a half-timbered hall, an open oak door with a lantern glowing behind, green and gold accents, visible brush strokes, detailed face, half-length portrait'
 const GAREFORD_STYLE = 'oil painting, alpine mountain-prince portrait, candlelit stone hall with dark oak panelling, warm lantern glow, a small brass lantern flame in the background, visible brush strokes, detailed face, half-length portrait'
 const CRYDON_STYLE = 'oil painting, naval admiralty portrait, dark navy uniform with gold braid, warm cabin lamp light, charts and a brass telescope behind, sea light through a window, visible brush strokes, detailed face, half-length portrait'
@@ -44,6 +46,55 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  'fm-lA-eg': 'sturdy woman in her fifties, long dark brown hair tied back, full head of hair, plain brown wool dress, a simple pendant, tired practical eyes',
+  'fm-lF-old': 'dignified landowner-judge in his sixties, short white hair, grey beard, dark toga, a scroll in hand, plain stone wall behind, no frame',
+  'fm-lF-w': 'practical widow in her fifties, brown hair streaked with grey tied in a bun, olive dress, vineyard basket, calm tired eyes',
+  'fm-lA-gn2': 'short broad-shouldered miner-engineer in his late twenties, short brown hair, light pale eyes, simple tunic with leather straps, a mine lamp',
+  'fm-lT-gib10': 'young warrior king in his thirties, short dark hair, short beard, bronze breastplate, a notched iron circlet, grim face',
+  // Когалым: крестьяне-беглецы Империи, северноевропейские лица
+  'kg-hans': 'broad weathered hop farmer and carter in his late forties, brown hair with grey, short beard, rough linen shirt and leather vest, a rope over his shoulder, a wooden cart behind, calm patient eyes',
+  'kg-agnes': 'dry upright woman in her early sixties, grey hair in a tight bun, a heavy iron key on a cord around her neck, plain dark wool dress, a bundle of notched tally sticks, sharp honest eyes',
+  'kg-klaus': 'tough veteran instructor in his mid fifties, short grey hair, scarred cheek, a faded imperial tunic with the badge cut off, a training spear, hard patient eyes',
+  'kg-erna': 'round cheerful woman in her fifties, brown hair with grey, flour on her arms and apron, a big ladle in hand, warm loud smile',
+  'kg-wolfgang': 'bald elderly judge in his mid sixties, huge white moustache, plain dark coat, an oak tree behind him, a tally stick in hand, stern fair eyes',
+  'kg-ortwin': 'broad young smith in his early forties, short dark beard, sooty leather apron, a spear shaft, strong honest eyes',
+  'kg-gisela': 'quick elegant woman in her mid forties, auburn hair pinned up, green wool dress with a small brooch, a sample of hops in her hand, shrewd lively eyes',
+  'kg-guntram': 'lean sleepless border watchman in his early forties, short brown hair, stubble, dark cloak and a signal horn, tired watchful eyes, hill fires behind',
+  'kg-jakob': 'very old man in his nineties, almost bald, wispy white hair, deep lines, a plain grey tunic, a bundle of keys, kind secret-keeping eyes',
+  'kg-martin': 'gentle tinsmith in his mid thirties, brown hair, clean shaven, leather apron, a small tin cup in hand, shy kind eyes',
+  'kg-bruno': 'polished republican commissar in his sixty, well-groomed grey hair, clean white hands, a dark coat with a tricolour sash, a thin guarded smile',
+  'kg-matilda': 'strong young baker woman in her mid thirties, dark hair under no cover, flour-dusted dress, a loaf of bread in her hands, hopeful determined eyes',
+  'kg-leopold': 'broad gentle priest in his sixty, white short hair, plain white robe with a small flame badge, a bowl of bread, quiet voice kind face',
+  'kg-conrad': 'old first Elder of the Cart, white beard, deep lines, rough homespun coat, a rope in his hands, tired proud smile',
+  'kg-rudolf': 'ageing landlord count in his late thirties, short dark hair, trimmed beard, dark red coat with a rose brooch, a hard dissatisfied face',
+  'kg-adelheid': 'tense noble lady in her early thirties, dark hair pinned up, plum-coloured gown, a rose brooch, frightened proud eyes',
+  // Протекторат Лирия: римско-горная знать, северноевропейские лица
+  'ly-gaius7': 'broad-shouldered duke in his mid forties, short dark brown hair with grey at the temples, strong jaw, clean shaven, deep red tunic with a gold eagle brooch and a thin iron torque, a calm orator look, marble wall behind',
+  'ly-gaius6': 'stern old duke in his sixties, white short hair, deep lines, red toga with a gold eagle, an iron circlet on the table, tired proud eyes',
+  'ly-cornelia': 'dignified duchess in her early forties, dark hair in an elegant braided coil, ivory stola with a blue sash, a small tablet pendant, steady eyes',
+  'ly-cornel': 'stooped scholar in his seventies, grey hair, long thin fingers dusty with stone, blue toga with a silver book pin, a wax tablet in hand',
+  'ly-fabia': 'proud strict woman in her early fifties, grey-streaked dark hair, silver thread in her braids, olive-green stola, a censor red belt, stern eyes',
+  'ly-valerius': 'weathered prefect in his sixty, short grey hair, scarred cheek, bronze cuirass over a red tunic, hand on a helmet, hard eyes',
+  'ly-servilius': 'smooth merchant in his late forties, thinning dark hair, trimmed beard, blue-grey toga with silver scales brooch, a ledger and coins, cunning pleasant eyes',
+  'ly-servilia': 'elegant woman in her mid forties, auburn hair pinned up, blue gown, pearl earrings, amused polite smile',
+  'ly-aurelius': 'stocky mine master in his mid fifties, short brown beard, hands like a stonecutter, red-brown tunic with a gold hammer brooch, a miner lamp, stony eyes',
+  'ly-tarquinia': 'white-haired high priestess in her sixties, pure white robe, thin cold hands holding a candle, a flame emblem, calm severe face',
+  'ly-aemilius': 'severe judge in his late fifties, clean-shaven, grey hair, grey toga with a black scales pin, never smiling, a scroll in hand',
+  'ly-nigidius': 'quiet young archivist in his thirties, light brown hair, ink-stained fingers, plain green tunic, a bundle of keys, watchful eyes',
+  'ly-quintilla': 'sharp young poet in her mid twenties, dark blonde hair loose, rose-coloured stola, a scroll of verses, a wry smile',
+  'ly-rufus': 'tough veteran in his mid thirties, short dark hair, stubble, blue cloak over mail, a plain shield, direct eyes',
+  'ly-legate': 'polished imperial legate in his fifties, well-groomed grey-brown hair, imperial purple trim on a white toga, a thin invisible smile',
+  'ly-licin': 'lean man in his mid thirties, short brown hair, plain grey tunic, a smooth blank stone on a cord around his neck, patient hard eyes',
+  'ly-annius': 'grizzled border commander in his fifty, short grey beard, mountain cloak over mail, wind-burnt face, a signal horn',
+  'ly-lucilia': 'round cheerful wine merchant woman in her forties, brown hair with a flower, olive tunic, a goblet in hand, shrewd laughing eyes',
+  'ly-decimus': 'neat young secretary in his early thirties, brown hair combed flat, simple tunic, wax tablet and stylus, careful eyes',
+  'ly-tit': 'old keeper in his seventies, white hair, deeply lined face, rough brown wool tunic, a lantern, haunted quiet eyes, bare empty field behind',
+  'ly-marcus': 'solid commander in his early forties, short brown hair, short beard, bronze breastplate, red cloak, open honest face',
+  'ly-tiberius': 'earnest young man in his twenties, dark brown hair, clean shaven, red tunic with a small gold eagle, serious eyes',
+  'ly-junia': 'bright girl in her mid teens, dark braid, cream tunic, a tablet in hand, clever lively eyes',
+  'ly-gibbelen2': 'ancient grim exiled king, long grey beard, iron crown with a notch, torn red cloak, hard cold eyes, a sword hilt in hand',
+  'ly-gibbelin9': 'ancient conqueror king, short black beard, iron crown, bronze cuirass, a stern look of a man who has done terrible things',
+  'ly-gaius5': 'unremarkable elderly clerk in his sixties, thin grey hair, plain brown tunic, a small old tablet hidden in his hand, quiet watchful face',
   // Королевство Темерия: беглецы Империи, северноевропейские лица
   'tm-foltest': 'sturdy grey-haired king in his sixties, short grey beard, hoarse weathered face, green velvet coat with a gold door emblem, a plain gold circlet-free head, an oak door and a bowl of soup on the table, tired kind eyes',
   'tm-berta': 'kind gray-haired queen-hostess in her sixties, a long grey braid, red work-worn hands, simple green gown with a gold brooch, ladling soup from a pot, warm calm face',
@@ -453,7 +504,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -472,7 +523,9 @@ for (const e of chars) {
   const crydon = e.base.tags.includes('Крайдонианская Лига')
   const gareford = e.base.tags.includes('Княжества Гарефорда')
   const temeria = e.base.tags.includes('Королевство Темерия')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria
+  const lyria = e.base.tags.includes('Протекторат Лирия')
+  const kogalym = e.base.tags.includes('Когалым')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -489,7 +542,11 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
-  const prompt = temeria
+  const prompt = kogalym
+    ? `${KOGALYM_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    : lyria
+    ? `${LYRIA_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    : temeria
     ? `${TEMERIA_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : gareford
     ? `${GAREFORD_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), ${id === 'gf-eyvind' ? '' : '(northern european, alpine german features, pale skin:1.25), '}${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`

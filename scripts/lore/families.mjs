@@ -5,6 +5,7 @@ import * as TM from './families/tm.mjs'
 import * as GF from './families/gf.mjs'
 import * as CR from './families/cr.mjs'
 import * as CH from './families/ch.mjs'
+import * as LY from './families/ly.mjs'
 import * as MISC from './families/misc.mjs'
 
 const HU = 'Человек (имперец)'
@@ -23,7 +24,7 @@ const CLOTH = {
   folk: 'simple linen shirt and a leather vest',
   child: 'simple clothes'
 }
-function look(g, age, role, key) {
+export function look(g, age, role, key) {
   const f = g === 'f'
   if (age < 14 || role === 'child') return `${f ? 'little girl' : 'little boy'}, ${pickBy(HAIR_Y, key, 'h')} hair, simple clothes, ${pickBy(MOOD, key, 'm')}`
   const hair = age >= 55 ? pickBy(HAIR_O, key, 'h') : age >= 42 && hash(key + 'g') % 3 === 0 ? pickBy(HAIR_O, key, 'h') : pickBy(HAIR_Y, key, 'h')
@@ -35,7 +36,7 @@ function look(g, age, role, key) {
 export default function families({ E, Y, entries }) {
   const idOf = (ref) => (ref == null ? null : ref.startsWith('@') ? ref.slice(1) : `fm-${ref}`)
   const pass = []
-  for (const m of [TM, GF, CR, CH]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
+  for (const m of [TM, GF, CR, CH, LY]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
   for (const m of MISC.MODULES) pass.push({ tag: m.tag, race: m.race ?? HU, specs: m.specs })
 
   let created = 0, patched = 0

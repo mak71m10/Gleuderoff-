@@ -678,6 +678,64 @@ async function migrateWorld(dir: string): Promise<void> {
       if (e.id === 'lore-cr-hildebrand') { e.base.body = d.base.body; e.base.summary = d.base.summary }
     }
   }
+  if ((user.version ?? 1) < 37) {
+    // v37: Протекторат Лирия — Стена Трёх Тысяч (тридцать Сотен, Сбор, Вписание), дома, люди, Лирия/Айзанх/Медиволанум вместо Хеймельштейна/Бадельштадта/Штайнштейна,
+    // описания и планы 51 поселения; Стена на площади
+    const ds = (def.states ?? []).find((s: Json) => s.base.name === 'Протекторат Лирия')
+    const us = ds && user.states.find((s: Json) => s.id === ds.id)
+    if (us) { us.base = { ...us.base, ...structuredClone(ds.base) }; us.factions = structuredClone(ds.factions); us.history = structuredClone(ds.history ?? []) }
+    const isNew = (e: Json) => String(e.id).startsWith('lore-ly-') || ['lore-book-houses', 'lore-book-war', 'lore-book-lands'].includes(e.id)
+    const fresh = (def.entries ?? []).filter(isNew)
+    const ids = new Set(fresh.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !ids.has(e.id)), ...structuredClone(fresh)]
+    const ourMaps = new Set<string>()
+    const defProvs = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProvs.get(p.id)
+      if (dp && ds && dp.owners?.at(-1)?.[1] === ds.id) {
+        p.name = dp.name; p.settlement = structuredClone(dp.settlement ?? null); p.description = dp.description
+        if (dp.cityMapId) { p.cityMapId = dp.cityMapId; ourMaps.add(dp.cityMapId) }
+      }
+    }
+    const defAreas = new Map<string, Json>((def.adminRegions ?? []).map((a: Json) => [a.id, a]))
+    for (const a of user.adminRegions ?? []) { const da = defAreas.get(a.id); if (da && ['Округ Лирия', 'Округ Айзанх', 'Округ Медиволанум'].includes(da.name)) a.name = da.name }
+    const cityMaps = (def.maps ?? []).filter((m: Json) => ourMaps.has(m.id) && !user.maps.some((u: Json) => u.id === m.id))
+    user.maps = [...user.maps, ...structuredClone(cityMaps)]
+    const isOurs = (x: Json) => String(x.id).startsWith('lore-ly-') || String(x.id).startsWith('lore-army-ly-') || ourMaps.has(x.mapId)
+    const placeIds = new Set((user.places ?? []).map((p: Json) => p.id))
+    user.places = [...(user.places ?? []), ...structuredClone((def.places ?? []).filter((p: Json) => isOurs(p) && !placeIds.has(p.id)))]
+    const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))
+    user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => isOurs(a) && !armyIds.has(a.id)))]
+  }
+  if ((user.version ?? 1) < 38) {
+    // v38: Когалым — Воз (Сельский сбор, Бремя, Три Слова, Общий Сход), дворы, люди, Когалым/Мёльн/Хмельнц/Нюнех вместо Унтерельвальда/Эберенберга/Корбаха/Брасельхаузена,
+    // описания и планы 13 поселений; Сходный круг на площади
+    const ds = (def.states ?? []).find((s: Json) => s.base.name === 'Когалым')
+    const us = ds && user.states.find((s: Json) => s.id === ds.id)
+    if (us) { us.base = { ...us.base, ...structuredClone(ds.base) }; us.factions = structuredClone(ds.factions); us.history = structuredClone(ds.history ?? []) }
+    const isNew = (e: Json) => String(e.id).startsWith('lore-kg-') || ['lore-book-houses', 'lore-book-war', 'lore-book-lands'].includes(e.id)
+    const fresh = (def.entries ?? []).filter(isNew)
+    const ids = new Set(fresh.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !ids.has(e.id)), ...structuredClone(fresh)]
+    const ourMaps = new Set<string>()
+    const defProvs = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProvs.get(p.id)
+      if (dp && ds && dp.owners?.at(-1)?.[1] === ds.id) {
+        p.name = dp.name; p.settlement = structuredClone(dp.settlement ?? null); p.description = dp.description
+        if (dp.cityMapId) { p.cityMapId = dp.cityMapId; ourMaps.add(dp.cityMapId) }
+      }
+    }
+    const defAreas = new Map<string, Json>((def.adminRegions ?? []).map((a: Json) => [a.id, a]))
+    for (const a of user.adminRegions ?? []) { const da = defAreas.get(a.id); if (da && ['Округ Когалым', 'Округ Мёльн'].includes(da.name)) a.name = da.name }
+    const cityMaps = (def.maps ?? []).filter((m: Json) => ourMaps.has(m.id) && !user.maps.some((u: Json) => u.id === m.id))
+    user.maps = [...user.maps, ...structuredClone(cityMaps)]
+    const isOurs = (x: Json) => String(x.id).startsWith('lore-kg-') || String(x.id).startsWith('lore-army-kg-') || ourMaps.has(x.mapId)
+    const placeIds = new Set((user.places ?? []).map((p: Json) => p.id))
+    user.places = [...(user.places ?? []), ...structuredClone((def.places ?? []).filter((p: Json) => isOurs(p) && !placeIds.has(p.id)))]
+    const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))
+    user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => isOurs(a) && !armyIds.has(a.id)))]
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))
