@@ -24,6 +24,7 @@ import garefordLore from './lore/gareford.mjs'
 import temeriaLore from './lore/temeria.mjs'
 import lyriaLore from './lore/lyria.mjs'
 import kogalymLore from './lore/kogalym.mjs'
+import kulagonLore from './lore/kulagon.mjs'
 import familiesLore from './lore/families.mjs'
 import geo from './lore/geo.mjs'
 
@@ -63,7 +64,8 @@ const E = (id, kind, name, f = {}) => {
       ...(f.lantern ? { lantern: f.lantern } : {}),
       ...(f.threshold ? { threshold: f.threshold } : {}),
       ...(f.wall ? { wall: f.wall } : {}),
-      ...(f.cart ? { cart: f.cart } : {})
+      ...(f.cart ? { cart: f.cart } : {}),
+      ...(f.ford ? { ford: f.ford } : {})
     },
     history: [],
     from: f.from ?? null,
@@ -166,7 +168,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 38
+world.version = 39
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })
@@ -186,6 +188,7 @@ garefordLore({ E, Y, world })
 temeriaLore({ E, Y, world })
 lyriaLore({ E, Y, world })
 kogalymLore({ E, Y, world })
+kulagonLore({ E, Y, world })
 familiesLore({ E, Y, entries })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })

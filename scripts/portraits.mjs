@@ -24,6 +24,7 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const KULAGON_STYLE = 'oil painting, Frisian canal-country portrait, flat green plain with brick houses and a stone arch over a canal behind, low grey sky with silver light, muted greens and slate blues, painterly, half-length portrait'
 const KOGALYM_STYLE = 'oil painting, rural commune portrait, timber meeting hall with a notched tally stick and a wooden cart behind, warm daylight, earthy tones, visible brush strokes, detailed face, half-length portrait'
 const LYRIA_STYLE = 'oil painting, mountain-roman ducal portrait, white marble hall with a wall of small glowing tablets behind, warm lamp light, terracotta and cream tones, visible brush strokes, detailed face, half-length portrait'
 const TEMERIA_STYLE = 'oil painting, medieval forest kingdom portrait, warm hearth firelight in a half-timbered hall, an open oak door with a lantern glowing behind, green and gold accents, visible brush strokes, detailed face, half-length portrait'
@@ -51,6 +52,45 @@ const CUSTOM = {
   'fm-lF-w': 'practical widow in her fifties, brown hair streaked with grey tied in a bun, olive dress, vineyard basket, calm tired eyes',
   'fm-lA-gn2': 'short broad-shouldered miner-engineer in his late twenties, short brown hair, light pale eyes, simple tunic with leather straps, a mine lamp',
   'fm-lT-gib10': 'young warrior king in his thirties, short dark hair, short beard, bronze breastplate, a notched iron circlet, grim face',
+  // Кулагон: фризская равнина, каналы
+  'kl-jasper': 'dry quick man of forty-eight, short grey-blond hair, grey cloak, a plain iron ring on a chain, tired watchful pale eyes',
+  'kl-auke': 'old stern patriarch in his late seventies, white hair, deep wrinkles, worn leather jacket, a heavy iron ring, proud look',
+  'kl-geeske': 'elderly woman in her late sixties, white hair under a linen cap, shrewd calm eyes, dark wool dress',
+  'kl-sjoukje': 'composed woman of forty-four, blond hair braided, grey dress, quiet clever expression',
+  'kl-piebe': 'serious boy of ten, straw hair, grey tunic, solemn look',
+  'kl-tjerk': 'hard exiled lord of seventy, long grey hair, weathered face, travelling cloak, bitter pride',
+  'kl-eelke': 'broad man of thirty-eight, red-blond beard, practical wool coat, stubborn jaw',
+  'kl-ymkje': 'strong woman of thirty-five, ginger hair tied back, shrewd green eyes',
+  'kl-haije': 'restless boy of nine, ginger hair, scuffed knees, curious eyes',
+  'kl-sybren': 'calm merchant lord of fifty-two, neat brown beard, blue coat, ledger under arm',
+  'kl-hiske': 'dignified woman of fifty, brown hair with grey, blue dress, kind firm eyes',
+  'kl-lolke': 'shy boy of eight, brown hair, big blue eyes, blue jacket',
+  'kl-fokke': 'sturdy bargeman of twenty-five, brown hair, rope over shoulder, open face',
+  'kl-obbe': 'heavy gruff man of fifty-five, grey beard, red-brown coat, wary hard eyes',
+  'kl-tsjitske': 'stern woman of fifty, grey hair in a bun, red shawl, sharp gaze',
+  'kl-eile': 'quiet young man of thirteen, dark blond hair, thin face, red scarf, haunted eyes',
+  'kl-edzke': 'sharp woman of twenty-eight, dark hair, red ribbon, assessing look',
+  'kl-hanneke': 'lively woman of forty-five, silver-blond hair, green dress, quick wry smile',
+  'kl-sierd': 'old man of sixty-four, white hair, green coat, tired scholarly face',
+  'kl-gerben': 'earnest boy of twelve, blond hair, green tunic, honest eyes',
+  'kl-reiner': 'gaunt old lord of sixty-two, white hair, violet cloak, severe stare',
+  'kl-doede': 'tall man of forty-two, light brown hair, violet coat, controlled expression',
+  'kl-baukje': 'elegant woman of thirty-eight, blond hair in a braided crown, violet dress, calm eyes',
+  'kl-sjoerd': 'small boy of seven, blond curls, violet tunic, serious face',
+  'kl-jouke': 'girl of ten, blond braids, violet dress, bright curious eyes',
+  'kl-wiebe': 'weathered man of sixty, grey hair, orange-brown coat, canal-boatman hands, steady look',
+  'kl-griet': 'woman of fifty-five, grey-blond hair, orange shawl, motherly worried eyes',
+  'kl-frouke': 'girl of fourteen, blond hair, orange ribbon, quiet resolute face',
+  'kl-eibe': 'dry archivist of fifty, thin face, grey hair, ink-stained fingers, a bowl of notched clay shards, spectacles-free sharp eyes',
+  'kl-remme': 'young scribe of thirty-two, brown hair, ink-stained cuffs, nervous clever eyes',
+  'kl-ruurd': 'broad ferryman of forty, brown beard, pole in hand, oilskin cloak, calm pale eyes',
+  'kl-anne': 'practical woman of thirty-two, brown hair under a cap, ferry ledger in hand',
+  'kl-radbod': 'old priest of fifty-five, tonsured grey hair, plain brown robe, gentle weary face',
+  'kl-garrelt': 'veteran captain of the Ward, forty-five, short grey hair, scarred jaw, grey leather coat, sword at hip',
+  'kl-leandr': 'smooth envoy of thirty-five, neat dark-blond hair, fine imperial-cut coat, polite measured smile',
+  'kl-meinert': 'bony clerk of thirty-two, thin blond hair, clay dust on hands, shrewd squint',
+  'kl-neltje': 'weathered boatwoman of sixty, grey hair under a kerchief, strong arms, wry smile, oar behind her',
+  'kl-jelle': 'stocky stonemason of sixty, white stubble, dusty apron, chisel in hand, patient eyes',
   // Когалым: крестьяне-беглецы Империи, северноевропейские лица
   'kg-hans': 'broad weathered hop farmer and carter in his late forties, brown hair with grey, short beard, rough linen shirt and leather vest, a rope over his shoulder, a wooden cart behind, calm patient eyes',
   'kg-agnes': 'dry upright woman in her early sixties, grey hair in a tight bun, a heavy iron key on a cord around her neck, plain dark wool dress, a bundle of notched tally sticks, sharp honest eyes',
@@ -504,7 +544,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -525,7 +565,8 @@ for (const e of chars) {
   const temeria = e.base.tags.includes('Королевство Темерия')
   const lyria = e.base.tags.includes('Протекторат Лирия')
   const kogalym = e.base.tags.includes('Когалым')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym
+  const kulagon = e.base.tags.includes('Кулагон')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -542,7 +583,9 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
-  const prompt = kogalym
+  const prompt = kulagon
+    ? `${KULAGON_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    : kogalym
     ? `${KOGALYM_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : lyria
     ? `${LYRIA_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`

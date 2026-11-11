@@ -77,6 +77,7 @@ export const STYLES: Record<string, Style> = {
   // Протекторат Лирия: римская Эллирия — кремовый мрамор и штукатурка, терракотовые крыши с низким скатом, колоннады
   lyria: { plaster: ['#f4eadb', '#ecdcc4', '#f6eee0', '#e0cfb4', '#efe2cc'], roof: ['#b5553a', '#a64a30', '#c2623f', '#9a4430', '#b85c3c'], timber: '#6a5a4a', stone: '#cfc6b4', wall: '#c4bba8', shutter: ['#7a3b2e', '#3f5a6a', '#8a6a2e'], pitch: 0.5, framed: false, floors: 1, grass: '#7a9a4e', grass2: '#86a458', dirt: '#bda884', pave: '#cfc4ac', lit: 0.45, conifer: 0.15, tower: '#b5553a' },
   // Когалым: деревенская коммуна — белёные срубы под тёплой соломой, крутой скат, потемневший дуб
+  kulag: { plaster: ['#e8e2d4', '#dcd4c0', '#f0ebdd', '#d4c8b0', '#e2dac6'], roof: ['#a8452f', '#9a3c28', '#b4503a', '#8a3424', '#6a2c20'], timber: '#2e2a26', stone: '#8a8478', wall: '#a8503a', shutter: ['#2a4a6a', '#3a5a3a', '#8a3a2a'], pitch: 1.15, framed: true, floors: 2, grass: '#6a9a48', grass2: '#76a652', dirt: '#9a8a64', pave: '#8e8672', lit: 0.4, conifer: 0.1, tower: '#8a3a28' },
   kogal: { plaster: ['#ece0c8', '#e0d2b4', '#f0e6d0', '#d8c8a8', '#e6d8bc'], roof: ['#b89a52', '#a88c48', '#c4a860', '#9a7e40', '#6a4a30'], timber: '#4a3420', stone: '#9a9484', wall: '#b0a890', shutter: ['#2f5a3a', '#8a6a2e', '#6a4a2a'], pitch: 1.1, framed: true, floors: 1, grass: '#74a04a', grass2: '#80aa52', dirt: '#a89268', pave: '#a09478', lit: 0.4, conifer: 0.4, tower: '#7a5a3a' },
   alpine: { plaster: ['#efe9dc', '#e6dccb', '#f3eee4', '#d9cfbd', '#e9e1d0'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#6a4a34', '#46434a'], timber: '#3a2416', stone: '#8a877e', wall: '#a8a49a', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#6f8f4e', grass2: '#7a9a56', dirt: '#9a8a6a', pave: '#9a958a', lit: 0.4, conifer: 1, tower: '#3f4a5a' },
   kranz: { plaster: ['#f4f0e8', '#ebe5d8', '#f7f4ee', '#e2dacb', '#efe8da'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#3a3a42', '#46434a'], timber: '#3a2416', stone: '#a9a598', wall: '#c8c3b6', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#a6a294', grass2: '#b0ac9e', dirt: '#b8b2a2', pave: '#c4bfb2', lit: 0.4, conifer: 1, tower: '#2a3a5a' },
@@ -1619,7 +1620,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const vendors: { x: number; z: number; a: number }[] = []
   const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
   // Гарефорд: Светочная башня всегда встаёт на самую большую площадь
-  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
+  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
     if (area > 500 || si === garefSq) {
@@ -1633,6 +1634,21 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           ch.solid.cyl(px, y, pz, 0.38, 4.2, 6, st.timber)
           ch.solid.box(px, y + 3.3, pz, 0.9, 0.8, 0.9, '#6a2a1a', a)
         }
+      } else if (si === garefSq && S.style === 'kulag') {
+        // Дом Колец Кулагона: круг из семи каменных арок над водой, у каждой — свой цвет Дома, в центре светящийся камень-черепок
+        ch.solid.cyl(cx, y, cz, 9.5, 0.35, 28, st.stone)
+        ch.solid.cyl(cx, y + 0.35, cz, 7.6, 0.15, 28, '#3a5a6a')
+        const hc = ['#c9a24a', '#6a9ac8', '#c8584a', '#7ab070', '#a878c0', '#d89a4a', '#8ab0b0']
+        for (let k = 0; k < 7; k++) {
+          const a = (k / 7) * 6.283, bx = cx + Math.cos(a) * 7.6, bz = cz + Math.sin(a) * 7.6, ra = a + Math.PI / 2
+          for (const sd of [-1.6, 1.6]) ch.solid.box(bx + Math.cos(ra) * sd, y + 0.35, bz + Math.sin(ra) * sd, 0.9, 5.2, 0.9, st.stone, a)
+          ch.solid.box(bx, y + 5.55, bz, 4.4, 0.8, 1.0, st.stone, ra)
+          ch.solid.box(bx, y + 6.35, bz, 3.0, 0.5, 0.8, hc[k], ra)
+          ch.glow.box(bx, y + 4.2, bz, 0.7, 0.7, 0.7, '#ffffff', ra)
+        }
+        ch.solid.cyl(cx, y + 0.35, cz, 1.6, 1.4, 10, st.stone)
+        ch.glow.box(cx, y + 1.75, cz, 1.1, 1.1, 1.1, '#ffffff', si)
+        fillLine([[cx - 9, cz], [cx + 9, cz]], 8, N + 2 + si)
       } else if (si === garefSq && S.style === 'kogal') {
         // Сходный круг Когалыма: камень и столб с зарубками посередине, кольцо брёвен-скамей, Сходная изба с открытыми стенами, Первый Воз
         ch.solid.cyl(cx, y, cz, 1.7, 0.9, 12, st.stone)
