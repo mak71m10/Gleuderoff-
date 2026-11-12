@@ -11,6 +11,12 @@ const SW = 4096, SH = 2336 // исходные растры
 const K = Number(process.env.K ?? 8) // во сколько раз крупнее исходника (8 → 32768×18688)
 const OW = SW * K, OH = SH * K
 const STRIP = 32
+const MOFF = +(process.env.MOFF || 0.22), MAMP = +(process.env.MAMP || 1.15), MFREQ = +(process.env.MFREQ || 0.007)
+// проба: CROP=x,y,w,h (в пикселях исходника 4096×2336) рисует только этот кусок; OUT=файл.png — сохранить PNG вместо base-render.rgb
+const CROP = process.env.CROP ? process.env.CROP.split(',').map(Number) : null
+const CX0 = CROP ? CROP[0] * K : 0, CY0 = CROP ? CROP[1] * K : 0
+const CX1 = CROP ? Math.min(OW, (CROP[0] + CROP[2]) * K) : OW, CY1 = CROP ? Math.min(OH, (CROP[1] + CROP[3]) * K) : OH
+const CWD = CX1 - CX0, CHT = CY1 - CY0
 
 // ================= главный поток: подготовка полей =================
 if (isMainThread) {
@@ -143,9 +149,22 @@ if (isMainThread) {
   // крупный рельеф: высоты по местности + выпуклости гор, нарисованные на исходной карте
   const CLASS_H = [-0.08, 0.1, 0.13, 0.28, 0.58, 0.72, 0.08]
   const ch = new Float32Array(N)
-  for (let i = 0; i < N; i++) ch[i] = CLASS_H[cls[i]]
+  for (let i = 0; i < N; i++) ch[i] = cls[i] === 4 || cls[i] === 5 ? 0.2 : CLASS_H[cls[i]]
   const coarse = new Float32Array(shared(N * 4))
   coarse.set(blur(ch, SW, SH, 9))
+  // MS — плавная доля гор (лесные карманы внутри хребта заполняются), MH — доля высоких гор
+  const MS = new Float32Array(shared(N * 4)), MH = new Float32Array(shared(N * 4))
+  {
+    const m = new Float32Array(N), m5 = new Float32Array(N)
+    for (let i = 0; i < N; i++) { m[i] = cls[i] === 5 ? 1 : cls[i] === 4 ? 0.85 : 0; m5[i] = cls[i] === 5 ? 1 : 0 }
+    const mb = blur(m, SW, SH, 12), hb = blur(m5, SW, SH, 12)
+    for (let i = 0; i < N; i++) {
+      const k = Math.min(1, Math.max(0, (mb[i] - 0.08) / 0.5))
+      MS[i] = k * k * (3 - 2 * k)
+      MH[i] = hb[i]
+      coarse[i] += MS[i] * 0.2 + MH[i] * 0.1
+    }
+  }
   const lum = new Float32Array(N)
   for (let i = 0; i < N; i++) lum[i] = (0.3 * base[i * 3] + 0.59 * base[i * 3 + 1] + 0.11 * base[i * 3 + 2]) / 255
   const lumB = blur(lum, SW, SH, 4)
@@ -194,37 +213,42 @@ if (isMainThread) {
   const SHD = new Uint8Array(shared(N))
   {
     const hs = new Float32Array(N)
+    const NZ = makeNoise()
     for (let i = 0; i < N; i++) {
-      const mtn = (CW[i * 7 + 4] + CW[i * 7 + 5]) / 255, hill = CW[i * 7 + 3] / 255
-      hs[i] = coarse[i] + lumHP[i] * (mtn * 0.9 + hill * 0.45 + 0.12) * 0.3
+      const mtn = MS[i], hill = CW[i * 7 + 3] / 255
+      hs[i] = coarse[i] + lumHP[i] * (hill * 0.45 + 0.12) * (1 - mtn) * 0.3
+      if (mtn > 0.01) hs[i] += mtnRelief(NZ, (i % SW) * 2, ((i / SW) | 0) * 2, mtn, MH[i])
     }
-    const GAIN = 0.011 // подъём луча на пиксель исходника: высота 0.3 даёт тень ≈ 27 px
+    const GAIN = 0.016 // подъём луча на пиксель исходника
     const raw = new Float32Array(N)
     for (let y = 0; y < SH; y++)
       for (let x = 0; x < SW; x++) {
         const i = y * SW + x
         const h0 = hs[i]
         let ex = 0
-        for (let t = 1; t <= 48; t++) {
+        for (let t = 1; t <= 64; t++) {
           const xx = x - t * 0.7071, yy = y - t * 0.7071
           if (xx < 0 || yy < 0) break
-          const e = hs[(yy | 0) * SW + (xx | 0)] - (h0 + t * GAIN)
+          const x0 = xx | 0, y0 = yy | 0, fx = xx - x0, fy = yy - y0, j = y0 * SW + x0
+          const x1 = x0 + 1 < SW ? 1 : 0, y1 = y0 + 1 < SH ? SW : 0
+          const hv = (hs[j] * (1 - fx) + hs[j + x1] * fx) * (1 - fy) + (hs[j + y1] * (1 - fx) + hs[j + y1 + x1] * fx) * fy
+          const e = hv - (h0 + t * GAIN)
           if (e > ex) ex = e
         }
-        raw[i] = Math.min(1, ex / 0.05)
+        raw[i] = Math.min(1, ex / 0.14)
       }
-    const b = blur(raw, SW, SH, 1)
+    const b = blur(raw, SW, SH, 2)
     for (let i = 0; i < N; i++) SHD[i] = Math.round(b[i] * 255)
   }
   log('тени гор')
 
-  const out = new Uint8Array(shared(OW * OH * 3))
+  const out = new Uint8Array(shared(CWD * CHT * 3))
   const counter = new Int32Array(shared(4))
   const nWorkers = Math.max(1, cpus().length)
   await Promise.all(
     Array.from({ length: nWorkers }, () =>
       new Promise((res, rej) => {
-        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RP: RP.buffer, RDT: RDT.buffer, RT: RT.buffer, SHD: SHD.buffer, FM: FM.buffer, RV: RV.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
+        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RP: RP.buffer, RDT: RDT.buffer, RT: RT.buffer, SHD: SHD.buffer, FM: FM.buffer, RV: RV.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, MS: MS.buffer, MH: MH.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
         w.on('message', (m) => process.stdout.write(`\r  полос: ${m}/${Math.ceil(OH / STRIP)}   `))
         w.on('error', rej)
         w.on('exit', res)
@@ -233,6 +257,12 @@ if (isMainThread) {
   )
   console.log()
   log('отрисовка')
+  if (process.env.OUT || CROP) {
+    const file = process.env.OUT || 'source-maps/probe.png'
+    await sharp(Buffer.from(out.buffer), { raw: { width: CWD, height: CHT, channels: 3 }, limitInputPixels: false }).png().toFile(file)
+    log(`${file} (${CWD}×${CHT})`)
+    process.exit(0)
+  }
   const { writeFileSync } = await import('fs')
   writeFileSync('source-maps/base-render.rgb', Buffer.from(out.buffer))
   writeFileSync('source-maps/base-render.json', JSON.stringify({ width: OW, height: OH, channels: 3 }))
@@ -312,32 +342,8 @@ function blur(src, W, H, r) {
 }
 
 // ================= рабочий поток: рисуем полосы =================
-if (!isMainThread) {
-  const sdf = new Float32Array(workerData.sdf)
-  const CW = new Uint8Array(workerData.CW)
-  const DB = new Uint8Array(workerData.DB)
-  const RV = new Uint8Array(workerData.RV)
-  const FM = new Uint8Array(workerData.FM)
-  const RP = new Uint8Array(workerData.RP)
-  const RDT = new Uint8Array(workerData.RDT)
-  const RT = new Uint8Array(workerData.RT)
-  const SHD = new Uint8Array(workerData.SHD)
-  // расстояние до дороги (логические единицы) — билинейно по сетке 8192×4672
-  const LW = SW * 2, LH = SH * 2
-  const roadD = (arr, lx, ly) => {
-    const x = Math.min(LW - 1.001, Math.max(0, lx - 0.5)), y = Math.min(LH - 1.001, Math.max(0, ly - 0.5))
-    const x0 = x | 0, y0 = y | 0, fx = x - x0, fy = y - y0
-    const i = y0 * LW + x0
-    const a = arr[i] + (arr[i + 1] - arr[i]) * fx
-    const b = arr[i + LW] + (arr[i + LW + 1] - arr[i + LW]) * fx
-    return (a + (b - a) * fy) / 32
-  }
-  const coarse = new Float32Array(workerData.coarse)
-  const lumHP = new Float32Array(workerData.lumHP)
-  const tint = new Uint8Array(workerData.tint)
-  const out = new Uint8Array(workerData.out)
-  const counter = new Int32Array(workerData.counter)
-
+// ---------- шум: общий для главного потока (тени гор) и рабочих ----------
+function makeNoise() {
   // --- шум Перлина ---
   const perm = new Uint8Array(512)
   {
@@ -389,6 +395,66 @@ if (!isMainThread) {
     }
     return s
   }
+  // горная страна: искривлённые острые гребни (1 − |шум|), мелкие отроги гуще у хребтов, долины гладкие
+  const MOUNT_SHARP = +(process.env.MSHARP || 1.7)
+  const MOCT = +(process.env.MOCT || 5), MWARP = +(process.env.MWARP || 0.9)
+  const mount = (x, y) => {
+    const dx = fbm(x * 0.6 + 3.1, y * 0.6, 3) * MWARP
+    const dy = fbm(x * 0.6 - 8.2, y * 0.6 + 7.7, 3) * MWARP
+    // высота хребта меняется вдоль гребня: вершины и седловины
+    const peak = Math.min(1.35, Math.max(0.35, 0.8 + fbm(x * 0.45 + 21.4, y * 0.45 - 13.9, 2) * 1.5))
+    let s = 0, a = 0.5, f = 1, w = 1, norm = 0
+    for (let o = 0; o < MOCT; o++) {
+      // искривление в единицах шума одинаково на всех октавах — иначе мелкие складки вытягиваются в террасы
+      const wk = o < 2 ? 1 : 1 / f
+      const v = 1 - Math.abs(noise((x + dx * wk) * f + o * 5.7, (y + dy * wk) * f + o * 3.3)) * MOUNT_SHARP
+      // склон тянется от гребня до дна долины, гребень острый
+      const n = v > 0 ? Math.pow(v, o === 0 ? 1.15 : 1.35) : 0
+      s += n * a * w * (o === 0 ? peak : 1)
+      norm += a
+      // отроги и промоины — на склонах, дно долин гладкое
+      w = Math.min(1, 0.15 + n * 1.1)
+      f *= 2.07
+      a *= 0.45
+    }
+    return s / norm
+  }
+  return { noise, fbm, ridged, mount }
+}
+// прибавка высоты в горах: mtn — доля гор, hi — доля высоких гор
+function mtnRelief(nz, lx, ly, mtn, hi) {
+  return mtn * (nz.mount(lx * MFREQ, ly * MFREQ) - MOFF) * MAMP * (0.8 + hi * 0.4)
+}
+
+if (!isMainThread) {
+  const sdf = new Float32Array(workerData.sdf)
+  const CW = new Uint8Array(workerData.CW)
+  const DB = new Uint8Array(workerData.DB)
+  const RV = new Uint8Array(workerData.RV)
+  const FM = new Uint8Array(workerData.FM)
+  const RP = new Uint8Array(workerData.RP)
+  const RDT = new Uint8Array(workerData.RDT)
+  const RT = new Uint8Array(workerData.RT)
+  const SHD = new Uint8Array(workerData.SHD)
+  // расстояние до дороги (логические единицы) — билинейно по сетке 8192×4672
+  const LW = SW * 2, LH = SH * 2
+  const roadD = (arr, lx, ly) => {
+    const x = Math.min(LW - 1.001, Math.max(0, lx - 0.5)), y = Math.min(LH - 1.001, Math.max(0, ly - 0.5))
+    const x0 = x | 0, y0 = y | 0, fx = x - x0, fy = y - y0
+    const i = y0 * LW + x0
+    const a = arr[i] + (arr[i + 1] - arr[i]) * fx
+    const b = arr[i + LW] + (arr[i + LW + 1] - arr[i + LW]) * fx
+    return (a + (b - a) * fy) / 32
+  }
+  const coarse = new Float32Array(workerData.coarse)
+  const MS = new Float32Array(workerData.MS), MH = new Float32Array(workerData.MH)
+  const lumHP = new Float32Array(workerData.lumHP)
+  const tint = new Uint8Array(workerData.tint)
+  const out = new Uint8Array(workerData.out)
+  const counter = new Int32Array(workerData.counter)
+
+  const NZ = makeNoise()
+  const { noise, fbm, ridged } = NZ
   const hash = (x, y) => {
     let h = Math.imul(x, 374761393) + Math.imul(y, 668265263)
     h = Math.imul(h ^ (h >>> 13), 1274126177)
@@ -431,7 +497,7 @@ if (!isMainThread) {
     plainA: hex('#7f8c4c'), plainB: hex('#9b9a5d'), plainC: hex('#687a40'), field: hex('#a8a067'),
     forestGround: hex('#2c3f26'), crownL: hex('#5d7d3f'), crownD: hex('#2a4122'), pineL: hex('#46663e'), pineD: hex('#1e3121'),
     hillA: hex('#8b8157'), hillB: hex('#76734c'),
-    rockA: hex('#7a746c'), rockB: hex('#58534d'), rockC: hex('#86735c'), snow: hex('#eef2f6'),
+    rockA: hex('#958c7e'), rockB: hex('#7a7268'), rockC: hex('#a08e74'), snow: hex('#e4e9ef'), alp: hex('#7c8050'), rockWarm: hex('#a58c6c'), rockCold: hex('#727880'), scree: hex('#b3aa9a'),
     sandA: hex('#d8b97f'), sandB: hex('#c39b63'), sandC: hex('#e2c895'), stone: hex('#a37f5b'),
     steppeA: hex('#b2a56c'), steppeB: hex('#9c9660'), tundraA: hex('#bdb9a2'), stoneRoad: hex('#b0aa9c'), kerb: hex('#6b665c'), dirtRoad: hex('#7a6040'), trailC: hex('#c2ad84'), plank: hex('#7a5a3a'), tundraB: hex('#a4a38b'), beach: hex('#d6c494'), wetSand: hex('#a3936c'),
     cropA: hex('#bdaa66'), cropB: hex('#8a9450'), cropC: hex('#9c8662'), cropD: hex('#aca76b'), hedge: hex('#55663a'),
@@ -512,17 +578,21 @@ if (!isMainThread) {
   const WY = new Float32Array((STRIP + 2) * OW)
   const LX = -0.62, LY = -0.62, LZ = 0.48 // солнце с северо-запада
   const flatDot = LZ
+  // пороги высот: луга, лес, снег
+  const MEADOW_LO = 0.36, MEADOW_HI = 0.72, TREE_LO = 0.4, TREE_HI = 0.6, SNOW_LO = 0.9, SNOW_HI = 1.1
 
   for (;;) {
     const strip = Atomics.add(counter, 0, 1)
     const y0 = strip * STRIP
     if (y0 >= OH) break
     const y1 = Math.min(OH, y0 + STRIP)
+    if (y1 <= CY0 || y0 >= CY1) { parentPort.postMessage(strip + 1); continue }
+    const xa = Math.max(0, CX0 - 1), xb = Math.min(OW, CX1 + 1)
     // проход 1: высоты (с запасом в строку сверху и снизу — для нормалей)
     for (let Y = y0 - 1; Y <= y1; Y++) {
       const row = (Y - y0 + 1) * OW
       const yy = Math.min(OH - 1, Math.max(0, Y))
-      for (let X = 0; X < OW; X++) {
+      for (let X = xa; X < xb; X++) {
         const lx = (X * 2) / K, ly = (yy * 2) / K // логические единицы
         const sx = (X + 0.5) / K - 0.5, sy = (yy + 0.5) / K - 0.5
         const wx = fbm(lx * 0.011, ly * 0.011, 3) * 2.2
@@ -531,12 +601,12 @@ if (!isMainThread) {
         let h
         if (s > 0) {
           bilW(sx + wx, sy + wy)
-          const mtn = wts[4] + wts[5]
+          const mtn = bil(MS, sx + wx * 0.6, sy + wy * 0.6)
           const hill = wts[3]
-          const rug = mtn * 0.9 + hill * 0.45 + 0.12
+          const rug = (hill * 0.45 + 0.12) * (1 - Math.min(1, mtn))
           h = bil(coarse, sx + wx * 0.5, sy + wy * 0.5)
           h += bil(lumHP, sx + wx * 0.15, sy + wy * 0.15) * rug * 0.3
-          h += mtn * (ridged(lx * 0.014 + wx * 0.02, ly * 0.014 + wy * 0.02, 6) - 0.45) * 0.3
+          if (mtn > 0.01) h += mtnRelief(NZ, lx + wx * 1.5, ly + wy * 1.5, mtn, bil(MH, sx + wx * 0.6, sy + wy * 0.6))
           h += hill * (fbm(lx * 0.03, ly * 0.03, 4)) * 0.1
           // мелкие гребни, осыпи и кочки — видны на самом сильном приближении
           h += (mtn * 0.035 + hill * 0.014 + 0.004) * fbm(lx * 0.13 + wx * 0.1, ly * 0.13, 4)
@@ -564,9 +634,9 @@ if (!isMainThread) {
       }
     }
     // проход 2: цвет и свет
-    for (let Y = y0; Y < y1; Y++) {
+    for (let Y = Math.max(y0, CY0); Y < Math.min(y1, CY1); Y++) {
       const row = (Y - y0 + 1) * OW
-      for (let X = 0; X < OW; X++) {
+      for (let X = CX0; X < CX1; X++) {
         const i = row + X
         const s = S[i]
         const lx = (X * 2) / K, ly = (Y * 2) / K
@@ -619,6 +689,21 @@ if (!isMainThread) {
           }
           const north = 1 - sstep(900, 1350, ly) // холодный север: пустыня → тундра
           const h = H[i]
+          let snowK = 0
+          let mt = Math.min(1, (wts[4] + wts[5]) / wl)
+          {
+            const ms = Math.min(1, bil(MS, sx + WX[i] * 0.6, sy + WY[i] * 0.6))
+            if (ms > mt + 0.01) {
+              const k = (1 - ms) / (1 - mt)
+              wts[1] *= k; wts[2] *= k; wts[3] *= k; wts[6] *= k
+              wts[4] += (ms - mt) * wl
+              mt = ms
+            }
+          }
+          const EX = (68 * K) / 4
+          const dzx = (H[i + 1] - H[i - 1]) * 0.5 * EX
+          const dzy = (H[i + OW] - H[i - OW]) * 0.5 * EX
+          const slope = Math.sqrt(dzx * dzx + dzy * dzy)
           const nB = fbm(lx * 0.035, ly * 0.035, 4)
           const nF = noise(lx * 0.14, ly * 0.14)
           // вокруг поселений лес вырублен под луга и пашни; край вырубки неровный
@@ -645,13 +730,31 @@ if (!isMainThread) {
           }
           // горы: скалы, осыпи, снег по высоте
           if (wts[4] + wts[5] > 0.01) {
-            const strata = noise(lx * 0.05, ly * 0.4 + nB * 4)
-            mix3(P.rockA, P.rockB, 0.5 + strata * 0.8)
+            const steep = sstep(0.5, 1.5, slope)
+            const strata = noise(lx * 0.03, ly * 0.09 + nB * 2)
+            // крутые стены темнее, пологие осыпи теплее
+            mix3(P.rockA, P.rockB, Math.min(1, Math.max(0, 0.22 + strata * 0.3 + steep * 0.42)))
             tmpA[0] = col[0]; tmpA[1] = col[1]; tmpA[2] = col[2]
-            mix3(tmpA, P.rockC, Math.max(0, nB) * 1.2)
-            const snowLine = sstep(0.66, 0.8, h + nB * 0.1 + wts[5] * 0.22 - (1 - north) * 0.08)
+            mix3(tmpA, P.rockC, Math.min(1, Math.max(0, nB) * 1.2) * (1 - steep))
+            // порода меняется от массива к массиву: тёплый песчаник, холодный сланец
+            const lith = fbm(lx * 0.004 + 40.3, ly * 0.004 - 17.1, 3)
+            const lk = Math.min(1, Math.abs(lith) * 2.2) * 0.55
+            const lt = lith > 0 ? P.rockWarm : P.rockCold
+            col[0] += (lt[0] - col[0]) * lk; col[1] += (lt[1] - col[1]) * lk; col[2] += (lt[2] - col[2]) * lk
+            // светлые осыпи у подножия крутых стен
+            const scree = sstep(0.35, 0.7, slope) * (1 - sstep(0.9, 1.5, slope)) * Math.max(0, noise(lx * 0.11, ly * 0.11) + 0.25)
+            col[0] += (P.scree[0] - col[0]) * scree * 0.5; col[1] += (P.scree[1] - col[1]) * scree * 0.5; col[2] += (P.scree[2] - col[2]) * scree * 0.5
+            // альпийские луга в долинах, на пологих склонах и у кромки леса
+            const fringe = sstep(0.03, 0.4, wts[2] / wl)
+            const meadow = Math.min(1, (1 - sstep(MEADOW_LO, MEADOW_HI, h + nB * 0.1)) * (1 - sstep(0.45, 1.1, slope)) * (1 - north * 0.6) + fringe * (1 - sstep(0.9, 1.8, slope)))
             tmpA[0] = col[0]; tmpA[1] = col[1]; tmpA[2] = col[2]
-            mix3(tmpA, P.snow, snowLine)
+            mix3(tmpA, P.alp, meadow * 0.85)
+            // снег: на высоте; рваная кромка, языки в ложбинах, на крутых стенах не держится
+            const nS = fbm(lx * 0.16 + 3.3, ly * 0.16 + 9.1, 3)
+            const snowLine = sstep(SNOW_LO, SNOW_HI, h + nB * 0.08 + nS * 0.22 + wts[5] * 0.1 + north * 0.14 - sstep(0.7, 1.9, slope) * 0.22)
+            tmpA[0] = col[0]; tmpA[1] = col[1]; tmpA[2] = col[2]
+            mix3(tmpA, P.snow, snowLine * 0.94)
+            snowK = snowLine * (wts[4] + wts[5]) / wl
             add3(col, wts[4] + wts[5])
           }
           // пустыня / тундра
@@ -765,16 +868,25 @@ if (!isMainThread) {
             b += (P.kerb[2] - b) * kerb * 0.7
           }
           // свет от рельефа
-          const EX = (68 * K) / 4
-          const dzx = (H[i + 1] - H[i - 1]) * 0.5 * EX
-          const dzy = (H[i + OW] - H[i - OW]) * 0.5 * EX
-          const inv = 1 / Math.sqrt(dzx * dzx + dzy * dzy + 1)
+          const inv = 1 / Math.sqrt(slope * slope + 1)
           let dot = (-dzx * LX - dzy * LY + LZ) * inv
-          let shade = (0.52 + Math.max(0, dot)) / (0.52 + flatDot)
+          // в горах рассеянного света меньше — склоны читаются резче
+          const amb = 0.52 - 0.06 * mt
+          let shade = (amb + Math.max(0, dot)) / (amb + flatDot)
+          if (shade > 1) shade = 1 + (shade - 1) * 0.45
           // тень от гор, заслоняющих солнце
-          shade *= 1 - (bil(SHD, sx, sy) / 255) * 0.38
+          shade *= 1 - (bil(SHD, sx, sy) / 255) * (0.36 + 0.04 * mt)
+          // снег в тени синеет, на свету не выгорает
+          if (snowK > 0.01) {
+            const sh = Math.min(1, Math.max(0, 1 - shade)) * snowK
+            r += (r * 0.8 - r) * sh; g += (g * 0.9 - g) * sh; b += (b * 1.12 - b) * sh
+            if (shade > 1) shade = 1 + (shade - 1) * (1 - snowK * 0.7)
+          }
           // деревья
-          const forestD = Math.min(1, (wts[2] / wl) * 1.25 + (wts[4] / wl) * 0.12 * (h < 0.5 ? 1 : 0) + (wts[1] / wl) * 0.03) * (1 - sstep(0.18, 0.34, rv)) * sstep(0.7, 1.6, Math.min(dP, dD)) * sstep(0.25, 0.6, dT)
+          // рощи и перелески на равнинах и холмах (подальше от поселений), лес в горных долинах
+          const grove = sstep(0.12, 0.3, fbm(lx * 0.018 + 11, ly * 0.018 - 5, 3)) * (1 - sstep(0.5, 0.85, fmW))
+          const mtnF = mt * 0.85 * (1 - sstep(TREE_LO, TREE_HI, h + nB * 0.08 + nF * 0.06)) * (1 - sstep(1.0, 2.2, slope))
+          const forestD = Math.min(1, (wts[2] / wl) * 1.25 + mtnF + (wts[1] / wl) * (grove * 0.55 + 0.06) + (wts[3] / wl) * grove * 0.6) * (1 - sstep(0.18, 0.34, rv)) * sstep(0.7, 1.6, Math.min(dP, dD)) * sstep(0.25, 0.6, dT)
           if (forestD > 0.04) {
             const dens = sstep(0.04, 0.9, forestD + nF * 0.2) * 0.97
             const pine = (h > 0.32 || ly < 1200) ? 1 : 0
@@ -795,7 +907,8 @@ if (!isMainThread) {
               r = col[0] * tv
               g = col[1] * tv
               b = col[2] * tv
-              shade = 0.75 + shade * 0.25
+              const sk = 0.25 + 0.3 * mt
+              shade = 1 - sk + shade * sk
             } else {
               // просвет между кронами — тёмная глубина леса
               if (dens > 0.5) {
@@ -817,7 +930,7 @@ if (!isMainThread) {
           g *= shade * 0.99
           b *= shade * (shade < 1 ? 1.04 : 0.98)
         }
-        const o = (Y * OW + X) * 3
+        const o = ((Y - CY0) * CWD + (X - CX0)) * 3
         out[o] = Math.max(0, Math.min(255, r * 255))
         out[o + 1] = Math.max(0, Math.min(255, g * 255))
         out[o + 2] = Math.max(0, Math.min(255, b * 255))

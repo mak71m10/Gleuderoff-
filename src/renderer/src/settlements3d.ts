@@ -52,7 +52,7 @@ function mat(color: number, tint = 0): THREE.MeshLambertMaterial {
   // приглушённая палитра: модели не спорят с картой
   const hsl = { h: 0, s: 0, l: 0 }
   c.getHSL(hsl)
-  c.setHSL(hsl.h, hsl.s * 0.6, hsl.l * 0.9 + tint)
+  c.setHSL(hsl.h, hsl.s * 0.5, hsl.l * 0.88 + 0.03 + tint)
   const key = c.getHexString()
   let m = matCache.get(key)
   if (!m) {
@@ -125,13 +125,39 @@ function house(st: Style, r: () => number, x: number, z: number, scale = 1, floo
   return g
 }
 
-function tree(r: () => number, x: number, z: number, culture: string): THREE.Group {
+// зелень — в тон кронам на самой карте
+const GREENS = [0x4f7436, 0x5d7d3f, 0x466a34, 0x6a8540]
+const PINES = [0x35553a, 0x2f4d36, 0x3f6040]
+const DRY = [0x7a8a3a, 0x8a8c4a, 0x6f7a3c]
+function tree(r: () => number, x: number, z: number, culture: string, s = 1): THREE.Group {
   const g = new THREE.Group()
-  const h = 0.8 + r() * 0.6
-  g.add(mesh(new THREE.CylinderGeometry(0.08, 0.1, h * 0.5, 5), mat(0x5a4028), 0, h * 0.25, 0))
-  const green = culture === 'desert' || culture === 'dark' ? 0x7a8a3a : culture === 'nordic' ? 0x2f5a3a : 0x3f6e2e
-  if (culture === 'nordic' || culture === 'dwarven' || r() < 0.4) g.add(mesh(new THREE.ConeGeometry(0.5 + r() * 0.2, h * 1.2, 7), mat(green, (r() - 0.5) * 0.1), 0, h * 0.5 + h * 0.55, 0))
-  else g.add(mesh(new THREE.IcosahedronGeometry(0.55 + r() * 0.25, 0), mat(green, (r() - 0.5) * 0.1), 0, h * 0.75, 0))
+  const h = (0.75 + r() * 0.7) * s
+  const dry = culture === 'desert' || culture === 'dark' || culture === 'orcish'
+  const cold = culture === 'nordic' || culture === 'dwarven'
+  const conifer = cold ? r() < 0.85 : !dry && r() < 0.28
+  const tint = (r() - 0.5) * 0.1
+  const pick = (a: number[]): number => a[Math.floor(r() * a.length)]
+  g.add(mesh(new THREE.CylinderGeometry(0.06 * s, 0.09 * s, h * 0.5, 5), mat(0x5a4028), 0, h * 0.25, 0))
+  if (conifer) {
+    // ель: три яруса
+    const c = mat(pick(PINES), tint)
+    const w = (0.42 + r() * 0.14) * s
+    for (let i = 0; i < 3; i++) {
+      const k = 1 - i * 0.27
+      g.add(mesh(new THREE.ConeGeometry(w * k, h * 0.62 * k + 0.1, 7), c, 0, h * (0.5 + i * 0.36), 0, r() * 3))
+    }
+  } else {
+    // лиственное: крона из двух-трёх комков
+    const c = mat(pick(dry ? DRY : GREENS), tint)
+    const rad = (0.42 + r() * 0.2) * s
+    const n = 2 + (r() < 0.5 ? 1 : 0)
+    for (let i = 0; i < n; i++) {
+      const a = r() * Math.PI * 2, d = i === 0 ? 0 : rad * 0.55
+      const b = mesh(new THREE.IcosahedronGeometry(rad * (i === 0 ? 1 : 0.72), 1), c, Math.cos(a) * d, h * 0.72 + (i === 0 ? 0 : (r() - 0.3) * rad * 0.6), Math.sin(a) * d, r() * 3)
+      b.scale.y = 0.85
+      g.add(b)
+    }
+  }
   g.position.set(x, 0, z)
   return g
 }
@@ -191,22 +217,50 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
   const r = rng(variant * 7919 + type.length * 104729 + culture.length * 31)
   const g = new THREE.Group()
   const addHouses = (n: number, radius: number, minDist: number, scale = 1, floors = 1, avoid: [number, number, number][] = []): void => {
-    for (const [x, z] of scatter(r, n, radius, minDist, avoid)) g.add(house(st, r, x, z, scale, floors + (r() < 0.25 ? 1 : 0) * (floors > 1 ? 1 : 0)))
+    for (const [x, z] of scatter(r, n, radius, minDist, avoid)) {
+      occupied.push([x, z, 1.15 * scale])
+      g.add(house(st, r, x, z, scale, floors + (r() < 0.25 ? 1 : 0) * (floors > 1 ? 1 : 0)))
+    }
   }
-  const addTrees = (n: number, rMin: number, rMax: number): void => {
-    for (let i = 0; i < n; i++) {
-      const a = r() * Math.PI * 2, d = rMin + r() * (rMax - rMin)
-      g.add(tree(r, Math.cos(a) * d, Math.sin(a) * d, culture))
+  // занятые места: дома и постройки — деревья растут только в просветах
+  const occupied: [number, number, number][] = []
+  // деревья своим генератором: раскладка домов от них не зависит
+  const rt = rng(variant * 4513 + type.length * 977 + culture.length * 131 + 7)
+  /** Деревья в кольце rMin…rMax; каждое третье — рощица из 2–3 стволов. zMax — не заходить в воду */
+  const addTrees = (n: number, rMin: number, rMax: number, zMax = Infinity, size = 1): void => {
+    let made = 0
+    const free = (x: number, z: number): boolean => z < zMax && Math.abs(x) < VIEW - 0.9 && !occupied.some(([ox, oz, or]) => Math.hypot(ox - x, oz - z) < or)
+    for (let t = 0; t < n * 25 && made < n; t++) {
+      const a = rt() * Math.PI * 2, d = Math.sqrt(rMin * rMin + rt() * (rMax * rMax - rMin * rMin))
+      const x = Math.cos(a) * d, z = Math.sin(a) * d
+      if (!free(x, z)) continue
+      g.add(tree(rt, x, z, culture, size * (0.85 + rt() * 0.35)))
+      occupied.push([x, z, 0.55])
+      made++
+      if (rt() < 0.35) {
+        for (let k = 0, m = 1 + Math.floor(rt() * 2); k < m && made < n; k++) {
+          const b = rt() * Math.PI * 2, x2 = x + Math.cos(b) * 0.75, z2 = z + Math.sin(b) * 0.75
+          if (!free(x2, z2)) continue
+          g.add(tree(rt, x2, z2, culture, size * (0.7 + rt() * 0.3)))
+          occupied.push([x2, z2, 0.5])
+          made++
+        }
+      }
     }
   }
   switch (type) {
     case 'village': {
       addHouses(4 + Math.floor(r() * 3), 3.2, 1.9)
-      addTrees(3, 3.5, 5)
+      addTrees(4, 1, 3.4)
+      addTrees(9, 3.6, 6)
       break
     }
     case 'fishing': {
-      for (const [x, z] of scatter(r, 5, 3.2, 1.9)) g.add(house(st, r, x, z - 1.5))
+      for (const [x, z] of scatter(r, 5, 3.2, 1.9)) {
+        occupied.push([x, z - 1.5, 1.15])
+        g.add(house(st, r, x, z - 1.5))
+      }
+      addTrees(8, 2, 5.6, 1.6)
       g.add(mesh(new THREE.BoxGeometry(0.8, 0.12, 4.5), mat(0x6b4a2e), 1.5, 0.15, 3.5))
       g.add(boat(3.2, 4.5, 0.3, 0.8))
       break
@@ -218,8 +272,10 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
       church.add(mesh(gableRoof(1.8, 3.2, 1.2), mat(st.roof), 0, 2.4, 0))
       church.add(tower(st, 0, -1.9, 0.55, 4.2))
       g.add(church)
+      occupied.push([0, -0.6, 2.6])
       addHouses(12 + Math.floor(r() * 5), 5.6, 1.7, 1, 1, [[0, 0, 2.6]])
-      addTrees(4, 6, 8)
+      addTrees(6, 1.5, 5.6, Infinity, 0.9)
+      addTrees(12, 5.9, 8.4)
       break
     }
     case 'city':
@@ -241,7 +297,11 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
       keep.add(mesh(new THREE.ConeGeometry(2.0, 1.5, 4), mat(st.roof), 0, (big ? 3.6 : 2.8) + 0.75, 0, Math.PI / 4))
       if (big) keep.add(tower(st, 1.4, -1.4, 0.5, 4.6))
       g.add(keep)
+      occupied.push([0, 0, 2.6])
       addHouses(big ? 44 : 30, R - 1.1, 1.45, 1.0, 1, [[0, 0, 3]])
+      // сады и дворы между крышами, у обычного города — ещё и опушка
+      addTrees(big ? 14 : 10, 2.6, R - 1.2, Infinity, 0.8)
+      if (!big) addTrees(10, R - 0.6, R + 1.2)
       break
     }
     case 'castle': {
@@ -262,11 +322,15 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
         w.position.y += y0
         g.add(w)
       }
-      addTrees(3, 6, 8)
+      occupied.push([0, 0, 4.4])
+      addTrees(11, 4.6, 8)
       break
     }
     case 'port': {
       addHouses(10, 4.6, 1.6, 1, 1, [[2, 4, 3]])
+      occupied.push([-3.5, 4.5, 1.2])
+      addTrees(4, 1, 4.6, 2.2, 0.9)
+      addTrees(8, 4.8, 7.2, 1.5)
       g.add(mesh(new THREE.BoxGeometry(1, 0.15, 7), mat(0x6b4a2e), 3, 0.15, 5.5))
       g.add(mesh(new THREE.BoxGeometry(4, 0.15, 0.9), mat(0x6b4a2e), 2, 0.15, 3.2))
       g.add(boat(5.2, 6.5, 0.2))
@@ -277,6 +341,7 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
     case 'grandport': {
       // Аурхафен: город на берегу (сзади), полукруглый волнолом с маяком, три бассейна, верфи и корабли (спереди — море)
       addHouses(46, 7.5, 1.35, 1.0, 1, [[0, 6, 6]])
+      addTrees(10, 2, 7.4, 0.4, 0.8)
       for (const [x, z] of [[-6.5, -3], [6.5, -3], [0, -7.5]]) g.add(tower(st, x, z, 0.55, 3.2))
       // набережная и склады
       g.add(mesh(new THREE.BoxGeometry(17, 0.25, 1.2), mat(st.stone), 0, 0.12, 2.6))
@@ -305,14 +370,16 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
         for (const x of [-1.8, 1.8]) g.add(mesh(new THREE.CylinderGeometry(0.22, 0.25, 2.6, 8), mat(0xe9e2d0), x, 2.2, -2.4 + i * 0.96))
       if (st.shape === 'flat' || st.shape === 'hut') g.add(mesh(new THREE.SphereGeometry(2, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), mat(st.roof), 0, 3.5, 0))
       else g.add(mesh(gableRoof(4.4, 5.6, 1.3), mat(st.roof), 0, 3.5, 0))
-      addTrees(3, 4.5, 6)
+      occupied.push([0, 0, 4.3])
+      addTrees(10, 4.4, 7.2)
       break
     }
     case 'tower': {
       g.add(tower(st, 0, 0, 1.0, 7))
       g.add(mesh(new THREE.CylinderGeometry(1.25, 1.25, 0.3, 10), mat(st.stone, -0.06), 0, 5.1, 0))
       g.add(house(st, r, 2.4, 1.6))
-      addTrees(2, 3.5, 5)
+      occupied.push([0, 0, 1.8], [2.4, 1.6, 1.3])
+      addTrees(9, 2.2, 5.5)
       break
     }
     case 'ruins': {
@@ -328,7 +395,7 @@ function build(type: SettlementType, culture: string, variant: number): THREE.Gr
         g.add(c)
       }
       for (let i = 0; i < 10; i++) g.add(mesh(new THREE.BoxGeometry(0.3 + r() * 0.4, 0.3, 0.3 + r() * 0.4), mat(0x7a756c), (r() - 0.5) * 7, 0.15, (r() - 0.5) * 7, r() * 3))
-      addTrees(3, 3, 6)
+      addTrees(10, 1.2, 6.5)
       break
     }
   }
@@ -351,9 +418,9 @@ function setup(): void {
   camera = new THREE.OrthographicCamera(-VIEW, VIEW, VIEW, -VIEW, 0.1, 100)
   camera.position.set(0, 20, 18)
   camera.lookAt(0, 0, 0)
-  const hemi = new THREE.HemisphereLight(0xf2ead8, 0x3a3428, 1.15)
+  const hemi = new THREE.HemisphereLight(0xf2ead8, 0x4a4436, 1.3)
   scene.add(hemi)
-  const sun = new THREE.DirectionalLight(0xfff0d8, 1.7)
+  const sun = new THREE.DirectionalLight(0xfff0d8, 1.35)
   sun.position.set(-10, 18, 6)
   sun.castShadow = true
   sun.shadow.mapSize.set(1024, 1024)
@@ -363,7 +430,7 @@ function setup(): void {
   sun.shadow.camera.bottom = -16
   sun.shadow.radius = 3
   scene.add(sun)
-  const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.38 }))
+  const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.28 }))
   shadowPlane.rotation.x = -Math.PI / 2
   shadowPlane.receiveShadow = true
   scene.add(shadowPlane)

@@ -351,7 +351,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     return (m[j * MS + i] * (1 - fu) + m[j * MS + i + 1] * fu) * (1 - fv) + (m[(j + 1) * MS + i] * (1 - fu) + m[(j + 1) * MS + i + 1] * fu) * fv
   }
   const hasWater = waters.length > 0 || rivers.length > 0
-  const waterAt = hasWater
+  const waterIn = hasWater
     ? sampler(canvasMask((g) => {
         waters.forEach((r) => { trace(g, r); g.fill() })
         rivers.forEach((q) => { trace(g, q.r, false); g.lineWidth = q.w; g.stroke() })
@@ -370,12 +370,49 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const x0 = -margin, z0 = -margin, EW = W + margin * 2, EH = H + margin * 2
   const hillAmp = S.rocky ? 46 : S.hills ? 20 : 7
   const n1 = noise2(hashOf(seedName) + 3)
+  // за краем плана берег и река продолжаются извилисто, а не прямой полосой от крайнего пикселя маски
+  const waterAt = (x: number, z: number): number => {
+    const d = Math.max(0, -x, x - W, -z, z - H)
+    if (d <= 0 || !hasWater) return waterIn(x, z)
+    const k = Math.min(d, margin * 1.2)
+    const ox = (n1(x * 0.0035 + 13, z * 0.0035 + 7) - 0.5) * k * 1.7 + (n1(x * 0.012 + 3, z * 0.012 + 51) - 0.5) * k * 0.5
+    const oz = (n1(x * 0.0035 + 91, z * 0.0035 + 37) - 0.5) * k * 1.7 + (n1(x * 0.012 + 77, z * 0.012 + 19) - 0.5) * k * 0.5
+    return waterIn(Math.max(0, Math.min(W, x)) + ox, Math.max(0, Math.min(H, z)) + oz)
+  }
+  // горы вокруг города: начинаются за краем плана и растут к горизонту (не для пещер и Кулагона)
+  const mtnOn = !kranz && S.style !== 'deep'
+  const mAmp = mtnOn ? margin * (S.rocky ? 0.42 : S.hills ? 0.24 : 0.1) : 0
+  const SKIRT = mtnOn ? Math.max(EW, EH) * 0.45 : 0
+  const mtnW = (x: number, z: number): number => smooth(margin * 0.45, margin * 1.6, Math.max(0, -x, x - W, -z, z - H))
+  const mtn = (x: number, z: number): number => {
+    const w = mtnW(x, z)
+    if (w <= 0) return 0
+    const f0 = 1 / Math.max(170, margin * 0.6)
+    let a = 0, amp = 1, fr = f0, prev = 1
+    for (let o = 0; o < 4; o++) {
+      let r = 1 - Math.abs(2 * n1(x * fr + 300 + o * 17, z * fr + 500 - o * 13) - 1)
+      r *= r
+      a += r * amp * prev
+      prev = Math.min(1, r * 1.5 + 0.15)
+      amp *= 0.5
+      fr *= 2.1
+    }
+    // перевалы и долины: кольцо гор не сплошное
+    const gap = 0.4 + 0.6 * smooth(0.3, 0.62, n1(x * f0 * 0.4 + 70, z * f0 * 0.4 + 90))
+    // к воде горы спускаются полого
+    let wb = 0
+    if (hasWater) {
+      const d = margin * 0.28, e = d * 0.4
+      wb = (waterAt(x - d, z) + waterAt(x + d, z) + waterAt(x, z - d) + waterAt(x, z + d) + waterAt(x - e, z - e) + waterAt(x + e, z + e) + waterAt(x - e, z + e) + waterAt(x + e, z - e)) / 8
+    }
+    return mAmp * w * gap * (0.16 + 1.25 * a) * (1 - smooth(0, 0.55, wb))
+  }
   const rawHeight = (x: number, z: number): number => {
     const f = 1 / Math.max(90, radius * 0.5)
     const hill = n1(x * f, z * f) * 0.65 + n1(x * f * 2.3 + 40, z * f * 2.3) * 0.28 + n1(x * f * 6 + 90, z * f * 6) * 0.07
     const out = 1 - smooth(0.02, 0.5, townAt(x, z))
-    const edge = Math.max(0, Math.max(-x, x - W, -z, z - H)) / margin
-    const land = 1.1 + (n1(x * 0.02, z * 0.02) - 0.5) * 0.6 + Math.max(0, hill - 0.3) * 1.7 * hillAmp * out * (0.45 + edge)
+    const edge = Math.min(1.5, Math.max(0, Math.max(-x, x - W, -z, z - H)) / margin)
+    const land = 1.1 + (n1(x * 0.02, z * 0.02) - 0.5) * 0.6 + Math.max(0, hill - 0.3) * 1.7 * hillAmp * out * (0.45 + edge) + mtn(x, z)
     const w = waterAt(x, z)
     const h = land * (1 - smooth(0.12, 0.5, w)) - 3 * smooth(0.3, 0.75, w)
     if (!kranz) return h
@@ -812,10 +849,27 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   groundTex.anisotropy = 8
   const scene = new THREE.Scene()
   const disposable: { dispose: () => void }[] = [groundTex]
+  // цвет земли по высоте и уклону: камень на кручах и высоте, лес на склонах, снег на вершинах, песок у воды
+  const landRock = new THREE.Color('#8b8878'), landShore = new THREE.Color(sand), landSnow = new THREE.Color(1.5, 1.52, 1.6), landWood = new THREE.Color(0.5, 0.66, 0.46)
+  const snowLine = Math.max(95, mAmp * 0.66)
+  const paintLand = (tmp: THREE.Color, x: number, z: number, y: number, sl: number): void => {
+    tmp.setRGB(1, 1, 1)
+    const mw = mtnOn ? mtnW(x, z) : 0
+    const lo = 12 + mw * mAmp * 0.4
+    if (mw > 0 && S.forest > 0.02) {
+      const wood = smooth(0.42, 0.6, n1(x * 0.011 + 21, z * 0.011 + 8) * 0.7 + n1(x * 0.04, z * 0.04 + 33) * 0.3) * mw * Math.min(1, S.forest * 3) * (1 - smooth(lo * 0.7, lo * 1.1, y))
+      tmp.lerp(landWood, wood * 0.8)
+    }
+    const rk = Math.max(smooth(lo, lo + 18 + mw * mAmp * 0.3, y) * 0.85, mw * smooth(0.55, 1.05, sl) * 0.9)
+    if (rk > 0) tmp.lerp(landRock, rk)
+    if (mw > 0 && y > snowLine * 0.7) tmp.lerp(landSnow, smooth(snowLine * 0.8, snowLine * 1.1, y + (n1(x * 0.03 + 5, z * 0.03) - 0.5) * snowLine * 0.25) * (1 - smooth(1.1, 2.2, sl) * 0.7) * 0.92)
+    if (y < 0.55 && hasWater) tmp.lerp(landShore, 0.75 * smooth(0.55, 0.1, y))
+    if (y < -0.3) tmp.multiplyScalar(0.55)
+  }
   const groundGeo = new THREE.BufferGeometry()
   {
     const n = (GN + 1) * (GM + 1), pos = new Float32Array(n * 3), uv = new Float32Array(n * 2), col = new Float32Array(n * 3)
-    const rock = C('#8b8878'), shore = C(sand), white = new THREE.Color(1, 1, 1), tmp = new THREE.Color()
+    const rock = C('#8b8878'), white = new THREE.Color(1, 1, 1), tmp = new THREE.Color()
     for (let j = 0; j <= GM; j++)
       for (let i = 0; i <= GN; i++) {
         const q = j * (GN + 1) + i, x = x0 + (i / GN) * EW, z = z0 + (j / GM) * EH, y = hgrid[q]
@@ -836,9 +890,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           col[q * 3] = tmp.r; col[q * 3 + 1] = tmp.g; col[q * 3 + 2] = tmp.b
           continue
         }
-        if (y > 12) tmp.lerp(rock, smooth(12, 30, y) * 0.85)
-        if (y < 0.55 && hasWater) tmp.lerp(shore, 0.75 * smooth(0.55, 0.1, y))
-        if (y < -0.3) tmp.multiplyScalar(0.55)
+        paintLand(tmp, x, z, y, Math.hypot((hgrid[i < GN ? q + 1 : q - 1] - y) / (EW / GN), (hgrid[j < GM ? q + GN + 1 : q - GN - 1] - y) / (EH / GM)))
         col[q * 3] = tmp.r; col[q * 3 + 1] = tmp.g; col[q * 3 + 2] = tmp.b
       }
     const idx = new Uint32Array(GN * GM * 6)
@@ -875,14 +927,60 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     return t
   })()
   disposable.push(grain)
-  groundMat.onBeforeCompile = (sh) => {
+  // дымка слабее на высоте: вершины дальних гор видны над горизонтом
+  const hazeUni = { value: new THREE.Vector2(mtnOn ? Math.max(14, mAmp * 0.15) : 1e6, mtnOn ? Math.max(40, mAmp * 0.7) : 2e6) }
+  const landShader = (sh: { uniforms: Record<string, unknown>; vertexShader: string; fragmentShader: string }): void => {
     sh.uniforms.uGrain = { value: grain }
-    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGr;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGr = position.xz;')
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vGr; uniform sampler2D uGrain;').replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= 0.55 + 0.45 * texture2D(uGrain, vGr * 0.09).r + 0.45 * texture2D(uGrain, vGr * 0.31 + 0.37).r;')
+    sh.uniforms.uHz = hazeUni
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGr; varying float vGy;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGr = position.xz; vGy = position.y;')
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 vGr; varying float vGy; uniform sampler2D uGrain; uniform vec2 uHz;')
+      .replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= 0.55 + 0.45 * texture2D(uGrain, vGr * 0.09).r + 0.45 * texture2D(uGrain, vGr * 0.31 + 0.37).r;')
+      .replace('#include <fog_fragment>', '#ifdef USE_FOG\nfloat fogK = smoothstep(fogNear, fogFar, vFogDepth) * (1.0 - 0.6 * smoothstep(uHz.x, uHz.y, vGy));\ngl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, fogK);\n#endif')
   }
+  groundMat.onBeforeCompile = landShader as never
   const ground = new THREE.Mesh(groundGeo, groundMat)
   ground.receiveShadow = true
   scene.add(ground)
+  if (mtnOn) {
+    // «юбка»: местность за краем земли города — предгорья и хребты до горизонта; сетка вдвое реже,
+    // внутренний ряд клеток заходит под землю города, чтобы на стыке не было щелей
+    const nxi = Math.round(GN / 2), nzi = Math.max(4, Math.round(GM / 2)), csx = EW / nxi, csz = EH / nzi
+    const kx = Math.ceil(SKIRT / csx), kz = Math.ceil(SKIRT / csz), NX = nxi + kx * 2, NZ = nzi + kz * 2, L = NX + 1
+    const n = L * (NZ + 1), pos = new Float32Array(n * 3), col = new Float32Array(n * 3), hs = new Float32Array(n)
+    for (let j = 0; j <= NZ; j++)
+      for (let i = 0; i <= NX; i++) {
+        const q = j * L + i, ii = i - kx, jj = j - kz, x = x0 + ii * csx, z = z0 + jj * csz
+        const inside = ii >= 0 && ii <= nxi && jj >= 0 && jj <= nzi
+        const inner = ii > 0 && ii < nxi && jj > 0 && jj < nzi
+        hs[q] = inner ? heightAt(x, z) - 6 : inside ? heightAt(x, z) : rawHeight(x, z)
+        pos[q * 3] = x; pos[q * 3 + 1] = hs[q]; pos[q * 3 + 2] = z
+      }
+    const tmp = new THREE.Color()
+    for (let j = 0; j <= NZ; j++)
+      for (let i = 0; i <= NX; i++) {
+        const q = j * L + i, y = hs[q]
+        paintLand(tmp, pos[q * 3], pos[q * 3 + 2], y, Math.hypot((hs[i < NX ? q + 1 : q - 1] - y) / csx, (hs[j < NZ ? q + L : q - L] - y) / csz))
+        col[q * 3] = tmp.r; col[q * 3 + 1] = tmp.g; col[q * 3 + 2] = tmp.b
+      }
+    const idx: number[] = []
+    for (let j = 0; j < NZ; j++)
+      for (let i = 0; i < NX; i++) {
+        const ii = i - kx, jj = j - kz
+        if (ii >= 1 && ii < nxi - 1 && jj >= 1 && jj < nzi - 1) continue
+        const a = j * L + i, b = a + 1, c = a + L, d = c + 1
+        idx.push(a, c, b, b, c, d)
+      }
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3))
+    geo.setIndex(idx)
+    geo.computeVertexNormals()
+    const mat = new THREE.MeshLambertMaterial({ color: groundFill, vertexColors: true })
+    mat.onBeforeCompile = landShader as never
+    scene.add(new THREE.Mesh(geo, mat))
+    disposable.push(geo, mat)
+  }
   disposable.push(groundGeo, groundMat)
 
   // ---------- материалы и куски города ----------
@@ -1794,6 +1892,23 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     if (R() > forest * (0.25 + clump * 1.6) * Math.min(1.4, 0.35 + d * 0.5)) continue
     treeSpots.push({ x, z, y, h: 5 + R() * 6, t: R() < coniferP ? 1 : 0 })
   }
+  if (mtnOn && forest > 0.02) {
+    // лес не обрывается по краю земли города: редеющие рощи на предгорьях (свой генератор — город не меняется)
+    let sd = (hashOf(seedName) ^ 0x51ed27) >>> 0
+    const R2 = (): number => ((sd = (Math.imul(sd, 1664525) + 1013904223) >>> 0) / 4294967296)
+    const reach = SKIRT * 0.75, capS = Math.round(cap * 0.7)
+    for (let i = 0, n = 0; i < capS * 10 && n < capS; i++) {
+      const x = x0 - reach + R2() * (EW + reach * 2), z = z0 - reach + R2() * (EH + reach * 2)
+      const dOut = Math.max(x0 - x, x - x0 - EW, z0 - z, z - z0 - EH)
+      if (dOut <= 0) continue
+      const clump = n1(x * 0.009 + 7, z * 0.009 + 3)
+      if (R2() > forest * (0.3 + clump * 1.7) * (1 - smooth(reach * 0.15, reach, dOut))) continue
+      const y = rawHeight(x, z)
+      if (y < 0.6 || y > 14 + mtnW(x, z) * mAmp * 0.45) continue
+      treeSpots.push({ x, z, y: y - 0.5, h: 7 + R2() * 8, t: R2() < Math.max(coniferP, mtnW(x, z) * 0.8) ? 1 : 0 })
+      n++
+    }
+  }
   greens.forEach((r) => {
     const [cx, cz] = centerOf(r)
     const n = Math.min(14, Math.floor(Math.abs(areaOf(r)) / 90))
@@ -1912,7 +2027,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   // ---------- вода ----------
   const waterUni = { uT: { value: 0 }, uDeep: { value: new THREE.Color('#2c6580') }, uSky: { value: new THREE.Color('#9fc8d8') }, uFog: { value: new THREE.Color() }, uNear: { value: 1 }, uFar: { value: 2 }, uDay: { value: 1 } }
   if (hasWater) {
-    const geo = new THREE.PlaneGeometry(EW * 1.5, EH * 1.5)
+    const geo = new THREE.PlaneGeometry(Math.max(EW * 1.5, EW + SKIRT * 2.1), Math.max(EH * 1.5, EH + SKIRT * 2.1))
     geo.rotateX(-Math.PI / 2)
     geo.translate(W / 2, 0, H / 2)
     const mat = new THREE.ShaderMaterial({

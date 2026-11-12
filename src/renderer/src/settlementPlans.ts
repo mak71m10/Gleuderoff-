@@ -37,7 +37,7 @@ function setup(): void {
   Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14 })
   sun.shadow.radius = 3
   scene.add(sun)
-  const plane = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.3 }))
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.24 }))
   plane.rotation.x = -Math.PI / 2
   plane.receiveShadow = true
   scene.add(plane)
@@ -49,7 +49,7 @@ function setup(): void {
 }
 
 /** Насколько крупно поселение в своём значке: деревня — горстка домов, столица — во весь круг */
-const FILL: Record<SettlementType, number> = { village: 3.6, fishing: 3.4, temple: 3.8, ruins: 3.2, tower: 2.6, castle: 4.0, town: 5.6, port: 6.0, city: 7.4, capital: 8.6, grandport: 8.6 }
+const FILL: Record<SettlementType, number> = { village: 5.4, fishing: 5.2, temple: 5.2, ruins: 4.8, tower: 3.8, castle: 5.4, town: 6.8, port: 7.0, city: 7.4, capital: 8.6, grandport: 8.6 }
 
 // облик по культуре провинции — для поселений без плана
 const CULTURE: Record<string, { style: string; plaster?: string[]; roof?: string[] }> = {
@@ -116,9 +116,21 @@ const muted = (hex: string, toward: THREE.Color, k: number): THREE.Color => {
   const c = new THREE.Color(hex)
   const hsl = { h: 0, s: 0, l: 0 }
   c.getHSL(hsl)
-  c.setHSL(hsl.h, hsl.s * 0.72, hsl.l)
+  c.setHSL(hsl.h, hsl.s * 0.62, hsl.l)
   return c.lerp(toward, k)
 }
+
+/** Деревья вокруг поселения по цвету поляны: сколько, доля хвойных, цвета крон */
+const TREES: Record<string, { n: number; pine: number; leaf: string[] }> = {
+  '#8c9a6a': { n: 1, pine: 0.15, leaf: ['#5f7a3c', '#6b8444', '#56703a'] },
+  '#a3a06a': { n: 0.9, pine: 0.1, leaf: ['#667f40', '#728848', '#5c753c'] },
+  '#77824a': { n: 2.3, pine: 0.45, leaf: ['#4f6c36', '#5a763c', '#486432'] },
+  '#8e8a62': { n: 1.1, pine: 0.3, leaf: ['#5d753c', '#687e42'] },
+  '#8a857a': { n: 0.7, pine: 0.85, leaf: ['#5a6e40'] },
+  '#d6dadb': { n: 0.4, pine: 1, leaf: ['#55684c'] },
+  '#cdb27c': { n: 0.25, pine: 0, leaf: ['#7f8448', '#8a8a4e'] }
+}
+const PINE = ['#3f5a3a', '#47623f', '#38523a']
 
 /** Собрать миниатюру: дома — призмы с шатровой крышей, стены — тонкий гребень, площади — мощёные пятна */
 function build(plan: CityPlan, seed: number, fill: number, ground: THREE.Color, ruins: boolean): THREE.Group {
@@ -159,8 +171,8 @@ function build(plan: CityPlan, seed: number, fill: number, ground: THREE.Color, 
     const floors = b.special ? 2.6 : a > 110 ? 1.8 : a > 55 ? 1.4 : 1
     const h = (b.special ? 5 : 2.6) * floors * 0.5 * lift * (ruins ? 0.5 : 1) + 0.02
     const roofs = S?.droof?.[b.d] ?? S?.roof ?? st.roof
-    const wall = muted(b.special ? st.wall : plasters[Math.floor(rnd() * plasters.length)], ground, 0.18)
-    const roof = muted(b.special ? st.tower : roofs[Math.floor(rnd() * roofs.length)], ground, 0.14)
+    const wall = muted(b.special ? st.wall : plasters[Math.floor(rnd() * plasters.length)], ground, 0.24)
+    const roof = muted(b.special ? st.tower : roofs[Math.floor(rnd() * roofs.length)], ground, 0.2)
     const ctr = centerOf(r)
     const top = h + (ruins ? 0 : Math.min(1.0, Math.sqrt(a) * 0.1) * lift * (st.pitch + 0.2))
     const cx = X(ctr[0]), cz = Z(ctr[1])
@@ -174,7 +186,7 @@ function build(plan: CityPlan, seed: number, fill: number, ground: THREE.Color, 
     }
   }
   // городские стены — тонкий гребень с редкими башнями
-  const wallCol = muted(st.wall, ground, 0.2)
+  const wallCol = muted(st.wall, ground, 0.3)
   const towers: [number, number][] = []
   for (const w of (S?.walls ?? []) as PlanLine[]) {
     const r = ringOf(w.r, 1)
@@ -202,6 +214,41 @@ function build(plan: CityPlan, seed: number, fill: number, ground: THREE.Color, 
       tri(A, B, B2, wallCol, 0.9)
       tri(A, B2, A2, wallCol, 0.9)
       tri(A2, B2, [x, th + 0.12, z], wallCol, 1.05)
+    }
+  }
+  // деревья: рощицами вокруг поселения и в просветах между домами — значок врастает в лес подложки
+  {
+    const T = TREES['#' + ground.getHexString()] ?? TREES['#a3a06a']
+    const foot = rings.filter((b) => b.r.length >= 3).map((b) => { const q = centerOf(b.r); return [X(q[0]), Z(q[1]), Math.sqrt(Math.abs(areaOf(b.r))) * u * 0.75] })
+    const cr0 = Math.min(0.17, Math.max(0.075, u * 4.5))
+    const n = Math.round(T.n * (6 + fill * fill * 0.9) * (ruins ? 1.6 : 1))
+    const rMin = fill * (ruins ? 0.15 : fill < 5 ? 0.4 : 0.75), rMax = Math.min(fill * 1.4, 12.5)
+    let px = 0, pz = 0, have = false
+    for (let i = 0, tries = 0; i < n && tries < n * 6; tries++) {
+      let x: number, z: number
+      if (have && rnd() < 0.62) {
+        const a = rnd() * Math.PI * 2, d = cr0 * (1.6 + rnd() * 2.2)
+        x = px + Math.cos(a) * d
+        z = pz + Math.sin(a) * d
+      } else {
+        const a = rnd() * Math.PI * 2, d = rMin + (rMax - rMin) * Math.pow(rnd(), 0.8)
+        x = Math.cos(a) * d
+        z = Math.sin(a) * d
+      }
+      if (Math.abs(x) > VIEW - 0.6 || Math.abs(z) > 13.5) continue
+      const cr = cr0 * (0.75 + rnd() * 0.5)
+      if (foot.some((f) => Math.hypot(f[0] - x, f[1] - z) < f[2] + cr)) continue
+      px = x; pz = z; have = true; i++
+      const pine = rnd() < T.pine
+      const col = muted(pine ? PINE[Math.floor(rnd() * PINE.length)] : T.leaf[Math.floor(rnd() * T.leaf.length)], ground, 0.12)
+      const rr = pine ? cr * 0.72 : cr, y0 = cr * 0.25, y1 = pine ? cr * 0.5 : cr * 1.05, y2 = pine ? cr * 3.3 : cr * 2.2
+      const rot = rnd() * Math.PI
+      for (let k = 0; k < 6; k++) {
+        const a0 = rot + (k / 6) * Math.PI * 2, a1 = rot + ((k + 1) / 6) * Math.PI * 2
+        const A = [x + Math.cos(a0) * rr, y1, z + Math.sin(a0) * rr], B = [x + Math.cos(a1) * rr, y1, z + Math.sin(a1) * rr]
+        tri(A, B, [x, y2, z], col, 0.92 + 0.16 * (k % 2))
+        tri(B, A, [x, y0, z], col, 0.7)
+      }
     }
   }
   const geo = new THREE.BufferGeometry()
