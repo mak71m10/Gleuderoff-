@@ -294,6 +294,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           if (city.takeDirty()) st.needShadow = true
           if (st.needShadow || hourMoved || placeMoved) {
             city.setTime(st.hour, focus)
+            renderer.toneMappingExposure = city.exposure()
             lastHourShadow = st.hour
             lastShadow.copy(focus)
             st.needShadow = false
@@ -323,6 +324,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           renderer.render(city.scene, cam)
         }
         city.setTime(state.current.hour, aim)
+        renderer.toneMappingExposure = city.exposure()
         city.setLabels(labels)
         setStatus(null)
         raf = requestAnimationFrame(frame)

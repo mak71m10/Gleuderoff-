@@ -258,6 +258,8 @@ export interface CityWorld {
   buildingTop: (i: number) => [number, number, number] | null
   spawn: () => P2
   setTime: (hour: number, focus: THREE.Vector3) => void
+  /** Экспозиция кадра для текущего времени суток */
+  exposure: () => number
   tick: (dt: number, t: number, cam: THREE.Camera) => void
   /** Достроились детали: нужно обновить тени */
   takeDirty: () => boolean
@@ -988,6 +990,14 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const tileTex = tileTexture()
   const roofMat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide, map: tileTex })
   const glowMat = new THREE.MeshBasicMaterial({ color: '#39464f', toneMapped: false, side: THREE.DoubleSide, fog: true })
+  // фактура штукатурки, камня и дерева: шум по мировым координатам, чтобы стены не были плоской заливкой
+  solidMat.onBeforeCompile = ((sh: { uniforms: Record<string, unknown>; vertexShader: string; fragmentShader: string }): void => {
+    sh.uniforms.uGrain = { value: grain }
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWp;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWp = position;')
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWp; uniform sampler2D uGrain;')
+      .replace('#include <map_fragment>', '#include <map_fragment>\nfloat wg = texture2D(uGrain, vec2(vWp.x + vWp.z, vWp.y) * 0.21).r * 0.6 + texture2D(uGrain, vec2(vWp.x - vWp.z, vWp.y * 1.3) * 0.67 + 0.31).r * 0.4;\ndiffuseColor.rgb *= 0.8 + 0.36 * wg;')
+  }) as never
   disposable.push(solidMat, roofMat, glowMat, tileTex)
   const CHUNK = Math.max(90, radius / 3)
   interface Chunk { solid: Bucket; roof: Bucket; glow: Bucket }
@@ -1089,6 +1099,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const hall = vik && (kind0 === 'keep' || kind0 === 'civic')
     const kind = hall ? '' : kind0
     const rv = rng(hashOf(seedName) + idx * 7919 + 13)
+    const rx = rng(hashOf(seedName) + idx * 104729 + 77)
     const orient = areaOf(r) > 0 ? 1 : -1
 
     // ось конька — длинная сторона наименьшего описанного прямоугольника
@@ -1122,7 +1133,10 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     // дварфы лиги: плоская каменная крыша с парапетом, на ней сушат руду
     const flat = dwStyle && !kind && !hall
     if (vik) floors = 1
-    const plaster = look ? look.wall[Math.floor(rv() * look.wall.length)] : mixHex(st.plaster[Math.floor(rv() * st.plaster.length)], town.tint, town.tintK)
+    const plaster0 = look ? look.wall[Math.floor(rv() * look.wall.length)] : mixHex(st.plaster[Math.floor(rv() * st.plaster.length)], town.tint, town.tintK)
+    // у каждого дома свой оттенок стены: светлее или темнее, чуть к общей пастельной гамме
+    const plaster = mixHex(mixHex(plaster0, rx() < 0.5 ? '#e8dcc0' : '#b9a98c', rx() * (look ? 0.1 : 0.22)), '#cfc2a4', look ? 0.04 : 0.12)
+    const quoin = rx() < 0.4
     const pal = look ? look.roof : S.droof[b.d] ?? S.roof ?? st.roof
     const roofCol = kind === 'temple' ? st.tower : kind === 'keep' ? mixHex(st.stone, '#000', 0.2) : look ? pal[Math.floor(rv() * pal.length)] : mixHex(pal[Math.floor(rv() * pal.length)], town.roofTone, town.roofK * rv())
     const stoneBody = !vik && (kind === 'temple' || kind === 'keep' || kind === 'civic')
@@ -1317,6 +1331,28 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           if (floors > 1 && e.len > 3.5) {
             for (const f of [0.34, 0.66]) ch.solid.quad(...wq(e, f - 0.06 / e.len, f + 0.06 / e.len, base + 0.5, base + eave, 0.05), st.timber)
           }
+          // раскосы верхнего этажа у углов
+          const yb = base + 0.5 + (floors - 1) * fh, yt = base + eave - 0.2
+          if (e.len > 3 && yt - yb > 1.5) {
+            const w = 0.14 / e.len, run = Math.min(0.3, ((yt - yb) * 0.55) / e.len), c0 = 0.16 / e.len
+            for (const [t0, t1] of [[c0 + run, c0], [1 - c0 - run - w, 1 - c0 - w]] as const) {
+              const a = wq(e, t0, t0 + w, yb, yb, 0.05), b = wq(e, t1, t1 + w, yt, yt, 0.05)
+              ch.solid.quad(a[0], a[1], b[1], b[0], st.timber)
+            }
+          }
+        }
+        if (!vik && !kind && !flat) {
+          // карниз под свесом крыши
+          ch.solid.quad(...wq(e, 0, 1, base + eave - 0.24, base + eave, 0.08), mixHex(wallCol, '#000', 0.2))
+          // угловые камни у оштукатуренных домов
+          if (detail >= 2 && quoin && !st.framed && cult === 'human') {
+            const qc = mixHex(wallCol, st.stone, 0.55)
+            for (let k = 0, y = base + 0.55; y + 0.42 < base + eave - 0.3; k++, y += 0.62) {
+              const w = (k % 2 ? 0.24 : 0.42) / e.len
+              ch.solid.quad(...wq(e, 0, w, y, y + 0.42, 0.06), qc)
+              ch.solid.quad(...wq(e, 1 - w, 1, y, y + 0.42, 0.06), qc)
+            }
+          }
         }
       }
       if (door && !stoneBody && dwStyle) {
@@ -1352,11 +1388,27 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const u = u0 + (u1 - u0) * (0.2 + rv() * 0.6), v = (rv() - 0.5) * hw * 0.5
       const [cx, cz] = fromUV(u, v)
       const y = base + eave + rise - Math.abs(v) * pitch - 0.4
-      const cw = cult === 'dwarf' ? 1.15 : 0.75
-      ch.solid.box(cx, y, cz, cw, 1.9, cw, st.stone, Math.atan2(uz, ux))
-      ch.solid.box(cx, y + 1.9, cz, cw + 0.2, 0.16, cw + 0.2, mixHex(st.stone, '#000', 0.3), Math.atan2(uz, ux))
-      if (dwStyle) ch.glow.box(cx, y + 2.04, cz, cw * 0.6, 0.04, cw * 0.6, '#ffffff', Math.atan2(uz, ux))
-      if (first && chimneys.length < 400) chimneys.push([cx, y + 2.1, cz])
+      const cw = cult === 'dwarf' ? 1.15 : 0.6 + rx() * 0.3
+      // трубы разной высоты, часть — кирпичные, с горшком наверху
+      const chH = 1.5 + rx() * 1.2
+      const chCol = cult === 'human' && rx() < 0.45 ? mixHex('#9a6a55', st.stone, 0.3) : st.stone
+      ch.solid.box(cx, y, cz, cw, chH, cw, chCol, Math.atan2(uz, ux))
+      ch.solid.box(cx, y + chH, cz, cw + 0.2, 0.16, cw + 0.2, mixHex(chCol, '#000', 0.3), Math.atan2(uz, ux))
+      if (!dwStyle && detail >= 2 && rx() < 0.6) ch.solid.cyl(cx, y + chH + 0.16, cz, 0.15, 0.38, 6, '#8a5a48', 0.12)
+      if (dwStyle) ch.glow.box(cx, y + chH + 0.14, cz, cw * 0.6, 0.04, cw * 0.6, '#ffffff', Math.atan2(uz, ux))
+      if (first && chimneys.length < 400) chimneys.push([cx, y + chH + 0.2, cz])
+    }
+    // слуховые окна на скате — у части домов с простой прямоугольной крышей
+    if (!vik && !kind && !flat && detail >= 1 && r.length === 4 && hw > 2.5 && hw < 7 && u1 - u0 > 6 && pitch > 0.35 && rx() < 0.4) {
+      const nd = u1 - u0 > 11 && rx() < 0.5 ? 2 : 1, sgn = rx() < 0.5 ? 1 : -1, rot = Math.atan2(uz, ux)
+      for (let k = 0; k < nd; k++) {
+        const u = u0 + (u1 - u0) * (nd === 1 ? 0.3 + rx() * 0.4 : k ? 0.7 : 0.3)
+        const vm = hw * 0.5, yTop = base + eave + rise - vm * pitch + 0.85, yLow = base + eave + rise - (vm + 0.75) * pitch
+        const [dx, dz] = fromUV(u, sgn * vm), [fx, fz] = fromUV(u, sgn * (vm + 0.72))
+        ch.solid.box(dx, yLow, dz, 1.25, yTop - yLow, 1.4, wallCol, rot)
+        ch.roof.box(dx, yTop, dz, 1.6, 0.16, 1.75, roofCol, rot)
+        ch.solid.box(fx, yTop - 0.85, fz, 0.7, 0.62, 0.1, '#2b3138', rot)
+      }
     }
     // двор по месту: у воды — рыбацкий, на людной улице — лавка, иногда мастерская, в деревне — огород за плетнём
     if (!kind && detail >= 2 && door) {
@@ -2555,11 +2607,13 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   }
 
   const KEY = {
-    day: { top: '#5a9bd8', hor: '#d5e6ea', sun: '#fff0d8', sunK: 2.9, hemiK: 1.55, sky: '#d6e6ff', gnd: '#8a9a68' },
-    gold: { top: '#465f96', hor: '#f4b37c', sun: '#ffa564', sunK: 2.4, hemiK: 0.95, sky: '#d8c0c0', gnd: '#6a5a4a' },
-    night: { top: '#060c1e', hor: '#16233f', sun: '#9db4ff', sunK: 0.95, hemiK: 0.72, sky: '#4a5a98', gnd: '#20263a' }
+    // тёплое солнце и мягкий свет неба, приглушённый пастельный горизонт
+    day: { top: '#5f97c9', hor: '#cfdfdc', sun: '#ffe8c4', sunK: 2.75, hemiK: 1.6, sky: '#f1ecde', gnd: '#74866a' },
+    gold: { top: '#4a5f92', hor: '#e9b594', sun: '#ffa868', sunK: 2.4, hemiK: 1.0, sky: '#dcc0b4', gnd: '#6a5a4a' },
+    night: { top: '#0a1226', hor: '#22344f', sun: '#9db4ff', sunK: 0.95, hemiK: 0.74, sky: '#4a5a98', gnd: '#20263a' }
   }
   const lerpKey = (a: typeof KEY.day, b: typeof KEY.day, t: number): typeof KEY.day => ({ top: mixHex(a.top, b.top, t), hor: mixHex(a.hor, b.hor, t), sun: mixHex(a.sun, b.sun, t), sunK: a.sunK + (b.sunK - a.sunK) * t, hemiK: a.hemiK + (b.hemiK - a.hemiK) * t, sky: mixHex(a.sky, b.sky, t), gnd: mixHex(a.gnd, b.gnd, t) })
+  let exposure = 1
   const setTime = (hour: number, focus: THREE.Vector3): void => {
     // под горой нет ни дня, ни ночи: свет сверху из зеркальных шахт, тени не бегают
     if (deep) hour = 11.5
@@ -2567,6 +2621,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const elev = Math.sin(ph) // > 0 — солнце над горизонтом (6:00–20:00)
     const k = elev > 0.28 ? KEY.day : elev > 0 ? lerpKey(KEY.gold, KEY.day, elev / 0.28) : elev > -0.2 ? lerpKey(KEY.night, KEY.gold, 1 + elev / 0.2) : KEY.night
     const nightK = smooth(0.16, -0.14, elev)
+    // на закате и ночью кадр чуть светлее, чтобы тени не проваливались
+    exposure = deep ? 1.04 : 1 + 0.1 * smooth(0.3, 0, elev)
     skyUni.uTop.value.set(k.top)
     skyUni.uHor.value.set(k.hor)
     skyUni.uSunCol.value.set(k.sun)
@@ -2734,6 +2790,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       return s
     },
     setTime,
+    exposure: () => exposure,
     tick,
     setLabels: (on) => { labels.visible = on },
     setPlaces,
