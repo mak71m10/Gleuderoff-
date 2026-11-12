@@ -132,6 +132,14 @@ function landmarksFrom(name, type, text, state) {
   return L.slice(0, 7)
 }
 
+const EXTRA = new Set()
+const LORE_STATES = new Set(['Империя', 'Корона Аргус', 'Республика', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым'])
+function EXTRA_STATES(world) {
+  const names = world.states.map((s) => s.base.name).filter((n) => !LORE_STATES.has(n) && !SOUTH_STATES[n] && !CHURCH_STATES.includes(n))
+  names.forEach((n) => EXTRA.add(n))
+  return names
+}
+
 export async function autoCities(world, handmade) {
   const wm = world.maps.find((m) => m.kind === 'world')
   const { data, info } = await sharp('resources/default-world/maps/terrain.png').raw().toBuffer({ resolveWithObject: true })
@@ -149,11 +157,13 @@ export async function autoCities(world, handmade) {
   const takenSlugs = new Set(handmade.map((c) => c.slug))
   const out = []
   const autoSlugs = new Set()
-  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES, 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым']) {
+  for (const sn of ['Империя', 'Корона Аргус', 'Республика', ...Object.keys(SOUTH_STATES), ...CHURCH_STATES, 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', ...EXTRA_STATES(world)]) {
     const st = world.states.find((s) => s.base.name === sn)
+    const cityOnly = EXTRA.has(sn) // у прочих государств лора нет: планы только городам (type city), чтобы значок «город» всегда открывал план
     for (const p of world.provinces) {
       const s = p.settlement
       if (!s || p.owners?.at(-1)?.[1] !== st.id || taken.has(p.name)) continue
+      if (cityOnly && s.type !== 'city') continue
       const text = p.description ?? ''
       const castra = /кастра [IVX]+/.test(text)
       const south = SOUTH_STATES[sn]

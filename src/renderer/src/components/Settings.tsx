@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useStore } from '../store'
 import { yearLength } from '../calendar'
 import { Button, DateField, NumberField, Section, TextField, assetUrl } from './ui'
@@ -7,6 +8,7 @@ export function SettingsView() {
   const world = useStore((s) => s.world!)
   const mutate = useStore((s) => s.mutate)
   const cal = world.calendar
+  const [mapsOpen, setMapsOpen] = useState(false) // список карт строится только по запросу: десятки картинок тормозили вкладку
   const editCal = (fn: (c: typeof cal) => void): void =>
     mutate((w) => {
       fn(w.calendar as typeof cal)
@@ -99,24 +101,35 @@ export function SettingsView() {
       </Section>
 
       <Section title="Карты" icon="map">
-        {world.maps.map((m) => (
-          <div key={m.id} className="map-row">
-            <img src={assetUrl(m.image)} alt="" />
-            <div className="map-row-text">
-              <TextField value={m.name} onChange={(v) => mutate((w) => void (w.maps.find((x) => x.id === m.id)!.name = v))} />
-              <span className="muted small">
-                {m.kind === 'world' ? 'Карта мира' : 'Карта места'} · {m.width}×{m.height}
-              </span>
-            </div>
-            <Button icon="image" onClick={() => replaceImage(m.id, 'image')}>
-              Заменить подложку
+        {!mapsOpen ? (
+          <Button icon="map" onClick={() => setMapsOpen(true)}>
+            Настройки карт ({world.maps.length})
+          </Button>
+        ) : (
+          <>
+            <Button icon="x" onClick={() => setMapsOpen(false)}>
+              Свернуть список карт
             </Button>
-            <Button icon="layers" onClick={() => replaceImage(m.id, 'reference')}>
-              Калька
-            </Button>
-          </div>
-        ))}
-        <p className="hint">У карты мира логический размер не меняется при замене картинки, поэтому метки и границы останутся на своих местах. Новая подложка должна быть в тех же пропорциях.</p>
+            {world.maps.map((m) => (
+              <div key={m.id} className="map-row">
+                <img src={assetUrl(m.image)} alt="" loading="lazy" decoding="async" />
+                <div className="map-row-text">
+                  <TextField value={m.name} onChange={(v) => mutate((w) => void (w.maps.find((x) => x.id === m.id)!.name = v))} />
+                  <span className="muted small">
+                    {m.kind === 'world' ? 'Карта мира' : 'Карта места'} · {m.width}×{m.height}
+                  </span>
+                </div>
+                <Button icon="image" onClick={() => replaceImage(m.id, 'image')}>
+                  Заменить подложку
+                </Button>
+                <Button icon="layers" onClick={() => replaceImage(m.id, 'reference')}>
+                  Калька
+                </Button>
+              </div>
+            ))}
+            <p className="hint">У карты мира логический размер не меняется при замене картинки, поэтому метки и границы останутся на своих местах. Новая подложка должна быть в тех же пропорциях.</p>
+          </>
+        )}
       </Section>
     </div>
   )
