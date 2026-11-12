@@ -1363,7 +1363,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           ch.solid.quad(...wq(e, 0, 1, base + eave - 0.24, base + eave, 0.08), mixHex(wallCol, '#000', 0.2))
           // угловые камни у оштукатуренных домов
           if (detail >= 2 && quoin && !st.framed && cult === 'human') {
-            const qc = mixHex(wallCol, st.stone, 0.55)
+            const qc = mixHex(wallCol, st.stone, 0.72)
             for (let k = 0, y = base + 0.55; y + 0.42 < base + eave - 0.3; k++, y += 0.62) {
               const w = (k % 2 ? 0.24 : 0.42) / e.len
               ch.solid.quad(...wq(e, 0, w, y, y + 0.42, 0.06), qc)
@@ -2639,7 +2639,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const k = elev > 0.28 ? KEY.day : elev > 0 ? lerpKey(KEY.gold, KEY.day, elev / 0.28) : elev > -0.2 ? lerpKey(KEY.night, KEY.gold, 1 + elev / 0.2) : KEY.night
     const nightK = smooth(0.16, -0.14, elev)
     // на закате и ночью кадр чуть светлее, чтобы тени не проваливались
-    exposure = deep ? 1.04 : 1 + 0.1 * smooth(0.3, 0, elev)
+    exposure = deep ? 1.22 : 1 + 0.1 * smooth(0.3, 0, elev)
     skyUni.uTop.value.set(k.top)
     skyUni.uHor.value.set(k.hor)
     skyUni.uSunCol.value.set(k.sun)
