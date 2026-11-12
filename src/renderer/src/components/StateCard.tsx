@@ -170,7 +170,21 @@ function StateCardBody({ id }: { id: string }) {
         <Stat icon="sword" label="Армия" value={f.army} />
         <Stat icon="target" label="Флот" value={f.navy} />
         <Stat icon="coins" label="Казна" value={f.treasury} />
-        <Stat icon="pin" label="Столица" value={capital ? resolve(capital, date).name : ''} />
+        <Stat
+          icon="pin"
+          label="Столица"
+          value={capital ? resolve(capital, date).name : ''}
+          title={capital?.innerMapId ? 'Открыть план столицы' : undefined}
+          onClick={
+            capital?.innerMapId && world.maps.some((m) => m.id === capital.innerMapId)
+              ? () => {
+                  useStore.getState().openMap(capital.innerMapId!)
+                  setView('map')
+                  close(null)
+                }
+              : undefined
+          }
+        />
         <div className="stat stability">
           <div className="stat-label">
             <Icon name="balance" size={14} /> Стабильность
@@ -260,17 +274,31 @@ function StateCardBody({ id }: { id: string }) {
                 {worldPlaces.slice(0, 30).map((p) => {
                   const pf = resolve(p, date)
                   return (
-                    <button
-                      key={p.id}
-                      className="chip"
-                      onClick={() => {
-                        select({ type: 'place', id: p.id })
-                        setView('map')
-                        close(null)
-                      }}
-                    >
-                      {PLACE_TYPES[pf.type]?.label}: {pf.name}
-                    </button>
+                    <span key={p.id} style={{ display: 'contents' }}>
+                      <button
+                        className="chip"
+                        onClick={() => {
+                          select({ type: 'place', id: p.id })
+                          setView('map')
+                          close(null)
+                        }}
+                      >
+                        {PLACE_TYPES[pf.type]?.label}: {pf.name}
+                      </button>
+                      {p.innerMapId && world.maps.some((m) => m.id === p.innerMapId) && (
+                        <button
+                          className="chip"
+                          title="Открыть план города"
+                          onClick={() => {
+                            useStore.getState().openMap(p.innerMapId!)
+                            setView('map')
+                            close(null)
+                          }}
+                        >
+                          План: {pf.name}
+                        </button>
+                      )}
+                    </span>
                   )
                 })}
                 {cityMaps.slice(0, 30).map((m) => (
@@ -534,9 +562,9 @@ function StateCardBody({ id }: { id: string }) {
   )
 }
 
-function Stat({ icon, label, value }: { icon: IconName; label: string; value: string }) {
+function Stat({ icon, label, value, onClick, title }: { icon: IconName; label: string; value: string; onClick?: () => void; title?: string }) {
   return (
-    <div className="stat">
+    <div className="stat" title={title} onClick={onClick} style={onClick ? { cursor: 'pointer' } : undefined}>
       <div className="stat-label">
         <Icon name={icon} size={14} /> {label}
       </div>
