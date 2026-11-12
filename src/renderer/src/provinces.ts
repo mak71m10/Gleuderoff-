@@ -134,7 +134,6 @@ export interface LutInput {
   mode: MapMode
   selectedProvince: number | null
   selectedState: string | null
-  hoverKey: string | null
 }
 
 /** Строк в таблице цветов провинций */
@@ -149,7 +148,10 @@ const NO_CHANGE = -32767
  * 3 — цвет прежнего владельца, 4 — дней от даты таблицы до последней смены владельца (int16) и ключ группы прежнего
  * владельца: по ним шейдер плавно перекрашивает захваченные провинции и рисует линии фронта.
  */
-export function buildLut(inp: LutInput, owners: (string | null)[]): { data: Uint8Array; width: number; keys: (string | null)[] } {
+export function buildLut(
+  inp: LutInput,
+  owners: (string | null)[]
+): { data: Uint8Array; width: number; keys: (string | null)[]; keyNums: Map<string, number> } {
   const { world, date, mode } = inp
   const provs = world.provinces ?? []
   const width = provs.length + 1
@@ -233,9 +235,8 @@ export function buildLut(inp: LutInput, owners: (string | null)[]): { data: Uint
     data[r1] = k & 255
     data[r1 + 1] = (k >> 8) & 255
     const selected = id === inp.selectedProvince || (owner !== null && owner === inp.selectedState)
-    const hovered = key !== null && key === inp.hoverKey
     data[r1 + 2] = selected ? 255 : 0
-    data[r1 + 3] = hovered ? 255 : 0
+    data[r1 + 3] = 0 // подсветка под мышкой — uniform uHover в шейдере, без пересборки таблицы
     const ok = keyNum(owner ? `o:${owner}` : null)
     const r2 = (width * 2 + id) * 4
     data[r2] = ok & 255
@@ -258,7 +259,7 @@ export function buildLut(inp: LutInput, owners: (string | null)[]): { data: Uint
     data[r4 + 2] = pk & 255
     data[r4 + 3] = (pk >> 8) & 255
   }
-  return { data, width, keys }
+  return { data, width, keys, keyNums: keyIds }
 }
 
 // ---------- подписи стран по провинциям ----------

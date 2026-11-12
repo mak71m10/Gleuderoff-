@@ -256,7 +256,9 @@ ${text(W / 2, 64, c.name, 58, '#2a1d12', 'font-weight="bold" letter-spacing="6"'
         s: +s.toFixed(4), style: c.style ?? styleOf(c.state), forest: c.forest ?? 0.1, ...(c.hills ? { hills: 1 } : {}), ...(c.rocky ? { rocky: 1 } : {}),
         tower: +(vals.towerRadius ?? 7.6).toFixed(1), ...(c.roof ? { roof: c.roof } : {}), droof: districts.map((q) => q.roof ?? null), citadel: citadel ? walls.indexOf(citadel) : -1,
         dist: districts.map((q) => fl(q.r)), water: water.map(fl), fields: fields.map(fl), greens: greens.map(fl), squares: squares.map(fl),
-        walls: walls.map(line), roads: roads.map(line), rivers: rivers.map(line), planks: planks.map(line)
+        walls: walls.map(line), roads: roads.map(line), rivers: rivers.map(line), planks: planks.map(line),
+        // контур суши — для моря в 3D (если суша не на весь кадр, см. scripts/city-earth.mjs)
+        earth: fl(earth)
       }
     })()
   }

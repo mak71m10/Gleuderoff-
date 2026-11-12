@@ -35,6 +35,7 @@ uniform float uPixel;       // пикселей холста на пиксель
 uniform float uShift;       // дней от даты таблицы до показываемого момента (во время перехода между датами < 0)
 uniform float uTrans;       // за сколько дней захваченная провинция перекрашивается
 uniform float uFront;       // сколько дней после захвата держится линия фронта и штриховка
+uniform float uHover;       // ключ группы под мышкой (-1 — нет)
 out vec4 outColor;
 
 int idAt(vec2 rp) {
@@ -108,11 +109,14 @@ void main() {
   int id = 0;
   for (int i = 0; i < NS; i++) if (id == 0 && ids[i] != 0 && grp[i] == bestKey) id = ids[i];
   float own = keyOf(id, 2);
-  float wId = 0.0, wOwn = 0.0;
+  float wId = 0.0, wOwn = 0.0, wSel = 0.0;
   for (int i = 0; i < NS; i++) {
     if (ids[i] == id) wId += wOf(i);
     if (ids[i] != 0 && keyOf(ids[i], 2) == own) wOwn += wOf(i);
+    if (ids[i] != 0 && lut(ids[i], 1).b > 0.5) wSel += wOf(i);
   }
+  float fSel = wSel / max(land, 0.001);
+  float dSel = (fSel - 0.5) / max(fwidth(fSel), 0.004);
   // доли «своих» среди суши: 1 — глубоко внутри, 0.5 — на границе
   float fGrp = bestW / max(land, 0.001);
   float fOwn = wOwn / max(land, 0.001);
@@ -125,10 +129,10 @@ void main() {
   float coast = clamp((fLand - 0.5) / max(fwidth(fLand), 0.004) + 0.5, 0.0, 1.0);
 
   // мягкое свечение внутрь от границы страны (без моря): доля чужих на большом круге
-  float glow = 0.0;
+  float glow = 0.0, selNear = 0.0;
   if (id != 0 && uGlowPx > 0.0) {
     float gr = uGlowPx * texPx * uPixel;
-    float foreign = 0.0, cnt = 0.0;
+    float foreign = 0.0, cnt = 0.0, selCnt = 0.0;
     for (int i = 1; i < NS; i++) {
       for (int s = 0; s < 2; s++) {
         vec2 o = DISK[i] * gr * (s == 0 ? 1.0 : 0.55);
@@ -136,9 +140,11 @@ void main() {
         if (n == 0) continue;
         cnt += 1.0;
         if (grpOf(n) != bestKey) foreign += 1.0;
+        if (lut(n, 1).b > 0.5) selCnt += s == 0 ? 0.6 : 1.4;
       }
     }
     glow = cnt > 0.0 ? smoothstep(0.0, 0.5, foreign / cnt) : 0.0;
+    selNear = cnt > 0.0 ? smoothstep(0.0, 0.6, selCnt / cnt) : 0.0;
   }
 
   if (id == 0 || coast <= 0.0 || logical.x < 0.0 || logical.y < 0.0 || logical.x > uMapSize.x || logical.y > uMapSize.y) {
@@ -164,12 +170,19 @@ void main() {
     col = mix(col, prevFill.rgb, stripe * 0.4 * fresh);
   }
   bool selected = meta.b > 0.5;
-  bool hovered = meta.a > 0.5;
+  bool hovered = uHover >= 0.0 && abs(floor(keyOf(id, 1) + 0.5) - uHover) < 0.5;
   if (hovered) { a += 0.07; col = mix(col, vec3(1.0), 0.1); }
-  if (selected) { a += 0.16; col = mix(col, vec3(1.0, 0.9, 0.6), 0.18); }
-  vec3 glowCol = selected ? vec3(0.96, 0.86, 0.56) : mix(col, vec3(1.0), 0.18);
+  vec3 gold = vec3(0.98, 0.84, 0.45);
+  if (selected) { a = max(a + 0.16, 0.3); col = mix(col, vec3(1.0, 0.92, 0.7), 0.22); }
+  vec3 glowCol = mix(col, vec3(1.0), 0.18);
   col = mix(col, glowCol, glow * 0.5);
-  a = max(a, glow * (selected ? 0.6 : min(0.5, uOpacity * 1.3 + 0.12)));
+  a = max(a, glow * min(0.5, uOpacity * 1.3 + 0.12));
+  // ореол выделения: золотое сияние по обе стороны его границы (внутри — тише)
+  float halo = selected ? (1.0 - selNear) * 0.8 : selNear;
+  if (halo > 0.0) {
+    col = mix(col, gold, halo * 0.55);
+    a = max(a, halo * 0.55);
+  }
 
   float px = uPixel; // пикселей холста на пиксель экрана
   // линии провинций — едва заметные, тоньше волоса
@@ -207,8 +220,16 @@ void main() {
     col = mix(col, dark, sh * 0.35);
     a = max(a, sh * 0.32);
     float line = max(lg, lo);
-    col = mix(col, selected ? vec3(0.96, 0.86, 0.56) : dark, line);
+    col = mix(col, dark, line);
     a = mix(a, 0.88, line);
+  }
+  // граница выделения: яркая золотая линия с тёмной каймой — поверх всех прочих линий
+  if (wSel > 0.0 && wSel < land) {
+    float ls = 1.0 - smoothstep(0.9 * px, 2.0 * px, abs(dSel));
+    float lk = 1.0 - smoothstep(2.0 * px, 3.2 * px, abs(dSel));
+    col = mix(col, vec3(0.12, 0.08, 0.02), (lk - ls) * 0.6);
+    col = mix(col, gold, ls);
+    a = max(a, max(ls * 0.97, lk * 0.7));
   }
   a *= coast;
   outColor = vec4(col * a, a);
@@ -262,7 +283,7 @@ export const ProvinceRenderer = L.Renderer.extend({
     gl.enableVertexAttribArray(loc)
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
     const u: Uniforms = {}
-    for (const n of ['uProv', 'uLut', 'uOrigin', 'uScale', 'uMapSize', 'uRaster', 'uHeight', 'uOpacity', 'uBorders', 'uProvLines', 'uGlowPx', 'uPixel', 'uShift', 'uTrans', 'uFront'])
+    for (const n of ['uProv', 'uLut', 'uOrigin', 'uScale', 'uMapSize', 'uRaster', 'uHeight', 'uOpacity', 'uBorders', 'uProvLines', 'uGlowPx', 'uPixel', 'uShift', 'uTrans', 'uFront', 'uHover'])
       u[n] = gl.getUniformLocation(prog, n)
     this._u = u
     const tex = (unit: number): WebGLTexture => {
@@ -325,6 +346,17 @@ export const ProvinceRenderer = L.Renderer.extend({
     this._draw()
   },
 
+  /** Подсветка группы под мышкой: k — номер ключа из buildLut (-1 — нет). Перерисовка — не чаще кадра. */
+  setHover(this: any, k: number) {
+    if (this._hover === k) return
+    this._hover = k
+    if (this._hoverRaf) return
+    this._hoverRaf = requestAnimationFrame(() => {
+      this._hoverRaf = 0
+      this._draw()
+    })
+  },
+
   _update(this: any) {
     if (this._map._animatingZoom && this._bounds) return
     (L.Renderer.prototype as any)._update.call(this)
@@ -375,6 +407,7 @@ export const ProvinceRenderer = L.Renderer.extend({
     gl.uniform1f(u.uShift, (this._now ?? this._lutDate ?? 0) - (this._lutDate ?? 0))
     gl.uniform1f(u.uTrans, 45)
     gl.uniform1f(u.uFront, 420)
+    gl.uniform1f(u.uHover, this._hover ?? -1)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
@@ -382,6 +415,7 @@ export const ProvinceRenderer = L.Renderer.extend({
 }) as unknown as new (mapW: number, mapH: number, image: HTMLImageElement, options?: L.RendererOptions) => L.Renderer & {
   setLut: (data: Uint8Array, width: number, rows: number, date: number) => void
   setView: (v: Partial<ProvinceView>) => void
+  setHover: (k: number) => void
 }
 
 /** Подписи на 2D-холсте: тысячи названий провинций рисуются быстро, только видимые */

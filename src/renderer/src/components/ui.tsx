@@ -77,10 +77,30 @@ export function TextField({
       </div>
     )
   }
+  // однострочное поле с подписью и длинным значением («Армия», «Культура и народы»…) не обрезаем:
+  // в режиме игрока показываем текстом с переносами, в режиме мастера — растущим полем
+  const long = !multiline && !!label && draft.length > 40
+  if (long && ro) {
+    return (
+      <div className={`field ${className ?? ''}`}>
+        <span className="field-label">{label}</span>
+        <div className="field-text field-wrap">{draft}</div>
+      </div>
+    )
+  }
   return (
     <label className={`field ${className ?? ''}`}>
       {label && <span className="field-label">{label}</span>}
-      {multiline ? (
+      {long ? (
+        <textarea
+          className="field-grow"
+          value={draft}
+          rows={Math.min(6, Math.ceil(draft.length / 38))}
+          onChange={(e) => setDraft(e.target.value.replace(/\n/g, ' '))}
+          onBlur={commit}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), (e.target as HTMLTextAreaElement).blur())}
+        />
+      ) : multiline ? (
         <textarea
           value={draft}
           readOnly={ro}

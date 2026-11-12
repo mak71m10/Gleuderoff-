@@ -31,6 +31,8 @@ export interface PlanScene {
   roads: PlanLine[]
   rivers: PlanLine[]
   planks: PlanLine[]
+  /** контур суши (как на 2D-плане): всё вне него — море; нет поля — суша на весь кадр */
+  earth?: number[]
 }
 export interface CityPlan {
   w: number
@@ -112,7 +114,12 @@ export class Bucket {
     this.p.push(a[0], a[1], a[2], b[0], b[1], b[2], d[0], d[1], d[2])
     const q = C(col)
     for (let i = 0; i < 3; i++) this.c.push(q.r * k, q.g * k, q.b * k)
-    if (uva) this.uv.push(...uva)
+    // uv держим ровно по вершинам: иначе одна коробка без uv в слое черепицы сдвигает фактуру всех следующих крыш
+    if (uva) {
+      const need = (this.p.length / 3 - 3) * 2
+      while (this.uv.length < need) this.uv.push(0, 0)
+      this.uv.push(...uva)
+    } else if (this.uv.length) this.uv.push(a[0] / 2.4, a[2] / 2.4, b[0] / 2.4, b[2] / 2.4, d[0] / 2.4, d[2] / 2.4)
   }
   quad(a: V3, b: V3, d: V3, e: V3, col: string, k = 1): void {
     this.tri(a, b, d, col, k)
@@ -145,6 +152,7 @@ export class Bucket {
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3))
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3))
+    while (this.uv.length && this.uv.length < (this.p.length / 3) * 2) this.uv.push(0, 0)
     if (this.uv.length) g.setAttribute('uv', new THREE.Float32BufferAttribute(this.uv, 2))
     g.computeVertexNormals()
     return g
@@ -340,9 +348,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     // размытие прямоугольником: ctx.filter на телефонах Safari не работает
     let b = new Float32Array(MS * MS)
     for (let p = 0; p < passes; p++) {
-      for (let y = 0; y < MS; y++) { let s = 0; for (let x = -rad; x < MS; x++) { if (x + rad < MS) s += a[y * MS + x + rad]; else s += a[y * MS + MS - 1]; if (x - rad - 1 >= 0) s -= a[y * MS + x - rad - 1]; else s -= a[y * MS]; if (x >= 0) b[y * MS + x] = s / (2 * rad + 1) + 0 } }
+      for (let y = 0; y < MS; y++) { let s = a[y * MS] * (2 * rad + 1); for (let x = -rad; x < MS; x++) { if (x + rad < MS) s += a[y * MS + x + rad]; else s += a[y * MS + MS - 1]; if (x - rad - 1 >= 0) s -= a[y * MS + x - rad - 1]; else s -= a[y * MS]; if (x >= 0) b[y * MS + x] = s / (2 * rad + 1) + 0 } }
       ;[a, b] = [b, a]
-      for (let x = 0; x < MS; x++) { let s = 0; for (let y = -rad; y < MS; y++) { if (y + rad < MS) s += a[(y + rad) * MS + x]; else s += a[(MS - 1) * MS + x]; if (y - rad - 1 >= 0) s -= a[(y - rad - 1) * MS + x]; else s -= a[x]; if (y >= 0) b[y * MS + x] = s / (2 * rad + 1) } }
+      for (let x = 0; x < MS; x++) { let s = a[x] * (2 * rad + 1); for (let y = -rad; y < MS; y++) { if (y + rad < MS) s += a[(y + rad) * MS + x]; else s += a[(MS - 1) * MS + x]; if (y - rad - 1 >= 0) s -= a[(y - rad - 1) * MS + x]; else s -= a[x]; if (y >= 0) b[y * MS + x] = s / (2 * rad + 1) } }
       ;[a, b] = [b, a]
     }
     return a
@@ -352,9 +360,18 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const i = Math.floor(u), j = Math.floor(v), fu = u - i, fv = v - j
     return (m[j * MS + i] * (1 - fu) + m[j * MS + i + 1] * fu) * (1 - fv) + (m[(j + 1) * MS + i] * (1 - fu) + m[(j + 1) * MS + i + 1] * fu) * fv
   }
-  const hasWater = waters.length > 0 || rivers.length > 0
+  const earth = S.earth && S.earth.length >= 6 ? ringOf(S.earth, k) : null
+  const hasWater = waters.length > 0 || rivers.length > 0 || !!earth
   const waterIn = hasWater
     ? sampler(canvasMask((g) => {
+        // море за берегом: весь кадр — вода, суша вырезается контуром
+        if (earth) {
+          g.fillRect(0, 0, W, H)
+          g.fillStyle = '#000'
+          trace(g, earth)
+          g.fill()
+          g.fillStyle = '#fff'
+        }
         waters.forEach((r) => { trace(g, r); g.fill() })
         rivers.forEach((q) => { trace(g, q.r, false); g.lineWidth = q.w; g.stroke() })
       }, 2, 2))

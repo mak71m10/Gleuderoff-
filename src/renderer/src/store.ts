@@ -62,6 +62,8 @@ interface Store {
   saveState: 'saved' | 'dirty' | 'saving' | 'error'
   past: WorldData[]
   future: WorldData[]
+  /** откуда открывали карты — для кнопки «назад» из плана города */
+  mapBack: { mapId: string; view: View; selection: Selection; stateCardOpen: string | null }[]
 
   load: () => Promise<void>
   mutate: (fn: (w: Draft<WorldData>) => void, opts?: { skipHistory?: boolean }) => void
@@ -70,6 +72,7 @@ interface Store {
   setDate: (d: WorldDate) => void
   setView: (v: View) => void
   openMap: (id: string) => void
+  mapGoBack: () => void
   select: (s: Selection) => void
   openStateCard: (id: string | null) => void
   setTool: (t: Tool) => void
@@ -150,6 +153,7 @@ export const useStore = create<Store>((set, get) => {
     saveState: 'saved',
     past: [],
     future: [],
+    mapBack: [],
 
     load: async () => {
       const { dir, data } = await window.api.loadWorld()
@@ -187,7 +191,21 @@ export const useStore = create<Store>((set, get) => {
 
     setDate: (date) => set({ date }),
     setView: (view) => set({ view }),
-    openMap: (mapId) => set({ mapId, view: 'map', selection: null }),
+    openMap: (mapId) => {
+      // запоминаем, откуда пришли: «назад» из плана вернёт туда же (карта, выделение, открытая карточка)
+      const s = get()
+      if (mapId === s.mapId) return set({ view: 'map', selection: null })
+      let back = s.mapBack
+      if (back.length && back[back.length - 1].mapId === mapId) back = back.slice(0, -1)
+      else back = [...back, { mapId: s.mapId, view: s.view, selection: s.selection, stateCardOpen: s.stateCardOpen }].slice(-20)
+      set({ mapId, view: 'map', selection: null, mapBack: back })
+    },
+    mapGoBack: () => {
+      const back = get().mapBack
+      const top = back[back.length - 1]
+      if (!top) return
+      set({ mapId: top.mapId, view: top.view, selection: top.selection, stateCardOpen: top.stateCardOpen, mapBack: back.slice(0, -1) })
+    },
     select: (selection) => set({ selection, vertexEdit: false }),
     openStateCard: (stateCardOpen) => set({ stateCardOpen }),
     setTool: (tool) => set({ tool }),

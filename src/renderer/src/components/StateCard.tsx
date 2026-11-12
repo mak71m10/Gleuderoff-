@@ -59,6 +59,22 @@ function StateCardBody({ id }: { id: string }) {
   const setView = useStore((s) => s.setView)
   const [tab, setTab] = useState<Tab>('overview')
   const [heraldryOpen, setHeraldryOpen] = useState(false)
+  // шапку (статы, панель мастера, полное название) можно свернуть — больше места под вкладки
+  const [compact, setCompactRaw] = useState(() => {
+    try {
+      return localStorage.getItem('sc-compact') === '1'
+    } catch {
+      return false
+    }
+  })
+  const setCompact = (v: boolean): void => {
+    setCompactRaw(v)
+    try {
+      localStorage.setItem('sc-compact', v ? '1' : '0')
+    } catch {
+      /* без памяти — не страшно */
+    }
+  }
   const masterMode = useStore((s) => s.masterMode)
   const st = world.states.find((s) => s.id === id)
   if (!st) return null
@@ -87,7 +103,17 @@ function StateCardBody({ id }: { id: string }) {
   const religions = world.entries.filter((e) => e.kind === 'religion').map((e) => ({ id: e.id, name: e.base.name }))
   const otherStates = world.states.filter((s) => s.id !== id).map((s) => ({ id: s.id, name: resolve(s, date).name }))
   const places = world.places.filter((p) => existsAt(p, date) && resolve(p, date).stateId === id)
-  const placeItems = world.places.map((p) => ({ id: p.id, name: resolve(p, date).name }))
+  const placeItems = world.places.filter((p) => p.mapId === 'world').map((p) => ({ id: p.id, name: resolve(p, date).name }))
+  // места внутри планов городов («Хоф», «Гавань»…) не показываем поштучно — одна кнопка на город, ведёт в его план
+  const worldPlaces = places.filter((p) => p.mapId === 'world')
+  const shownMaps = new Set(worldPlaces.map((p) => p.innerMapId).filter(Boolean))
+  const cityMaps = [...new Set(places.filter((p) => p.mapId !== 'world').map((p) => p.mapId))]
+    .filter((m) => !shownMaps.has(m))
+    .map((m) => {
+      const def = world.maps.find((x) => x.id === m)
+      const owner = world.places.find((p) => p.innerMapId === m)
+      return { id: m, name: owner ? resolve(owner, date).name : (def?.name ?? m).replace(/\s*—\s*план города$/, '') }
+    })
   const capital = world.places.find((p) => p.id === f.capitalId)
   const rulerChar = world.entries.find((e) => e.id === f.rulerId)
   const dynasty = world.entries.find((e) => e.id === f.dynastyId)
@@ -101,9 +127,12 @@ function StateCardBody({ id }: { id: string }) {
   const mark = (k: keyof StateFields): string => (changedHere.has(k) ? 'changed-here' : '')
 
   return (
-    <div className="state-card" style={{ ['--state' as string]: f.color }}>
+    <div className={`state-card${compact ? ' sc-compact' : ''}`} style={{ ['--state' as string]: f.color }}>
       <header className="sc-header">
         <div className="sc-banner" />
+        <button className="sc-back" title="Назад" onClick={() => close(null)}>
+          <Icon name="back" size={22} />
+        </button>
         {f.flag ? (
           <ImageField value={f.flag} folder="flags" shape="flag" onChange={(flag) => set({ flag })} />
         ) : (
@@ -188,6 +217,9 @@ function StateCardBody({ id }: { id: string }) {
             <Icon name={t.icon} size={15} /> {t.label}
           </button>
         ))}
+        <button className="sc-collapse" title={compact ? 'Развернуть шапку' : 'Свернуть шапку'} onClick={() => setCompact(!compact)}>
+          {compact ? '▼ шапка' : '▲ свернуть'}
+        </button>
       </nav>
 
       <div className="sc-content">
@@ -221,11 +253,11 @@ function StateCardBody({ id }: { id: string }) {
                   )}
                 </div>
                 <div>
-                  <b>{places.length}</b> поселений и мест
+                  <b>{worldPlaces.length}</b> поселений и мест
                 </div>
               </div>
               <div className="chip-list">
-                {places.slice(0, 30).map((p) => {
+                {worldPlaces.slice(0, 30).map((p) => {
                   const pf = resolve(p, date)
                   return (
                     <button
@@ -241,6 +273,20 @@ function StateCardBody({ id }: { id: string }) {
                     </button>
                   )
                 })}
+                {cityMaps.slice(0, 30).map((m) => (
+                  <button
+                    key={m.id}
+                    className="chip"
+                    title="Открыть план города"
+                    onClick={() => {
+                      useStore.getState().openMap(m.id)
+                      setView('map')
+                      close(null)
+                    }}
+                  >
+                    План: {m.name}
+                  </button>
+                ))}
               </div>
             </div>
           </div>

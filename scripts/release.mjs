@@ -2,7 +2,8 @@
 // Версия берётся из package.json; загружает release/Gleuderoff-<версия>.apk и Gleuderoff-Setup-<версия>.exe.
 // Токен — из git credential (тот же, что у git push), нигде не печатается.
 import { execSync } from 'child_process'
-import { existsSync, readFileSync, statSync } from 'fs'
+import { existsSync, readFileSync, statSync, createReadStream } from 'fs'
+import { Readable } from 'stream'
 
 const ver = JSON.parse(readFileSync('package.json', 'utf8')).version
 const [title = `Gleuderoff ${ver}`, notes = ''] = process.argv.slice(2)
@@ -24,7 +25,7 @@ for (const [name, type] of [[`Gleuderoff-${ver}.apk`, 'application/vnd.android.p
   const file = `release/${name}`
   if (!existsSync(file)) { console.log('нет файла', file); continue }
   if (r.assets?.some((a) => a.name === name)) { console.log('уже загружен', name); continue }
-  const up = await fetch(r.upload_url.replace(/\{.*\}/, '') + '?name=' + name, { method: 'POST', headers: { ...H, 'Content-Type': type, 'Content-Length': String(statSync(file).size) }, body: readFileSync(file), duplex: 'half' })
+  const up = await fetch(r.upload_url.replace(/\{.*\}/, '') + '?name=' + name, { method: 'POST', headers: { ...H, 'Content-Type': type, 'Content-Length': String(statSync(file).size) }, body: Readable.toWeb(createReadStream(file)), duplex: 'half' })
   const a = await up.json()
   console.log(name, up.status, a.state ?? JSON.stringify(a).slice(0, 200))
 }

@@ -92,9 +92,13 @@ function insideOwned(world: WorldData, mapId: string, date: WorldDate, stateId: 
   )
 }
 
+/** последний вид камеры для каждой карты — чтобы «назад» возвращал туда же, а не к общему виду */
+const savedViews = new Map<string, { c: L.LatLng; z: number }>()
+
 export function MapView() {
   const divRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
+  const curMapId = useRef<string | null>(null)
   const g = useRef<{
     base?: L.ImageOverlay
     tiles?: L.TileLayer
@@ -187,6 +191,10 @@ export function MapView() {
     map.getPane('labels')!.style.pointerEvents = 'none'
     L.control.zoom({ position: 'bottomright' }).addTo(map)
     map.on('zoomend', refreshZoomStyles)
+    // помним вид каждой карты: вернулись из плана — мир там же, где был
+    map.on('moveend', () => {
+      if (curMapId.current) savedViews.set(curMapId.current, { c: map.getCenter(), z: map.getZoom() })
+    })
     return () => {
       map.remove()
       mapRef.current = null
@@ -224,9 +232,13 @@ export function MapView() {
     }
     if (mapDef.reference) g.current.ref = L.imageOverlay(assetUrl(mapDef.reference), b, { className: 'map-ref' })
     const lb = L.latLngBounds(b as L.LatLngBoundsLiteral)
+    const saved = savedViews.get(mapDef.id)
+    curMapId.current = null
     map.setMaxBounds(lb.pad(0.25))
-    map.fitBounds(lb)
+    map.fitBounds(lb, { animate: false })
     map.setMinZoom(map.getBoundsZoom(lb) - 1)
+    if (saved) map.setView(saved.c, saved.z, { animate: false })
+    curMapId.current = mapDef.id
     polys.current.forEach((p) => p.poly.remove())
     polys.current.clear()
     refreshZoomStyles()
@@ -332,6 +344,17 @@ export function MapView() {
     } else if (t.kind === 'select') {
       // клик по объёмному поселению: место автора или поселение провинции
       const hit = settleLayer.current?.hit(x, y)
+      // издалека на политической карте клик выбирает всю страну, вблизи — провинцию или поселение
+      const far = s.mapMode === 'political' && (mapRef.current?.getZoom() ?? 0) < -1.25
+      if (far && md.provinceMap && rasterRef.current) {
+        const pid = provinceAt(rasterRef.current, md.width, md.height, x, y)
+        const prov = pid ? s.world!.provinces?.find((p) => p.id === pid) : undefined
+        const owner = prov ? ownerAt(prov, s.date) : null
+        if (owner) {
+          s.select({ type: 'state', id: owner })
+          return
+        }
+      }
       if (hit?.key?.startsWith('place:')) {
         s.select({ type: 'place', id: hit.key.slice(6) })
         return
@@ -510,6 +533,13 @@ export function MapView() {
   }, [provinces, date])
   const ownersKey = useMemo(() => owners.join('|'), [owners])
 
+  // от даты подписям на провинциальной карте нужны только владельцы (ownersKey) и названия стран:
+  // пока они те же, при «время идёт» подписи не пересоздаём
+  const labelDateKey = useMemo(
+    () => (provinces ? world.states.map((s) => (existsAt(s, date) ? resolve(s, date).name : '')).join('|') : String(date)),
+    [provinces, world.states, date]
+  )
+
   // --- подписи государств ---
   useEffect(() => {
     const lg = g.current!.labels
@@ -554,14 +584,21 @@ export function MapView() {
       }
     }
     refreshZoomStyles()
-  }, [world.regions, world.states, date, layers.stateLabels, mapDef.id, ownersKey, rasterTick])
+  }, [world.regions, world.states, labelDateKey, layers.stateLabels, mapDef.id, ownersKey, rasterTick])
 
   // --- провинции: WebGL-слой, режимы карты, наведение, кисть ---
   const mapMode = useStore((s) => s.mapMode)
   const provLayer = useRef<InstanceType<typeof ProvinceRenderer> | null>(null)
   const textLayer = useRef<InstanceType<typeof TextRenderer> | null>(null)
   const lutKeys = useRef<(string | null)[]>([])
-  const [hoverKey, setHoverKey] = useState<string | null>(null)
+  // наведение — без состояния React: иначе каждое движение мыши пересобирало таблицу и перерисовывало MapView
+  const hoverKeyRef = useRef<string | null>(null)
+  const keyNums = useRef<Map<string, number>>(new Map())
+  const setHoverKey = (key: string | null): void => {
+    if (hoverKeyRef.current === key) return
+    hoverKeyRef.current = key
+    provLayer.current?.setHover(key ? keyNums.current.get(key) ?? -1 : -1)
+  }
   const tipRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -706,6 +743,15 @@ export function MapView() {
       settleLayer.current = null
     }
   }, [mapDef.id, mapDef.provinceMap])
+  // от даты значкам нужно только «какие места видны и какого они типа» — пока это не меняется, не пересобираем
+  const placesDateKey = useMemo(
+    () =>
+      world.places
+        .filter((pl) => pl.mapId === mapDef.id && placeVisible(pl, date))
+        .map((pl) => `${pl.id}:${pl.model ?? resolve(pl, date).type}`)
+        .join('|'),
+    [world.places, mapDef.id, date]
+  )
   useEffect(() => {
     const layer = settleLayer.current
     if (!layer) return
@@ -743,25 +789,32 @@ export function MapView() {
       items.push({ x: pl.x, y: pl.y, type, culture: pv?.culture ?? 'imperial', variant: pl.id.length * 7 + pl.id.charCodeAt(0), key: `place:${pl.id}`, plan, terrain: pv?.terrain })
     }
     layer.setItems(items)
-  }, [rasterTick, provinces, world.places, date, layers.models, mapDef.id])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rasterTick, provinces, world.places, placesDateKey, layers.models, mapDef.id, world.maps])
 
-  // таблица цветов: дата, режим, выделение, наведение
+  // таблица цветов: дата, режим, выделение (наведение — отдельно, uniform в шейдере).
+  // От даты зависят только политический режим, религии и выделенная страна (её провинции на дату);
+  // в остальных режимах при «время идёт» таблицу не пересобираем
+  const lutDate =
+    mapMode === 'political' || mapMode === 'religions' || selection?.type === 'state' ? date : null
   useEffect(() => {
     if (!provLayer.current || !provinces) return
-    const { data, width, keys } = buildLut(
+    const { data, width, keys, keyNums: nums } = buildLut(
       {
         world,
         date,
         mode: mapMode,
         selectedProvince: selection?.type === 'province' ? selection.id : null,
-        selectedState: selection?.type === 'state' ? selection.id : null,
-        hoverKey
+        selectedState: selection?.type === 'state' ? selection.id : null
       },
       owners
     )
     lutKeys.current = keys
+    keyNums.current = nums
     provLayer.current.setLut(data, width, LUT_ROWS, date)
-  }, [rasterTick, date, world.states, mapMode, selection, hoverKey, provinces])
+    provLayer.current.setHover(hoverKeyRef.current ? nums.get(hoverKeyRef.current) ?? -1 : -1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rasterTick, lutDate, world.states, mapMode, selection, provinces])
 
   // вид слоя: заливка, границы, линии провинций при приближении
   useEffect(() => {
@@ -876,7 +929,7 @@ export function MapView() {
       raf = requestAnimationFrame(() => {
         const id = pick(e.latlng)
         const key = id ? lutKeys.current[id] ?? null : null
-        setHoverKey((k) => (k === key ? k : key))
+        setHoverKey(key)
         const tip = tipRef.current
         if (!tip) return
         // на телефоне подсказки под пальцем нет: касание не уводит «мышь», и подсказка зависала бы на экране
@@ -1088,10 +1141,15 @@ export function MapView() {
       {mapDef.kind !== 'world' && (() => {
         // назад — на карту, где стоит место с этой картой (здание → город → мир)
         const owner = world.places.find((p) => p.innerMapId === mapDef.id)
-        const parent = world.maps.find((m) => m.id === owner?.mapId) ?? world.maps.find((m) => m.kind === 'world')!
+        // если пришли откуда-то (карта, карточка страны) — туда и возвращаемся
+        const from = useStore.getState().mapBack.at(-1)
+        const parent = world.maps.find((m) => m.id === (from?.mapId ?? owner?.mapId)) ?? world.maps.find((m) => m.kind === 'world')!
+        const label = from?.stateCardOpen
+          ? (world.states.find((s) => s.id === from.stateCardOpen)?.base.name ?? 'Назад')
+          : parent.kind === 'world' ? 'Карта мира' : parent.name.replace(/ — план города$/, '')
         return (
           <div className="map-breadcrumb">
-            <button onClick={() => openMap(parent.id)}>← {parent.kind === 'world' ? 'Карта мира' : parent.name.replace(/ — план города$/, '')}</button>
+            <button onClick={() => (from ? useStore.getState().mapGoBack() : openMap(parent.id))}>← {label}</button>
             <span>{mapDef.name}</span>
             {mapDef.plan && (
               <span className="map-view-switch">
