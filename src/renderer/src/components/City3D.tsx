@@ -18,6 +18,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
   const stick = useRef<HTMLDivElement>(null)
   const state = useRef({ mode, hour: DAY, flow: false, fly: false, tour: false, needShadow: true, stickX: 0, stickY: 0 })
   const worldRef = useRef<CityWorld | null>(null)
+  const bubbleEl = useRef<HTMLDivElement>(null)
   const [hour, setHourState] = useState(DAY)
   const [flow, setFlow] = useState(false)
   const [tour, setTour] = useState(false)
@@ -85,7 +86,7 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
         // чьё поселение: состав жителей зависит от государства и культуры
         const prov = w.provinces?.find((p) => p.cityMapId === mapDef.id)
         const stateId = prov?.owners?.at(-1)?.[1] ?? w.places.find((p) => p.innerMapId === mapDef.id)?.base.stateId
-        const city = buildCity(plan, mapDef.id, { mobile, maxTexture: renderer.capabilities.maxTextureSize, places: placesOf(), state: w.states.find((q) => q.id === stateId)?.base.name ?? '', culture: prov?.culture ?? 'imperial' })
+        const city = buildCity(plan, mapDef.id, { mobile, maxTexture: renderer.capabilities.maxTextureSize, places: placesOf(), state: w.states.find((q) => q.id === stateId)?.base.name ?? '', culture: prov?.culture ?? 'imperial', gov: w.states.find((q) => q.id === stateId)?.base.government ?? '' })
         setCensus(city.census)
         worldRef.current = city
         setMini({ w: city.size[0], h: city.size[1] })
@@ -234,6 +235,8 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
         let lastT = performance.now()
         let uiTick = 0
         const dir = new THREE.Vector3()
+        let lastSpeak = 0
+        let speech: { pos: THREE.Vector3; until: number } | null = null
         const frame = (now: number): void => {
           raf = requestAnimationFrame(frame)
           if (document.hidden) return
@@ -269,10 +272,14 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
               walk.vy = 0
             } else {
               const pad = 0.35
-              const free = (x: number, z: number): boolean => city.walkable(x + Math.sign(mx || 1) * pad, z) && city.walkable(x, z + Math.sign(mz || 1) * pad) && city.walkable(x, z)
+              // пол с учётом высоты: лестницы, пандусы и верх стен; ступень — не выше ~0.8 м, через стену не пройти
+              const fy = walk.y
+              const free = (x: number, z: number): boolean => city.floorAt(x + Math.sign(mx || 1) * pad, z, fy) !== null && city.floorAt(x, z + Math.sign(mz || 1) * pad, fy) !== null && city.floorAt(x, z, fy) !== null
               if (free(cam.position.x + mx, cam.position.z)) cam.position.x += mx
               if (free(cam.position.x, cam.position.z + mz)) cam.position.z += mz
-              const g = Math.max(city.heightAt(cam.position.x, cam.position.z), city.deckAt(cam.position.x, cam.position.z) ?? -99)
+              const g = city.floorAt(cam.position.x, cam.position.z, fy) ?? city.heightAt(cam.position.x, cam.position.z)
+              // сход по лестнице вниз — без «прыжков»
+              if (walk.vy === 0 && walk.y > g && walk.y - g < 0.5) walk.y = g
               // приземлиться, если до этого летали
               if (walk.y > g + 0.01 || walk.vy !== 0) {
                 walk.vy -= 12 * dt
@@ -301,6 +308,32 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
             renderer.shadowMap.needsUpdate = true
           }
           city.tick(dt, now / 1000, cam)
+          // реплика жителя над головой: в режиме прогулки, когда подошли близко
+          const bub = bubbleEl.current
+          if (bub) {
+            if (st.mode === 'walk' && now - lastSpeak > 300) {
+              lastSpeak = now
+              cam.getWorldDirection(dir)
+              const sp = (!speech || now > speech.until) ? city.speak(cam.position, dir, 3.8, now / 1000) : null
+              if (sp) {
+                speech = { pos: new THREE.Vector3(sp.x, sp.y, sp.z), until: now + 2800 + sp.text.length * 55 }
+                bub.textContent = sp.text
+              }
+            }
+            if (speech && (now > speech.until || st.mode !== 'walk')) speech = null
+            if (speech) {
+              const p = speech.pos.clone().project(cam)
+              const el2 = bub.parentElement!
+              const w = el2.clientWidth, h = el2.clientHeight
+              if (p.z < 1 && p.z > -1) {
+                const bw = bub.offsetWidth
+                const x = Math.max(bw / 2 + 8, Math.min(w - bw / 2 - 8, ((p.x + 1) / 2) * w))
+                const y = Math.max(bub.offsetHeight + 8, Math.min(h - 8, ((1 - p.y) / 2) * h))
+                bub.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`
+                bub.style.opacity = String(Math.min(1, (speech.until - now) / 400))
+              } else bub.style.opacity = '0'
+            } else bub.style.opacity = '0'
+          }
           // мини-карта и метка выбранного
           if (arrow.current) {
             cam.getWorldDirection(dir)
@@ -409,12 +442,14 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
           <small>Клик по жителю покажет, кто это.</small>
         </div>
       )}
+      <div ref={bubbleEl} className="city3d-say" aria-live="polite" />
       {met && (
         <div className="city3d-met" role="status">
           <i style={{ background: met.race.mark }} />
           <div>
             <b>{met.race.name}</b>
             <span>{met.role}</span>
+            {met.say && <q className="city3d-met-say">{met.say}</q>}
             {(() => {
               const e = world.entries.find((q) => q.id === met.race.entry)
               const text = (e?.base as { summary?: string } | undefined)?.summary
