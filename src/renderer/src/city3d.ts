@@ -1225,8 +1225,11 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const over = grow(r, vik ? 0.8 : kind ? 0.5 : 0.35)
       const uv = over.map(toUV)
       const LIFT = 0.02
+      // фактический размах крыши по линии конька (для непрямоугольных контуров он короче описанного прямоугольника)
+      let rU0 = 1e9, rU1 = -1e9
       for (const sgn of [1, -1]) {
         const half = clipHalf(uv, sgn)
+        for (const q of half) if (Math.abs(q[1]) < 1e-4) { rU0 = Math.min(rU0, q[0]); rU1 = Math.max(rU1, q[0]) }
         if (half.length < 3) continue
         const tris = THREE.ShapeUtils.triangulateShape(half.map(([u, v]) => new THREE.Vector2(u, v)), [])
         const P = (q: P2): V3 => { const w = fromUV(q[0], q[1]); return [w[0], base + eave + rise - Math.abs(q[1]) * pitch + LIFT, w[1]] }
@@ -1237,8 +1240,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         }
       }
       // конёк
-      if (detail >= 1) {
-        const a = fromUV(u0 - 0.3, 0), c = fromUV(u1 + 0.3, 0), y = base + eave + rise + 0.02
+      if (detail >= 1 && rU1 - rU0 > 0.6) {
+        const a = fromUV(rU0 + 0.05, 0), c = fromUV(rU1 - 0.05, 0), y = base + eave + rise + 0.02
         ch.solid.box((a[0] + c[0]) / 2, y - 0.08, (a[1] + c[1]) / 2, Math.hypot(c[0] - a[0], c[1] - a[1]), 0.18, 0.28, mixHex(roofCol, '#000', 0.35), Math.atan2(c[1] - a[1], c[0] - a[0]))
       }
       // Креит: на щипцах — скрещённые доски, концы которых вырезаны драконьими головами
