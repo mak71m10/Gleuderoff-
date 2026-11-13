@@ -81,6 +81,8 @@ export const STYLES: Record<string, Style> = {
   // Когалым: деревенская коммуна — белёные срубы под тёплой соломой, крутой скат, потемневший дуб
   kulag: { plaster: ['#e8e2d4', '#dcd4c0', '#f0ebdd', '#d4c8b0', '#e2dac6'], roof: ['#a8452f', '#9a3c28', '#b4503a', '#8a3424', '#6a2c20'], timber: '#2e2a26', stone: '#8a8478', wall: '#a8503a', shutter: ['#2a4a6a', '#3a5a3a', '#8a3a2a'], pitch: 1.15, framed: true, floors: 2, grass: '#6a9a48', grass2: '#76a652', dirt: '#9a8a64', pave: '#8e8672', lit: 0.4, conifer: 0.1, tower: '#8a3a28' },
   kogal: { plaster: ['#ece0c8', '#e0d2b4', '#f0e6d0', '#d8c8a8', '#e6d8bc'], roof: ['#b89a52', '#a88c48', '#c4a860', '#9a7e40', '#6a4a30'], timber: '#4a3420', stone: '#9a9484', wall: '#b0a890', shutter: ['#2f5a3a', '#8a6a2e', '#6a4a2a'], pitch: 1.1, framed: true, floors: 1, grass: '#74a04a', grass2: '#80aa52', dirt: '#a89268', pave: '#a09478', lit: 0.4, conifer: 0.4, tower: '#7a5a3a' },
+  // Эльфборн: светлое дерево и белый камень, серебристо-зелёные крутые крыши, арки, много лиственных крон
+  elf: { plaster: ['#eef0e4', '#e4ead8', '#f3f0e2', '#dfe6d4', '#e9ecdc'], roof: ['#5a8068', '#4a7470', '#6a8a5a', '#7a9a86', '#8aa0a0'], timber: '#b59a6a', stone: '#c8c6b8', wall: '#d6d4c6', shutter: ['#5d7f5a', '#4a6a70', '#b59a6a'], pitch: 1.4, framed: false, floors: 1, grass: '#6e9a52', grass2: '#7aa65a', dirt: '#a09272', pave: '#cfcbbc', lit: 0.42, conifer: 0.25, tower: '#5a8a7a' },
   alpine: { plaster: ['#efe9dc', '#e6dccb', '#f3eee4', '#d9cfbd', '#e9e1d0'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#6a4a34', '#46434a'], timber: '#3a2416', stone: '#8a877e', wall: '#a8a49a', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#6f8f4e', grass2: '#7a9a56', dirt: '#9a8a6a', pave: '#9a958a', lit: 0.4, conifer: 1, tower: '#3f4a5a' },
   kranz: { plaster: ['#f4f0e8', '#ebe5d8', '#f7f4ee', '#e2dacb', '#efe8da'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#3a3a42', '#46434a'], timber: '#3a2416', stone: '#a9a598', wall: '#c8c3b6', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#a6a294', grass2: '#b0ac9e', dirt: '#b8b2a2', pave: '#c4bfb2', lit: 0.4, conifer: 1, tower: '#2a3a5a' },
   // Республика Чеафарал: имперский фахверк на нордской земле — светлая штукатурка, тёмные нордские крыши, серый камень
@@ -1064,6 +1066,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   type Cult = 'human' | 'gnome' | keyof typeof CULT_SHARE
   const dwStyle = S.style === 'dwarf' || S.style === 'deep'
   const gnStyle = S.style === 'gnome'
+  const elStyle = S.style === 'elf'
   const pickCult = (u: number, k: number): Cult => {
     let acc = 0
     for (const [c, s] of Object.entries(CULT_SHARE) as [Cult, number][]) {
@@ -1077,6 +1080,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const houseCult = (idx: number, u: number): Cult => {
     if (dwStyle) return 'dwarf'
     if (gnStyle) return 'gnome'
+    if (elStyle) return u < 0.85 ? 'elf' : 'human'
     const dc = distCult[blds[idx].d] ?? 'human'
     if (dc !== 'human') return u < 0.75 ? dc : 'human'
     return pickCult(u, 0.35)
@@ -1787,7 +1791,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const vendors: { x: number; z: number; a: number }[] = []
   const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
   // Гарефорд: Светочная башня всегда встаёт на самую большую площадь
-  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
+  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag' || S.style === 'elf') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
     if (area > 500 || si === garefSq) {
@@ -1801,6 +1805,34 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           ch.solid.cyl(px, y, pz, 0.38, 4.2, 6, st.timber)
           ch.solid.box(px, y + 3.3, pz, 0.9, 0.8, 0.9, '#6a2a1a', a)
         }
+      } else if (si === garefSq && S.style === 'elf') {
+        // Серебряная Ива Эльфборна: белое каменное кольцо с водой, серебристый ствол с корнями, широкая крона
+        // и двенадцать ниспадающих ветвей Домов — на конце каждой светится лист
+        ch.solid.cyl(cx, y, cz, 9.6, 0.3, 32, st.stone)
+        ch.solid.cyl(cx, y + 0.3, cz, 8.4, 0.1, 32, '#4a7a78')
+        ch.solid.cyl(cx, y + 0.3, cz, 3.2, 0.5, 16, '#8a9a7a')
+        for (let k = 0; k < 6; k++) {
+          const a = si + (k / 6) * 6.283
+          ch.solid.box(cx + Math.cos(a) * 2.2, y + 0.3, cz + Math.sin(a) * 2.2, 2.6, 0.7, 0.6, '#a9ada4', a)
+        }
+        ch.solid.cyl(cx, y + 0.8, cz, 1.35, 4.6, 12, '#c4c8c0', 0.95)
+        ch.solid.cyl(cx, y + 5.4, cz, 0.95, 1.4, 10, '#b8bcb4', 0.6)
+        ch.solid.cyl(cx, y + 5.2, cz, 6.4, 1.6, 20, '#9fb8a4', 5.6)
+        ch.solid.cyl(cx, y + 6.8, cz, 5.6, 1.8, 18, '#b4c8b8', 3.4)
+        ch.solid.cyl(cx, y + 8.6, cz, 3.4, 1.4, 14, '#c8d8cc', 0.6)
+        for (let k = 0; k < 12; k++) {
+          const a = si * 0.3 + (k / 12) * 6.283, ca = Math.cos(a), sa = Math.sin(a)
+          for (const [rr, hh] of [[5.6, 3.6], [4.4, 2.6]] as const) {
+            const bx = cx + ca * rr, bz = cz + sa * rr
+            ch.solid.box(bx, y + 5.4 - hh, bz, 0.22, hh, 0.22, '#d4e2d6', a)
+            if (rr > 5) ch.glow.box(bx, y + 5.2 - hh, bz, 0.34, 0.34, 0.34, '#ffffff', a)
+          }
+        }
+        for (let k = 0; k < 4; k++) {
+          const a = si + 0.4 + (k / 4) * 6.283
+          ch.solid.box(cx + Math.cos(a) * 9.0, y + 0.3, cz + Math.sin(a) * 9.0, 3.2, 0.45, 0.7, '#b59a6a', a + Math.PI / 2)
+        }
+        fillLine([[cx - 9, cz], [cx + 9, cz]], 10, N + 2 + si)
       } else if (si === garefSq && S.style === 'kulag') {
         // Дом Колец Кулагона: круг из семи каменных арок над водой, у каждой — свой цвет Дома, в центре светящийся камень-черепок
         ch.solid.cyl(cx, y, cz, 9.5, 0.35, 28, st.stone)

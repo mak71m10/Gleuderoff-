@@ -33,7 +33,9 @@ const CRYDON_STYLE = 'oil painting, naval admiralty portrait, dark navy uniform 
 const CHEAFARAL_STYLE = 'oil painting, northern republic council portrait, dutch golden age style, candlelight, dark wood and grey stone hall behind, visible brush strokes, detailed face, half-length portrait'
 const HIGHLAND_STYLE = 'oil painting, alpine noble portrait, cold clear mountain light, snowy peaks and pale sky behind, dark wood panelling, visible brush strokes, detailed face, half-length portrait'
 const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge light and brass lamps, carved stone pillars, dark background, visible brush strokes, detailed face, half-length portrait'
-const KREIT_STYLE = 'oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
+// Эльфборн: светлый эльфийский двор — серебристая ива и белые арки за спиной, рассеянный зеленоватый свет
+const ELFBORN_STYLE = 'oil painting, high fantasy elven court portrait, pre-raphaelite style, soft silver-green light through willow leaves, pale stone arches behind, visible brush strokes, detailed face, half-length portrait'
+const KREIT_STYLE ='oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
 // цвета домов -> слова для одежды
@@ -58,6 +60,30 @@ const CUSTOM = {
   'kl-geeske': 'elderly woman in her late sixties, white hair under a linen cap, shrewd calm eyes, dark wool dress',
   'kl-sjoukje': 'composed woman of forty-four, blond hair braided, grey dress, quiet clever expression',
   'kl-piebe': 'serious boy of ten, straw hair, grey tunic, solemn look',
+  // Эльфборн: эльфы стареют медленно — в описании видимый возраст; северноевропейские лица, остроконечные уши
+  'el-faeron': 'ageless elf lord looking about sixty, long silver-grey hair with a golden ribbon, rigid straight posture, spotless white cloak, stern regretful eyes',
+  'el-romendil': 'broad-shouldered elf warrior looking about fifty, scar across the eyebrow, long grey braid, worn steel armor with a silver leaf, hard tired face',
+  'el-illendel': 'elf queen-regent looking about forty, sun-tanned golden skin, golden eyes, auburn hair, sunset-orange gown, a wooden bracelet of willow twig, anxious composed face',
+  'el-irmel': 'thin almost translucent elf priestess looking about seventy, white robes, a silver chain with twelve small green leaves, pale cold eyes',
+  'el-serindor': 'round-faced grey-skinned elf priest looking about fifty, plump hands, sly constant smile, grey robes, a small purse of gold coins',
+  'el-elelmo': 'ancient blind elf high priest, milky white eyes, very long white hair, white and gold robes, serene face',
+  'el-valandil': 'tall well-groomed elf lord looking about forty, long fair hair, white doublet with a golden crown embroidered on the collar, arrogant smile',
+  'el-serelin': 'stately elf noblewoman looking about thirty-five, tall winged silver helmet, azure cloak, proud resentful eyes',
+  'el-meriel': 'grey-haired elf noblewoman looking about fifty, pastel grey gown, a grey dove on her shoulder, calm unreadable face',
+  'el-elbaron': 'narrow-faced elf ranger looking about fifty, green eyes, long brown hair, leaf-green hooded cloak, a longbow, watchful worried look',
+  'el-tarilon': 'wild elf chieftain looking about forty-five, tanned skin with dark tribal tattoos from cheekbones down the neck, wolf-pelt cloak, fierce eyes',
+  'el-liren': 'small elf healer looking about thirty, soft grey feathered wings half-open behind her, plain linen dress, kind determined eyes',
+  'el-ninel': 'old sea elf woman, pale pearly skin, long white hair with pearls woven in, sea-blue robes, distant grey eyes',
+  'el-aeglos': 'pale night elf lord looking about fifty, silver eyes squinting, long black hair, dark blue cloak, cold secretive face',
+  'el-karmel': 'blood elf noblewoman looking about thirty-five, bright emerald green eyes, dark auburn hair, dark blood-red gown, black gloves',
+  'el-gaelion': 'tall elf knight looking about thirty-five, long fair hair, heavy silver plate armor, a silver leaf brooch on the chest, tired sleepless eyes',
+  'el-heldar': 'grey-haired elf veteran looking about forty-five, missing left forearm with the sleeve pinned by a silver brooch, brown leather coat, stubborn face',
+  'el-nolore': 'short half-elf woman of forty, light brown hair with a grafted apple twig in it, plain green clothes, sharp defiant eyes',
+  'el-brendir': 'broad red-haired half-elf man of thirty-five, stubble, a wolf fang on a cord around the neck, worn leather jerkin, rough grin',
+  'el-meyrin': 'young half-elf seamstress of twenty-five, clear bright eyes, light brown hair, simple work dress with a grey ribbon on the shoulder',
+  'el-silviel': 'slender elf seer looking about fifty, a rowan berry wreath on greying hair, mossy green robes, faraway eyes',
+  'el-thomas': 'reddish-haired merchant of thirty-five, short beard, travelling coat with a grey ribbon on the left sleeve, wary look',
+  'el-arviel': 'cold beautiful elf noblewoman looking about thirty, long fair braid with golden pins, white and azure gown, disdainful look',
   'kl-tjerk': 'hard exiled lord of seventy, long grey hair, weathered face, travelling cloak, bitter pride',
   'kl-eelke': 'broad man of thirty-eight, red-blond beard, practical wool coat, stubborn jaw',
   'kl-ymkje': 'strong woman of thirty-five, ginger hair tied back, shrewd green eyes',
@@ -544,7 +570,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон', 'Эльфборн'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -566,7 +592,8 @@ for (const e of chars) {
   const lyria = e.base.tags.includes('Протекторат Лирия')
   const kogalym = e.base.tags.includes('Когалым')
   const kulagon = e.base.tags.includes('Кулагон')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon
+  const elfborn = e.base.tags.includes('Эльфборн')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon || elfborn
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -583,7 +610,10 @@ for (const e of chars) {
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
-  const prompt = kulagon
+  const halfElf = /Полуэльф/.test(race), elfR = /эльф/i.test(race) && !halfElf
+  const prompt = elfborn
+    ? `${ELFBORN_STYLE}, portrait of ${elfR ? `an (elf ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, long pointed elf ears:1.3)` : halfElf ? `a (half-elf ${female ? 'woman' : 'man'}:1.35), (northern european human face, slightly pointed ears:1.25)` : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25)`}, ${CUSTOM[id] ?? subject}${id === 'el-serelin' ? '' : ', (bareheaded:1.1)'}`
+    : kulagon
     ? `${KULAGON_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : kogalym
     ? `${KOGALYM_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
