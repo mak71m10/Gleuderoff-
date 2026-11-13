@@ -2058,3 +2058,35 @@ button.pw-chip:hover { background: var(--panel-2); }
 .ford-card { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border: 2px solid color-mix(in srgb, var(--bc) 55%, #000); border-radius: 8px; background: color-mix(in srgb, var(--bc) 10%, #0c0e10); color: #e8e4cc; cursor: pointer; text-align: center; } .ford-card.broken { opacity: .6; border-style: dashed; } .ford-card small { color: #a8a888; font-size: 11px; }
 .ford-face { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; background: #1c1c10; border: 2px solid var(--bc); display: flex; align-items: center; justify-content: center; font-family: var(--serif); } .ford-face img { width: 100%; height: 100%; object-fit: cover; }
 .ford-rules { margin: 10px 0 0; padding-left: 18px; color: #b0b090; font-size: 13px; }
+
+/* «Ива» Эльфборна: Серебряная Ива с 12 ветвями Домов */
+.wil { margin: 16px 0; padding: 14px; border: 1px solid #4a6a5a; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #1c2a26, #0b100f 80%); color: #e6eee6; }
+.wil-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wil-head small { display: block; color: #9ab8a8; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; } .wil-head b { font-family: var(--serif); font-size: 20px; }
+.wil-status { padding: 6px 12px; border-radius: 8px; background: #121816; border: 1px solid #4a5a52; font-size: 14px; } .wil-status.calm { border-color: #6aaa7a; } .wil-status.edge { border-color: #c9a24a; background: #26220f; } .wil-status.hot, .wil-status.root { border-color: #a04a3a; background: #281612; }
+.wil-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.wil-tabs button, .wil-card-btns button { padding: 4px 10px; border-radius: 6px; border: 1px solid #3a5a4a; background: #121816; color: #c0d4c8; cursor: pointer; font-size: 13px; } .wil-tabs button.on { border-color: #b8d8c8; background: #1e3028; color: #f0fff4; }
+.wil-svg { width: 100%; max-width: 560px; display: block; margin: 8px auto 0; } .wil-chart { width: 100%; display: block; margin-top: 8px; }
+.wil-bg { fill: #0c1210; stroke: #263a32; } .wil-root { fill: #3a2e22; opacity: .8; } .wil-trunk { fill: #b8c4c0; }
+.wil-branch { cursor: pointer; } .wil-branch:hover circle { stroke-width: 3; }
+.wil-name { font-size: 9px; font-weight: 700; pointer-events: none; } .wil-spark { font-size: 11px; fill: #ffd27a; }
+.wil-ruler { fill: #e8f4ec; font-size: 13px; font-family: var(--serif); } .wil-axis { fill: #88a898; font-size: 10px; }
+.wil-thr { stroke: #c9a24a; stroke-dasharray: 5 4; stroke-width: 1.2; } .wil-thr.root { stroke: #d0604a; } .wil-line { fill: none; stroke: #9ad0a8; stroke-width: 2; } .wil-cur { stroke: #fff; stroke-width: 1; opacity: .6; }
+.wil-slider { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; color: #9ab8a8; font-size: 13px; } .wil-slider input { flex: 1; accent-color: #9ad0a8; }
+.wil-signs { margin: 8px 0 0; padding-left: 4px; list-style: none; font-size: 13px; color: #d8e4dc; } .wil-signs li { margin: 2px 0; }
+.wil-card { margin-top: 8px; padding: 8px 10px; border-left: 4px solid var(--bc); border-radius: 6px; background: #121816; } .wil-card small { color: #9ab8a8; } .wil-card p { margin: 4px 0; font-size: 14px; }
+.wil-card-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.wil-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 0; font-size: 12px; color: #9ab8a8; } .wil-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.wil-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 10px; }
+.wil-hcard { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border: 2px solid color-mix(in srgb, var(--bc) 55%, #000); border-radius: 8px; background: color-mix(in srgb, var(--bc) 10%, #0b100f); color: #e6eee6; cursor: pointer; text-align: center; } .wil-hcard.d { border-style: dashed; } .wil-hcard.b { opacity: .6; border-style: dotted; } .wil-hcard small { color: #9ab8a8; font-size: 11px; }
+.wil-face { width: 52px; height: 52px; flex: none; border-radius: 50%; overflow: hidden; background: #16201c; border: 2px solid var(--bc, #9ad0a8); display: flex; align-items: center; justify-content: center; font-family: var(--serif); } .wil-face img { width: 100%; height: 100%; object-fit: cover; }
+.wil-nights { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-top: 10px; }
+.wil-night { padding: 8px 10px; border: 1px solid #6a3a2a; border-radius: 8px; background: #1a1210; } .wil-night small { display: block; color: #d0a080; font-size: 12px; } .wil-night p { margin: 4px 0 0; font-size: 13px; color: #e0d4cc; }
+.wil-guards { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.wil-guard { display: flex; gap: 10px; align-items: center; padding: 6px 8px; border: 1px solid #3a5a4a; border-radius: 8px; background: #121816; color: #e6eee6; cursor: pointer; text-align: left; } .wil-guard small { display: block; color: #9ab8a8; font-size: 12px; }
+.wil-rules { margin: 10px 0 0; padding-left: 18px; color: #a8c0b0; font-size: 13px; }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .wil { padding: 10px; } .wil-head b { font-size: 16px; } .wil-status { font-size: 12px; }
+  .wil-cards { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); } .wil-nights { grid-template-columns: 1fr; }
+  .wil-svg { max-width: 420px; }
+}

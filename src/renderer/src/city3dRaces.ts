@@ -115,6 +115,9 @@ const TABLES: Record<string, W> = {
   kalt: { kaltrans: 52, gladry: 14, tsions: 10, nargi: 8, dragonborn: 5, orcs: 4, roma: 2, dukulites: 3, ogres: 2 },
   nordic: { nords: 70, imperials: 10, dwarves: 8, gnomes: 3, skugga: 3, orcs: 2, goliaths: 2 },
   dwarven: { dwarves: 62, gnomes: 25, imperials: 6, nords: 4, gremlins: 3 },
+  // Эльфборн: высшие и лесные эльфы в Книге Побегов; полуэльфов (вне Книги, серая лента) отдельной расы в 3D нет —
+  // они видны как люди-имперцы и гладры; немного сильв, элуинов и гремлинов
+  elf: { 'high-elves': 36, 'wood-elves': 30, imperials: 14, gladry: 6, sylva: 6, eluins: 4, gremlins: 3, eleons: 1 },
   elven: { 'high-elves': 35, 'wood-elves': 35, sylva: 12, gremlins: 8, imperials: 4, eleons: 4 },
   eluin: { eluins: 80, imperials: 12, 'high-elves': 5, gnomes: 3 },
   eleon: { eleons: 80, 'high-elves': 8, imperials: 8, gnomes: 2, nords: 2 },

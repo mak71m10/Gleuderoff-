@@ -23,6 +23,7 @@ import { ThresholdView } from './Threshold'
 import { WallView } from './Wall'
 import { CartView } from './Cart'
 import { FordsView } from './Fords'
+import { WillowView } from './Willow'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { renderBody } from './prose'
@@ -344,6 +345,7 @@ function EntryEditor({ id }: { id: string }) {
                 {f.wall && <WallView data={f.wall} onOpen={goto} />}
                 {f.cart && <CartView data={f.cart} onOpen={goto} />}
                 {f.ford && <FordsView data={f.ford} onOpen={goto} />}
+                {f.willow && <WillowView data={f.willow} onOpen={goto} />}
           {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}
