@@ -1774,6 +1774,80 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
 
   // ---------- стены города: зубцы, башни, ворота там, где стену пересекает дорога ----------
   const wallColor = st.wall
+  // ворота: башни, арка проезда, створки, решётка; вид зависит от стиля города
+  const gatehouse = (cx: number, cz: number, ux: number, uz: number, nx: number, nz: number, th: number, wh: number): void => {
+    const y = heightAt(cx, cz), s = chunkAt(cx, cz).solid, rot = Math.atan2(uz, ux)
+    const kind = dwStyle || gnStyle ? 'dwarf' : elStyle ? 'elf' : S.style === 'south' ? 'south' : S.style === 'styria' ? 'dark' : 'human'
+    const wc = wallColor, dk = '#1c1713', pw = 2.2
+    const bx = (u: number, v: number, h: number, sx: number, sh: number, sz: number, col: string, r = 0): void => s.box(cx + ux * u + nx * v, y + h, cz + uz * u + nz * v, sx, sh, sz, col, rot + r)
+    const roofC = kind === 'dark' ? '#34323a' : kind === 'elf' ? '#4f8f72' : st.roof[0]
+    const stoneC = mixHex(st.stone, wc, 0.3)
+    const D = th + 3.4 // глубина башни поперёк стены
+    const top = wh + 1.2 // верх надвратного пролёта
+    // башни
+    for (const sd of [-1, 1]) {
+      const u = sd * (kind === 'dwarf' ? 4.7 : kind === 'elf' ? 4.2 : 4.4)
+      if (kind === 'elf') {
+        const hh = wh + 6.5
+        s.cyl(cx + ux * u, y - 3, cz + uz * u, 2.0, hh + 3, 14, mixHex(wc, '#ffffff', 0.18), 1.65)
+        s.cyl(cx + ux * u, y + hh - 0.2, cz + uz * u, 2.35, 0.6, 14, stoneC)
+        s.cyl(cx + ux * u, y + hh + 0.4, cz + uz * u, 2.5, 4.6, 14, roofC, 0, false)
+        s.cyl(cx + ux * u, y + hh + 5.0, cz + uz * u, 0.12, 1.3, 5, '#d8c27a', 0.04)
+        for (const v of [-1, 1]) bx(u, v * 1.9, wh * 0.5, 0.3, 1.6, 0.12, dk)
+        // колонна-подпорка проезда, чтобы между круглой башней и аркой не было щели
+        bx(sd * 2.9, 0, -3, 1.6, wh + 4.2, th + 1.6, wc)
+      } else {
+        const T = kind === 'dwarf' ? 5.0 : 4.4, ht = kind === 'dwarf' ? wh + 2.4 : wh + 4
+        bx(u, 0, -3, T, ht + 3, D, wc)
+        bx(u, 0, -0.2, T + 0.5, 1.4, D + 0.5, mixHex(wc, '#000', 0.16)) // цоколь
+        bx(u, 0, ht - 0.6, T + 0.8, 0.7, D + 0.8, stoneC) // карниз
+        if (kind === 'human' || kind === 'dark') {
+          s.cyl(cx + ux * u, y + ht, cz + uz * u, (T + 0.9) * 0.71, T * (kind === 'dark' ? 1.7 : 1.3), 4, roofC, 0, false, rot + Math.PI / 4)
+          s.cyl(cx + ux * u, y + ht + T * (kind === 'dark' ? 1.7 : 1.3), cz + uz * u, 0.07, 1.6, 4, '#3a2a1a', 0.07)
+          bx(u + 0.7, 0, ht + T * (kind === 'dark' ? 1.7 : 1.3) + 0.9, 1.3, 0.7, 0.05, kind === 'dark' ? '#2a1a2a' : '#8f2f2f')
+        } else {
+          for (const f of [-1, 1]) {
+            crenel(chunkAt(cx, cz), [cx + ux * (u - T / 2 - 0.2) + nx * (D / 2 + 0.2) * f, cz + uz * (u - T / 2 - 0.2) + nz * (D / 2 + 0.2) * f], [cx + ux * (u + T / 2 + 0.2) + nx * (D / 2 + 0.2) * f, cz + uz * (u + T / 2 + 0.2) + nz * (D / 2 + 0.2) * f], y + ht + 0.1, wc, 0.5)
+          }
+        }
+        if (detail >= 1) for (const v of [-1, 1]) for (const du of [-0.9, 0.9]) bx(u + du, v * (D / 2 + 0.03), wh * 0.5, 0.32, 1.5, 0.1, dk)
+      }
+    }
+    // арка проезда: ступенчатая по кривой, с кольцом из камня
+    const Hs = kind === 'dwarf' ? 4.1 : kind === 'dark' ? 2.6 : kind === 'elf' ? 3.0 : 2.9
+    const rise = kind === 'dwarf' ? 0 : kind === 'dark' ? 2.9 : kind === 'elf' ? 3.6 : kind === 'south' ? 2.2 : 2.4
+    const sh = (t: number): number => kind === 'south' ? Math.sqrt(Math.max(0, 1 - t * t)) : Math.pow(Math.max(0, 1 - t), kind === 'elf' ? 0.55 : 0.7)
+    const NS = 12, sw = (2 * pw) / NS
+    for (let i = 0; i < NS; i++) {
+      const u = -pw + (i + 0.5) * sw, hA = Hs + rise * sh(Math.abs(u) / pw)
+      bx(u, 0, hA, sw + 0.02, top - hA, th + 1.6, mixHex(wc, '#000', 0.04))
+      bx(u, 0, hA, sw + 0.02, 0.6, th + 2.0, kind === 'elf' ? '#e6dcc0' : stoneC)
+      const v0 = -(th + 1.6) / 2, v1 = (th + 1.6) / 2
+      s.quad([cx + ux * (u - sw / 2) + nx * v0, y + hA, cz + uz * (u - sw / 2) + nz * v0], [cx + ux * (u + sw / 2) + nx * v0, y + hA, cz + uz * (u + sw / 2) + nz * v0], [cx + ux * (u + sw / 2) + nx * v1, y + hA, cz + uz * (u + sw / 2) + nz * v1], [cx + ux * (u - sw / 2) + nx * v1, y + hA, cz + uz * (u - sw / 2) + nz * v1], '#2d2620')
+    }
+    if (kind === 'dwarf') {
+      bx(0, 0, Hs - 0.4, 5.2, 0.9, th + 2.2, stoneC) // тяжёлая перемычка
+      if (detail >= 1) for (let q = -3; q <= 3; q++) bx(q * 0.62, th / 2 + 1.12, Hs + 0.9, 0.22, 0.5, 0.06, '#c9a24a') // золотые руны
+    }
+    // зубцы над проездом
+    if (kind !== 'elf') for (const f of [1, -1]) crenel(chunkAt(cx, cz), [cx - ux * pw + nx * (th / 2 + 0.7) * f, cz - uz * pw + nz * (th / 2 + 0.7) * f], [cx + ux * pw + nx * (th / 2 + 0.7) * f, cz + uz * pw + nz * (th / 2 + 0.7) * f], y + top, wc, 0.4)
+    else for (let q = -2; q <= 2; q++) s.cyl(cx + ux * q * 0.9, y + top, cz + uz * q * 0.9, 0.22, 1.5, 5, '#f0e8d0', 0.03)
+    // герб над аркой
+    const gh = Hs + rise + 0.55
+    bx(0, th / 2 + 0.88, gh, 1.1, Math.min(1.5, top - gh - 0.1), 0.08, kind === 'dark' ? '#2a1a2a' : kind === 'elf' ? '#3e7d5c' : '#8f2f2f')
+    // створки: распахнуты наружу, с железными полосами; опущенная решётка не мешает проезду — поднята под свод
+    for (const sd of [-1, 1]) {
+      const phi = 1.15, du = -sd * Math.cos(phi), dv = Math.sin(phi), ang = Math.atan2(dv, du)
+      const hx = sd * pw, hv = th / 2 + 0.7, L = 2.1, doorH = Hs - 0.2
+      const dc = kind === 'dwarf' ? '#3c4046' : kind === 'elf' ? '#c9b98a' : mixHex(st.timber, '#000', 0.25)
+      bx(hx + du * L / 2, hv + dv * L / 2, 0, L, doorH, 0.24, dc, ang)
+      if (detail >= 1) for (const hh of [0.5, doorH - 0.7]) bx(hx + du * L / 2, hv + dv * L / 2, hh, L * 0.96, 0.22, 0.3, kind === 'elf' ? '#9a8a5a' : '#2a2c30', ang)
+    }
+    if (detail >= 1 && kind !== 'elf') for (let q = -3; q <= 3; q++) {
+      const u = q * 0.55, hA = Hs + rise * sh(Math.abs(u) / pw)
+      bx(u, 0, hA - 1.1, 0.12, 1.2, 0.12, '#2a2a2e')
+    }
+  }
   let stairCount = 0
   wallLines.forEach((w, wi) => {
     const r = w.r
@@ -1839,16 +1913,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       }
       // надвратные башни
       for (const g0 of gates) {
-        const cx = a[0] + ux * g0, cz = a[1] + uz * g0, y = heightAt(cx, cz), ch = chunkAt(cx, cz), rot = Math.atan2(uz, ux)
-        for (const sd of [-1, 1]) {
-          const tx = cx + ux * sd * 4.2, tz = cz + uz * sd * 4.2
-          ch.solid.cyl(tx, y - 2, tz, towerR * 0.85, wh + 5, 10, wallColor)
-          for (let m = 0; m < 8; m++) { const q = (m / 8) * 6.283; ch.solid.box(tx + Math.cos(q) * towerR * 0.85, y + wh + 3, tz + Math.sin(q) * towerR * 0.85, 1, 1, 0.5, wallColor, q + 1.57) }
-        }
-        // свод над проездом и герб над аркой
-        ch.solid.box(cx, y + wh - 2.2, cz, 8.4, 3.6, th + 1, mixHex(wallColor, '#000', 0.05), rot)
-        for (const sd of [1, -1]) crenel(ch, [cx - ux * 4.2 + nx * (th / 2 + 0.3) * sd, cz - uz * 4.2 + nz * (th / 2 + 0.3) * sd], [cx + ux * 4.2 + nx * (th / 2 + 0.3) * sd, cz + uz * 4.2 + nz * (th / 2 + 0.3) * sd], y + wh + 1.4, wallColor, 0.4)
-        ch.solid.box(cx + nx * (th / 2 + 0.56), y + wh - 1.2, cz + nz * (th / 2 + 0.56), 1.1, 1.5, 0.08, S.style === 'styria' ? '#2a1a2a' : '#8f2f2f', rot)
+        gatehouse(a[0] + ux * g0, a[1] + uz * g0, ux, uz, nx, nz, th, wh)
       }
       // угловая башня
       const ty = heightAt(a[0], a[1]), ch = chunkAt(a[0], a[1])

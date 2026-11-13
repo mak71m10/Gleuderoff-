@@ -1086,8 +1086,62 @@ export function MapView() {
     refreshZoomStyles()
   }, [world.places, date, mapDef.id, selection, tool.kind, layers.cities, layers.settlements, layers.poi, layers.models])
 
+  // --- Стена Отчаяния: сплошная линия через Поющие Камни, разрыв у Пролома ---
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    const layer = L.layerGroup([]).addTo(map)
+    const pts = world.places
+      .filter((p) => p.mapId === mapDef.id && /^lore-el-(stone-|breach)/.test(p.id) && placeVisible(p, date))
+      .sort((a, b) => a.x - b.x)
+    for (let i = 0; i + 1 < pts.length; i++) {
+      const a = pts[i], b = pts[i + 1]
+      const broken = a.id.includes('breach') || b.id.includes('breach')
+      const ll = [toLL([a.x, a.y]), toLL([b.x, b.y])]
+      if (broken) {
+        L.polyline(ll, { pane: 'geo', color: '#8c8f93', weight: 3, opacity: 0.8, dashArray: '2 9', interactive: false }).addTo(layer)
+      } else {
+        L.polyline(ll, { pane: 'geo', color: '#f1f4f8', weight: 11, opacity: 0.22, interactive: false }).addTo(layer)
+        L.polyline(ll, { pane: 'geo', color: '#3b4048', weight: 7, opacity: 0.95, interactive: false }).addTo(layer)
+        L.polyline(ll, { pane: 'geo', color: '#d8dde4', weight: 3, opacity: 1, interactive: false }).addTo(layer)
+      }
+    }
+    return () => { layer.remove() }
+  }, [world.places, date, mapDef.id])
+
+  // --- Серебряная Ива: огромное дерево над Анорланте, видно издалека ---
+  useEffect(() => {
+    const map = mapRef.current
+    const w = world.places.find((p) => p.id === 'lore-el-willow' && p.mapId === mapDef.id && placeVisible(p, date))
+    if (!map || !w) return
+    const strands = Array.from({ length: 19 }, (_, i) => {
+      const x = 14 + i * 4.1
+      const h = 34 + ((i * 37) % 17) + Math.sin(i * 0.9) * 6
+      return `<path d="M${x} 44 q${i % 2 ? 2.4 : -2.4} ${h / 2} 0 ${h}" stroke="${i % 3 ? '#cfe3d6' : '#e8f1ea'}" stroke-width="1.7" fill="none" stroke-linecap="round" opacity="0.92"/>`
+    }).join('')
+    const svg = `<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 7px rgba(214,240,224,.9)) drop-shadow(0 3px 3px rgba(0,0,0,.65))">
+      <ellipse cx="50" cy="109" rx="30" ry="3.2" fill="#000" opacity=".35"/>
+      <path d="M43 109 C45 90 46 70 43 52 L57 52 C54 70 55 90 57 109 Z" fill="#5a4a3a"/>
+      <path d="M46 100 C42 92 36 88 31 86 M54 100 C58 91 64 88 69 85 M48 70 C42 62 37 58 33 55 M52 68 C58 61 63 57 67 54" stroke="#5a4a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      ${strands}
+      <ellipse cx="50" cy="38" rx="42" ry="22" fill="#9fc4a9"/><ellipse cx="33" cy="34" rx="24" ry="16" fill="#b9d8c1"/><ellipse cx="67" cy="33" rx="25" ry="17" fill="#aed0b7"/><ellipse cx="50" cy="26" rx="26" ry="15" fill="#d3e9da"/>
+    </svg>`
+    const ico = (px: number): L.DivIcon =>
+      L.divIcon({
+        className: 'willow-wrap',
+        html: `<div class="willow-tree" style="width:${px}px;height:${px * 1.12}px">${svg}<span class="willow-name" style="font-size:${Math.max(13, Math.min(26, px / 7))}px">Серебряная Ива</span></div>`,
+        iconSize: [px, px * 1.12],
+        iconAnchor: [px / 2, px * 1.08]
+      })
+    const sizeAt = (z: number): number => Math.max(64, Math.min(300, 64 * Math.pow(2, z + 2.6)))
+    const mk = L.marker(toLL([w.x, w.y]), { icon: ico(sizeAt(map.getZoom())), interactive: false, keyboard: false, zIndexOffset: -500 }).addTo(map)
+    const onZoom = (): void => { mk.setIcon(ico(sizeAt(map.getZoom()))) }
+    map.on('zoomend', onZoom)
+    return () => { map.off('zoomend', onZoom); mk.remove() }
+  }, [world.places, date, mapDef.id])
+
   // --- правка вершин выбранного участка ---
-  const region = selection?.type === 'region' ? world.regions.find((r) => r.id === selection.id && r.mapId === mapDef.id) : undefined
+  const region =selection?.type === 'region' ? world.regions.find((r) => r.id === selection.id && r.mapId === mapDef.id) : undefined
   const vertexCount = region ? region.rings.reduce((s, r) => s + r.length, 0) : 0
   const vertexEdit = useStore((s) => s.vertexEdit)
   useEffect(() => {
