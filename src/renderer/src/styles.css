@@ -385,7 +385,11 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0; letter-spac
 .sc-compact .sc-stats, .sc-compact .sc-toolbar, .sc-compact .sc-fullname, .sc-compact .sc-motto, .sc-compact .sc-ruler, .sc-compact .sc-kicker { display: none; }
 .sc-compact .sc-header { padding-top: 10px; padding-bottom: 10px; }
 .sc-compact .sc-heraldry svg, .sc-compact .sc-heraldry img { max-height: 44px; width: auto; }
-.sc-content { flex: 1; overflow-y: auto; padding: 22px 30px 30px; }
+/* Прокручивается вся карточка (шапка уезжает), вкладки закреплены сверху — иначе на ПК
+   под длинным списком правителей оставалось ~320px окна прокрутки. */
+.state-card { height: auto; min-height: 100%; }
+.sc-tabs { position: sticky; top: 0; z-index: 6; }
+.sc-content { flex: none; overflow: visible; padding: 22px 30px 30px; }
 .sc-cols { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
 .sc-cols > .parchment { order: 2; }
 .sc-side { display: flex; flex-direction: column; gap: 12px; }
