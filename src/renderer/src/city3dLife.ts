@@ -3,6 +3,7 @@ import { Bucket } from './city3d'
 import type { Streets } from './city3dStreets'
 import type { Feat, Race } from './city3dRaces'
 import { createPeople, type Look } from './city3dPeople'
+import { phrase, type Role } from './city3dSpeech'
 
 type P2 = [number, number]
 const enum K { Man, Woman, Child, Guard, Vendor }
@@ -36,7 +37,8 @@ interface Person {
   moving: boolean
   look: Look | null
 }
-export interface PersonInfo { race: Race; role: string }
+export interface PersonInfo { race: Race; role: string; say: string }
+export interface Speech { id: number; text: string; x: number; y: number; z: number }
 
 const CLOTHES: Record<string, string[]> = {
   styria: ['#2a2630', '#3a3540', '#322a30', '#4a4048', '#3a3028', '#2e2e36'],
@@ -52,6 +54,8 @@ export interface Life {
   tick: (dt: number, t: number, night: number, focus: THREE.Vector3, boost: number) => void
   setMarks: (on: boolean) => void
   pick: (o: THREE.Vector3, d: THREE.Vector3, maxT: number) => PersonInfo | null
+  /** Ближайший житель впереди (до range м), который «заговаривает»; после реплики молчит 30 с */
+  speak: (o: THREE.Vector3, d: THREE.Vector3, range: number, t: number) => Speech | null
   /** Сколько жителей какого народа сейчас в городе */
   census: { race: Race; count: number }[]
   dispose: () => void
@@ -76,6 +80,9 @@ export function createLife(o: {
   rnd: () => number
   dot: THREE.Texture
   population: { race: Race; weight: number }[]
+  state?: string
+  culture?: string
+  gov?: string
 }): Life {
   const { scene, streets, heightAt, gridAt, doors, pois, gates, rnd: R } = o
   const clothes = CLOTHES[o.style] ?? CLOTHES.empire
@@ -374,9 +381,11 @@ export function createLife(o: {
     for (const [m, s] of p.slots) featMeshes.get(featList[m])!.setMatrixAt(s, ZERO)
   }
   const index = new Map(people.map((p, i) => [p, i]))
+  let nightNow = 0
 
   const tick = (dt: number, t: number, night: number, focus: THREE.Vector3, boost: number): void => {
     focusNow.copy(focus)
+    nightNow = night
     // сверху фигуры лишь чуть крупнее настоящих, чтобы не вырастали выше домов; заметными издали их делают круги режима «Расы»
     const body = 1 + (boost - 1) * 0.1
     // жители стягиваются туда, куда смотрят: дальних незаметно переселяем ближе, и улицы вокруг камеры не пустеют
@@ -564,6 +573,20 @@ export function createLife(o: {
 
   const census = o.population.map((q) => ({ race: q.race, count: people.filter((p) => p.race === q.race).length })).filter((q) => q.count > 0).sort((a, b) => b.count - a.count)
   const ROLE: Record<number, string> = { [K.Man]: 'горожанин', [K.Woman]: 'горожанка', [K.Child]: 'ребёнок', [K.Guard]: 'стражник', [K.Vendor]: 'торговец' }
+  const SROLE: Record<number, Role> = { [K.Man]: 'man', [K.Woman]: 'woman', [K.Child]: 'child', [K.Guard]: 'guard', [K.Vendor]: 'vendor' }
+  // реплики: у каждого жителя своя (по номеру), меняются со временем суток; свой генератор — не трогает случайность города
+  const cool = new Map<Person, number>()
+  const said = new Map<Person, { text: string; dusk: boolean }>()
+  const sayOf = (p: Person, fresh: boolean): string => {
+    const dusk = nightNow > 0.35
+    const had = said.get(p)
+    if (had && had.dusk === dusk && !fresh) return had.text
+    let s = ((index.get(p) ?? 0) * 2654435761 + (fresh ? Math.floor(Math.random() * 1e6) : 0)) >>> 0
+    const rnd = (): number => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296 }
+    const text = phrase({ style: o.style, culture: o.culture ?? '', state: o.state ?? '', gov: o.gov ?? '', role: SROLE[p.kind] ?? 'man', night: nightNow, rnd })
+    said.set(p, { text, dusk })
+    return text
+  }
 
   return {
     tick,
@@ -585,7 +608,23 @@ export function createLife(o: {
         const tol = Math.max(0.55, h * 0.55)
         if (px * px + py * py + pz * pz < tol * tol) { bt = t; best = p }
       }
-      return best ? { race: best.race, role: ROLE[best.kind] } : null
+      return best ? { race: best.race, role: ROLE[best.kind], say: sayOf(best, true) } : null
+    },
+    speak: (ro, rd, range, t) => {
+      let best: Person | null = null, bd = range
+      for (let i = 0; i < people.length; i++) {
+        const p = people[i]
+        if (!p.shown) continue
+        const dx = p.dx - ro.x, dz = p.dz - ro.z, d = Math.hypot(dx, dz)
+        if (d > bd || d < 0.01) continue
+        if ((dx * rd.x + dz * rd.z) / (d * Math.hypot(rd.x, rd.z) || 1) < 0.55) continue
+        if ((cool.get(p) ?? -99) > t) continue
+        bd = d; best = p
+      }
+      if (!best) return null
+      cool.set(best, t + 30)
+      const h = best.scale * best.race.h * 1.7
+      return { id: index.get(best) ?? 0, text: sayOf(best, true), x: best.dx, y: best.y + h + 0.12, z: best.dz }
     },
     dispose: () => {
       detailed.dispose()

@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { buildStreets, type Streets } from './city3dStreets'
 import { buildMonument, MON_SIZE, monumentKind, type MonKind, type MonOut, type MonStyle } from './city3dMonuments'
-import { createLife, type PersonInfo } from './city3dLife'
+import { createLife, type PersonInfo, type Speech } from './city3dLife'
 import type { Race } from './city3dRaces'
 import { populationFor } from './city3dRaces'
 
@@ -264,6 +264,7 @@ export interface CityWorld {
   /** Можно ли стоять в этой точке (и на какой высоте настил) */
   walkable: (x: number, z: number) => boolean
   deckAt: (x: number, z: number) => number | null
+  floorAt: (x: number, z: number, y: number) => number | null
   pick: (o: THREE.Vector3, d: THREE.Vector3) => number | null
   buildingTop: (i: number) => [number, number, number] | null
   spawn: () => P2
@@ -280,13 +281,15 @@ export interface CityWorld {
   /** Подсветка здания при наведении и выборе */
   setHighlight: (hover: number | null, selected: number | null) => void
   pickPerson: (o: THREE.Vector3, d: THREE.Vector3) => PersonInfo | null
+  /** Кто из жителей впереди заговаривает (реплика и точка над головой) */
+  speak: (o: THREE.Vector3, d: THREE.Vector3, range: number, t: number) => Speech | null
   census: { race: Race; count: number }[]
   dispose: () => void
 }
 
 export interface CityPlace { id: string; name: string; x: number; y: number; building?: number | null }
 
-export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: boolean; maxTexture: number; places: CityPlace[]; state: string; culture: string }): CityWorld {
+export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: boolean; maxTexture: number; places: CityPlace[]; state: string; culture: string; gov?: string }): CityWorld {
   const S: PlanScene = plan.scene ?? { s: 1, style: 'empire', forest: 0.1, tower: 7.6, droof: [], citadel: -1, dist: [], water: [], fields: [], greens: [], squares: [], walls: [], roads: [], rivers: [], planks: [] }
   const st = STYLES[S.style] ?? STYLES.empire
   const R = rng(hashOf(seedName) + 1)
@@ -1652,6 +1655,45 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
   }
 
+  // ---------- подъём пешком: поверхности (верх стен, площадки) и лестницы ----------
+  // поверхность — повёрнутый прямоугольник, высота растёт линейно вдоль него
+  type Climb = { ax: number; az: number; bx: number; bz: number; w: number; ya: number; yb: number }
+  const climbs: Climb[] = []
+  const surfH = (s: Climb, x: number, z: number): number | null => {
+    const dx = s.bx - s.ax, dz = s.bz - s.az, l2 = dx * dx + dz * dz
+    if (l2 < 1e-6) return null
+    const px = x - s.ax, pz = z - s.az, t = (px * dx + pz * dz) / l2
+    if (t < 0 || t > 1) return null
+    if (Math.abs(px * dz - pz * dx) / Math.sqrt(l2) > s.w / 2) return null
+    return s.ya + (s.yb - s.ya) * t
+  }
+  // лестница от земли в (sx,sz) до высоты hEnd в (ex,ez); tail — хвост у стены, который не проверяем на занятость
+  const addStair = (sx: number, sz: number, ex: number, ez: number, w: number, hEnd: number, c1: string, c2: string, tail: number): boolean => {
+    const L = Math.hypot(ex - sx, ez - sz)
+    if (L < 2) return false
+    const ux = (ex - sx) / L, uz = (ez - sz) / L, px = -uz, pz = ux
+    const y0 = heightAt(sx, sz)
+    if ((hEnd - y0) / L > 0.7 || hEnd < y0 + 1) return false
+    for (let d = 0; d <= L - tail; d += 0.75) {
+      const lin = y0 + ((hEnd - y0) * d) / L
+      for (const o of [-w / 2, 0, w / 2]) {
+        const x = sx + ux * d + px * o, z = sz + uz * d + pz * o
+        if (gridAt(x, z) !== 0 || heightAt(x, z) < -0.2 || heightAt(x, z) > lin + 0.5) return false
+      }
+    }
+    const n = Math.max(2, Math.ceil(L / 0.7)), riser = (hEnd - y0) / n, rot = Math.atan2(uz, ux)
+    for (let k = 0; k < n; k++) {
+      const d = ((k + 0.5) * L) / n, x = sx + ux * d, z = sz + uz * d
+      const top = y0 + riser * (k + 1), base = heightAt(x, z) - 1.5
+      chunkAt(x, z).solid.box(x, base, z, L / n + 0.02, top - base, w, k % 2 ? c1 : c2, rot)
+    }
+    climbs.push({ ax: sx, az: sz, bx: ex, bz: ez, w, ya: y0 + riser / 2, yb: hEnd + riser / 2 })
+    // под лестницей и по бокам не пройти (первые метры у земли остаются проходимыми)
+    const lead = Math.min(L - 1, 1.6 + cell)
+    fillLine([[sx + ux * lead, sz + uz * lead], [ex, ez]], w + 0.4, -1)
+    return true
+  }
+
   // ---------- Креит: частокол из заострённых брёвен, деревянные вышки и надвратные башни под шатром ----------
   const palisade = (r: P2[], isCit: boolean): void => {
     const logH = isCit ? 5.2 : 4.4
@@ -1690,6 +1732,30 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           const m = (s0 + s1) / 2, x = a[0] + ux * m - nx * 0.55, z = a[1] + uz * m - nz * 0.55
           chunkAt(x, z).solid.box(x, heightAt(x, z) + logH * 0.62, z, s1 - s0, 0.28, 0.28, st.timber, Math.atan2(uz, ux))
         }
+        // дощатый настил за частоколом и лестница на него (внутренняя сторона — минус нормаль)
+        if (s1 - s0 >= 12 && stairCount++ % 3 === 0) {
+          const m = (s0 + s1) / 2, mx = a[0] + ux * m, mz = a[1] + uz * m
+          const hy = heightAt(mx, mz) + 2.7, rot = Math.atan2(uz, ux)
+          const t1 = mixHex(st.timber, '#000', 0.08), t2 = mixHex(st.timber, '#000', 0.16)
+          const cx = mx - nx * 1.9, cz = mz - nz * 1.9
+          const ax = cx - ux * 3.5, az = cz - uz * 3.5, bx = cx + ux * 3.5, bz = cz + uz * 3.5
+          let placed = false
+          for (const sd of [-1, 1]) {
+            if (placed) break
+            // лестница перпендикулярно стене к краю настила, со стороны ±вдоль стены
+            const sx = cx + ux * sd * 2, sz = cz + uz * sd * 2
+            const ex = sx - nx * 1.2, ez = sz - nz * 1.2
+            if (addStair(sx - nx * 7.2, sz - nz * 7.2, ex, ez, 2.2, hy - 0.15, t1, t2, 1.2)) {
+              placed = true
+            }
+          }
+          if (placed) {
+            const ch = chunkAt(cx, cz)
+            ch.solid.box(cx, hy - 0.45, cz, 7, 0.4, 2.4, t1, rot)
+            for (const sd of [-3.2, 3.2]) ch.solid.box(cx + ux * sd, heightAt(cx + ux * sd, cz + uz * sd) - 1.5, cz + uz * sd, 0.4, hy - 0.45 - heightAt(cx + ux * sd, cz + uz * sd) + 1.5, 2.2, t2, rot)
+            climbs.push({ ax, az, bx, bz, w: 2.4, ya: hy, yb: hy })
+          }
+        }
       }
       // надвратные башни: две деревянные вышки под шатром и перекладина над проездом с черепами коней
       for (const g0 of gates) {
@@ -1708,6 +1774,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
 
   // ---------- стены города: зубцы, башни, ворота там, где стену пересекает дорога ----------
   const wallColor = st.wall
+  let stairCount = 0
   wallLines.forEach((w, wi) => {
     const r = w.r
     if (r.length < 2) return
@@ -1742,6 +1809,31 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           ch.solid.quad(up(A1, wh), up(B1, wh), up(B2, wh), up(A2, wh), mixHex(wallColor, '#000', 0.2))
           if (detail >= 1) {
             for (const sd of [1, -1]) crenel(ch, [A[0] + nx * o * sd, A[1] + nz * o * sd], [B[0] + nx * o * sd, B[1] + nz * o * sd], (ya + yb) / 2 + wh, wallColor, 0.4)
+          }
+          // верх стены — можно ходить; у башен отступаем
+          const sh = towerR * 0.9 + 0.2
+          const fa = j === 0 ? sh : 0, fb = j === n - 1 ? sh : 0
+          if (L - fa - fb > 1) {
+            const pa = f0 + fa, pb = f1 - fb
+            const ax2 = a[0] + ux * pa, az2 = a[1] + uz * pa, bx2 = a[0] + ux * pb, bz2 = a[1] + uz * pb
+            climbs.push({ ax: ax2, az: az2, bx: bx2, bz: bz2, w: th, ya: heightAt(ax2, az2) + wh, yb: heightAt(bx2, bz2) + wh })
+          }
+        }
+        // лестницы на стену: на каждом третьем длинном участке, с той стороны, где есть место
+        if (L >= 14 && (stairCount++ % 3 === 0)) {
+          const sc1 = mixHex(wallColor, '#000', 0.06), sc2 = mixHex(wallColor, '#000', 0.1)
+          let done = false
+          for (const fr of [0.5, 0.35, 0.65]) {
+            if (done) break
+            const m = s0 + L * fr, mx = a[0] + ux * m, mz = a[1] + uz * m, hEnd = heightAt(mx, mz) + wh
+            for (const slope of [0.42, 0.6]) {
+              if (done) break
+              const rl = wh / slope
+              for (const sd of [1, -1]) {
+                // прямо от стены
+                if (addStair(mx + nx * sd * (th / 2 - 0.5 + rl), mz + nz * sd * (th / 2 - 0.5 + rl), mx + nx * sd * (th / 2 - 0.5), mz + nz * sd * (th / 2 - 0.5), 2.6, hEnd, sc1, sc2, 2.5)) { done = true; break }
+              }
+            }
           }
         }
       }
@@ -2330,7 +2422,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   scene.add(clouds)
 
   // ---------- люди ----------
-  const life = createLife({ scene, streets, heightAt, gridAt, doors, pois, gates: gatePts, vendors, center, radius, size: [W, H], style: S.style, buildings: N, mobile: opts.mobile, rnd: R, dot, population })
+  const life = createLife({ scene, streets, heightAt, gridAt, doors, pois, gates: gatePts, vendors, center, radius, size: [W, H], style: S.style, buildings: N, mobile: opts.mobile, rnd: R, dot, population, state: opts.state, culture: opts.culture, gov: opts.gov })
   let marksOn = false
 
   // ---------- дым из труб ----------
@@ -2819,6 +2911,19 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       return v === 0 || v === -3
     },
     deckAt: (x, z) => (gridAt(x, z) === -3 ? DECK : null),
+    // высота пола под ногами, стоящими на высоте y: лестницы, пандусы и верх стен (шаг вверх ≤ 0.8 м), иначе земля/настил; null — не пройти
+    floorAt: (x, z, y) => {
+      let best: number | null = null
+      for (const s of climbs) {
+        const h = surfH(s, x, z)
+        if (h !== null && h <= y + 0.8 && (best === null || h > best)) best = h
+      }
+      if (best !== null) return best
+      if (kranz) { const r = Math.hypot(x - center[0], z - center[1]); if (r < R0 * 1.08 || r > RP - 2) return null }
+      const v = gridAt(x, z)
+      if (v !== 0 && v !== -3) return null
+      return Math.max(heightAt(x, z), v === -3 ? DECK : -99)
+    },
     pick,
     buildingTop: (i) => { const m = monAt.get(i); if (m) return [m.x, tops[i], m.z]; const b = blds[i]; if (!b) return null; const c = centerOf(b.r); return [c[0], tops[i], c[1]] },
     spawn: () => {
@@ -2859,6 +2964,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       }
       return life.pick(o, d, tMax)
     },
+    speak: life.speak,
     census: life.census,
     takeDirty: () => { const d = dirty; dirty = false; return d },
     dispose: () => {
