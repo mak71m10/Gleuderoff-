@@ -1766,7 +1766,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           const m = (s0 + s1) / 2, mx = a[0] + ux * m, mz = a[1] + uz * m
           const hy = heightAt(mx, mz) + 2.7, rot = Math.atan2(uz, ux)
           const t1 = mixHex(st.timber, '#000', 0.08), t2 = mixHex(st.timber, '#000', 0.16)
-          const isg = (center[0] - mx) * nx + (center[1] - mz) * nz >= 0 ? 1 : -1 // сторона к центру города
+          const wc = centerOf(r), isg = (wc[0] - mx) * nx + (wc[1] - mz) * nz >= 0 ? 1 : -1 // сторона внутрь контура этой стены
           const cx = mx + nx * isg * 1.9, cz = mz + nz * isg * 1.9
           const ax = cx - ux * 3.5, az = cz - uz * 3.5, bx = cx + ux * 3.5, bz = cz + uz * 3.5
           let placed = false
@@ -1856,7 +1856,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           for (const fr of [0.5, 0.35, 0.65]) {
             if (done) break
             const m = s0 + L * fr, mx = a[0] + ux * m, mz = a[1] + uz * m, hEnd = heightAt(mx, mz) + wh
-            const isg = (center[0] - mx) * nx + (center[1] - mz) * nz >= 0 ? 1 : -1 // только внутренняя сторона
+            const wc = centerOf(r), isg = (wc[0] - mx) * nx + (wc[1] - mz) * nz >= 0 ? 1 : -1 // внутрь контура этой стены (замок — к замку)
             if (gatesOn(a, b, len).some((g) => Math.abs(g - m) < 9)) continue
             for (const slope of [0.42, 0.6]) {
               if (done) break
