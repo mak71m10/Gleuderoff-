@@ -941,7 +941,16 @@ function createWindow(): void {
   else win.loadFile(join(__dirname, '../renderer/index.html'))
 }
 
+// Ноутбуки с двумя видеокартами: просим систему отдавать окно дискретной (RTX), а не встроенной Intel.
+// Должно стоять до app.ready.
+app.commandLine.appendSwitch('force_high_performance_gpu')
+
 app.whenReady().then(async () => {
+  // Один раз пишем в консоль, какая видеокарта реально работает (для отчётов тестеров).
+  app.getGPUInfo('basic').then((info: any) => {
+    const devs = (info?.gpuDevice ?? []).map((d: any) => `${d.vendorId?.toString(16)}:${d.deviceId?.toString(16)}${d.active ? ' (активна)' : ''}`)
+    console.log('[gpu]', info?.auxAttributes?.glRenderer ?? '', devs.join(', '))
+  }).catch(() => {})
   const dir = await ensureWorld()
   await backupWorld(dir)
   await migrateWorld(dir)

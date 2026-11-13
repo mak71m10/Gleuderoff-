@@ -110,7 +110,7 @@ export function MapView() {
     edit: L.LayerGroup
     draw: L.LayerGroup
   } | null>(null)
-  const polys = useRef(new Map<string, { poly: L.Polygon; rings: Region['rings'] }>())
+  const polys = useRef(new Map<string, { poly: L.Polygon; rings: Region['rings']; sk?: string }>())
   const labelEls = useRef<LabelInfo[]>([])
   const geoEls = useRef<LabelInfo[]>([])
   const placeMarkers = useRef(new Map<string, PlaceMarker>())
@@ -473,7 +473,11 @@ export function MapView() {
     const group = g.current!.regions
     const seen = new Set<string>()
     const stateColor = new Map<string, string>()
-    for (const st of world.states) if (existsAt(st, date)) stateColor.set(st.id, resolve(st, date).color)
+    const stateById = new Map<string, (typeof world.states)[number]>()
+    for (const st of world.states) {
+      stateById.set(st.id, st)
+      if (existsAt(st, date)) stateColor.set(st.id, resolve(st, date).color)
+    }
     const selRegion = selection?.type === 'region' ? selection.id : null
     const selState = selection?.type === 'state' ? selection.id : null
 
@@ -503,16 +507,21 @@ export function MapView() {
           setHoverTick((t) => t + 1)
         })
         poly.addTo(group)
-        entry = { poly, rings: r.rings }
+        entry = { poly, rings: r.rings, sk: JSON.stringify(style) }
         polys.current.set(r.id, entry)
       } else {
         if (entry.rings !== r.rings) {
           entry.poly.setLatLngs(r.rings.map((ring) => [ring.map(toLL)]))
           entry.rings = r.rings
         }
-        entry.poly.setStyle(style)
+        // setStyle заставляет холст перерисоваться — не трогаем участок, если стиль тот же (зум, наведение)
+        const sk = JSON.stringify(style)
+        if (entry.sk !== sk) {
+          entry.poly.setStyle(style)
+          entry.sk = sk
+        }
       }
-      const tipName = owner ? world.states.find((s) => s.id === owner) : undefined
+      const tipName = owner ? stateById.get(owner) : undefined
       const name = tipName ? resolve(tipName, date).name : 'Ничья земля'
       if (entry.poly.getTooltip()?.getContent() !== name) entry.poly.unbindTooltip().bindTooltip(name, { sticky: true, className: 'region-tip', direction: 'top', offset: [0, -8] })
     }

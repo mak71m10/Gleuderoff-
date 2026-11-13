@@ -83,7 +83,9 @@ export function buildStreets(o: {
   for (let j = 0; j < gh; j++)
     for (let i = 0; i < gw; i++) {
       const x = (i + 0.5) * cell, z = (j + 0.5) * cell
-      open[j * gw + i] = off.some(([a, b]) => o.free(x + a * cell, z + b * cell)) ? 1 : 0
+      let ok = 0
+      for (let t = 0; t < off.length && !ok; t++) if (o.free(x + off[t][0] * cell, z + off[t][1] * cell)) ok = 1
+      open[j * gw + i] = ok
     }
 
   // расстояние до ближайшей стены дома: улица идёт посередине проезда
@@ -160,7 +162,7 @@ export function buildStreets(o: {
   }
   const dist = new Float32Array(n)
   const parent = new Int32Array(n)
-  const NB = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, 1.414], [1, -1, 1.414], [-1, 1, 1.414], [-1, -1, 1.414]]
+  const NBX = [1, -1, 0, 0, 1, 1, -1, -1], NBY = [0, 0, 1, -1, 1, -1, 1, -1], NBL = [1, 1, 1, 1, 1.414, 1.414, 1.414, 1.414]
   const solve = (): void => {
     dist.fill(1e30)
     parent.fill(-1)
@@ -172,14 +174,16 @@ export function buildStreets(o: {
       const q = h.popVal
       if (h.popKey > dist[q]) continue
       const i = q % gw, j = (q / gw) | 0
-      for (const [dx, dy, l] of NB) {
+      const dq = dist[q]
+      for (let t = 0; t < 8; t++) {
+        const dx = NBX[t], dy = NBY[t], l = NBL[t]
         const x = i + dx, y = j + dy
         if (x < 0 || y < 0 || x >= gw || y >= gh) continue
         const w = y * gw + x
         if (!open[w]) continue
         // по диагонали нельзя срезать угол дома
         if (dx && dy && (!open[j * gw + x] || !open[y * gw + i])) continue
-        const d = dist[q] + cost[w] * l
+        const d = dq + cost[w] * l
         if (d < dist[w]) {
           dist[w] = d
           parent[w] = q
