@@ -1682,10 +1682,39 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       }
     }
     const n = Math.max(2, Math.ceil(L / 0.7)), riser = (hEnd - y0) / n, rot = Math.atan2(uz, ux)
+    // деревянная лестница: ступени-доски, две тетивы-балки, столбы-опоры и перила
+    const line = (d: number): number => y0 + riser * 0.5 + ((hEnd - y0) * d) / L
+    const q2 = (ch: Chunk, a: V3, b: V3, d2: V3, e: V3, col: string): void => { ch.solid.quad(a, b, d2, e, col); ch.solid.quad(e, d2, b, a, col) }
+    const beam = (off: number, dA: number, dB: number, yA: number, yB: number, t: number, hg: number, col: string): void => {
+      const mx = sx + ux * (dA + dB) / 2, mz = sz + uz * (dA + dB) / 2, ch = chunkAt(mx, mz)
+      const P = (d: number, l: number, y: number): V3 => [sx + ux * d + px * (off + l), y, sz + uz * d + pz * (off + l)]
+      for (const l of [-t / 2, t / 2]) q2(ch, P(dA, l, yA - hg), P(dB, l, yB - hg), P(dB, l, yB), P(dA, l, yA), col)
+      q2(ch, P(dA, -t / 2, yA), P(dB, -t / 2, yB), P(dB, t / 2, yB), P(dA, t / 2, yA), col)
+    }
     for (let k = 0; k < n; k++) {
       const d = ((k + 0.5) * L) / n, x = sx + ux * d, z = sz + uz * d
-      const top = y0 + riser * (k + 1), base = heightAt(x, z) - 1.5
-      chunkAt(x, z).solid.box(x, base, z, L / n + 0.02, top - base, w, k % 2 ? c1 : c2, rot)
+      const top = y0 + riser * (k + 1)
+      chunkAt(x, z).solid.box(x, top - 0.14, z, L / n + 0.04, 0.14, w, k % 2 ? c1 : c2, rot)
+    }
+    const timb = mixHex(c1, '#000', 0.15)
+    for (const sg of [-1, 1]) {
+      const off = sg * (w / 2 - 0.1)
+      beam(off, 0, L, line(0) - 0.1, line(L) - 0.1, 0.2, 0.55, timb)
+      // перила: столбы и поручень
+      const posts: number[] = []
+      for (let d = 0; d < L - 0.2; d += 2.1) posts.push(d)
+      posts.push(L - 0.1)
+      for (const d of posts) {
+        const x = sx + ux * d + px * off, z = sz + uz * d + pz * off
+        chunkAt(x, z).solid.box(x, line(d) - 0.1, z, 0.12, 1.05, 0.12, timb, rot)
+      }
+      beam(off, 0, L - 0.1, line(0) + 0.95, line(L - 0.1) + 0.95, 0.1, 0.1, c2)
+      beam(off, 0, L - 0.1, line(0) + 0.5, line(L - 0.1) + 0.5, 0.06, 0.06, c2)
+      // опоры под тетивой
+      for (let d = 1.5; d < L - 0.3; d += 3) {
+        const x = sx + ux * d + px * off, z = sz + uz * d + pz * off, g = heightAt(x, z)
+        if (line(d) - g > 1) chunkAt(x, z).solid.box(x, g - 0.8, z, 0.22, line(d) - 0.65 - g + 0.8, 0.22, timb, rot)
+      }
     }
     climbs.push({ ax: sx, az: sz, bx: ex, bz: ez, w, ya: y0 + riser / 2, yb: hEnd + riser / 2 })
     // под лестницей и по бокам не пройти (первые метры у земли остаются проходимыми)
@@ -1732,20 +1761,21 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           const m = (s0 + s1) / 2, x = a[0] + ux * m - nx * 0.55, z = a[1] + uz * m - nz * 0.55
           chunkAt(x, z).solid.box(x, heightAt(x, z) + logH * 0.62, z, s1 - s0, 0.28, 0.28, st.timber, Math.atan2(uz, ux))
         }
-        // дощатый настил за частоколом и лестница на него (внутренняя сторона — минус нормаль)
+        // дощатый настил за частоколом и лестница на него (внутренняя сторона — к центру города)
         if (s1 - s0 >= 12 && stairCount++ % 3 === 0) {
           const m = (s0 + s1) / 2, mx = a[0] + ux * m, mz = a[1] + uz * m
           const hy = heightAt(mx, mz) + 2.7, rot = Math.atan2(uz, ux)
           const t1 = mixHex(st.timber, '#000', 0.08), t2 = mixHex(st.timber, '#000', 0.16)
-          const cx = mx - nx * 1.9, cz = mz - nz * 1.9
+          const isg = (center[0] - mx) * nx + (center[1] - mz) * nz >= 0 ? 1 : -1 // сторона к центру города
+          const cx = mx + nx * isg * 1.9, cz = mz + nz * isg * 1.9
           const ax = cx - ux * 3.5, az = cz - uz * 3.5, bx = cx + ux * 3.5, bz = cz + uz * 3.5
           let placed = false
           for (const sd of [-1, 1]) {
             if (placed) break
             // лестница перпендикулярно стене к краю настила, со стороны ±вдоль стены
             const sx = cx + ux * sd * 2, sz = cz + uz * sd * 2
-            const ex = sx - nx * 1.2, ez = sz - nz * 1.2
-            if (addStair(sx - nx * 7.2, sz - nz * 7.2, ex, ez, 2.2, hy - 0.15, t1, t2, 1.2)) {
+            const ex = sx + nx * isg * 1.2, ez = sz + nz * isg * 1.2
+            if (addStair(sx + nx * isg * 7.2, sz + nz * isg * 7.2, ex, ez, 2.2, hy - 0.15, t1, t2, 1.2)) {
               placed = true
             }
           }
@@ -1821,16 +1851,18 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         }
         // лестницы на стену: на каждом третьем длинном участке, с той стороны, где есть место
         if (L >= 14 && (stairCount++ % 3 === 0)) {
-          const sc1 = mixHex(wallColor, '#000', 0.06), sc2 = mixHex(wallColor, '#000', 0.1)
+          const sc1 = mixHex(st.timber, '#000', 0.08), sc2 = mixHex(st.timber, '#000', 0.16)
           let done = false
           for (const fr of [0.5, 0.35, 0.65]) {
             if (done) break
             const m = s0 + L * fr, mx = a[0] + ux * m, mz = a[1] + uz * m, hEnd = heightAt(mx, mz) + wh
+            const isg = (center[0] - mx) * nx + (center[1] - mz) * nz >= 0 ? 1 : -1 // только внутренняя сторона
+            if (gatesOn(a, b, len).some((g) => Math.abs(g - m) < 9)) continue
             for (const slope of [0.42, 0.6]) {
               if (done) break
               const rl = wh / slope
-              for (const sd of [1, -1]) {
-                // прямо от стены
+              for (const sd of [isg]) {
+                // деревянная лестница прямо от стены, изнутри
                 if (addStair(mx + nx * sd * (th / 2 - 0.5 + rl), mz + nz * sd * (th / 2 - 0.5 + rl), mx + nx * sd * (th / 2 - 0.5), mz + nz * sd * (th / 2 - 0.5), 2.6, hEnd, sc1, sc2, 2.5)) { done = true; break }
               }
             }
