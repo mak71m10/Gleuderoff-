@@ -154142,7 +154142,10 @@
        "bg": "#f3e6c4",
        "emblem": "sun",
        "arms": "красное солнце на светлом поле",
-       "head": null
+       "head": {
+        "id": "lore-el-illendel",
+        "name": "Иллендель Лаурэндил"
+       }
       },
       {
        "key": "isilven",

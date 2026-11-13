@@ -126,7 +126,7 @@ export function willowData() {
   const heads = Object.fromEntries(EL_PEOPLE.filter((p) => p[6] !== 'none' && /Глава/.test(p[8])).map((p) => [p[6], { id: `lore-el-${p[0]}`, name: p[1].split(' «')[0] }]))
   return {
     yearFrom: 981, yearTo: 1010, needGreen: 5, rootGreen: 3,
-    houses: hs.map((h) => ({ ...h, head: heads[h.key] ?? null })),
+    houses: hs.map((h) => ({ ...h, head: heads[h.key] ?? (h.key === 'laurendil' ? { id: 'lore-el-illendel', name: 'Иллендель Лаурэндил' } : null) })),
     sides: EL_SIDES,
     years,
     signs: SIGNS.map(([y, house, kind, note]) => ({ y, house, kind, note })),
