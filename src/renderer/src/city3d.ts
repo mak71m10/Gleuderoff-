@@ -1668,7 +1668,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     return s.ya + (s.yb - s.ya) * t
   }
   // лестница от земли в (sx,sz) до высоты hEnd в (ex,ez); tail — хвост у стены, который не проверяем на занятость
-  const addStair = (sx: number, sz: number, ex: number, ez: number, w: number, hEnd: number, c1: string, c2: string, tail: number): boolean => {
+  const addStair = (sx: number, sz: number, ex: number, ez: number, w: number, hEnd: number, c1: string, c2: string, tail: number, chk?: number[], okWall = false): boolean => {
     const L = Math.hypot(ex - sx, ez - sz)
     if (L < 2) return false
     const ux = (ex - sx) / L, uz = (ez - sz) / L, px = -uz, pz = ux
@@ -1676,9 +1676,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     if ((hEnd - y0) / L > 0.7 || hEnd < y0 + 1) return false
     for (let d = 0; d <= L - tail; d += 0.75) {
       const lin = y0 + ((hEnd - y0) * d) / L
-      for (const o of [-w / 2, 0, w / 2]) {
+      for (const o of chk ?? [-w / 2, 0, w / 2]) {
         const x = sx + ux * d + px * o, z = sz + uz * d + pz * o
-        if (gridAt(x, z) !== 0 || heightAt(x, z) < -0.2 || heightAt(x, z) > lin + 0.5) return false
+        if ((gridAt(x, z) !== 0 && !(okWall && gridAt(x, z) === -1)) || heightAt(x, z) < -0.2 || heightAt(x, z) > lin + 0.5) return false
       }
     }
     const n = Math.max(2, Math.ceil(L / 0.7)), riser = (hEnd - y0) / n, rot = Math.atan2(uz, ux)
@@ -1762,28 +1762,24 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           chunkAt(x, z).solid.box(x, heightAt(x, z) + logH * 0.62, z, s1 - s0, 0.28, 0.28, st.timber, Math.atan2(uz, ux))
         }
         // дощатый настил за частоколом и лестница на него (внутренняя сторона — к центру города)
-        if (s1 - s0 >= 12 && stairCount++ % 3 === 0) {
-          const m = (s0 + s1) / 2, mx = a[0] + ux * m, mz = a[1] + uz * m
-          const hy = heightAt(mx, mz) + 2.7, rot = Math.atan2(uz, ux)
+        if (s1 - s0 >= 16 && stairCount++ % 3 === 0) {
+          const rot = Math.atan2(uz, ux), rl = 2.7 / 0.42
           const t1 = mixHex(st.timber, '#000', 0.08), t2 = mixHex(st.timber, '#000', 0.16)
-          const wc = centerOf(r), isg = (wc[0] - mx) * nx + (wc[1] - mz) * nz >= 0 ? 1 : -1 // сторона внутрь контура этой стены
-          const cx = mx + nx * isg * 1.9, cz = mz + nz * isg * 1.9
-          const ax = cx - ux * 3.5, az = cz - uz * 3.5, bx = cx + ux * 3.5, bz = cz + uz * 3.5
-          let placed = false
-          for (const sd of [-1, 1]) {
-            if (placed) break
-            // лестница перпендикулярно стене к краю настила, со стороны ±вдоль стены
-            const sx = cx + ux * sd * 2, sz = cz + uz * sd * 2
-            const ex = sx + nx * isg * 1.2, ez = sz + nz * isg * 1.2
-            if (addStair(sx + nx * isg * 7.2, sz + nz * isg * 7.2, ex, ez, 2.2, hy - 0.15, t1, t2, 1.2)) {
-              placed = true
-            }
-          }
-          if (placed) {
+          const m0 = (s0 + s1) / 2, wc = centerOf(r), m0x = a[0] + ux * m0, m0z = a[1] + uz * m0
+          const isg = (wc[0] - m0x) * nx + (wc[1] - m0z) * nz >= 0 ? 1 : -1 // сторона внутрь контура этой стены
+          for (const dir of [1, -1]) {
+            const pm = dir > 0 ? s0 + 4.5 : s1 - 4.5, mx = a[0] + ux * pm, mz = a[1] + uz * pm
+            const hy = heightAt(mx, mz) + 2.7
+            const cx = mx + nx * isg * 1.9, cz = mz + nz * isg * 1.9
+            // лестница идёт вдоль частокола от края настила
+            const ex = cx + ux * dir * 3.0, ez = cz + uz * dir * 3.0
+            if (!addStair(ex + ux * dir * rl, ez + uz * dir * rl, ex, ez, 2.2, hy - 0.15, t1, t2, 1.2, [0], true)) continue
+            const ax = cx - ux * 3.5, az = cz - uz * 3.5, bx = cx + ux * 3.5, bz = cz + uz * 3.5
             const ch = chunkAt(cx, cz)
             ch.solid.box(cx, hy - 0.45, cz, 7, 0.4, 2.4, t1, rot)
             for (const sd of [-3.2, 3.2]) ch.solid.box(cx + ux * sd, heightAt(cx + ux * sd, cz + uz * sd) - 1.5, cz + uz * sd, 0.4, hy - 0.45 - heightAt(cx + ux * sd, cz + uz * sd) + 1.5, 2.2, t2, rot)
             climbs.push({ ax, az, bx, bz, w: 2.4, ya: hy, yb: hy })
+            break
           }
         }
       }
@@ -1849,21 +1845,25 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
             climbs.push({ ax: ax2, az: az2, bx: bx2, bz: bz2, w: th, ya: heightAt(ax2, az2) + wh, yb: heightAt(bx2, bz2) + wh })
           }
         }
-        // лестницы на стену: на каждом третьем длинном участке, с той стороны, где есть место
-        if (L >= 14 && (stairCount++ % 3 === 0)) {
+        // лестницы на стену: на каждом третьем длинном участке, изнутри и ВДОЛЬ стены (ступени идут параллельно стене)
+        const sw = 2.6, rl0 = wh / 0.5
+        if (L >= rl0 + 6 && (stairCount++ % 3 === 0)) {
           const sc1 = mixHex(st.timber, '#000', 0.08), sc2 = mixHex(st.timber, '#000', 0.16)
+          const wc = centerOf(r), mm = a[0] + ux * (s0 + L / 2), mz0 = a[1] + uz * (s0 + L / 2)
+          const isg = (wc[0] - mm) * nx + (wc[1] - mz0) * nz >= 0 ? 1 : -1 // внутрь контура этой стены (замок — к замку)
+          const off = isg * (th / 2 - 0.5 + sw / 2)
           let done = false
-          for (const fr of [0.5, 0.35, 0.65]) {
+          for (const slope of [0.5, 0.42, 0.6]) {
             if (done) break
-            const m = s0 + L * fr, mx = a[0] + ux * m, mz = a[1] + uz * m, hEnd = heightAt(mx, mz) + wh
-            const wc = centerOf(r), isg = (wc[0] - mx) * nx + (wc[1] - mz) * nz >= 0 ? 1 : -1 // внутрь контура этой стены (замок — к замку)
-            if (gatesOn(a, b, len).some((g) => Math.abs(g - m) < 9)) continue
-            for (const slope of [0.42, 0.6]) {
+            const rl = wh / slope, lo = s0 + 3, hi = s1 - 3, room = hi - lo - rl
+            if (room < 0) continue
+            for (const dir of [1, -1]) {
               if (done) break
-              const rl = wh / slope
-              for (const sd of [isg]) {
-                // деревянная лестница прямо от стены, изнутри
-                if (addStair(mx + nx * sd * (th / 2 - 0.5 + rl), mz + nz * sd * (th / 2 - 0.5 + rl), mx + nx * sd * (th / 2 - 0.5), mz + nz * sd * (th / 2 - 0.5), 2.6, hEnd, sc1, sc2, 2.5)) { done = true; break }
+              for (const t of [0.5, 0, 1]) {
+                const ps = dir > 0 ? lo + room * t : hi - room * t, pe = ps + dir * rl
+                if (gatesOn(a, b, len).some((g) => Math.abs(g - ps) < 6 || Math.abs(g - pe) < 6)) continue
+                const hEnd = heightAt(a[0] + ux * pe, a[1] + uz * pe) + wh
+                if (addStair(a[0] + ux * ps + nx * off, a[1] + uz * ps + nz * off, a[0] + ux * pe + nx * off, a[1] + uz * pe + nz * off, sw, hEnd, sc1, sc2, 2.5, [0], true)) { done = true; break }
               }
             }
           }
