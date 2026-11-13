@@ -11,7 +11,8 @@ const SW = 4096, SH = 2336 // исходные растры
 const K = Number(process.env.K ?? 8) // во сколько раз крупнее исходника (8 → 32768×18688)
 const OW = SW * K, OH = SH * K
 const STRIP = 32
-const MOFF = +(process.env.MOFF || 0.22), MAMP = +(process.env.MAMP || 1.15), MFREQ = +(process.env.MFREQ || 0.007)
+const RVAR = +(process.env.RVAR || 1), MEADK = +(process.env.MEADK || 1) // разнообразие скал, сила альпийских лугов
+const MOFF =+(process.env.MOFF || 0.22), MAMP = +(process.env.MAMP || 1.15), MFREQ = +(process.env.MFREQ || 0.007)
 // проба: CROP=x,y,w,h (в пикселях исходника 4096×2336) рисует только этот кусок; OUT=файл.png — сохранить PNG вместо base-render.rgb
 const CROP = process.env.CROP ? process.env.CROP.split(',').map(Number) : null
 const CX0 = CROP ? CROP[0] * K : 0, CY0 = CROP ? CROP[1] * K : 0
@@ -497,7 +498,7 @@ if (!isMainThread) {
     plainA: hex('#7f8c4c'), plainB: hex('#9b9a5d'), plainC: hex('#687a40'), field: hex('#a8a067'),
     forestGround: hex('#2c3f26'), crownL: hex('#5d7d3f'), crownD: hex('#2a4122'), pineL: hex('#46663e'), pineD: hex('#1e3121'),
     hillA: hex('#8b8157'), hillB: hex('#76734c'),
-    rockA: hex('#958c7e'), rockB: hex('#7a7268'), rockC: hex('#a08e74'), snow: hex('#e4e9ef'), alp: hex('#7c8050'), rockWarm: hex('#a58c6c'), rockCold: hex('#727880'), scree: hex('#b3aa9a'),
+    rockA: hex('#958c7e'), rockB: hex('#7a7268'), rockC: hex('#a08e74'), snow: hex('#e4e9ef'), alp: hex('#7c8050'), alpLush: hex('#6f9440'), rockRust: hex('#9a6a48'), rockDark: hex('#4e4a48'), rockLit: hex('#c2bbae'), rockWarm: hex('#a58c6c'), rockCold: hex('#727880'), scree: hex('#b3aa9a'),
     sandA: hex('#d8b97f'), sandB: hex('#c39b63'), sandC: hex('#e2c895'), stone: hex('#a37f5b'),
     steppeA: hex('#b2a56c'), steppeB: hex('#9c9660'), tundraA: hex('#bdb9a2'), stoneRoad: hex('#b0aa9c'), kerb: hex('#6b665c'), dirtRoad: hex('#7a6040'), trailC: hex('#c2ad84'), plank: hex('#7a5a3a'), tundraB: hex('#a4a38b'), beach: hex('#d6c494'), wetSand: hex('#a3936c'),
     cropA: hex('#bdaa66'), cropB: hex('#8a9450'), cropC: hex('#9c8662'), cropD: hex('#aca76b'), hedge: hex('#55663a'),
@@ -741,6 +742,15 @@ if (!isMainThread) {
             const lk = Math.min(1, Math.abs(lith) * 2.2) * 0.55
             const lt = lith > 0 ? P.rockWarm : P.rockCold
             col[0] += (lt[0] - col[0]) * lk; col[1] += (lt[1] - col[1]) * lk; col[2] += (lt[2] - col[2]) * lk
+            // слои породы по высоте: чередуются тёплые и холодные полосы, ржавые и тёмные прослойки на крутых стенах
+            const band = Math.sin((h * 38 + nB * 2.4 + noise(lx * 0.012, ly * 0.012) * 3) * 1.0)
+            const bk = RVAR * (0.18 + steep * 0.5)
+            const bt = band > 0 ? P.rockRust : P.rockDark
+            const bw = Math.abs(band) * bk
+            col[0] += (bt[0] - col[0]) * bw; col[1] += (bt[1] - col[1]) * bw; col[2] += (bt[2] - col[2]) * bw
+            // светлые гребни: острые вершины и кромки обнажены и выбелены, выше леса
+            const crest = sstep(0.55, 0.95, h) * (1 - steep * 0.5) * RVAR * 0.35 * (0.6 + 0.4 * noise(lx * 0.06, ly * 0.06))
+            col[0] += (P.rockLit[0] - col[0]) * crest; col[1] += (P.rockLit[1] - col[1]) * crest; col[2] += (P.rockLit[2] - col[2]) * crest
             // светлые осыпи у подножия крутых стен
             const scree = sstep(0.35, 0.7, slope) * (1 - sstep(0.9, 1.5, slope)) * Math.max(0, noise(lx * 0.11, ly * 0.11) + 0.25)
             col[0] += (P.scree[0] - col[0]) * scree * 0.5; col[1] += (P.scree[1] - col[1]) * scree * 0.5; col[2] += (P.scree[2] - col[2]) * scree * 0.5
@@ -748,7 +758,11 @@ if (!isMainThread) {
             const fringe = sstep(0.03, 0.4, wts[2] / wl)
             const meadow = Math.min(1, (1 - sstep(MEADOW_LO, MEADOW_HI, h + nB * 0.1)) * (1 - sstep(0.45, 1.1, slope)) * (1 - north * 0.6) + fringe * (1 - sstep(0.9, 1.8, slope)))
             tmpA[0] = col[0]; tmpA[1] = col[1]; tmpA[2] = col[2]
-            mix3(tmpA, P.alp, meadow * 0.85)
+            // свежая зелень лугов: в долинах ярче, выше — жухлая
+            mix3(P.alp, P.alpLush, (1 - sstep(0.2, 0.7, h)) * 0.8 + nB * 0.3)
+            const alpC = [col[0], col[1], col[2]]
+            col[0] = tmpA[0]; col[1] = tmpA[1]; col[2] = tmpA[2]
+            mix3(tmpA, alpC, Math.min(1, meadow * MEADK))
             // снег: на высоте; рваная кромка, языки в ложбинах, на крутых стенах не держится
             const nS = fbm(lx * 0.16 + 3.3, ly * 0.16 + 9.1, 3)
             const snowLine = sstep(SNOW_LO, SNOW_HI, h + nB * 0.08 + nS * 0.22 + wts[5] * 0.1 + north * 0.14 - sstep(0.7, 1.9, slope) * 0.22)
