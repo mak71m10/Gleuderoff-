@@ -46,7 +46,7 @@ export function Timeline() {
       const s = useStore.getState()
       const c = s.world!.calendar
       s.setDate(speed === 'day' ? s.date + 1 : speed === 'month' ? addMonths(c, s.date, 1) : addYears(c, s.date, 1))
-    }, 120)
+    }, speed === 'day' ? 120 : speed === 'month' ? 700 : 1500)
     return () => clearInterval(t)
   }, [playing, speed])
 

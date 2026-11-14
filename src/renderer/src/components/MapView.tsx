@@ -257,6 +257,22 @@ export function MapView() {
   // 3D-вид поселения поверх карты; при переходе на другую карту — снова план
   const [view3d, setView3d] = useState<View3D | null>(null)
   useEffect(() => setView3d(null), [mapDef?.id])
+  // вернулись из 3D: карта под оверлеем «зависала» (клики проходили только по подписям) —
+  // пересчитываем размер, возвращаем перетаскивание и сбрасываем «залипшее» наведение холста
+  useEffect(() => {
+    if (view3d) return
+    const map = mapRef.current
+    if (!map) return
+    const id = requestAnimationFrame(() => {
+      map.invalidateSize(false)
+      if (!(useStore.getState().tool.kind === 'paint' && provinces)) map.dragging.enable()
+      const r = (map as unknown as { _renderer?: { _hoveredLayer?: unknown; _mouseHoverThrottled?: boolean; _draggableMoved?: unknown } })._renderer
+      if (r) { r._hoveredLayer = null; r._mouseHoverThrottled = false }
+      ;(map as unknown as { _draggableMoved?: unknown })._draggableMoved = undefined
+      ;(map as unknown as { _container: HTMLElement })._container.style.pointerEvents = ''
+    })
+    return () => cancelAnimationFrame(id)
+  }, [view3d])
 
   // --- план города: здания можно выбрать и сделать локацией ---
   const planRef = useRef<{ layer: L.LayerGroup; polys: L.Polygon[] } | null>(null)
