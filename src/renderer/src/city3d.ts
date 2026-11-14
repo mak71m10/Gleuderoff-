@@ -495,6 +495,14 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       }
     }
   }
+  /** Мелкий предмет на земле (бочка, ящик, фонарь, сушилка…): закрывает свободные клетки круга, чтобы сквозь него не ходили */
+  const blockProp = (x: number, z: number, rad: number): void => {
+    const rr = Math.max(0, Math.ceil(rad / cell) - 1), cx = Math.floor(x / cell), cy = Math.floor(z / cell)
+    for (let dy = -rr; dy <= rr; dy++) for (let dx = -rr; dx <= rr; dx++) {
+      const gx = cx + dx, gy = cy + dy
+      if (gx >= 0 && gy >= 0 && gx < gw && gy < gh && dx * dx + dy * dy <= rr * rr + 0.5 && grid[gy * gw + gx] === 0) grid[gy * gw + gx] = -1
+    }
+  }
   if (hasWater) for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) if (heightAt((i + 0.5) * cell, (j + 0.5) * cell) < -0.2) grid[j * gw + i] = -2
   planks.forEach((q) => fillLine(q.r, Math.max(q.w, 3), -3))
   const gridAt = (x: number, z: number): number => {
@@ -1401,6 +1409,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
             const sx = cx + Math.cos(rot) * 1.4 + door.n[0] * 0.2, sz = cz + Math.sin(rot) * 1.4 + door.n[1] * 0.2
             if (rv() < 0.5) ch.solid.cyl(sx, base, sz, 0.36, 0.95, 7, '#6e4a2c')
             else ch.solid.box(sx, base, sz, 0.8, 0.7, 0.8, '#8a6a42', rot)
+            blockProp(sx, sz, 0.5)
           }
         }
       }
@@ -1454,11 +1463,13 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           const y = ground(p)
           for (const s of [-1.2, 1.2]) ch.solid.box(p[0] + co * s, y, p[1] + si * s, 0.1, 1.9, 0.1, st.timber)
           ch.solid.box(p[0], y + 1.75, p[1], 2.6, 0.06, 0.06, st.timber, rot)
+          blockProp(p[0], p[1], 1.3)
           ch.solid.quad([p[0] - co * 1.2, y + 1.75, p[1] - si * 1.2], [p[0] + co * 1.2, y + 1.75, p[1] + si * 1.2], [p[0] + co * 1.2 + nx * 0.05, y + 0.5, p[1] + si * 1.2 + nz * 0.05], [p[0] - co * 1.2 + nx * 0.05, y + 0.5, p[1] - si * 1.2 + nz * 0.05], '#8a7a58')
         }
         const q = at(-2.2, 2.6)
         if (free(...q)) {
           const y = ground(q)
+          blockProp(q[0], q[1], 1.6)
           ch.solid.box(q[0], y + 0.05, q[1], 3.2, 0.42, 1.05, '#5a4026', rot)
           ch.solid.box(q[0], y + 0.47, q[1], 2.6, 0.12, 0.8, '#6e4e30', rot)
           ch.solid.cyl(...([q[0] + nx * 1.2, y, q[1] + nz * 1.2] as V3), 0.32, 0.8, 7, '#6e4a2c')
@@ -1477,6 +1488,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         for (let i = 0; i < 3; i++) {
           const p = at(-wdt / 2 + 0.5 + i * 0.9, 1.0)
           ch.solid.box(p[0], base, p[1], 0.7, 0.45, 0.6, '#8a6a42', rot)
+          blockProp(p[0], p[1], 0.45)
           ch.solid.box(p[0], base + 0.45, p[1], 0.6, 0.14, 0.5, ['#c9843a', '#8fa04a', '#c94a3a', '#d8c070', '#7a4a8a'][Math.floor(rv() * 5)], rot)
         }
       } else if (kindRoll > 0.93 && N > 20) {
@@ -1484,11 +1496,13 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         const p = at(door.len * 0.35, 0.7)
         if (free(...p)) {
           const y = ground(p)
+          blockProp(p[0], p[1], 1.1)
           for (let row = 0; row < 3; row++) ch.solid.box(p[0], y + row * 0.3, p[1], 2.2, 0.3, 0.6, row % 2 ? '#7a5a38' : '#8a6a42', rot)
         }
         const q = at(-1.6, 1.8)
         if (free(...q)) {
           const y = ground(q)
+          blockProp(q[0], q[1], 0.4)
           ch.solid.cyl(q[0], y, q[1], 0.35, 0.6, 8, '#6e4a2c')
           ch.solid.box(q[0], y + 0.6, q[1], 0.6, 0.26, 0.26, '#3a3a40', rot)
         }
@@ -1499,6 +1513,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         if (free(bx, bz) && free(bx + co * 3, bz + si * 3) && free(bx - co * 3, bz - si * 3) && free(bx - nx * 2.4, bz - nz * 2.4)) {
           const y = heightAt(bx, bz), fw = 6.4, fd = 4.2
           const corner = (u: number, v: number): P2 => [bx + co * u - nx * v, bz + si * u - nz * v]
+          for (let u = -fw / 2; u <= fw / 2; u += 0.7) for (let v = -fd / 2; v <= fd / 2; v += 0.7) { const c = corner(u, v); blockProp(c[0], c[1], 0.4) }
           const posts: P2[] = [corner(-fw / 2, -fd / 2), corner(fw / 2, -fd / 2), corner(fw / 2, fd / 2), corner(-fw / 2, fd / 2)]
           for (let s = 0; s < 4; s++) {
             const A = posts[s], B = posts[(s + 1) % 4], len = Math.hypot(B[0] - A[0], B[1] - A[1]), rr = Math.atan2(B[1] - A[1], B[0] - A[0])
@@ -1514,6 +1529,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           }
           const hp = corner(fw / 2 + 1.4, 0)
           if (free(...hp)) {
+            blockProp(hp[0], hp[1], 1.1)
             if (rv() < 0.5) ch.solid.cyl(hp[0], y, hp[1], 1.1, 1.9, 9, '#c9b06a', 0.15)
             else for (let row = 0; row < 3; row++) ch.solid.box(hp[0], y + row * 0.28, hp[1], 1.8, 0.28, 0.55, row % 2 ? '#7a5a38' : '#8a6a42', rot + 1.57)
           }
@@ -2052,7 +2068,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         ch.roof.cyl(cx, y + th + 3.6, cz, 2.6, 6.2, 4, st.tower, 0, false, si + Math.PI / 4)
         ch.solid.cyl(cx, y + th + 9.7, cz, 0.12, 1.4, 6, '#c9a24a')
         ch.solid.cyl(cx, y + th + 11.1, cz, 0.34, 0.5, 8, '#c9a24a', 0.1)
-        fillLine([[cx, cz], [cx + 0.1, cz]], 7, N + 2 + si)
+        fillLine([[cx, cz], [cx + 0.1, cz]], 8.4, N + 2 + si)
       } else if (si % 2 === 0) {
         ch.solid.cyl(cx, y, cz, 3.4, 0.8, 16, st.stone)
         ch.solid.cyl(cx, y + 0.8, cz, 3, 0.02, 16, '#3f7f96')
@@ -2063,7 +2079,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         ch.solid.box(cx, y + 2.6, cz, 1, 2.4, 0.7, '#6d7a70')
         ch.solid.cyl(cx, y + 5, cz, 0.42, 0.75, 8, '#6d7a70', 0.3)
       }
-      fillLine([[cx, cz], [cx + 0.1, cz]], 7, N + 2 + si)
+      fillLine([[cx, cz], [cx + 0.1, cz]], 8.4, N + 2 + si)
     } else if (S.style === 'viking') {
       // малая площадь гарда: колодец-сруб
       ch.solid.box(cx, y, cz, 2.2, 0.9, 2.2, mixHex(st.plaster[0], '#000', 0.15))
@@ -2087,7 +2103,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       for (const s of [-1.2, 1.2]) for (const t of [-0.5, 0.5]) ch.solid.box(sx + Math.cos(rot) * s - Math.sin(rot) * t, y, sz + Math.sin(rot) * s + Math.cos(rot) * t, 0.08, 2.2, 0.08, st.timber)
       ch.solid.box(sx, y + 2.2, sz, 2.9, 0.1, 1.5, col, rot)
       ch.solid.box(sx, y + 0.85, sz, 2, 0.18, 0.7, ['#c9843a', '#8fa04a', '#c94a3a', '#d8c070'][i % 4], rot)
-      fillLine([[sx, sz], [sx + 0.1, sz]], 2, si + N + 2)
+      fillLine([[sx, sz], [sx + 0.1, sz]], 3, si + N + 2)
       // торговец за прилавком, лицом к центру площади
       vendors.push({ x: sx + Math.cos(a) * 1.15, z: sz + Math.sin(a) * 1.15, a: Math.atan2(-Math.cos(a), -Math.sin(a)) })
     }
@@ -2209,6 +2225,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     ch.solid.box(x, y + 3.1, z, 0.34, 0.08, 0.34, '#2a2420')
     ch.glow.box(x, y + 2.7, z, 0.26, 0.4, 0.26, '#ffffff')
     glows.push(x, y + 2.9, z)
+    blockProp(x, z, 0.4)
   }
   const LAMP_STEP = S.style === 'styria' ? 68 : 34
   if (detail >= 1) {
