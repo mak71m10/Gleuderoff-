@@ -68,6 +68,22 @@ for (let i = 0; i < N; i++) {
       if (n < 3) river[i] = 0
     }
 }
+// р. Века (юго-запад): на базовой карте бирюза темнее порога — мягкий порог только в её рамке
+for (let y = 1868; y < 1945; y++)
+  for (let x = 915; x < 1105; x++) {
+    const i = y * W + x
+    if (!prov[i]) continue
+    const r = base[i * 3], g = base[i * 3 + 1], b = base[i * 3 + 2]
+    if (g > r + 15 && b > r + 8 && g > 70) river[i] = 255
+  }
+// разрыв русла Веки между двумя плёсами: соединяем отрезком шириной ~4 px
+for (let t = 0; t <= 1.5; t += 0.02) {
+  const cx = Math.round(980 + 22 * t), cy = Math.round(1905 - 8 * t)
+  for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (dx * dx + dy * dy <= 5 && prov[(cy + dy) * W + cx + dx]) river[(cy + dy) * W + cx + dx] = 255
+}
+// южная река Империи раздваивалась у устья: короткий рукав в бухту (x 1828–1842, y 1373–1395) убран,
+// петля над ним и основное русло к восточному устью остаются
+for (let y = 1373; y <= 1395; y++) for (let x = 1828; x <= 1842; x++) river[y * W + x] = 0
 log('реки')
 
 const out = Buffer.alloc(N * 4)
