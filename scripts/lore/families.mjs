@@ -6,6 +6,7 @@ import * as GF from './families/gf.mjs'
 import * as CR from './families/cr.mjs'
 import * as CH from './families/ch.mjs'
 import * as LY from './families/ly.mjs'
+import * as EL from './families/el.mjs'
 import * as MISC from './families/misc.mjs'
 
 const HU = 'Человек (имперец)'
@@ -36,20 +37,22 @@ export function look(g, age, role, key) {
 export default function families({ E, Y, entries }) {
   const idOf = (ref) => (ref == null ? null : ref.startsWith('@') ? ref.slice(1) : `fm-${ref}`)
   const pass = []
-  for (const m of [TM, GF, CR, CH, LY]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
+  for (const m of [TM, GF, CR, CH, LY, EL]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
   for (const m of MISC.MODULES) pass.push({ tag: m.tag, race: m.race ?? HU, specs: m.specs })
 
   let created = 0, patched = 0
   for (const mod of pass) {
     for (const spec of mod.specs) {
       for (const p of spec.people) {
-        const [key, name, g, born, died, father, mother, spouse, title, text, role, house, secret] = p
+        const [key, name, g, born, died, father, mother, spouse, title, text, role, house, secret, ownRace, ownLook] = p
         const age = (died ?? 1010) - born
-        const links = { dynasty: house ?? spec.dyn }
+        const links = {}
+        const dy = house ?? spec.dyn
+        if (dy) links.dynasty = dy
         for (const [k, ref] of [['father', father], ['mother', mother], ['spouse', spouse]]) if (ref) links[k] = idOf(ref)
         E(`fm-${key}`, 'character', name, {
           title, summary: text.split('. ')[0].replace(/\.$/, '') + '.', from: Y(born), ...(died ? { to: Y(died) } : {}),
-          props: { race: mod.race, gender: g === 'f' ? 'Женский' : 'Мужской', occupation: title.split(',')[0].replace(/ \(.*\)/, ''), look: look(g, age, role ?? 'folk', key) },
+          props: { race: ownRace ?? mod.race, gender: g === 'f' ? 'Женский' : 'Мужской', occupation: title.split(',')[0].replace(/ \(.*\)/, ''), look: ownLook ?? look(g, age, role ?? 'folk', key) },
           links, body: text, ...(secret ? { secret } : {}), tags: [mod.tag, 'родословная']
         })
         created++
