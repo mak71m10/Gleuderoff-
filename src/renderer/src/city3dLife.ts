@@ -164,6 +164,13 @@ export function createLife(o: {
     const x = g[0] + sd * 1.6, z = g[1] + sd * 1.1
     if (gridAt(x, z) === 0) add(K.Guard, x, z, R() * 6.28, drawRace(guardRace))
   }
+  /** Ближайшая свободная клетка вокруг (кольцами 1.5…12 м) */
+  const unstick = (p: Person): void => {
+    for (let r = 1.5; r <= 12; r += 1.5) for (let k = 0; k < 12; k++) {
+      const a = (k / 12) * 6.283, x = p.x + Math.sin(a) * r, z = p.z + Math.cos(a) * r
+      if (gridAt(x, z) === 0 && groundY(x, z) >= 0.2) { p.x = x; p.z = z; p.a = a; return }
+    }
+  }
   const patrols = Math.min(o.mobile ? 8 : 30, Math.floor(N / 40))
   for (let i = 0; i < patrols; i++) {
     const p = add(K.Guard, 0, 0, 0, drawRace(guardRace))
@@ -418,6 +425,8 @@ export function createLife(o: {
       else if (p.wander) {
         const st = p.speed * dt, ax = Math.sin(p.a), az = Math.cos(p.a)
         if (gridAt(p.x + ax * 1.6, p.z + az * 1.6) !== 0 || groundY(p.x + ax * 1.6, p.z + az * 1.6) < 0.2) {
+          // застрял внутри фонтана/площади/здания (клетка занята): вытолкнуть на ближайшую свободную
+          if (gridAt(p.x, p.z) !== 0 && gridAt(p.x, p.z) !== -3) unstick(p)
           p.a += 0.8 + R() * 2.4
           if (R() < 0.08) p.rest = 1 + R() * 5
         } else {
@@ -576,6 +585,7 @@ export function createLife(o: {
   const SROLE: Record<number, Role> = { [K.Man]: 'man', [K.Woman]: 'woman', [K.Child]: 'child', [K.Guard]: 'guard', [K.Vendor]: 'vendor' }
   // реплики: у каждого жителя своя (по номеру), меняются со временем суток; свой генератор — не трогает случайность города
   const cool = new Map<Person, number>()
+  let nextAny = -99 // общая пауза между репликами: на людной площади пузыри не сыплются подряд
   const said = new Map<Person, { text: string; dusk: boolean }>()
   const sayOf = (p: Person, fresh: boolean): string => {
     const dusk = nightNow > 0.35
@@ -611,11 +621,13 @@ export function createLife(o: {
       return best ? { race: best.race, role: ROLE[best.kind], say: sayOf(best, true) } : null
     },
     speak: (ro, rd, range, t) => {
-      let best: Person | null = null, bd = range
+      if (t < nextAny) return null
+      let best: Person | null = null, bd = range, near = 0
       for (let i = 0; i < people.length; i++) {
         const p = people[i]
         if (!p.shown) continue
         const dx = p.dx - ro.x, dz = p.dz - ro.z, d = Math.hypot(dx, dz)
+        if (d < range * 2) near++
         if (d > bd || d < 0.01) continue
         if ((dx * rd.x + dz * rd.z) / (d * Math.hypot(rd.x, rd.z) || 1) < 0.55) continue
         if ((cool.get(p) ?? -99) > t) continue
@@ -623,6 +635,7 @@ export function createLife(o: {
       }
       if (!best) return null
       cool.set(best, t + 30)
+      nextAny = t + Math.min(16, 6 + near * 0.6) // чем люднее вокруг, тем реже
       const h = best.scale * best.race.h * 1.7
       return { id: index.get(best) ?? 0, text: sayOf(best, true), x: best.dx, y: best.y + h + 0.12, z: best.dz }
     },
