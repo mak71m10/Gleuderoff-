@@ -23,7 +23,14 @@ export const ORGANIC = {
   lauenvald: { type: 'port', houses: 440, outside: 0.3, axis: 125, roads: 2 },
   mitmyunde: { type: 'castle', houses: 180, outside: 0.3, axis: 85, roads: 2, seed: 2 },
   ulghaim: { type: 'port', houses: 240, outside: 0.2, axis: 350, roads: 2 },
-  kogalym: { type: 'road', houses: 1200, outside: 0.3, axis: 170, roads: 2, stretch: 1.8 }
+  kogalym: { type: 'road', houses: 1200, outside: 0.3, axis: 170, roads: 2, stretch: 1.8 },
+  dalau: { type: 'port', houses: 450, outside: 0.3, axis: 265, roads: 2 },
+  hagau: { type: 'port', houses: 140, outside: 0.3, axis: 35, roads: 2 },
+  kirch: { type: 'road', houses: 280, outside: 0.3, axis: 175, roads: 2 },
+  korel: { type: 'port', houses: 2000, outside: 0.35, axis: 295, roads: 2, stretch: 1.6 },
+  tirel: { type: 'port', houses: 410, outside: 0.3, axis: 290, roads: 2 },
+  tirrit: { type: 'road', houses: 1250, outside: 0.35, axis: 135, roads: 2, stretch: 1.6 },
+  santareya: { type: 'port', houses: 1450, outside: 0.35, axis: 140, roads: 2, stretch: 1.5 }
 }
 
 export const CITY_MAPS = [
