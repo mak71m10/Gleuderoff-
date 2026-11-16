@@ -1,9 +1,12 @@
 # Передача работы
 
-Последний релиз: 0.43.0 (https://github.com/mak71m10/Gleuderoff-/releases/tag/v0.43.0), world v40 — Эльфборн и слияние пяти потоков (13.11.2026).
+Последний релиз: 0.44.0 (https://github.com/mak71m10/Gleuderoff-/releases/tag/v0.44.0), world v40 — новые города, Эльфборн целиком (16.11.2026).
 
-## Города: ошибки city-check исправлены (16.11.2026)
-- 155 из 162 городов проработанных стран проходят city-check; 7 старых планов Watabou не трогались. Подробности — `docs/handoff-goroda.md`, последний раздел.
+## 0.44.0 (16.11.2026) — выпущено
+Слиты все потоки: города (goroda, 5450e048 — все 162 города проработанных стран на city-organic), конёк крыши, лестницы изнутри стен, bagi, mehaniki, skorost, grafika, strany-2. `world.json` слит по id записей (maps 2480, places 4177, states 146, provinces 4176). tsc чистый, strip-draft — 0.
+- Сборка exe: `npm run dist` сломан (битый junction `%LOCALAPPDATA%\electron`); обход — `npx electron-vite build`, затем `npx electron-builder --win -c.electronDist=node_modules/electron/dist`.
+- Не проверено глазами: 3D новых городов в Electron и на телефоне, 3D Эльфборна, лестницы изнутри стен в игре.
+- Замечания автора 1–7 по 0.43 (ниже) закрыты в 0.44, кроме проверки глазами.
 
 ## 0.43.0 (13.11.2026) — выпущено
 Все пять потоков слиты в main (strany, grafika, mehaniki, skorost, bagi); мир — версия 40. Подробности — `docs/handoff-<поток>.md`.
