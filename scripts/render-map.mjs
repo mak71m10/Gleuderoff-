@@ -65,6 +65,14 @@ if (isMainThread) {
     const b = blur(tmp, SW, SH, 1)
     for (let i = 0; i < N; i++) RV[i] = Math.round(b[i] * 255)
   }
+  // долина: широкое плавное углубление вдоль русла (река «врезана» в рельеф, а не нарисована поверх)
+  const VAL = new Uint8Array(shared(N))
+  {
+    const tmp = new Float32Array(N)
+    for (let i = 0; i < N; i++) tmp[i] = riv[i]
+    const b1 = blur(tmp, SW, SH, 3), b2 = blur(tmp, SW, SH, 8)
+    for (let i = 0; i < N; i++) VAL[i] = Math.round(Math.min(1, b1[i] * 1.8 * 0.6 + b2[i] * 3.2 * 0.4) * 255)
+  }
 
   // пашни вокруг поселений: чем крупнее поселение, тем шире круг наделов
   const FM = new Uint8Array(shared(N))
@@ -217,7 +225,7 @@ if (isMainThread) {
     const NZ = makeNoise()
     for (let i = 0; i < N; i++) {
       const mtn = MS[i], hill = CW[i * 7 + 3] / 255
-      hs[i] = coarse[i] + lumHP[i] * (hill * 0.45 + 0.12) * (1 - mtn) * 0.3
+      hs[i] = coarse[i] + lumHP[i] * (hill * 0.45 + 0.12) * (1 - mtn) * 0.3 - VAL[i] / 255 * 0.05
       if (mtn > 0.01) hs[i] += mtnRelief(NZ, (i % SW) * 2, ((i / SW) | 0) * 2, mtn, MH[i])
     }
     const GAIN = 0.016 // подъём луча на пиксель исходника
@@ -249,7 +257,7 @@ if (isMainThread) {
   await Promise.all(
     Array.from({ length: nWorkers }, () =>
       new Promise((res, rej) => {
-        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RP: RP.buffer, RDT: RDT.buffer, RT: RT.buffer, SHD: SHD.buffer, FM: FM.buffer, RV: RV.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, MS: MS.buffer, MH: MH.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
+        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RP: RP.buffer, RDT: RDT.buffer, RT: RT.buffer, SHD: SHD.buffer, FM: FM.buffer, RV: RV.buffer, VAL: VAL.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, MS: MS.buffer, MH: MH.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
         w.on('message', (m) => process.stdout.write(`\r  полос: ${m}/${Math.ceil(OH / STRIP)}   `))
         w.on('error', rej)
         w.on('exit', res)
@@ -432,6 +440,7 @@ if (!isMainThread) {
   const CW = new Uint8Array(workerData.CW)
   const DB = new Uint8Array(workerData.DB)
   const RV = new Uint8Array(workerData.RV)
+  const VAL = new Uint8Array(workerData.VAL)
   const FM = new Uint8Array(workerData.FM)
   const RP = new Uint8Array(workerData.RP)
   const RDT = new Uint8Array(workerData.RDT)
@@ -623,7 +632,8 @@ if (!isMainThread) {
             h += des * dune * 0.03 * (0.6 + 0.4 * noise(lx * 0.03, ly * 0.03))
           }
           const rv = bil(RV, sx + wx * 0.12, sy + wy * 0.12) / 255
-          h -= rv * 0.025
+          const vl = bil(VAL, sx + wx * 0.12, sy + wy * 0.12) / 255
+          h -= vl * 0.055 + rv * 0.03
           h = Math.max(0.002, h + Math.min(s, 3) * 0.004)
         } else {
           h = Math.max(-1, s * 0.004)
@@ -840,17 +850,34 @@ if (!isMainThread) {
           }
           // река: вода с тёмными мокрыми берегами
           const rv = bil(RV, sx + WX[i] * 0.12, sy + WY[i] * 0.12) / 255 + noise(lx * 0.4, ly * 0.4) * 0.06
-          if (rv > 0.28) {
-            const bank = sstep(0.28, 0.46, rv)
-            const wet = 1 - bank * 0.25
+          {
+            // пойма: влажная тёмная земля и свежая зелень в долине, плавно уходящая в рельеф
+            const vl = bil(VAL, sx + WX[i] * 0.12, sy + WY[i] * 0.12) / 255
+            const flood = sstep(0.08, 0.7, vl) * (1 - sstep(0.4, 0.8, wts[6]))
+            if (flood > 0.01) {
+              const gk = flood * 0.32
+              r += (r * 0.8 + 0.024 - r) * gk
+              g += (g * 1.02 + 0.039 - g) * gk
+              b += (b * 0.72 - b) * gk
+              const dk = 1 - flood * 0.14
+              r *= dk; g *= dk; b *= dk
+            }
+          }
+          if (rv > 0.2) {
+            const bank = sstep(0.2, 0.46, rv)
+            const wet = 1 - bank * 0.34
             r *= wet
             g *= wet
             b *= wet
-            const water = sstep(0.5, 0.6, rv)
+            const water = sstep(0.46, 0.6, rv)
+            const depth = sstep(0.6, 1, rv) // середина русла глубже и темнее, у берега мельче и светлее
             const ripple = 1 + noise(lx * 1.2, ly * 1.2) * 0.06
-            r += (P.river[0] * ripple - r) * water
-            g += (P.river[1] * ripple - g) * water
-            b += (P.river[2] * ripple - b) * water
+            const dm = 1.12 - depth * 0.32
+            // вода подхватывает свет и тень врезанного рельефа
+            const lit = 1
+            r += (P.river[0] * ripple * dm * lit - r) * water
+            g += (P.river[1] * ripple * dm * lit - g) * water
+            b += (P.river[2] * ripple * dm * lit - b) * water
           }
           // дороги: тракт из серого камня с бордюром, грунтовка, тропа; над рекой — мост
           const dP = roadD(RP, lx, ly), dD = roadD(RDT, lx, ly), dT = roadD(RT, lx, ly)

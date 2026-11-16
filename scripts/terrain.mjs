@@ -3,6 +3,7 @@
 // Запуск после provinces.mjs: node --max-old-space-size=8192 scripts/terrain.mjs
 import { readFileSync, writeFileSync } from 'fs'
 import sharp from 'sharp'
+import { hydro } from './hydro.mjs'
 
 const WORLD = 'resources/default-world/world.json'
 const SCALE = 2
@@ -49,25 +50,17 @@ for (let i = 0; i < N; i++) {
 }
 log('высоты')
 
-// ---------- реки: светло-голубые линии на суше ----------
-const river = new Uint8Array(N)
+// ---------- реки и озёра: гидрология по рельефу (scripts/hydro.mjs) ----------
+// Нарисованные светло-голубые линии базы служат только подсказкой (русло чуть «ниже»), сами реки считаются по стоку.
+const guide = new Uint8Array(N)
 for (let i = 0; i < N; i++) {
   if (!prov[i]) continue
   const r = base[i * 3], g = base[i * 3 + 1], b = base[i * 3 + 2]
-  if (b > r + 22 && g > r + 8 && lum[i] > 95 && b > 110) river[i] = 255
+  if ((b > r + 22 && g > r + 8 && lum[i] > 95 && b > 110) || (g > r + 15 && b > r + 8 && g > 70 && b > 100)) guide[i] = 1
 }
-{
-  // убрать одиночные точки
-  const copy = river.slice()
-  for (let y = 1; y < H - 1; y++)
-    for (let x = 1; x < W - 1; x++) {
-      const i = y * W + x
-      if (!copy[i]) continue
-      let n = 0
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (copy[i + dy * W + dx]) n++
-      if (n < 3) river[i] = 0
-    }
-}
+const hy = hydro({ W, H, prov, cls, smooth, guide })
+const river = hy.river
+console.log('гидрология', JSON.stringify(hy.stats))
 log('реки')
 
 const out = Buffer.alloc(N * 4)

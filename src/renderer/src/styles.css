@@ -2099,3 +2099,8 @@ button.pw-chip:hover { background: var(--panel-2); }
   .wil-cards { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); } .wil-nights { grid-template-columns: 1fr; }
   .wil-svg { max-width: 420px; }
 }
+
+/* Серебряная Ива на карте мира — огромное дерево, видно издалека */
+.willow-wrap { pointer-events: none; }
+.willow-tree { position: relative; }
+.willow-name { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); white-space: nowrap; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 700; color: #eaf4ec; text-shadow: 0 0 4px #000, 0 0 8px #0a1a10; letter-spacing: .04em; }
