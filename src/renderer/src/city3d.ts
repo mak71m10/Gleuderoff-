@@ -31,6 +31,8 @@ export interface PlanScene {
   roads: PlanLine[]
   rivers: PlanLine[]
   planks: PlanLine[]
+  /** мосты: ось (с заездом на оба берега) и ширина; где дорога переходит реку */
+  bridges?: PlanLine[]
   /** контур суши (как на 2D-плане): всё вне него — море; нет поля — суша на весь кадр */
   earth?: number[]
 }
@@ -281,6 +283,8 @@ export interface CityWorld {
   /** Подсветка здания при наведении и выборе */
   setHighlight: (hover: number | null, selected: number | null) => void
   pickPerson: (o: THREE.Vector3, d: THREE.Vector3) => PersonInfo | null
+  /** Тап/клик по воротам: открыть или закрыть их вручную. true — луч попал в ворота */
+  toggleGate: (o: THREE.Vector3, d: THREE.Vector3) => boolean
   /** Кто из жителей впереди заговаривает (реплика и точка над головой) */
   speak: (o: THREE.Vector3, d: THREE.Vector3, range: number, t: number) => Speech | null
   census: { race: Race; count: number }[]
@@ -315,10 +319,33 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const PEAK = Math.max(60, RP * 0.75)
 
   // на плане дома стоят почти вплотную: в 3D чуть уже, чтобы между ними появились проходы и улицы
+  // ширина дома (короткая сторона наименьшего описанного прямоугольника) и ось этой ширины
+  const narrowOf = (r: P2[]): { w: number; nx: number; nz: number; c: number } => {
+    let best = 1e18, w = 0, nx = 0, nz = 1, c = 0
+    for (let i = 0; i < r.length; i++) {
+      const p = r[i], q = r[(i + 1) % r.length]
+      const l = Math.hypot(q[0] - p[0], q[1] - p[1]); if (l < 0.01) continue
+      const ax = (q[0] - p[0]) / l, az = (q[1] - p[1]) / l
+      let a0 = 1e9, a1 = -1e9, c0 = 1e9, c1 = -1e9
+      for (const t of r) { const u = t[0] * ax + t[1] * az, v = -t[0] * az + t[1] * ax; a0 = Math.min(a0, u); a1 = Math.max(a1, u); c0 = Math.min(c0, v); c1 = Math.max(c1, v) }
+      const s = (a1 - a0) * (c1 - c0)
+      if (s < best) { best = s; if (a1 - a0 < c1 - c0) { w = a1 - a0; nx = ax; nz = az; c = (a0 + a1) / 2 } else { w = c1 - c0; nx = -az; nz = ax; c = (c0 + c1) / 2 } }
+    }
+    return { w, nx, nz, c }
+  }
+  // минимальная ширина дома в 3D (бета-тестер: «дома очень узкие»): отступ не делает дом уже HOUSE_W,
+  // а слишком узкий участок плана раздвигается поперёк конька
+  const HOUSE_W = 4.6
   const inset = (r: P2[]): P2[] => {
     const a = Math.abs(areaOf(r))
+    const nw = narrowOf(r)
+    if (nw.w < HOUSE_W - 0.4) {
+      const f = Math.min(1.7, (HOUSE_W - 0.4) / Math.max(0.5, nw.w))
+      return r.map(([x, z]) => { const d = x * nw.nx + z * nw.nz - nw.c; return [x + nw.nx * d * (f - 1), z + nw.nz * d * (f - 1)] as P2 })
+    }
     if (a < 18) return r
-    const q = grow(r, -Math.min(1.5, 0.5 + Math.sqrt(a) * 0.05))
+    const dd = Math.min(1.5, 0.5 + Math.sqrt(a) * 0.05, Math.max(0.2, (nw.w - HOUSE_W) / 2))
+    const q = grow(r, -dd)
     return Math.abs(areaOf(q)) > a * 0.4 && areaOf(q) * areaOf(r) > 0 ? q : r
   }
   const blds = plan.buildings.map((b) => { const r = ringOf(b, k, 2); return { d: b[0], special: b[1] === 1, r: b[1] === 1 ? r : inset(r) } })
@@ -329,7 +356,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   // город на вершине: площади, что оказались на скале посреди платформы, не нужны — рынок и жителей там не будет
   const squares = S.squares.map((f) => ringOf(f, k)).filter((r) => { if (!kranz) return true; const c = centerOf(r); return Math.hypot(c[0] - center[0], c[1] - center[1]) > R0 * 1.35 })
   const lines = (l: PlanLine[]): { r: P2[]; w: number }[] => l.map((q) => ({ r: ringOf(q.r, k), w: q.w / k }))
-  const roads = lines(S.roads), rivers = lines(S.rivers), planks = lines(S.planks), wallLines = lines(S.walls)
+  const roads = lines(S.roads), rivers = lines(S.rivers), planks = lines(S.planks), bridges = lines(S.bridges ?? []), wallLines = lines(S.walls)
 
   const trace = (g: CanvasRenderingContext2D, r: P2[], close = true): void => {
     g.beginPath()
@@ -497,6 +524,34 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   }
   if (hasWater) for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) if (heightAt((i + 0.5) * cell, (j + 0.5) * cell) < -0.2) grid[j * gw + i] = -2
   planks.forEach((q) => fillLine(q.r, Math.max(q.w, 3), -3))
+  // ---------- мосты: профиль настила — концы на берегах, над водой горб не ниже 1.8 м ----------
+  type Bridge = { a: P2; ux: number; uz: number; L: number; w: number; ya: number; yb: number; hump: number; d0: number; d1: number }
+  const bridgeList: Bridge[] = []
+  const deckY = (B: Bridge, d: number): number => { const t = Math.max(0, Math.min(1, d / B.L)); return B.ya + (B.yb - B.ya) * t + B.hump * Math.sin(Math.PI * t) }
+  for (const q of bridges) for (let s = 1; s < q.r.length; s++) {
+    const a = q.r[s - 1], b = q.r[s], L = Math.hypot(b[0] - a[0], b[1] - a[1])
+    if (L < 4) continue
+    const ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L
+    let d0 = -1, d1 = -1
+    for (let d = 0; d <= L; d += 0.5) if (heightAt(a[0] + ux * d, a[1] + uz * d) < -0.2) { if (d0 < 0) d0 = d; d1 = d }
+    if (d0 < 0) continue
+    const ya = Math.max(heightAt(a[0], a[1]), 0.2), yb = Math.max(heightAt(b[0], b[1]), 0.2)
+    let hump = 0.8
+    for (let d = d0; d <= d1; d += 0.5) { const t = d / L, sn = Math.sin(Math.PI * t); if (sn > 0.05) hump = Math.max(hump, (1.8 - (ya + (yb - ya) * t)) / sn) }
+    bridgeList.push({ a, ux, uz, L, w: Math.max(q.w, 4.5), ya, yb, hump: Math.min(hump, 4), d0, d1 })
+  }
+  // высота настила моста в точке (null — не на мосту); ходят по нему между парапетами
+  const bridgeAt = (x: number, z: number): number | null => {
+    let best: number | null = null
+    for (const B of bridgeList) {
+      const px = x - B.a[0], pz = z - B.a[1], d = px * B.ux + pz * B.uz
+      if (d < 0 || d > B.L || Math.abs(-px * B.uz + pz * B.ux) > B.w / 2 - 0.45) continue
+      const h = deckY(B, d)
+      if (best === null || h > best) best = h
+    }
+    return best
+  }
+  bridgeList.forEach((B) => fillLine([B.a, [B.a[0] + B.ux * B.L, B.a[1] + B.uz * B.L]], B.w - 1.2, -3))
   const gridAt = (x: number, z: number): number => {
     const i = Math.floor(x / cell), j = Math.floor(z / cell)
     return i < 0 || j < 0 || i >= gw || j >= gh ? 0 : grid[j * gw + i]
@@ -513,17 +568,32 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const GATE = 4.2
   const gatesOn = (a: P2, b: P2, len: number): number[] => {
     const out: number[] = []
-    for (const q of [...roads, ...planks]) for (let s = 1; s < q.r.length; s++) { const t = segCross(a, b, q.r[s - 1], q.r[s]); if (t !== null) out.push(t * len) }
+    for (const q of [...roads, ...planks, ...bridges]) for (let s = 1; s < q.r.length; s++) { const t = segCross(a, b, q.r[s - 1], q.r[s]); if (t !== null) out.push(t * len) }
     return out.sort((m, n) => m - n)
   }
-  const spansOf = (gates: number[], len: number): [number, number][] => {
+  // водяные ворота: участки, где стена переходит реку поперёк (вдоль берега по воде стену не режем)
+  const waterOn = (a: P2, b: P2, len: number): [number, number][] => {
+    if (!hasWater || len < 2) return []
+    const out: [number, number][] = [], st = 1.5, n = Math.ceil(len / st)
+    let w0 = -1
+    for (let j = 0; j <= n; j++) {
+      const f = (len * j) / n, wet = heightAt(a[0] + ((b[0] - a[0]) * f) / len, a[1] + ((b[1] - a[1]) * f) / len) < -0.2
+      if (wet && w0 < 0) w0 = f
+      if ((!wet || j === n) && w0 >= 0) { const w1 = wet ? f : f - len / n; if (w1 - w0 > 2 && w1 - w0 < 40) out.push([w0, w1]); w0 = -1 }
+    }
+    // если реку здесь уже переходит мост с дорогой — это обычные ворота, не водяные
+    return out.filter(([w0, w1]) => !gatesOn(a, b, len).some((g) => g > w0 - GATE && g < w1 + GATE))
+  }
+  const spansOf = (gates: number[], len: number, wet: [number, number][] = []): [number, number][] => {
+    const cuts: [number, number][] = [...gates.map((g): [number, number] => [g - GATE, g + GATE]), ...wet.map(([w0, w1]): [number, number] => [w0 - 1.2, w1 + 1.2])].sort((m, n) => m[0] - n[0])
     const spans: [number, number][] = []
     let cur = 0
-    for (const g0 of gates) { if (g0 - GATE > cur) spans.push([cur, g0 - GATE]); cur = Math.max(cur, g0 + GATE) }
+    for (const [c0, c1] of cuts) { if (c0 > cur) spans.push([cur, c0]); cur = Math.max(cur, c1) }
     if (cur < len) spans.push([cur, len])
     return spans
   }
   const gatePts: P2[] = []
+  const towerSpots: { x: number; z: number; r: number }[] = []
   wallLines.forEach((w) => {
     const th = Math.max(1.8, Math.min(3.2, w.w / 2)), towerR = Math.max(2.4, Math.min(4.4, (S.tower / k) * 0.9))
     w.r.forEach((a, i) => {
@@ -531,13 +601,17 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       if (len < 0.5) return
       const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len
       const gates = gatesOn(a, b, len)
-      for (const [s0, s1] of spansOf(gates, len)) fillLine([[a[0] + ux * s0, a[1] + uz * s0], [a[0] + ux * s1, a[1] + uz * s1]], th + 0.6, -1)
+      for (const [s0, s1] of spansOf(gates, len, waterOn(a, b, len))) fillLine([[a[0] + ux * s0, a[1] + uz * s0], [a[0] + ux * s1, a[1] + uz * s1]], th + 0.6, -1)
       for (const g0 of gates) {
         const cx = a[0] + ux * g0, cz = a[1] + uz * g0
         gatePts.push([cx, cz])
-        for (const sd of [-1, 1]) fillLine([[cx + ux * sd * GATE, cz + uz * sd * GATE], [cx + ux * sd * GATE + 0.1, cz + uz * sd * GATE]], towerR * 1.7, -1)
+        for (const sd of [-1, 1]) {
+          fillLine([[cx + ux * sd * GATE, cz + uz * sd * GATE], [cx + ux * sd * GATE + 0.1, cz + uz * sd * GATE]], towerR * 1.7, -1)
+          towerSpots.push({ x: cx + ux * sd * GATE, z: cz + uz * sd * GATE, r: towerR * 0.9 + 0.8 })
+        }
       }
       fillLine([a, [a[0] + 0.1, a[1]]], towerR * 2, -1)
+      towerSpots.push({ x: a[0], z: a[1], r: towerR + 0.8 })
     })
   })
 
@@ -621,7 +695,12 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   blds.forEach((b, i) => {
     if (marks.has(i)) return
     const c = centerOf(b.r)
-    if (mons.some((m) => inRect(m, c[0], c[1], 1.5))) removed[i] = 1
+    // сносим по площади: задет хоть угол или середина ребра дома — дом уступает
+    const pts: P2[] = [c, ...b.r, ...b.r.map((p, j) => { const q = b.r[(j + 1) % b.r.length]; return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] as P2 })]
+    const monCorners = (m: Mon): P2[] => { const co = Math.cos(m.rot), n = Math.sin(m.rot); return [[-1, -1], [1, -1], [1, 1], [-1, 1], [0, 0]].map(([u, v]) => [m.x + (u * m.L) / 2 * co - (v * m.W) / 2 * n, m.z + (u * m.L) / 2 * n + (v * m.W) / 2 * co] as P2) }
+    if (mons.some((m) => pts.some((p) => inRect(m, p[0], p[1], 1.5)) || monCorners(m).some((p) => pointIn(p, b.r)))) removed[i] = 1
+    // угловые и надвратные башни стоят свободно: дом, задевший башню, уступает
+    if (towerSpots.some((t) => pointIn([t.x, t.z], b.r) || pts.some((p) => Math.hypot(p[0] - t.x, p[1] - t.z) < t.r))) removed[i] = 1
     // на вершине — скала и дворец, домов там нет
     if (kranz && Math.hypot(c[0] - center[0], c[1] - center[1]) < R0 * 1.08) removed[i] = 1
     // за краем платформы — обрыв, домов там нет
@@ -675,13 +754,24 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     pois.push([c[0] + 5, c[1] + 2], [c[0] - 4, c[1] - 5])
   })
   const roadAt = sampler(canvasMask((c) => { roads.forEach((q) => { trace(c, q.r, false); c.lineWidth = Math.max(4, q.w); c.stroke() }) }, 0, 0))
+  // концы дорог — главные цели улиц. За городской стеной это только выезды с карты: тупик слободского проулка
+  // в поле главной улицей не считается, иначе от каждого такого тупика к воротам тянется мощёная колея вдоль стены
+  const ringWall = wallLines.find((w, i) => i !== S.citadel && w.r.length > 2)
+  const edgeGap = Math.max(W, H) * 0.06
   const roadEnds: P2[] = roads.flatMap((q) => (q.r.length ? [q.r[0], q.r[q.r.length - 1]] : [])).filter((p) => p[0] > 0 && p[1] > 0 && p[0] < W && p[1] < H)
+    .filter((p) => !ringWall || pointIn(p, ringWall.r) || Math.min(p[0], p[1], W - p[0], H - p[1]) < edgeGap)
   let streets: Streets | null = null
   if (doors.length > 1) {
     streets = buildStreets({
       W, H,
       cell: Math.max(1.4, Math.max(W, H) / (opts.mobile ? 420 : 640)),
-      free: (x, z) => { const g = gridAt(x, z); return (g === 0 || g === -3) && heightAt(x, z) > 0.05 },
+      // проезд ворот уже клетки сетки (башни по бокам почти смыкаются), поэтому у самих ворот стена проходима:
+      // иначе город внутри отрезан, центр улиц уезжает в поле, и все пути огибают стену кольцами
+      free: (x, z) => {
+        const g = gridAt(x, z)
+        if (g === -1 && gatePts.some((p) => (p[0] - x) ** 2 + (p[1] - z) ** 2 < 10)) return true
+        return (g === 0 || g === -3) && (heightAt(x, z) > 0.05 || bridgeAt(x, z) !== null)
+      },
       roadAt,
       hub: hubAim,
       mains: [...gatePts, ...pois, ...roadEnds],
@@ -1162,10 +1252,11 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const plaster = mixHex(mixHex(plaster0, rx() < 0.5 ? '#e8dcc0' : '#b9a98c', rx() * (look ? 0.1 : 0.22)), '#cfc2a4', look ? 0.04 : 0.12)
     const quoin = rx() < 0.4
     const pal = look ? look.roof : S.droof[b.d] ?? S.roof ?? st.roof
-    const roofCol = kind === 'temple' ? st.tower : kind === 'keep' ? mixHex(st.stone, '#000', 0.2) : look ? pal[Math.floor(rv() * pal.length)] : mixHex(pal[Math.floor(rv() * pal.length)], town.roofTone, town.roofK * rv())
+    const roofCol = kind === 'temple' ? (vik ? mixHex(st.tower, '#8a6a48', 0.4) : st.tower) : kind === 'keep' ? mixHex(st.stone, '#000', 0.2) : look ? pal[Math.floor(rv() * pal.length)] : mixHex(pal[Math.floor(rv() * pal.length)], town.roofTone, town.roofK * rv())
     const stoneBody = !vik && (kind === 'temple' || kind === 'keep' || kind === 'civic')
-    const wallCol = stoneBody ? mixHex(st.wall, st.plaster[0], 0.3) : plaster
-    const eave = vik && !kind ? (hall ? 4.4 : 2.7) : kind === 'temple' ? Math.min(16, 8 + Math.sqrt(area) * 0.2) : kind === 'keep' ? Math.min(22, 11 + Math.sqrt(area) * 0.3) : kind === 'civic' ? 3.3 * Math.max(floors, 3) : 0.5 + floors * 3 + (look?.eave ?? 0)
+    // хоф у викингов — деревянный, но светлее жилых срубов, чтобы не сливаться в чёрную глыбу
+    const wallCol = stoneBody ? mixHex(st.wall, st.plaster[0], 0.3) : vik && kind === 'temple' ? mixHex(plaster, '#9a7a52', 0.35) : plaster
+    const eave = vik && !kind ? (hall ? 4.4 : 2.7) : vik && kind === 'temple' ? Math.min(7, 4.5 + Math.sqrt(area) * 0.1) : kind === 'temple' ? Math.min(16, 8 + Math.sqrt(area) * 0.2) : kind === 'keep' ? Math.min(22, 11 + Math.sqrt(area) * 0.3) : kind === 'civic' ? 3.3 * Math.max(floors, 3) : 0.5 + floors * 3 + (look?.eave ?? 0)
     // эльфы строят высокие крутые крыши, дварфы — низкие каменные, орки — приземистые
     const rise = flat ? 0 : Math.min(hw * st.pitch * (look?.pitch ?? 1) * (kind ? 1 : town.pitchK), kind === 'keep' ? 0 : hw > 8 ? (cult === 'elf' ? 11 : hall ? 12 : vik ? 9 : 7) : 99)
     const pitch = flat ? 0 : rise / hw
@@ -1411,11 +1502,20 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       // у викингов не трубы, а дымовое отверстие в коньке
       const [cx, cz] = fromUV((u0 + u1) / 2, 0)
       chimneys.push([cx, base + eave + rise + 0.3, cz])
-    } else if (!vik && !kind && detail >= 1 && cult !== 'elf' && (cult === 'dwarf' || rv() < 0.55) && hw < 7) {
-      const u = u0 + (u1 - u0) * (0.2 + rv() * 0.6), v = (rv() - 0.5) * hw * 0.5
-      const [cx, cz] = fromUV(u, v)
-      const y = base + eave + rise - Math.abs(v) * pitch - 0.4
+    } else if (!vik && !kind && detail >= 1 && cult !== 'elf' && (cult === 'dwarf' || rv() < 0.55) && hw < 7 && hw > 1.6) {
       const cw = cult === 'dwarf' ? 1.15 : 0.6 + rx() * 0.3
+      // труба стоит на самой крыше: все четыре угла внутри контура дома (у Г-образных и косых домов
+      // прямоугольник шире контура — раньше труба висела над пустотой), основание ниже ската у нижнего угла
+      let cx = 0, cz = 0, v = 0, ok = false
+      for (let t = 0; t < 6 && !ok; t++) {
+        const u = u0 + (u1 - u0) * (0.2 + rv() * 0.6)
+        v = (rv() - 0.5) * Math.max(0, hw - cw) * 0.8
+        ;[cx, cz] = fromUV(u, v)
+        const h = cw * 0.5 + 0.25
+        ok = [[-h, -h], [h, -h], [h, h], [-h, h]].every(([a, b]) => pointIn(fromUV(u + a, v + b), r))
+      }
+      const y = base + eave + Math.max(-1.5, rise - (Math.abs(v) + cw * 0.5) * pitch) - 0.25
+      if (ok) {
       // трубы разной высоты, часть — кирпичные, с горшком наверху
       const chH = 1.5 + rx() * 1.2
       const chCol = cult === 'human' && rx() < 0.45 ? mixHex('#9a6a55', st.stone, 0.3) : st.stone
@@ -1424,6 +1524,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       if (!dwStyle && detail >= 2 && rx() < 0.6) ch.solid.cyl(cx, y + chH + 0.16, cz, 0.15, 0.38, 6, '#8a5a48', 0.12)
       if (dwStyle) ch.glow.box(cx, y + chH + 0.14, cz, cw * 0.6, 0.04, cw * 0.6, '#ffffff', Math.atan2(uz, ux))
       if (first && chimneys.length < 400) chimneys.push([cx, y + chH + 0.2, cz])
+      }
     }
     // слуховые окна на скате — у части домов с простой прямоугольной крышей
     if (!vik && !kind && !flat && detail >= 1 && r.length === 4 && hw > 2.5 && hw < 7 && u1 - u0 > 6 && pitch > 0.35 && rx() < 0.4) {
@@ -1569,7 +1670,17 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       }
     }
     // башня с шатром у храма, башенка с часами у ратуши, крылья у мельницы
-    if (kind === 'temple') {
+    if (kind === 'temple' && vik) {
+      // хоф: не каменная колокольня, а ярусная деревянная башенка на коньке, как у ставкирки
+      const s = Math.max(2.4, Math.min(5, hw * 0.7)), rot = Math.atan2(uz, ux) + Math.PI / 4, y0 = base + eave + rise * 0.55
+      ch.solid.box(ctr[0], y0, ctr[1], s, rise * 0.45 + 2.4, s, wallCol, rot - Math.PI / 4)
+      const y1 = base + eave + rise + 2.4
+      ch.solid.cyl(ctr[0], y1, ctr[1], s * 0.95, 1.6, 4, roofCol, s * 0.45, true, rot)
+      ch.solid.box(ctr[0], y1 + 1.6, ctr[1], s * 0.55, 1.6, s * 0.55, wallCol, rot - Math.PI / 4)
+      ch.solid.cyl(ctr[0], y1 + 3.2, ctr[1], s * 0.6, s * 1.1, 4, roofCol, 0, false, rot)
+      ch.solid.box(ctr[0], y1 + 3.2 + s * 1.1, ctr[1], 0.14, 1.4, 0.14, '#d8c070')
+      tops[idx] = Math.max(tops[idx], y1 + 3.2 + s * 1.1 + 1.4)
+    } else if (kind === 'temple') {
       const [tx, tz] = fromUV(u0 + Math.min(hw, (u1 - u0) / 4), 0)
       const s = Math.max(3.4, Math.min(9, hw * 1.25)), th = eave + rise + 8 + Math.sqrt(area) * 0.3, rot = Math.atan2(uz, ux)
       ch.solid.box(tx, base, tz, s, th, s, wallCol, rot)
@@ -1726,6 +1837,27 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     return true
   }
 
+  // ---------- водяные ворота: опоры у берегов, свод над рекой и опущенная решётка до воды ----------
+  const waterGate = (a: P2, ux: number, uz: number, w0: number, w1: number, th: number, wh: number, col: string, wood: boolean): void => {
+    const rot = Math.atan2(uz, ux), span = w1 - w0 + 2.4, m = (w0 + w1) / 2
+    const cx = a[0] + ux * m, cz = a[1] + uz * m, ch = chunkAt(cx, cz)
+    const arch = 3.6 // высота проёма над водой — лодка проходит, когда решётку поднимут
+    for (const sd of [-1, 1]) {
+      const px = cx + ux * sd * (span / 2), pz = cz + uz * sd * (span / 2), py = Math.min(heightAt(px, pz), -0.6)
+      ch.solid.box(px, py - 2, pz, 2.4, wh + 2 - py, th + 1.2, mixHex(col, '#000', 0.06), rot)
+    }
+    ch.solid.box(cx, arch, cz, span, wh - arch, th, col, rot)
+    ch.solid.box(cx, arch - 0.5, cz, span, 0.5, th + 0.4, mixHex(col, '#000', 0.18), rot)
+    if (!wood && detail >= 1) for (const sd of [1, -1]) crenel(ch, [cx - ux * (span / 2) + -uz * (th / 2) * sd, cz - uz * (span / 2) + ux * (th / 2) * sd], [cx + ux * (span / 2) + -uz * (th / 2) * sd, cz + uz * (span / 2) + ux * (th / 2) * sd], wh, col, 0.4)
+    // решётка: железные прутья до самой воды и две поперечины
+    const IRON = wood ? '#3a2c20' : '#2b2a28', bars = Math.max(3, Math.round((span - 2.4) / 0.7))
+    for (let j = 0; j <= bars; j++) {
+      const f = -((span - 2.4) / 2) + ((span - 2.4) * j) / bars
+      ch.solid.box(cx + ux * f, -0.4, cz + uz * f, 0.16, arch - 0.1, 0.16, IRON, rot)
+    }
+    for (const hy of [0.7, 2.2]) ch.solid.box(cx, hy, cz, span - 2.4, 0.16, 0.2, IRON, rot)
+  }
+
   // ---------- Креит: частокол из заострённых брёвен, деревянные вышки и надвратные башни под шатром ----------
   const palisade = (r: P2[], isCit: boolean): void => {
     const logH = isCit ? 5.2 : 4.4
@@ -1741,8 +1873,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       const len = Math.hypot(b[0] - a[0], b[1] - a[1])
       if (len < 0.5) continue
       const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len, nx = -uz, nz = ux
-      const gates = gatesOn(a, b, len)
-      for (const [s0, s1] of spansOf(gates, len)) {
+      const gates = gatesOn(a, b, len), wet = waterOn(a, b, len)
+      for (const [w0, w1] of wet) waterGate(a, ux, uz, w0, w1, 1.4, logH, st.timber, true)
+      for (const [s0, s1] of spansOf(gates, len, wet)) {
         const n = Math.max(1, Math.round((s1 - s0) / 0.85))
         for (let j = 0; j <= n; j++) {
           const f = s0 + ((s1 - s0) * j) / n
@@ -1792,6 +1925,12 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         for (const sd of [-1, 1]) tower(cx + ux * sd * 4, cz + uz * sd * 4, y, 2.6, logH + 2.6, rot, ch)
         ch.solid.box(cx, y + logH + 0.6, cz, 8.6, 0.7, 1.2, st.timber, rot)
         if (detail >= 1) for (const sd of [-1.4, 0, 1.4]) ch.solid.box(cx + ux * sd + nx * 0.7, y + logH - 0.1, cz + uz * sd + nz * 0.7, 0.42, 0.5, 0.6, '#d8d0bc', rot)
+        // дощатые створки между вышками (наружу — от центра частокола)
+        const pc = centerOf(r), vs = (pc[0] - cx) * nx + (pc[1] - cz) * nz >= 0 ? -1 : 1
+        const gy = bridgeAt(cx, cz) ?? y
+        const rd = gateRoad(cx, cz, nx * vs, nz * vs)
+        rd.e = Math.min(rd.e, 2.6)
+        addGate(cx, cz, gy, ux, uz, nx * vs, nz * vs, 2.7, 0.7, logH - 0.2, mixHex(st.timber, '#000', 0.2), '#2a2c30', rd)
       }
       // угловые дозорные вышки — не на каждом углу
       if (i % 3 === 0 || isCit) {
@@ -1803,6 +1942,176 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
 
   // ---------- стены города: зубцы, башни, ворота там, где стену пересекает дорога ----------
   const wallColor = st.wall
+  // ---------- ворота со створками: открываются днём и при подходе, закрываются ночью; тап по воротам — вручную ----------
+  // Данные берём из плана как есть: точка ворот — пересечение стены с дорогой/мостом; ширину проезда и сторону «наружу» считаем здесь.
+  type GateLeaf = { mesh: THREE.Mesh; a0: number; a1: number }
+  type Gate = { x: number; z: number; y: number; ux: number; uz: number; nx: number; nz: number; pw: number; hv: number; h: number; open: number; target: number; manual: boolean | null; leaves: GateLeaf[] }
+  const gateList: Gate[] = []
+  const gateGeos: THREE.BufferGeometry[] = []
+  // закрытые (больше чем наполовину) створки не пропускают
+  const gateShut = (x: number, z: number): boolean => {
+    for (const g of gateList) {
+      if (g.open >= 0.5) continue
+      const dx = x - g.x, dz = z - g.z
+      if (Math.abs(dx * g.ux + dz * g.uz) < g.pw && Math.abs(dx * g.nx + dz * g.nz) < g.hv + 0.3) return true
+    }
+    return false
+  }
+  // дорога через ворота: направление наружу, полуширина проезда поперёк дороги и смещение оси дороги от точки ворот
+  const gateRoad = (cx: number, cz: number, nx: number, nz: number): { dx: number; dz: number; e: number; off: number } => {
+    let best = 1e9, dx = nx, dz = nz
+    for (const q of [...bridges, ...roads, ...planks]) for (let s = 1; s < q.r.length; s++) {
+      const a = q.r[s - 1], b = q.r[s], L = Math.hypot(b[0] - a[0], b[1] - a[1])
+      if (L < 0.01) continue
+      const ex = (b[0] - a[0]) / L, ez = (b[1] - a[1]) / L
+      const t = Math.max(0, Math.min(L, (cx - a[0]) * ex + (cz - a[1]) * ez))
+      const d = Math.hypot(cx - a[0] - ex * t, cz - a[1] - ez * t)
+      if (d < best - 0.01) { best = d; dx = ex; dz = ez }
+    }
+    let e = 2.2, off = 0, bridge: Bridge | null = null
+    for (const B of bridgeList) {
+      const px = cx - B.a[0], pz = cz - B.a[1], d = px * B.ux + pz * B.uz
+      if (d < -3 || d > B.L + 3 || Math.abs(-px * B.uz + pz * B.ux) > B.w / 2 + 1) continue
+      bridge = B; dx = B.ux; dz = B.uz
+    }
+    if (dx * nx + dz * nz < 0) { dx = -dx; dz = -dz }
+    if (bridge) {
+      // створки встают у перил, внутри настила: весь настил остаётся проходом
+      e = Math.max(2.2, bridge.w / 2 - 0.65)
+      off = (cx - bridge.a[0]) * -dz + (cz - bridge.a[1]) * dx
+    }
+    return { dx, dz, e, off }
+  }
+  // полуширина арки вдоль стены, чтобы косой проезд/мост целиком проходил через толщу стены
+  const gateSpan = (ux: number, uz: number, nx: number, nz: number, rd: { dx: number; dz: number; e: number }, depth: number): number => {
+    const px = -rd.dz, pz = rd.dx
+    const sp = Math.max(0.5, Math.abs(ux * px + uz * pz)), cp = Math.abs(nx * px + nz * pz)
+    return Math.min(9, Math.max(2.2, (rd.e + depth * cp) / sp))
+  }
+  // створки: две отдельные сетки на петлях (крутятся в tick); n — наружу
+  const addGate = (cx: number, cz: number, y: number, ux: number, uz: number, nx: number, nz: number, pw: number, hv: number, doorH: number, col: string, band: string, rd: { dx: number; dz: number; e: number; off: number }): void => {
+    if (gateList.some((g) => Math.hypot(g.x - cx, g.z - cz) < 3)) return
+    const px = -rd.dz, pz = rd.dx
+    let sp = ux * px + uz * pz
+    if (Math.abs(sp) < 0.5) sp = sp < 0 ? -0.5 : 0.5
+    const cp = nx * px + nz * pz
+    const t0 = (-rd.off - hv * cp) / sp // середина проезда на внешней грани
+    const leaves: GateLeaf[] = []
+    const aOpen = Math.atan2(-rd.dz, rd.dx)
+    for (const sd of [-1, 1]) {
+      const t = (sd * rd.e - rd.off - hv * cp) / sp, L = Math.abs(t0 - t)
+      if (L < 0.4) continue
+      const s = Math.sign(t0 - t), dirx = ux * s, dirz = uz * s
+      const b = new Bucket()
+      b.box(L / 2, 0, 0, L - 0.04, doorH, 0.24, col)
+      // доски и железные полосы
+      if (detail >= 1) {
+        for (const hh of [0.5, doorH - 0.7]) b.box(L / 2, hh, 0, L * 0.96, 0.22, 0.32, band)
+        const nb = Math.max(2, Math.round(L / 0.45))
+        for (let q = 1; q < nb; q++) b.box((L * q) / nb, 0.05, 0.125, 0.04, doorH - 0.1, 0.02, mixHex(col, '#000', 0.25))
+      }
+      b.box(0.1, -0.05, 0, 0.3, doorH + 0.15, 0.36, mixHex(band, col, 0.3)) // столб петли
+      const geo = b.geometry()
+      if (!geo) continue
+      geo.computeBoundingSphere()
+      gateGeos.push(geo)
+      const mesh = new THREE.Mesh(geo, solidMat)
+      mesh.castShadow = true
+      mesh.receiveShadow = true
+      mesh.position.set(cx + ux * t + nx * hv, y, cz + uz * t + nz * hv)
+      const aClosed = Math.atan2(-dirz, dirx)
+      let d = aOpen - aClosed
+      while (d > Math.PI) d -= 2 * Math.PI
+      while (d < -Math.PI) d += 2 * Math.PI
+      mesh.rotation.y = aClosed + d
+      scene.add(mesh)
+      leaves.push({ mesh, a0: aClosed, a1: aClosed + d })
+      // глухая вставка между петлёй и башней (над перилами/обочиной — проходу не мешает)
+      const gap = pw - Math.abs(t)
+      if (gap > 0.3 && Math.abs(t) < pw) {
+        const m = (Math.abs(t) + pw) / 2 * Math.sign(t)
+        chunkAt(cx, cz).solid.box(cx + ux * m + nx * hv, y - 0.5, cz + uz * m + nz * hv, gap, doorH + 0.5, 0.4, mixHex(col, '#000', 0.15), Math.atan2(uz, ux))
+      }
+    }
+    gateList.push({ x: cx, z: cz, y, ux, uz, nx, nz, pw, hv, h: doorH, open: 1, target: 1, manual: null, leaves })
+  }
+  // надвратное строение: башни, арка проезда, решётка; вид зависит от стиля города. nx,nz — наружу
+  const gatehouse = (cx: number, cz: number, ux: number, uz: number, nx: number, nz: number, th: number, wh: number): void => {
+    if (gateList.some((g) => Math.hypot(g.x - cx, g.z - cz) < 3)) return
+    const y = bridgeAt(cx, cz) ?? heightAt(cx, cz), s = chunkAt(cx, cz).solid, rot = Math.atan2(uz, ux)
+    const kind = dwStyle || gnStyle ? 'dwarf' : elStyle ? 'elf' : S.style === 'south' ? 'south' : S.style === 'styria' ? 'dark' : 'human'
+    const D = th + 3.4 // глубина башни поперёк стены
+    const rd = gateRoad(cx, cz, nx, nz)
+    const pw = gateSpan(ux, uz, nx, nz, rd, D / 2)
+    const wc = wallColor, dk = '#1c1713'
+    const bx = (u: number, v: number, h: number, sx: number, sh: number, sz: number, col: string, r = 0): void => s.box(cx + ux * u + nx * v, y + h, cz + uz * u + nz * v, sx, sh, sz, col, rot + r)
+    const roofC = kind === 'dark' ? '#34323a' : kind === 'elf' ? '#4f8f72' : st.roof[0]
+    const stoneC = mixHex(st.stone, wc, 0.3)
+    const top = wh + 1.2 // верх надвратного пролёта
+    // башни
+    for (const sd of [-1, 1]) {
+      if (kind === 'elf') {
+        const u = sd * (pw + 2.0), hh = wh + 6.5
+        s.cyl(cx + ux * u, y - 3, cz + uz * u, 2.0, hh + 3, 14, mixHex(wc, '#ffffff', 0.18), 1.65)
+        s.cyl(cx + ux * u, y + hh - 0.2, cz + uz * u, 2.35, 0.6, 14, stoneC)
+        s.cyl(cx + ux * u, y + hh + 0.4, cz + uz * u, 2.5, 4.6, 14, roofC, 0, false)
+        s.cyl(cx + ux * u, y + hh + 5.0, cz + uz * u, 0.12, 1.3, 5, '#d8c27a', 0.04)
+        for (const v of [-1, 1]) bx(u, v * 1.9, wh * 0.5, 0.3, 1.6, 0.12, dk)
+        // колонна-подпорка проезда, чтобы между круглой башней и аркой не было щели
+        bx(sd * (pw + 0.7), 0, -3, 1.6, wh + 4.2, th + 1.6, wc)
+      } else {
+        const T = kind === 'dwarf' ? 5.0 : 4.4, ht = kind === 'dwarf' ? wh + 2.4 : wh + 4
+        const u = sd * (pw + T / 2)
+        bx(u, 0, -3, T, ht + 3, D, wc)
+        bx(u, 0, -0.2, T + 0.5, 1.4, D + 0.5, mixHex(wc, '#000', 0.16)) // цоколь
+        bx(u, 0, ht - 0.6, T + 0.8, 0.7, D + 0.8, stoneC) // карниз
+        if (kind === 'human' || kind === 'dark') {
+          const rh = T * (kind === 'dark' ? 1.7 : 1.3)
+          s.cyl(cx + ux * u, y + ht, cz + uz * u, (T + 0.9) * 0.71, rh, 4, roofC, 0, false, rot + Math.PI / 4)
+          s.cyl(cx + ux * u, y + ht + rh, cz + uz * u, 0.07, 1.6, 4, '#3a2a1a', 0.07)
+          bx(u + 0.7, 0, ht + rh + 0.9, 1.3, 0.7, 0.05, kind === 'dark' ? '#2a1a2a' : '#8f2f2f')
+        } else {
+          for (const f of [-1, 1]) {
+            crenel(chunkAt(cx, cz), [cx + ux * (u - T / 2 - 0.2) + nx * (D / 2 + 0.2) * f, cz + uz * (u - T / 2 - 0.2) + nz * (D / 2 + 0.2) * f], [cx + ux * (u + T / 2 + 0.2) + nx * (D / 2 + 0.2) * f, cz + uz * (u + T / 2 + 0.2) + nz * (D / 2 + 0.2) * f], y + ht + 0.1, wc, 0.5)
+          }
+        }
+        if (detail >= 1) for (const v of [-1, 1]) for (const du of [-0.9, 0.9]) bx(u + du, v * (D / 2 + 0.03), wh * 0.5, 0.32, 1.5, 0.1, dk)
+      }
+    }
+    // арка проезда: ступенчатая по кривой, с кольцом из камня
+    const Hs = kind === 'dwarf' ? 4.1 : kind === 'dark' ? 2.6 : kind === 'elf' ? 3.0 : 2.9
+    const rise = kind === 'dwarf' ? 0 : kind === 'dark' ? 2.9 : kind === 'elf' ? 3.6 : kind === 'south' ? 2.2 : 2.4
+    const sh = (t: number): number => kind === 'south' ? Math.sqrt(Math.max(0, 1 - t * t)) : Math.pow(Math.max(0, 1 - t), kind === 'elf' ? 0.55 : 0.7)
+    const NS = Math.max(12, Math.round(pw * 5)), sw = (2 * pw) / NS
+    const v0 = -(th + 1.6) / 2, v1 = (th + 1.6) / 2
+    for (let i = 0; i < NS; i++) {
+      const u = -pw + (i + 0.5) * sw, hA = Hs + rise * sh(Math.abs(u) / pw)
+      bx(u, 0, hA, sw + 0.02, top - hA, th + 1.6, mixHex(wc, '#000', 0.04))
+      bx(u, 0, hA, sw + 0.02, 0.6, th + 2.0, kind === 'elf' ? '#e6dcc0' : stoneC)
+      s.quad([cx + ux * (u - sw / 2) + nx * v0, y + hA, cz + uz * (u - sw / 2) + nz * v0], [cx + ux * (u + sw / 2) + nx * v0, y + hA, cz + uz * (u + sw / 2) + nz * v0], [cx + ux * (u + sw / 2) + nx * v1, y + hA, cz + uz * (u + sw / 2) + nz * v1], [cx + ux * (u - sw / 2) + nx * v1, y + hA, cz + uz * (u - sw / 2) + nz * v1], '#2d2620')
+    }
+    if (kind === 'dwarf') {
+      bx(0, 0, Hs - 0.4, 2 * pw + 0.8, 0.9, th + 2.2, stoneC) // тяжёлая перемычка
+      if (detail >= 1) for (let q = -3; q <= 3; q++) bx(q * 0.62, th / 2 + 1.12, Hs + 0.9, 0.22, 0.5, 0.06, '#c9a24a') // золотые руны
+    }
+    // зубцы над проездом
+    if (kind !== 'elf') for (const f of [1, -1]) crenel(chunkAt(cx, cz), [cx - ux * pw + nx * (th / 2 + 0.7) * f, cz - uz * pw + nz * (th / 2 + 0.7) * f], [cx + ux * pw + nx * (th / 2 + 0.7) * f, cz + uz * pw + nz * (th / 2 + 0.7) * f], y + top, wc, 0.4)
+    else for (let q = -2; q <= 2; q++) s.cyl(cx + ux * q * 0.9, y + top, cz + uz * q * 0.9, 0.22, 1.5, 5, '#f0e8d0', 0.03)
+    // герб над аркой
+    const gh = Hs + rise + 0.55
+    bx(0, th / 2 + 0.88, gh, 1.1, Math.min(1.5, top - gh - 0.1), 0.08, kind === 'dark' ? '#2a1a2a' : kind === 'elf' ? '#3e7d5c' : '#8f2f2f')
+    // решётка поднята под свод — проезду не мешает
+    if (detail >= 1 && kind !== 'elf') {
+      const nq = Math.floor((pw - 0.3) / 0.55)
+      for (let q = -nq; q <= nq; q++) {
+        const u = q * 0.55, hA = Hs + rise * sh(Math.abs(u) / pw)
+        bx(u, 0, hA - 1.1, 0.12, 1.2, 0.12, '#2a2a2e')
+      }
+    }
+    // створки
+    const dc = kind === 'dwarf' ? '#3c4046' : kind === 'elf' ? '#c9b98a' : mixHex(st.timber, '#000', 0.25)
+    addGate(cx, cz, y, ux, uz, nx, nz, pw, th / 2 + 0.7, Hs - 0.2, dc, kind === 'elf' ? '#9a8a5a' : '#2a2c30', rd)
+  }
   let stairCount = 0
   wallLines.forEach((w, wi) => {
     const r = w.r
@@ -1820,8 +2129,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       if (len < 0.5) continue
       const ux = (b[0] - a[0]) / len, uz = (b[1] - a[1]) / len, nx = -uz, nz = ux
       // ворота на этом участке
-      const gates = gatesOn(a, b, len)
-      const spans = spansOf(gates, len)
+      const gates = gatesOn(a, b, len), wet = waterOn(a, b, len)
+      const spans = spansOf(gates, len, wet)
+      for (const [w0, w1] of wet) waterGate(a, ux, uz, w0, w1, th, wh, wallColor, false)
       for (const [s0, s1] of spans) {
         const L = s1 - s0, n = Math.max(1, Math.ceil(L / 7))
         for (let j = 0; j < n; j++) {
@@ -1872,18 +2182,14 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           }
         }
       }
-      // надвратные башни
-      for (const g0 of gates) {
-        const cx = a[0] + ux * g0, cz = a[1] + uz * g0, y = heightAt(cx, cz), ch = chunkAt(cx, cz), rot = Math.atan2(uz, ux)
-        for (const sd of [-1, 1]) {
-          const tx = cx + ux * sd * 4.2, tz = cz + uz * sd * 4.2
-          ch.solid.cyl(tx, y - 2, tz, towerR * 0.85, wh + 5, 10, wallColor)
-          for (let m = 0; m < 8; m++) { const q = (m / 8) * 6.283; ch.solid.box(tx + Math.cos(q) * towerR * 0.85, y + wh + 3, tz + Math.sin(q) * towerR * 0.85, 1, 1, 0.5, wallColor, q + 1.57) }
+      // надвратные башни со створками; «наружу» — от центра контура этой стены
+      if (gates.length) {
+        const wc = centerOf(r)
+        for (const g0 of gates) {
+          const cx = a[0] + ux * g0, cz = a[1] + uz * g0
+          const vs = (wc[0] - cx) * nx + (wc[1] - cz) * nz >= 0 ? -1 : 1
+          gatehouse(cx, cz, ux, uz, nx * vs, nz * vs, th, wh)
         }
-        // свод над проездом и герб над аркой
-        ch.solid.box(cx, y + wh - 2.2, cz, 8.4, 3.6, th + 1, mixHex(wallColor, '#000', 0.05), rot)
-        for (const sd of [1, -1]) crenel(ch, [cx - ux * 4.2 + nx * (th / 2 + 0.3) * sd, cz - uz * 4.2 + nz * (th / 2 + 0.3) * sd], [cx + ux * 4.2 + nx * (th / 2 + 0.3) * sd, cz + uz * 4.2 + nz * (th / 2 + 0.3) * sd], y + wh + 1.4, wallColor, 0.4)
-        ch.solid.box(cx + nx * (th / 2 + 0.56), y + wh - 1.2, cz + nz * (th / 2 + 0.56), 1.1, 1.5, 0.08, S.style === 'styria' ? '#2a1a2a' : '#8f2f2f', rot)
       }
       // угловая башня
       const ty = heightAt(a[0], a[1]), ch = chunkAt(a[0], a[1])
@@ -1911,6 +2217,74 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         }
       }
       for (const sd of [-1, 1]) ch.solid.box(cx - Math.sin(rot) * (w / 2) * sd, DECK + 0.7, cz + Math.cos(rot) * (w / 2) * sd, len, 0.1, 0.1, '#4a3522', rot)
+    }
+  })
+
+  // каменный мост арками (дерево — у северных стилей): настил с парапетами/перилами на уровне улицы, по нему ходят
+  const woodBridge = ['viking', 'norse', 'alpine', 'chea', 'gnome', 'elf'].includes(S.style)
+  bridgeList.forEach((B) => {
+    const { a, ux, uz, L, w } = B, px = -uz, pz = ux, rot = Math.atan2(uz, ux)
+    const P = (d: number, o: number, y: number): V3 => [a[0] + ux * d + px * o, y, a[1] + uz * d + pz * o]
+    const q2 = (ch: Chunk, p1: V3, p2: V3, p3: V3, p4: V3, col: string): void => { ch.solid.quad(p1, p2, p3, p4, col); ch.solid.quad(p4, p3, p2, p1, col) }
+    const n = Math.max(4, Math.ceil(L / 0.8)), ds = L / n, hw = w / 2
+    // ходьба: настил кусками (поверхность Climb линейна), ширина — между парапетами
+    const m = Math.max(4, Math.ceil(L / 2.5))
+    for (let i = 0; i < m; i++) {
+      const dA = (L * i) / m, dB = (L * (i + 1)) / m
+      climbs.push({ ax: a[0] + ux * dA, az: a[1] + uz * dA, bx: a[0] + ux * dB, bz: a[1] + uz * dB, w: w - 0.9, ya: deckY(B, dA), yb: deckY(B, dB) })
+    }
+    if (!woodBridge) {
+      const stone = st.stone, dark = mixHex(st.stone, '#000', 0.25), pave = st.pave, par = 0.45, parH = 0.85
+      // пролёты: арки над водой, между ними быки с волнорезами
+      const A = Math.max(0, B.d0 - 1.5), Z = Math.min(L, B.d1 + 1.5), na = Math.max(1, Math.round((Z - A) / 11)), span = (Z - A) / na, pt = 1.6
+      const bottom = (d: number): number => {
+        const g = heightAt(a[0] + ux * d, a[1] + uz * d)
+        if (d < A || d > Z) return Math.min(g - 0.6, deckY(B, d) - 0.4)
+        const k = Math.min(na - 1, Math.floor((d - A) / span)), s0 = A + k * span + (k ? pt / 2 : 0), s1 = A + (k + 1) * span - (k < na - 1 ? pt / 2 : 0)
+        if (d < s0 || d > s1) return -2.5
+        const mid = (s0 + s1) / 2, half = (s1 - s0) / 2, crown = Math.min(deckY(B, mid) - 0.7, -0.3 + half), f = (d - mid) / half
+        return -0.3 + (crown + 0.3) * Math.sqrt(Math.max(0, 1 - f * f))
+      }
+      for (let i = 0; i < n; i++) {
+        const dA = i * ds, dB = (i + 1) * ds, ch = chunkAt(a[0] + ux * dA, a[1] + uz * dA)
+        const yA = deckY(B, dA), yB = deckY(B, dB), bA = bottom(dA), bB = bottom(dB)
+        // настил-мостовая и свод снизу
+        q2(ch, P(dA, -hw + par, yA), P(dA, hw - par, yA), P(dB, hw - par, yB), P(dB, -hw + par, yB), i % 2 ? pave : mixHex(pave, '#000', 0.06))
+        q2(ch, P(dA, -hw, bA), P(dA, hw, bA), P(dB, hw, bB), P(dB, -hw, bB), dark)
+        for (const sg of [-1, 1]) {
+          // наружная стена от свода до верха парапета, внутренняя сторона парапета и его верх
+          q2(ch, P(dA, sg * hw, bA), P(dB, sg * hw, bB), P(dB, sg * hw, yB + parH), P(dA, sg * hw, yA + parH), stone)
+          q2(ch, P(dA, sg * (hw - par), yA), P(dB, sg * (hw - par), yB), P(dB, sg * (hw - par), yB + parH), P(dA, sg * (hw - par), yA + parH), stone)
+          q2(ch, P(dA, sg * (hw - par), yA + parH), P(dB, sg * (hw - par), yB + parH), P(dB, sg * hw, yB + parH + 0.06), P(dA, sg * hw, yA + parH + 0.06), mixHex(stone, '#fff', 0.12))
+        }
+      }
+      // торцы парапетов и быки с волнорезами
+      for (const d of [0.35, L - 0.35]) for (const sg of [-1, 1]) { const [x, , z] = P(d, sg * (hw - par / 2), 0); chunkAt(x, z).solid.box(x, deckY(B, d), z, 0.7, parH + 0.35, 0.7, stone, rot) }
+      for (let k = 1; k < na; k++) {
+        const d = A + k * span, [x, , z] = P(d, 0, 0), top = Math.max(0.6, bottom(d - pt / 2 - 0.4) + 0.2)
+        const ch = chunkAt(x, z)
+        ch.solid.box(x, -2.5, z, pt, top + 2.5, w + 0.3, stone, rot)
+        for (const sg of [-1, 1]) ch.solid.box(x + px * sg * (hw + 0.4), -2.5, z + pz * sg * (hw + 0.4), pt * 0.75, top + 1.9, pt * 0.75, dark, rot + Math.PI / 4)
+      }
+    } else {
+      const plank = '#6b4f33', dark = '#4a3522'
+      for (let i = 0; i < n; i++) {
+        const dA = i * ds, dB = (i + 1) * ds, ch = chunkAt(a[0] + ux * dA, a[1] + uz * dA), yA = deckY(B, dA), yB = deckY(B, dB)
+        q2(ch, P(dA, -hw, yA), P(dA, hw, yA), P(dB, hw, yB), P(dB, -hw, yB), i % 2 ? plank : mixHex(plank, '#000', 0.1))
+        for (const sg of [-1, 1]) {
+          q2(ch, P(dA, sg * hw, yA - 0.35), P(dB, sg * hw, yB - 0.35), P(dB, sg * hw, yB), P(dA, sg * hw, yA), dark)
+          q2(ch, P(dA, sg * (hw - 0.1), yA + 0.95), P(dB, sg * (hw - 0.1), yB + 0.95), P(dB, sg * (hw - 0.1), yB + 1.05), P(dA, sg * (hw - 0.1), yA + 1.05), dark)
+        }
+      }
+      for (let d = 0.2; d < L; d += 2) for (const sg of [-1, 1]) {
+        const [x, , z] = P(d, sg * (hw - 0.1), 0), y = deckY(B, d)
+        chunkAt(x, z).solid.box(x, y, z, 0.14, 1.05, 0.14, dark, rot)
+      }
+      // сваи: ряды поперёк реки через 4 м
+      for (let d = B.d0; d <= B.d1; d += 4) for (const o of [-hw + 0.3, 0, hw - 0.3]) {
+        const [x, , z] = P(d, o, 0)
+        chunkAt(x, z).solid.box(x, -3, z, 0.34, deckY(B, d) + 2.7, 0.34, dark, rot)
+      }
     }
   })
 
@@ -2457,7 +2831,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   scene.add(clouds)
 
   // ---------- люди ----------
-  const life = createLife({ scene, streets, heightAt, gridAt, doors, pois, gates: gatePts, vendors, center, radius, size: [W, H], style: S.style, buildings: N, mobile: opts.mobile, rnd: R, dot, population, state: opts.state, culture: opts.culture, gov: opts.gov })
+  const life = createLife({ scene, streets, heightAt: (x: number, z: number) => bridgeAt(x, z) ?? heightAt(x, z), gridAt, doors, pois, gates: gatePts, vendors, center, radius, size: [W, H], style: S.style, buildings: N, mobile: opts.mobile, rnd: R, dot, population, state: opts.state, culture: opts.culture, gov: opts.gov })
   let marksOn = false
 
   // ---------- дым из труб ----------
@@ -2515,6 +2889,23 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   }
   setPlaces(opts.places)
   scene.add(labels)
+  // подписи не налезают друг на друга: ближняя к камере остаётся, задетая ею прячется
+  let labelCheck = 0
+  const tmpLbl = new THREE.Vector3()
+  const declutter = (cam: THREE.Camera): void => {
+    const pc = cam as THREE.PerspectiveCamera
+    const tf = pc.isPerspectiveCamera ? Math.tan((pc.fov * Math.PI) / 360) : 1, asp = pc.isPerspectiveCamera ? pc.aspect : 1
+    const list = [...labelCache.values()].map((v) => ({ sp: v.sp, d: v.sp.position.distanceToSquared(cam.position) })).sort((m, n) => m.d - n.d)
+    const shown: [number, number, number, number][] = []
+    for (const { sp } of list) {
+      tmpLbl.copy(sp.position).project(cam)
+      if (tmpLbl.z > 1) { sp.visible = false; continue }
+      const hw = (0.5 * sp.scale.x) / tf / asp + 0.01, hh = (0.5 * sp.scale.y) / tf + 0.008
+      const box: [number, number, number, number] = [tmpLbl.x - hw, tmpLbl.y - hh, tmpLbl.x + hw, tmpLbl.y + hh]
+      sp.visible = !shown.some((o) => box[0] < o[2] && box[2] > o[0] && box[1] < o[3] && box[3] > o[1])
+      if (sp.visible) shown.push(box)
+    }
+  }
   let nightNow = 0
 
   // подсветка здания: полупрозрачная оболочка по контуру, как рамка на плане
@@ -2877,6 +3268,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     }
     sky.position.copy(cam.position)
     stars.position.copy(cam.position)
+    labelCheck -= dt
+    if (labels.visible && labelCheck <= 0) { labelCheck = 0.15; declutter(cam) }
     const camH = cam.position.y - heightAt(cam.position.x, cam.position.z)
     // огни переставляем к ближайшим фонарям раз в полсекунды и только ночью
     lampCheck -= dt
@@ -2905,6 +3298,17 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     tmpFocus.set(cam.position.x, 0, cam.position.z)
     if (camH > 12) { cam.getWorldDirection(tmpDir); if (tmpDir.y < -0.05) { const f = camH / -tmpDir.y; tmpFocus.set(cam.position.x + tmpDir.x * f, 0, cam.position.z + tmpDir.z * f) } }
     life.tick(dt, t, nightNow, tmpFocus, boost)
+    // ворота: днём открыты, ночью закрыты, но открываются, когда к ним подходишь; тап — ручной выбор, пока не уйдёшь
+    for (const g of gateList) {
+      const dh = Math.hypot(cam.position.x - g.x, cam.position.z - g.z)
+      if (g.manual !== null && dh > 60) g.manual = null
+      const auto = nightNow < 0.5 || (dh < 20 && camH < 30)
+      g.target = (g.manual ?? auto) ? 1 : 0
+      if (g.open === g.target) continue
+      g.open = g.target > g.open ? Math.min(g.target, g.open + dt / 1.5) : Math.max(g.target, g.open - dt / 1.5)
+      const e = g.open * g.open * (3 - 2 * g.open)
+      for (const lf of g.leaves) lf.mesh.rotation.y = lf.a0 + (lf.a1 - lf.a0) * e
+    }
     upgradeNear(cam, dt)
     for (let i = 0; i < smokeSrc.length; i++) {
       const [sx, sy, sz] = smokeSrc[i]
@@ -2943,9 +3347,9 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     walkable: (x, z) => {
       if (kranz) { const r = Math.hypot(x - center[0], z - center[1]); if (r < R0 * 1.08 || r > RP - 2) return false }
       const v = gridAt(x, z)
-      return v === 0 || v === -3
+      return (v === 0 || v === -3) && !gateShut(x, z)
     },
-    deckAt: (x, z) => (gridAt(x, z) === -3 ? DECK : null),
+    deckAt: (x, z) => bridgeAt(x, z) ?? (gridAt(x, z) === -3 ? DECK : null),
     // высота пола под ногами, стоящими на высоте y: лестницы, пандусы и верх стен (шаг вверх ≤ 0.8 м), иначе земля/настил; null — не пройти
     floorAt: (x, z, y) => {
       let best: number | null = null
@@ -2956,8 +3360,8 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       if (best !== null) return best
       if (kranz) { const r = Math.hypot(x - center[0], z - center[1]); if (r < R0 * 1.08 || r > RP - 2) return null }
       const v = gridAt(x, z)
-      if (v !== 0 && v !== -3) return null
-      return Math.max(heightAt(x, z), v === -3 ? DECK : -99)
+      if ((v !== 0 && v !== -3) || gateShut(x, z)) return null
+      return Math.max(heightAt(x, z), v === -3 ? bridgeAt(x, z) ?? DECK : -99)
     },
     pick,
     buildingTop: (i) => { const m = monAt.get(i); if (m) return [m.x, tops[i], m.z]; const b = blds[i]; if (!b) return null; const c = centerOf(b.r); return [c[0], tops[i], c[1]] },
@@ -2999,6 +3403,21 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       }
       return life.pick(o, d, tMax)
     },
+    toggleGate: (o, d) => {
+      // луч до земли; попадание — в объём проезда ворот
+      for (let q = 0.5; q < 400; q += 0.5) {
+        const x = o.x + d.x * q, y = o.y + d.y * q, z = o.z + d.z * q
+        if (y < heightAt(x, z) - 0.3) break
+        for (const g of gateList) {
+          const dx = x - g.x, dz = z - g.z
+          if (Math.abs(dx * g.ux + dz * g.uz) < g.pw + 1 && Math.abs(dx * g.nx + dz * g.nz) < g.hv + 2 && y > g.y - 1 && y < g.y + g.h + 2) {
+            g.manual = !(g.target > 0.5)
+            return true
+          }
+        }
+      }
+      return false
+    },
     speak: life.speak,
     census: life.census,
     takeDirty: () => { const d = dirty; dirty = false; return d },
@@ -3007,6 +3426,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
       life.dispose()
       for (const h of cells.values()) for (const m of h.meshes) m.geometry.dispose()
       disposable.forEach((d) => d.dispose())
+      gateGeos.forEach((g) => g.dispose())
     }
   }
 }

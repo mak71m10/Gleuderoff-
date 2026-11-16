@@ -10,6 +10,22 @@
 //   citadel (в цитадели), temple (храм — особое здание), water (у воды), river (у реки), gate (у ворот),
 //   edge (на окраине), center (в центре), big (самое большое оставшееся)
 
+// города, которые строятся общим генератором city-organic.mjs (docs/мастерская/8-как-строить-города.md).
+// grow: type river|road|port, houses, outside, axis (градусы, y вниз: река вдоль axis, у порта море со стороны axis+90), roads, water
+export const ORGANIC = {
+  kulagbryug: { type: 'river', houses: 520, outside: 0.35, axis: 30, roads: 4, water: 22 },
+  heiddalen: { type: 'port', houses: 220, outside: 0.3, axis: 60, roads: 3 },
+  albanana: { type: 'port', houses: 130, outside: 0.3, axis: 168, roads: 2 },
+  tingvell: { type: 'road', houses: 380, outside: 0.3, axis: 15, roads: 4 },
+  aurhafen: { type: 'port', houses: 2000, outside: 0.35, axis: 290, roads: 3, stretch: 1.6 },
+  norershtadt: { type: 'river', houses: 1200, outside: 0.3, axis: 135, roads: 3, water: 20, seed: 5 },
+  landveiler: { type: 'hill', houses: 800, outside: 0.3, axis: 100, roads: 3 },
+  lauenvald: { type: 'port', houses: 440, outside: 0.3, axis: 125, roads: 2 },
+  mitmyunde: { type: 'castle', houses: 180, outside: 0.3, axis: 85, roads: 2, seed: 2 },
+  ulghaim: { type: 'port', houses: 240, outside: 0.2, axis: 350, roads: 2 },
+  kogalym: { type: 'road', houses: 1200, outside: 0.3, axis: 170, roads: 2, stretch: 1.8 }
+}
+
 export const CITY_MAPS = [
   {
     slug: 'tirrit', name: 'Тиррит', province: 'Тиррит', place: 'lore-rp-capital', forest: 0.15, citadelName: 'Губернаторский холм',
@@ -52,8 +68,9 @@ export const CITY_MAPS = [
     ]
   },
   {
-    slug: 'erin', name: 'Эринберг', province: 'Эринберг', forest: 0.1, hills: true, citadelName: 'Летний двор',
-    gen: { size: 12, walls: 0, citadel: 1, plaza: 1, temple: 1, river: 0, coast: 0, shantytown: 0, greens: 1 },
+    slug: 'erin', name: 'Эринберг', province: 'Эринберг', forest: 0.1, hills: true, citadelName: 'Летний двор', custom: 'city-organic.mjs',
+    grow: { type: 'river', houses: 350, outside: 0.35, axis: 20, roads: 4, water: 18 },
+    gen: { size: 12, walls: 1, citadel: 1, plaza: 1, temple: 1, river: 0, coast: 0, shantytown: 0, greens: 1 },
     districts: ['Виноградная гора', 'Подворье Тирнау', 'Нижние погреба', 'Летний склон'],
     landmarks: [
       ['Летний двор императоров', 'treasury', 'citadel', 'Над городом — Летний двор, «закрытый на ремонт» с 979 г.; у ворот стоит рота ЧК. Под ним — сокровищница императоров.'],

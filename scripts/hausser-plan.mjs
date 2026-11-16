@@ -4,6 +4,9 @@
 // Генератор Watabou такую планировку не строит, поэтому план собирается здесь — в том же формате, что и его
 // выгрузка (FeatureCollection, ось y вверх), и дальше рисуется общим кодом scripts/city-maps.mjs.
 // У каждого дистрикта свой узор улиц (сетка, кольца, лабиринт) и свой цвет крыш, как на эскизе.
+// За стеной у каждых ворот — предместье вдоль тракта (около трети домов: столица переросла свою стену).
+// Примечательные здания стоят там, где их ставит этот план (фича landmarks), а не по правилам lore/cities.mjs:
+// так они разнесены по городу не ближе 12% ширины плана (правило П8 scripts/city-check.mjs).
 
 const rnd = (seed) => () => ((seed = (Math.imul(seed ^ (seed >>> 15), 2246822507) + 0x9e3779b9) >>> 0), seed / 4294967296)
 const deg = Math.PI / 180
@@ -15,12 +18,15 @@ const segDist = ([px, py], [ax, ay], [bx, by]) => {
   return Math.hypot(px - ax - t * dx, py - ay - t * dy)
 }
 const edgeDist = (p, poly) => Math.min(...poly.map((a, i) => segDist(p, a, poly[(i + 1) % poly.length])))
+const lineDist = (p, line) => Math.min(...line.slice(1).map((b, i) => segDist(p, line[i], b)))
 const circle = (cx, cy, r, n = 24, a0 = 0) => Array.from({ length: n }, (_, i) => [cx + r * Math.cos(a0 + (i / n) * 2 * Math.PI), cy + r * Math.sin(a0 + (i / n) * 2 * Math.PI)])
 const ring = (pts) => [...pts, pts[0]]
 
 const R = 1000 // внешняя стена
-const RA = 250 // стена Альфы
+const RA = 570 // стена Альфы
 const SPAN = 34 // полуширина дистрикта, градусы (между ними — бульвары)
+const RL = 880 // кольцо, на котором стоят примечательные здания дистриктов
+const SUB = 250 // глубина предместий за стеной
 
 /** Узоры улиц: отображение «координаты кварталов» (u, v) → точка плана */
 const grid = (o, ang, warp = 0, seed = 1) => {
@@ -42,9 +48,11 @@ export default function buildHausser(c) {
   const greens = []
   const fields = []
   const roads = []
+  const marks = [] // [имя, индекс в prisms]
 
   // ---- дистрикты: пятиугольники между бульварами ----
-  const sectorPoly = (a) => [polar(RA + 18, (a - SPAN + 3) * deg), polar(R * 0.9, (a - SPAN) * deg), polar(R * 0.975, a * deg), polar(R * 0.9, (a + SPAN) * deg), polar(RA + 18, (a + SPAN - 3) * deg)]
+  // внутренний край — дуга за стеной Альфы (хорда между двумя точками срезала бы угол Альфы)
+  const sectorPoly = (a) => [polar(R * 0.9, (a - SPAN) * deg), polar(R * 0.975, a * deg), polar(R * 0.9, (a + SPAN) * deg), ...Array.from({ length: 9 }, (_, i) => polar(RA + 22, (a + SPAN - 3 - (i * (2 * SPAN - 6)) / 8) * deg))]
   const alpha = circle(0, 0, RA, 8, 22.5 * deg)
   const D = [
     { ru: 'Омега', a: -90, roof: ['#6f7a5c', '#7a8566', '#65704f', '#808b6c'], fill: '#c8c9ac' },
@@ -53,10 +61,49 @@ export default function buildHausser(c) {
     { ru: 'Бета', a: 126, roof: ['#9a4a3c', '#a85646', '#8e4235', '#b0604e'], fill: '#dcc8b4' },
     { ru: 'Браво', a: 198, roof: ['#6b4a35', '#7a5640', '#5f412e', '#86624a'], fill: '#d2c3a8' }
   ].map((d) => ({ ...d, poly: sectorPoly(d.a) }))
+  const at = (d, r, da = 0) => polar(r, (d.a + da) * deg)
+
+  // ---- бульвары между дистриктами: от площади у замка через ворота Альфы и городские ворота в тракт ----
+  // внешняя стена повёрнута на полшага башен, чтобы ворота приходились на середину пролёта, а не на башню
+  const gates = D.map((d) => (d.a + 36) * deg)
+  const boulevards = gates.map((a) => [polar(RA - 60, a), polar(R + SUB + 140, a)])
+  for (const b of boulevards) roads.push({ type: 'LineString', width: 12, coordinates: b })
+  const nearRoad = (p, pad) => boulevards.some((b) => segDist(p, b[0], b[1]) < 6 + pad) || roads.slice(5).some((q) => lineDist(p, q.coordinates) < q.width / 2 + pad)
+
+  // ---- примечательные здания: заранее, чтобы кварталы обходили их место ----
+  const blob = (x, y, w, h, ang) => {
+    const pts = [[-w, -h], [w * 0.2, -h], [w * 0.2, -h * 0.55], [w, -h * 0.55], [w, h], [-w * 0.3, h], [-w * 0.3, h * 0.5], [-w, h * 0.5]]
+    return pts.map(([u, v]) => [x + u * Math.cos(ang) - v * Math.sin(ang), y + u * Math.sin(ang) + v * Math.cos(ang)])
+  }
+  const keepOut = [] // [x, y, радиус] — сюда кварталы не заходят (место под здание и проход вокруг)
+  const special = (name, shape, clear) => {
+    const cx = shape.reduce((s, p) => s + p[0], 0) / shape.length, cy = shape.reduce((s, p) => s + p[1], 0) / shape.length
+    keepOut.push([cx, cy, clear])
+    if (name) marks.push([name, prisms.length])
+    prisms.push(shape)
+  }
+  // Альфа: замок Монстаргов в середине, амфитеатр и казармы стражи по краям дистрикта
+  const castle = [[-70, -40], [-30, -40], [-30, -78], [30, -78], [30, -40], [70, -40], [70, 40], [30, 40], [30, 78], [-30, 78], [-30, 40], [-70, 40]].map(([x, y]) => [x * 0.95, y * 0.95])
+  special('Замок Монстаргов', castle, 125)
+  special('Амфитеатр Альфы', circle(...polar(472, 198 * deg), 40, 24), 70)
+  special('Казармы Императорских стражей', blob(...polar(472, -90 * deg), 40, 28, 0), 62)
+  // Дельта: замок Верховного совета прямо у стены Альфы — «Дистрикт Власти»
+  const [om, ma, de, be, br] = D
+  const big = (name, d, r, da, w, h) => special(name, blob(...at(d, r, da), w, h, (d.a + da + 90) * deg), Math.hypot(w, h) + 20)
+  big('Замок Верховного совета', de, RA + 70, -14, 50, 36)
+  big('Министерства', de, RL, 16, 42, 30)
+  big('Городская библиотека', ma, RL, -16, 38, 30)
+  big('Управа городской стражи', ma, RL, 16, 40, 32)
+  big('Верховная ставка', be, RL, -14, 44, 34)
+  big('Военная академия', be, RL, 18, 40, 30)
+  big('Дом Сообщества рабочих', br, RL, -20, 40, 30)
+  big('Большие цеха', br, RL, 20, 46, 26)
+  big('Крысиный двор', om, RL, 20, 34, 28)
+  const free = (p) => !keepOut.some(([x, y, r]) => Math.hypot(p[0] - x, p[1] - y) < r)
 
   /** Кварталы по узору: обходит клетки (u, v), застраивает их, оставляет здания внутри многоугольника и вне «дыр» */
-  const fill = ({ map, poly, us, vs, ur, vr, street, mode, depth = 12, lot = [8, 14], holes = [], keep = 1, margin = 8 }) => {
-    const ok = (pts) => pts.every((p) => inside(p, poly) && edgeDist(p, poly) > margin && !holes.some(([hx, hy, hr]) => Math.hypot(p[0] - hx, p[1] - hy) < hr + 4))
+  const fill = ({ map, poly, us, vs, ur, vr, street, mode, depth = 12, lot = [8, 14], holes = [], keep = 1, margin = 8, gap = 2.2, bad = () => false }) => {
+    const ok = (pts) => pts.every((p) => inside(p, poly) && edgeDist(p, poly) > margin && free(p) && !bad(p) && !nearRoad(p, 3) && !holes.some(([hx, hy, hr]) => Math.hypot(p[0] - hx, p[1] - hy) < hr + 4))
     const quad = (u0, v0, u1, v1) => {
       // длинные стороны — с промежуточными точками, чтобы на кольцах дома изгибались вместе с улицей
       const n = Math.max(1, Math.round(Math.max(u1 - u0, v1 - v0) / 18))
@@ -69,19 +116,17 @@ export default function buildHausser(c) {
     }
     const put = (q, into = buildings) => ok(q) && rand() < keep && into.push(q)
     for (let u = ur[0]; u < ur[1]; u += us)
-      for (let v = vr[0]; v < vr[1]; v += vs) {
+      for (let v = vr[0]; v + vs <= vr[1] + 1; v += vs) {
         const u0 = u + street, u1 = u + us - street, v0 = v + street, v1 = v + vs - street
         if (mode === 'dense') {
-          // трущобы: весь квартал нарезан на мелкие хибары, кое-где проходы
-          for (let a = u0; a < u1 - 4; ) {
-            const da = Math.min(between(...lot), u1 - a)
+          // трущобы: узкий квартал в две хибары глубиной, каждая выходит в проулок
+          const m = (u0 + u1) / 2 + between(-2, 2)
+          for (const [a0, a1] of [[u0, m - 1.1], [m + 1.1, u1]])
             for (let b = v0; b < v1 - 4; ) {
               const db = Math.min(between(...lot), v1 - b)
-              if (rand() < 0.88) put(quad(a + 0.6, b + 0.6, a + da - 0.6, b + db - 0.6))
+              if (rand() < 0.9) put(quad(a0, b + 1.1, a1, b + db - 1.1))
               b += db
             }
-            a += da
-          }
         } else if (mode === 'villa') {
           // особняк посреди сада
           const gu = (u1 - u0) * 0.14, gv = (v1 - v0) * 0.14
@@ -96,96 +141,71 @@ export default function buildHausser(c) {
           // обычный квартал: дома по периметру, внутри дворы
           const d = Math.min(depth, (u1 - u0) / 2 - 1, (v1 - v0) / 2 - 1)
           for (const [s0, s1, side] of [[u0, u1, 0], [u0, u1, 1]])
-            for (let a = s0; a < s1 - 3; ) {
+            for (let a = s0; a < s1 - gap - 2; ) {
               const w = Math.min(between(...lot), s1 - a)
-              put(side ? quad(a, v1 - d, a + w - 1, v1) : quad(a, v0, a + w - 1, v0 + d))
+              put(side ? quad(a, v1 - d, a + w - gap, v1) : quad(a, v0, a + w - gap, v0 + d))
               a += w
             }
           for (const side of [0, 1])
-            for (let b = v0 + d + 1; b < v1 - d - 3; ) {
-              const w = Math.min(between(...lot), v1 - d - 1 - b)
-              put(side ? quad(u1 - d, b, u1, b + w - 1) : quad(u0, b, u0 + d, b + w - 1))
+            for (let b = v0 + d + gap; b < v1 - d - gap - 2; ) {
+              const w = Math.min(between(...lot), v1 - d - gap - b)
+              put(side ? quad(u1 - d, b, u1, b + w - gap) : quad(u0, b, u0 + d, b + w - gap))
               b += w
             }
         }
       }
   }
-  const at = (d, r, da = 0) => polar(r, (d.a + da) * deg)
 
-  // Омега — лабиринт трущоб: кривая сетка мелких кварталов
-  const [om, ma, de, be, br] = D
-  fill({ map: grid(at(om, 600), om.a * deg + 0.4, 9, 3), poly: om.poly, us: 28, vs: 24, ur: [-480, 480], vr: [-480, 480], street: 2.4, mode: 'dense', lot: [5, 8] })
+  // Омега — лабиринт трущоб: кривая сетка узких кварталов
+  fill({ map: grid(at(om, 760), om.a * deg + 0.4, 9, 3), poly: om.poly, us: 26, vs: 34, ur: [-480, 480], vr: [-480, 480], street: 2.6, mode: 'dense', lot: [8, 12], keep: 0.68 })
   // Матра — кольца вокруг своего центра, круглые площади на перекрёстках
-  const maC = at(ma, 600)
-  const maHoles = [[...maC, 34], [...at(ma, 470, -16), 24], [...at(ma, 720, 14), 26], [...at(ma, 430, 20), 20]]
-  fill({ map: rings(maC, 200), poly: ma.poly, us: 44, vs: 42, ur: [70, 470], vr: [0, 1257], street: 4, mode: 'block', depth: 11, lot: [7, 12], holes: maHoles })
+  const maC = at(ma, 740)
+  const maHoles = [[...maC, 34], [...at(ma, 610, -14), 24], [...at(ma, 620, 15), 22]]
+  fill({ map: rings(maC, 200), poly: ma.poly, us: 46, vs: 44, ur: [100, 470], vr: [0, 1257], street: 4, mode: 'block', depth: 11, lot: [10, 16], gap: 4.5, holes: maHoles })
   maHoles.forEach(([x, y, r]) => squares.push(circle(x, y, r, 20)))
   // Дельта — широкие кольца и лучи, особняки в садах, большая круглая площадь
-  const deC = at(de, 610)
-  const deHoles = [[...deC, 48], [...at(de, 330, 0), 70]]
-  fill({ map: rings(deC, 260), poly: de.poly, us: 52, vs: 60, ur: [70, 520], vr: [0, 1634], street: 6, mode: 'villa', holes: deHoles })
+  const deC = at(de, 750, 0)
+  fill({ map: rings(deC, 260), poly: de.poly, us: 52, vs: 60, ur: [70, 520], vr: [0, 1634], street: 6, mode: 'villa', holes: [[...deC, 48]] })
   squares.push(circle(...deC, 48, 28))
   // Бета — прямая сетка казарм и плац
-  const beO = at(be, 560)
-  const beHoles = [[...beO, 60]]
-  fill({ map: grid(beO, be.a * deg, 0, 7), poly: be.poly, us: 58, vs: 40, ur: [-450, 450], vr: [-450, 450], street: 5, mode: 'block', depth: 13, lot: [16, 30], holes: beHoles })
+  const beO = at(be, 720)
+  fill({ map: grid(beO, be.a * deg, 0, 7), poly: be.poly, us: 58, vs: 40, ur: [-450, 450], vr: [-450, 450], street: 5, mode: 'block', depth: 13, lot: [16, 30], holes: [[...beO, 76]] })
   squares.push([[-56, -46], [56, -46], [56, 46], [-56, 46]].map(([u, v]) => grid(beO, be.a * deg)(u, v)))
   // Браво — дуги вокруг центра города, большие цеха
   fill({ map: rings([0, 0], 500), poly: br.poly, us: 44, vs: 50, ur: [RA, R], vr: [(br.a - 40) * deg * 500, (br.a + 40) * deg * 500], street: 5, mode: 'hall' })
-
-  // особые здания (тёмные на эскизе): по 3 на дистрикт + замок Верховного совета у Альфы
-  const blob = (x, y, w, h, ang) => {
-    const pts = [[-w, -h], [w * 0.2, -h], [w * 0.2, -h * 0.55], [w, -h * 0.55], [w, h], [-w * 0.3, h], [-w * 0.3, h * 0.5], [-w, h * 0.5]]
-    return pts.map(([u, v]) => [x + u * Math.cos(ang) - v * Math.sin(ang), y + u * Math.sin(ang) + v * Math.cos(ang)])
-  }
-  const clearFor = (shape, pad = 6) => {
-    for (const list of [buildings, greens]) for (let i = list.length - 1; i >= 0; i--) if (list[i].some((p) => inside(p, shape) || edgeDist(p, shape) < pad) || shape.some((p) => inside(p, list[i]))) list.splice(i, 1)
-  }
-  const special = (shape) => { clearFor(shape); prisms.push(shape) }
-  special(blob(...at(de, RA + 70, 0), 46, 34, (de.a + 90) * deg)) // замок Верховного совета — «Дистрикт Власти»
-  const extra = { Омега: [[480, -14], [690, 10], [380, 18]], Матра: [[350, -22], [560, 22], [800, -6]], Дельта: [[480, -24], [520, 24], [760, 6]], Бета: [[400, 18], [690, -14], [430, -20]], Браво: [[420, -16], [650, 16], [780, -4]] }
-  for (const d of D) for (const [r, da] of extra[d.ru]) special(blob(...at(d, r, da), between(22, 32), between(16, 24), between(0, Math.PI)))
-
-  // ---- Альфа: замок Монстаргов, амфитеатр, кольцо дворцов ----
-  const castle = [[-70, -40], [-30, -40], [-30, -78], [30, -78], [30, -40], [70, -40], [70, 40], [30, 40], [30, 78], [-30, 78], [-30, 40], [-70, 40]].map(([x, y]) => [x * 0.95, y * 0.95])
-  prisms.push(castle)
-  prisms.push(circle(-120, 120, 38, 20)) // амфитеатр
-  fill({ map: rings([0, 0], 200), poly: alpha, us: 46, vs: 52, ur: [118, 236], vr: [0, 1257], street: 5, mode: 'block', depth: 12, lot: [12, 20], holes: [[0, 0, 110], [-120, 120, 44]] })
+  // Альфа — кольцо дворцов вокруг сада замка
   greens.push(circle(0, 0, 104, 32))
-
-  // ---- предместья внутри стены: редкие дома и сады между дистриктами ----
-  const sub = []
-  for (let i = 0; i < 4000; i++) {
-    const a = rand() * 2 * Math.PI, r = Math.sqrt(between(0.3, 0.92)) * R
-    const p = polar(r, a)
-    if (r < RA + 30 || D.some((d) => inside(p, d.poly) || edgeDist(p, d.poly) < 14)) continue
-    if (sub.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 12)) continue
-    sub.push(p)
-    const s = between(4, 7)
-    buildings.push(blob(p[0], p[1], s, s * 0.8, a).slice(0, 8))
-  }
+  fill({ map: rings([0, 0], 200), poly: alpha, us: 50, vs: 56, ur: [150, RA], vr: [0, 1257], street: 6, mode: 'block', depth: 14, lot: [22, 34], margin: 12, keep: 0.7, gap: 3.5 })
   for (const d of D) for (const side of [-1, 1]) {
     const g = circle(...polar(R * 0.9, (d.a + side * 40) * deg), between(30, 44), 16)
-    clearFor(g, 2)
-    greens.push(g)
+    if (!boulevards.some((b) => g.some((p) => segDist(p, b[0], b[1]) < 10))) greens.push(g)
   }
 
-  // ---- бульвары между дистриктами, ворота, дороги за стеной, поля ----
-  for (const d of D) {
-    const a = (d.a + 36) * deg
-    roads.push({ type: 'LineString', width: 12, coordinates: [polar(RA + 6, a), polar(R + 2, a), polar(R * 1.7, a + 0.05)] })
-  }
+  // ---- предместья за стеной: вдоль каждого тракта, с поперечными улочками ----
+  const subs = []
+  gates.forEach((a, k) => {
+    const map = grid([0, 0], a, 0, 11 + k)
+    const tr = (u, v) => map(u, v)
+    // клин вдоль тракта: у стены шире, дальше сужается в одну улицу
+    const shape = [[R + 26, -175], [R + SUB * 0.55, -165], [R + SUB, -95], [R + SUB + 110, -40], [R + SUB + 110, 40], [R + SUB, 95], [R + SUB * 0.55, 165], [R + 26, 175]].map(([u, v]) => tr(u, v))
+    subs.push(shape)
+    for (const u of [R + 70, R + 160]) roads.push({ type: 'LineString', width: 6, coordinates: [tr(u, -150 + 40 * (u - R) / 100), tr(u, 150 - 40 * (u - R) / 100)] })
+    fill({ map, poly: shape, us: 45, vs: 38, ur: [R + 25, R + SUB + 120], vr: [-190, 190], street: 4.5, mode: 'block', depth: 10, lot: [7, 12], margin: 4, bad: (p) => Math.hypot(...p) < R + 24 })
+  })
+
+  // ---- поля за предместьями ----
   for (let k = 0; k < 5; k++)
     for (let r = R + 60; r < R * 1.6; r += between(70, 110)) {
-      const a0 = (D[k].a + 36) * deg + 0.03, a1 = (D[(k + 1) % 5].a + 36) * deg - 0.03
+      const a0 = gates[k] + 0.03, a1 = gates[(k + 1) % 5] + (k === 4 ? 2 * Math.PI : 0) - 0.03
       for (let a = a0; a < a1 - 0.02; ) {
         const da = Math.min(between(0.06, 0.13), a1 - a), dr = between(55, 95)
-        if (rand() < 0.7) fields.push([polar(r, a), polar(r + dr, a), polar(r + dr, a + da), polar(r, a + da)])
+        const f = [polar(r, a), polar(r + dr, a), polar(r + dr, a + da), polar(r, a + da)]
+        if (rand() < 0.7 && !subs.some((s) => f.some((p) => inside(p, s) || edgeDist(p, s) < 20))) fields.push(f)
         a += da + 0.012
       }
     }
 
-  const wallOuter = circle(0, 0, R, 40)
+  const wallOuter = circle(0, 0, R, 40, 4.5 * deg)
   const flip = (r) => r.map(([x, y]) => [+x.toFixed(2), +(-y).toFixed(2)])
   const poly = (list) => list.map((r) => [ring(flip(r))])
   const E = 1900
@@ -204,6 +224,8 @@ export default function buildHausser(c) {
       { type: 'MultiPolygon', id: 'greens', coordinates: poly(greens) },
       { type: 'MultiPolygon', id: 'fields', coordinates: poly(fields) },
       { type: 'MultiPoint', id: 'trees', coordinates: [] },
+      // какое здание под какое примечательное место: индекс в общем списке [...buildings, ...prisms]
+      { type: 'Feature', id: 'landmarks', items: marks.map(([name, i]) => ({ name, b: buildings.length + i })) },
       {
         type: 'GeometryCollection', id: 'districts',
         geometries: [...D.map((d) => ({ type: 'Polygon', name: d.ru, ru: d.ru, roof: d.roof, fill: d.fill, coordinates: [ring(flip(d.poly))] })),

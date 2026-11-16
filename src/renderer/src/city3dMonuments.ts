@@ -335,15 +335,48 @@ export function buildMonument(kind: MonKind, P: Parts, x: number, z: number, rot
       return base + h + 4.4 + w * 1.2
     }
     case 'darktower': {
-      // глухая башня без окон: только узкая щель наверху
-      const w = Math.min(L, W) * 0.82, h = 30
-      box(0, 0, -2, w, h + 2, w, st.dark)
-      box(0, 0, h, w + 1.2, 1.2, w + 1.2, st.dark)
-      merlons(0, 0, h + 1.2, w + 1, w + 1, st.dark)
-      for (const a of [-1, 1]) for (const b of [-1, 1]) box((a * w) / 2, (b * w) / 2, 0, 1.5, h - 2, 1.5, st.stone)
-      glow(0, w / 2 + 0.05, h - 4, w * 0.6, 0.28, 0.14)
-      box(0, w / 2 + 0.05, 0, 2.6, 3.6, 0.14, '#111')
-      return base + h + 3
+      // суровая каменная башня-палата: три уступа, ряды узких окон (горят немногие), карниз с зубцами и шатёр
+      const w = Math.min(L, W) * 0.82, h1 = 9, h2 = 16, h3 = 22
+      const w2 = w * 0.84, w3 = w * 0.66
+      const cornice = st.stone
+      box(0, 0, -2, w + 1.4, 3.2, w + 1.4, st.stone) // цоколь
+      box(0, 0, -2, w, h1 + 2, w, st.wall)
+      box(0, 0, h1, w + 0.6, 0.6, w + 0.6, cornice)
+      box(0, 0, h1, w2, h2 - h1, w2, st.wall)
+      box(0, 0, h2, w2 + 0.6, 0.6, w2 + 0.6, cornice)
+      box(0, 0, h2, w3, h3 - h2, w3, st.wall)
+      // контрфорсы по углам нижнего яруса
+      for (const a of [-1, 1]) for (const b of [-1, 1]) box((a * w) / 2, (b * w) / 2, -1, 1.6, h1, 1.6, st.stone)
+      // окна: узкие, тёмное стекло; светятся лишь некоторые
+      const win = (u: number, v: number, y: number, hh: number, alongU: boolean, lit: boolean): void => {
+        if (lit) glow(u, v, y, alongU ? 0.7 : 0.12, hh, alongU ? 0.12 : 0.7)
+        else box(u, v, y, alongU ? 0.7 : 0.12, hh, alongU ? 0.12 : 0.7, '#2b333b')
+        box(u, v, y - 0.25, alongU ? 1.1 : 0.3, 0.25, alongU ? 0.3 : 1.1, cornice) // подоконник
+      }
+      let k = 0
+      const ring = (half: number, y: number, hh: number, n: number): void => {
+        for (let i = 0; i < n; i++) {
+          const t = -half + ((i + 0.5) * 2 * half) / n
+          for (const sd of [-1, 1]) {
+            win(t, sd * (half + 0.06), y, hh, true, k++ % 5 === 1)
+            win(sd * (half + 0.06), t, y, hh, false, k++ % 7 === 3)
+          }
+        }
+      }
+      ring(w / 2, 4.6, 2.2, Math.max(3, Math.round(w / 3.4)))
+      ring(w2 / 2, h1 + 2.2, 2.4, Math.max(3, Math.round(w2 / 3.4)))
+      ring(w3 / 2, h2 + 2, 2.2, Math.max(2, Math.round(w3 / 3.2)))
+      // карниз с зубцами на верхнем ярусе и шатёр за ними
+      box(0, 0, h3, w3 + 1, 0.7, w3 + 1, cornice)
+      merlons(0, 0, h3 + 0.7, w3 + 0.8, w3 + 0.8, st.wall)
+      cyl(0, 0, h3 + 0.7, w3 * 0.6, w3 * 0.95, 4, st.roof, 0, false)
+      box(0, 0, h3 + 0.7 + w3 * 0.95, 0.16, 2.2, 0.16, '#2a2420')
+      // на нижнем уступе — зубцы по краю
+      merlons(0, 0, h1 + 0.6, w - 0.2, w - 0.2, st.wall)
+      // тяжёлая дверь в каменном портале
+      box(0, w / 2 + 0.2, -0.4, 3.6, 4.6, 0.5, cornice)
+      box(0, w / 2 + 0.48, 0, 2.4, 3.4, 0.1, '#3a2a1e')
+      return base + h3 + 0.7 + w3 * 0.95 + 2
     }
   }
 }

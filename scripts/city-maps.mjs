@@ -7,7 +7,7 @@ import sharp from 'sharp'
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
-import { CITY_MAPS } from './lore/cities.mjs'
+import { CITY_MAPS, ORGANIC } from './lore/cities.mjs'
 import { autoCities } from './lore/cities-auto.mjs'
 
 const WORLD = 'resources/default-world/world.json'
@@ -16,6 +16,12 @@ const world = JSON.parse(readFileSync(WORLD, 'utf8'))
 const worldMap = world.maps.find((m) => m.kind === 'world')
 // города, описанные вручную (cities.mjs), и все остальные города, городки, порты и кастры — по описаниям из мира
 const CITIES = [...CITY_MAPS, ...(await autoCities(world, CITY_MAPS))]
+for (const c of CITIES) if (ORGANIC[c.slug]) Object.assign(c, { custom: 'city-organic.mjs', grow: ORGANIC[c.slug] })
+// авто-города с grow из карты мира (lore/city-grow.mjs) строит тот же органический генератор, а не Watabou
+for (const c of CITIES) if (c.auto && c.grow && !c.custom) c.custom = 'city-organic.mjs'
+// проба типа без правки мира: GROW_TEST='{"slug":{"type":"cross",…}}' — пишет только план и svg, без картинки и world.json
+const GROW_TEST = process.env.GROW_TEST ? JSON.parse(process.env.GROW_TEST) : null
+if (GROW_TEST) for (const c of CITIES) if (GROW_TEST[c.slug]) Object.assign(c, { custom: 'city-organic.mjs', grow: GROW_TEST[c.slug] })
 // список заданий для scripts/city-gen.cjs — файлом: сотни деревень не влезают в командную строку Windows
 const listFile = (items) => {
   const f = join(tmpdir(), `gleuderoff-cities-${process.pid}.json`)
@@ -89,6 +95,24 @@ const area = (r) => Math.abs(r.reduce((s, [x, y], i) => { const [u, v] = r[(i + 
 const centroid = (r) => { let x = 0, y = 0; for (const p of r) (x += p[0]), (y += p[1]); return [x / r.length, y / r.length] }
 const inside = ([x, y], r) => { let c = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const [xi, yi] = r[i], [xj, yj] = r[j]; if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c } return c }
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+// мосты для планов без своих мостов (Watabou): где дорога проходит над рекой — прямой пролёт с заездом на берег
+const segD = ([px, py], [ax, ay], [bx, by]) => { const dx = bx - ax, dy = by - ay, t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1))); return Math.hypot(px - ax - t * dx, py - ay - t * dy) }
+const autoBridges = (roads, rivers, s) => {
+  const out = [], wet = (p) => rivers.some((q) => q.r.some((a, i) => i && segD(p, q.r[i - 1], a) < q.w / 2))
+  for (const q of roads) {
+    const pts = []
+    q.r.forEach((p, i) => { if (!i) return pts.push(p); const a = q.r[i - 1], n = Math.max(1, Math.ceil(Math.hypot(p[0] - a[0], p[1] - a[1]) / (1.5 * s))); for (let k = 1; k <= n; k++) pts.push([a[0] + ((p[0] - a[0]) * k) / n, a[1] + ((p[1] - a[1]) * k) / n]) })
+    for (let i = 0; i < pts.length; i++) {
+      if (!wet(pts[i])) continue
+      let j = i
+      while (j + 1 < pts.length && wet(pts[j + 1])) j++
+      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, j + 1)], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1, ex = 5 * s
+      out.push({ r: [[a[0] - (dx / L) * ex, a[1] - (dy / L) * ex], [b[0] + (dx / L) * ex, b[1] + (dy / L) * ex]], w: q.w + 1.5 * s })
+      i = j
+    }
+  }
+  return out
+}
 
 // облик построек в 3D-виде (src/renderer/src/city3d.ts) по государству
 const styleOf = (state) =>
@@ -141,6 +165,7 @@ function renderCity(c, J) {
   const roads = geoms('roads').map((g) => ({ r: P(flip(g.coordinates)), w: (g.width ?? vals.roadWidth) * s }))
   const rivers = geoms('rivers').map((g) => ({ r: P(flip(g.coordinates)), w: (g.width ?? vals.riverWidth) * s }))
   const planks = geoms('planks').map((g) => ({ r: P(flip(g.coordinates)), w: (g.width ?? 4) * s }))
+  const bridges = f('bridges') ? geoms('bridges').map((g) => ({ r: P(flip(g.coordinates)), w: (g.width ?? 6) * s })) : autoBridges(roads, rivers, s)
   // у своих планов (Хауссер) кварталы приходят уже с русским именем, цветом крыш и подложки
   const districts = geoms('districts').map((g) => ({ r: P(flip(g.coordinates[0])), en: g.name, name: g.ru, roof: g.roof, fill: g.fill }))
   // какая стена что значит: из двух меньшая — цитадель; если одна — по параметрам города
@@ -234,6 +259,7 @@ ${districts.map((q) => `<path d="${d(q.r)}" fill="${q.fill ?? '#d6c9a2'}" fill-o
 ${squares.map((r) => `<path d="${d(r)}" fill="#e6dcbc" stroke="#a8966c" stroke-width="1.4"/>`).join('')}
 ${rivers.map((q) => `<path d="${d(q.r, false)}" fill="none" stroke="#3f6f86" stroke-width="${q.w.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
 ${planks.map((q) => `<path d="${d(q.r, false)}" fill="none" stroke="#6b4f33" stroke-width="${Math.max(3, q.w).toFixed(1)}" stroke-linecap="butt"/>`).join('')}
+${bridges.map((q) => `<path d="${d(q.r, false)}" fill="none" stroke="#4a4038" stroke-width="${(q.w + 3).toFixed(1)}" stroke-linecap="butt"/><path d="${d(q.r, false)}" fill="none" stroke="#b8ad94" stroke-width="${q.w.toFixed(1)}" stroke-linecap="butt"/>`).join('')}
 <g opacity="0.3" transform="translate(2.5 2.5)">${B.map((b) => `<path d="${d(b.r)}" fill="#1c140e"/>`).join('')}</g>
 ${B.map((b, i) => `<path d="${d(b.r)}" ${bAttr(b, i)}/>`).join('')}
 ${walls.map((w) => `<path d="${d(w.r)}" fill="none" stroke="#3b342d" stroke-width="${w.w.toFixed(1)}" stroke-linejoin="round"/>${towers(w)}`).join('')}
@@ -244,19 +270,22 @@ ${text(W / 2, 64, c.name, 58, '#2a1d12', 'font-weight="bold" letter-spacing="6"'
 </svg>`
 
   // здания для приложения: [квартал, особое, x,y,x,y…]
+  // крупный органический город (меньше 1.5 px на метр): целый пиксель — до 0.4 м сдвига, и дом у дороги
+  // наезжает на неё; там пишем с десятой долей пикселя, остальные планы — как раньше, целыми
+  const rd = c.custom === 'city-organic.mjs' && s < 1.5 ? (v) => Math.round(v * 10) / 10 : Math.round
   const plan = {
     w: W, h: H,
     districts: districts.map((q) => { const [x, y] = centroid(q.r); return { name: q.name, x: +x.toFixed(1), y: +y.toFixed(1) } }),
-    buildings: B.map((b) => [b.d, b.special ? 1 : 0, ...b.r.flat().map((v) => Math.round(v))]),
+    buildings: B.map((b) => [b.d, b.special ? 1 : 0, ...b.r.flat().map(rd)]),
     // для 3D-вида: всё, кроме зданий, плоскими списками x,y… (деревья и камни рисует сам 3D по forest/hills/rocky)
     scene: (() => {
-      const fl = (r) => r.flat().map((v) => Math.round(v))
+      const fl = (r) => r.flat().map(rd)
       const line = (q) => ({ r: fl(q.r), w: +q.w.toFixed(1) })
       return {
         s: +s.toFixed(4), style: c.style ?? styleOf(c.state), forest: c.forest ?? 0.1, ...(c.hills ? { hills: 1 } : {}), ...(c.rocky ? { rocky: 1 } : {}),
         tower: +(vals.towerRadius ?? 7.6).toFixed(1), ...(c.roof ? { roof: c.roof } : {}), droof: districts.map((q) => q.roof ?? null), citadel: citadel ? walls.indexOf(citadel) : -1,
         dist: districts.map((q) => fl(q.r)), water: water.map(fl), fields: fields.map(fl), greens: greens.map(fl), squares: squares.map(fl),
-        walls: walls.map(line), roads: roads.map(line), rivers: rivers.map(line), planks: planks.map(line),
+        walls: walls.map(line), roads: roads.map(line), rivers: rivers.map(line), planks: planks.map(line), bridges: bridges.map(line),
         // контур суши — для моря в 3D (если суша не на весь кадр, см. scripts/city-earth.mjs)
         earth: fl(earth)
       }
@@ -296,7 +325,9 @@ ${text(W / 2, 64, c.name, 58, '#2a1d12', 'font-weight="bold" letter-spacing="6"'
       marks.push({ name, type, x: +(x + 12).toFixed(1), y: +(y + 12).toFixed(1), b: -1, text: txt })
       continue
     }
-    const b = pick(rule)
+    // свой генератор (city-organic) сам говорит, какое здание под это место
+    const fx = f('landmarks')?.items?.find((x) => x.name === name)
+    const b = fx && info[fx.b] && !used.has(fx.b) ? info[fx.b] : pick(rule)
     if (!b) continue
     used.add(b.i)
     marks.push({ name, type, x: +b.c[0].toFixed(1), y: +b.c[1].toFixed(1), b: b.i, text: txt })
@@ -342,6 +373,8 @@ for (const c of CITIES) {
   made.push({ c, H, marks })
   console.log(`${c.name}: ${plan.buildings.length} зданий, ${plan.districts.length} кварталов, ${marks.length} примечательных мест`)
 }
+
+if (GROW_TEST) process.exit(0)
 
 // SVG → PNG движком Chromium (scripts/city-gen.cjs; librsvg в sharp рисовал одну карту до 2,5 минут), затем
 // бумажная фактура: мелкий шум, растянутый на всю карту и наложенный умножением

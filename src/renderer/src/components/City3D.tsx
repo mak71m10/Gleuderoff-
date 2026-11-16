@@ -103,6 +103,8 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
         orbit.maxDistance = Math.max(500, r * 5)
         orbit.screenSpacePanning = false
         orbit.update()
+        // только для разработки: камера и план доступны из консоли (снимки для проверки городов)
+        if ((import.meta as { env?: { DEV?: boolean } }).env?.DEV) Object.assign(window, { __city3d: { cam, orbit, city, plan, state: state.current } })
 
         // ---- прогулка ----
         const keys = new Set<string>()
@@ -202,6 +204,8 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
             return
           }
           setMet(null)
+          // тап/клик по воротам открывает или закрывает их (на телефоне — тот же тап)
+          if (city.toggleGate(ray.ray.origin, ray.ray.direction)) return
           const i = city.pick(ray.ray.origin, ray.ray.direction)
           const s = useStore.getState()
           if (i === null || s.tool.kind !== 'select') return
