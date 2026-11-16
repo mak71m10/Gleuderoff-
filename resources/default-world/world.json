@@ -91,7 +91,7 @@
    "kind": "city",
    "image": "maps/cities/tirrit.webp",
    "width": 2048,
-   "height": 2650,
+   "height": 2144,
    "plan": "maps/cities/tirrit.plan.json",
    "placeId": "lore-rp-capital"
   },
@@ -101,7 +101,7 @@
    "kind": "city",
    "image": "maps/cities/korel.webp",
    "width": 2048,
-   "height": 2474,
+   "height": 3126,
    "plan": "maps/cities/korel.plan.json"
   },
   {
@@ -110,7 +110,7 @@
    "kind": "city",
    "image": "maps/cities/kirch.webp",
    "width": 2048,
-   "height": 1963,
+   "height": 1224,
    "plan": "maps/cities/kirch.plan.json"
   },
   {
@@ -119,7 +119,7 @@
    "kind": "city",
    "image": "maps/cities/tirel.webp",
    "width": 2048,
-   "height": 1914,
+   "height": 3159,
    "plan": "maps/cities/tirel.plan.json"
   },
   {
@@ -128,7 +128,7 @@
    "kind": "city",
    "image": "maps/cities/dalau.webp",
    "width": 2048,
-   "height": 2172,
+   "height": 3547,
    "plan": "maps/cities/dalau.plan.json"
   },
   {
@@ -137,7 +137,7 @@
    "kind": "city",
    "image": "maps/cities/hagau.webp",
    "width": 2048,
-   "height": 1609,
+   "height": 1760,
    "plan": "maps/cities/hagau.plan.json"
   },
   {
@@ -7398,7 +7398,7 @@
    "kind": "city",
    "image": "maps/cities/santareya.webp",
    "width": 2048,
-   "height": 2032,
+   "height": 1837,
    "plan": "maps/cities/santareya.plan.json",
    "placeId": "lore-santareya"
   },
@@ -99626,9 +99626,9 @@
   {
    "id": "city-tirrit-0",
    "mapId": "map-city-tirrit",
-   "x": 1046.4,
-   "y": 1471.2,
-   "building": 0,
+   "x": 790.7,
+   "y": 1113.7,
+   "building": 907,
    "base": {
     "name": "Ратуша Тиррита",
     "type": "assembly",
@@ -99645,9 +99645,9 @@
   {
    "id": "city-tirrit-1",
    "mapId": "map-city-tirrit",
-   "x": 1438.2,
-   "y": 1522.8,
-   "building": 645,
+   "x": 1362,
+   "y": 1016.2,
+   "building": 908,
    "base": {
     "name": "Бывший дом губернатора (министерства)",
     "type": "castle",
@@ -99664,9 +99664,9 @@
   {
    "id": "city-tirrit-2",
    "mapId": "map-city-tirrit",
-   "x": 1018.6,
-   "y": 1445.3,
-   "building": 1250,
+   "x": 1115.2,
+   "y": 677.6,
+   "building": 914,
    "base": {
     "name": "Собор Тиррита",
     "type": "temple",
@@ -99683,9 +99683,9 @@
   {
    "id": "city-tirrit-3",
    "mapId": "map-city-tirrit",
-   "x": 854.6,
-   "y": 1134.3,
-   "building": 111,
+   "x": 785.1,
+   "y": 773.2,
+   "building": 910,
    "base": {
     "name": "Серый дом",
     "type": "tower",
@@ -99702,9 +99702,9 @@
   {
    "id": "city-tirrit-4",
    "mapId": "map-city-tirrit",
-   "x": 930.3,
-   "y": 1559.6,
-   "building": 91,
+   "x": 1111.9,
+   "y": 1220.7,
+   "building": 909,
    "base": {
     "name": "Банк Гольдах",
     "type": "landmark",
@@ -99721,8 +99721,8 @@
   {
    "id": "city-tirrit-5",
    "mapId": "map-city-tirrit",
-   "x": 1025.6,
-   "y": 1452.7,
+   "x": 808.8,
+   "y": 1133.9,
    "base": {
     "name": "Площадь Правосудия",
     "type": "gallows",
@@ -99739,9 +99739,9 @@
   {
    "id": "city-tirrit-6",
    "mapId": "map-city-tirrit",
-   "x": 1028.5,
-   "y": 2140.7,
-   "building": 854,
+   "x": 1122.6,
+   "y": 933.4,
+   "building": 912,
    "base": {
     "name": "Мануфактура Гольдахов",
     "type": "strike",
@@ -99758,9 +99758,9 @@
   {
    "id": "city-tirrit-7",
    "mapId": "map-city-tirrit",
-   "x": 1446,
-   "y": 1638.5,
-   "building": 1036,
+   "x": 860.3,
+   "y": 1363.2,
+   "building": 913,
    "base": {
     "name": "Типография «Тирритской правды»",
     "type": "landmark",
@@ -99777,9 +99777,9 @@
   {
    "id": "city-korel-0",
    "mapId": "map-city-korel",
-   "x": 878.4,
-   "y": 1336.9,
-   "building": 285,
+   "x": 676.7,
+   "y": 1861.8,
+   "building": 1532,
    "base": {
     "name": "Пакгауз №7",
     "type": "assembly",
@@ -99796,9 +99796,9 @@
   {
    "id": "city-korel-1",
    "mapId": "map-city-korel",
-   "x": 712.7,
-   "y": 1153.2,
-   "building": 0,
+   "x": 1186.4,
+   "y": 1419.4,
+   "building": 1530,
    "base": {
     "name": "Ратуша Сорока мостов",
     "type": "assembly",
@@ -99815,9 +99815,9 @@
   {
    "id": "city-korel-2",
    "mapId": "map-city-korel",
-   "x": 889.9,
-   "y": 1255.8,
-   "building": 262,
+   "x": 1214.3,
+   "y": 1717.3,
+   "building": 1533,
    "base": {
     "name": "Верфи Корельвейлера",
     "type": "landmark",
@@ -99834,9 +99834,9 @@
   {
    "id": "city-korel-3",
    "mapId": "map-city-korel",
-   "x": 740.1,
-   "y": 1202.8,
-   "building": 574,
+   "x": 1192.6,
+   "y": 1164.2,
+   "building": 1534,
    "base": {
     "name": "Казармы XII Берегового легиона «Чайки»",
     "type": "castle",
@@ -99853,9 +99853,9 @@
   {
    "id": "city-korel-4",
    "mapId": "map-city-korel",
-   "x": 756.4,
-   "y": 1139.7,
-   "building": 2076,
+   "x": 1006.4,
+   "y": 1928.6,
+   "building": 1535,
    "base": {
     "name": "Храм Новой Воли",
     "type": "temple",
@@ -99872,9 +99872,9 @@
   {
    "id": "city-korel-5",
    "mapId": "map-city-korel",
-   "x": 729.5,
-   "y": 1004.4,
-   "building": 117,
+   "x": 804.2,
+   "y": 1561.9,
+   "building": 1531,
    "base": {
     "name": "Контора губернатора",
     "type": "landmark",
@@ -99891,9 +99891,9 @@
   {
    "id": "city-kirch-0",
    "mapId": "map-city-kirch",
-   "x": 1037,
-   "y": 991,
-   "building": 0,
+   "x": 818.3,
+   "y": 590.8,
+   "building": 244,
    "base": {
     "name": "Хлебная биржа",
     "type": "assembly",
@@ -99910,9 +99910,9 @@
   {
    "id": "city-kirch-1",
    "mapId": "map-city-kirch",
-   "x": 1229.8,
-   "y": 1604.4,
-   "building": 213,
+   "x": 1130.4,
+   "y": 851.3,
+   "building": 245,
    "base": {
     "name": "Амбары Кирхфельда",
     "type": "strike",
@@ -99929,9 +99929,9 @@
   {
    "id": "city-kirch-2",
    "mapId": "map-city-kirch",
-   "x": 571.8,
-   "y": 1409.4,
-   "building": 268,
+   "x": 974.6,
+   "y": 372.9,
+   "building": 246,
    "base": {
     "name": "Мельницы Хагенау",
     "type": "landmark",
@@ -99948,9 +99948,9 @@
   {
    "id": "city-kirch-3",
    "mapId": "map-city-kirch",
-   "x": 1019.9,
-   "y": 1396.8,
-   "building": 36,
+   "x": 873,
+   "y": 849.8,
+   "building": 247,
    "base": {
     "name": "Оружейни Брандштеттеров",
     "type": "landmark",
@@ -99967,9 +99967,9 @@
   {
    "id": "city-kirch-4",
    "mapId": "map-city-kirch",
-   "x": 1013.4,
-   "y": 1064.5,
-   "building": 277,
+   "x": 1184.1,
+   "y": 531.8,
+   "building": 248,
    "base": {
     "name": "Храм Кирхфельда",
     "type": "temple",
@@ -99986,9 +99986,9 @@
   {
    "id": "city-tirel-0",
    "mapId": "map-city-tirel",
-   "x": 1151.6,
-   "y": 1167.6,
-   "building": 360,
+   "x": 1278.9,
+   "y": 1507.7,
+   "building": 390,
    "base": {
     "name": "Старый соляной склад",
     "type": "assembly",
@@ -100005,9 +100005,9 @@
   {
    "id": "city-tirel-1",
    "mapId": "map-city-tirel",
-   "x": 605.4,
-   "y": 858.7,
-   "building": 394,
+   "x": 676.9,
+   "y": 1651.9,
+   "building": 391,
    "base": {
     "name": "Солеварни Зальцеров",
     "type": "strike",
@@ -100024,9 +100024,9 @@
   {
    "id": "city-tirel-2",
    "mapId": "map-city-tirel",
-   "x": 1103,
-   "y": 680.1,
-   "building": 413,
+   "x": 1018.1,
+   "y": 1825.2,
+   "building": 393,
    "base": {
     "name": "Храм Тирельлаге",
     "type": "temple",
@@ -100043,9 +100043,9 @@
   {
    "id": "city-tirel-3",
    "mapId": "map-city-tirel",
-   "x": 1053.3,
-   "y": 658.9,
-   "building": 0,
+   "x": 1054.2,
+   "y": 1184.4,
+   "building": 392,
    "base": {
     "name": "Таможня",
     "type": "landmark",
@@ -100062,9 +100062,9 @@
   {
    "id": "city-dalau-0",
    "mapId": "map-city-dalau",
-   "x": 727.2,
-   "y": 1344.4,
-   "building": 32,
+   "x": 1072.8,
+   "y": 1468.5,
+   "building": 438,
    "base": {
     "name": "Вольная палата",
     "type": "assembly",
@@ -100081,9 +100081,9 @@
   {
    "id": "city-dalau-1",
    "mapId": "map-city-dalau",
-   "x": 798.6,
-   "y": 1217.2,
-   "building": 4,
+   "x": 804.7,
+   "y": 1809.4,
+   "building": 439,
    "base": {
     "name": "Лоцманский дом",
     "type": "landmark",
@@ -100100,9 +100100,9 @@
   {
    "id": "city-dalau-2",
    "mapId": "map-city-dalau",
-   "x": 771,
-   "y": 1049.6,
-   "building": 359,
+   "x": 1372.1,
+   "y": 1639.8,
+   "building": 440,
    "base": {
     "name": "~Верфи Весселей",
     "type": "landmark",
@@ -100119,9 +100119,9 @@
   {
    "id": "city-dalau-3",
    "mapId": "map-city-dalau",
-   "x": 806.9,
-   "y": 1318.6,
-   "building": 456,
+   "x": 1173.1,
+   "y": 2026.7,
+   "building": 441,
    "base": {
     "name": "Храм Дальау",
     "type": "temple",
@@ -100138,9 +100138,9 @@
   {
    "id": "city-hagau-0",
    "mapId": "map-city-hagau",
-   "x": 810.3,
-   "y": 419.3,
-   "building": 137,
+   "x": 1027.7,
+   "y": 591.4,
+   "building": 135,
    "base": {
     "name": "Маяк Хагау",
     "type": "tower",
@@ -100157,9 +100157,9 @@
   {
    "id": "city-hagau-1",
    "mapId": "map-city-hagau",
-   "x": 1040.6,
-   "y": 577.2,
-   "building": 0,
+   "x": 1139.3,
+   "y": 998.2,
+   "building": 134,
    "base": {
     "name": "Маячный совет",
     "type": "assembly",
@@ -100176,9 +100176,9 @@
   {
    "id": "city-hagau-2",
    "mapId": "map-city-hagau",
-   "x": 1277.7,
-   "y": 816.6,
-   "building": 107,
+   "x": 1284.9,
+   "y": 778.9,
+   "building": 136,
    "base": {
     "name": "Склады Фрахтов",
     "type": "landmark",
@@ -100195,9 +100195,9 @@
   {
    "id": "city-hagau-3",
    "mapId": "map-city-hagau",
-   "x": 1122.5,
-   "y": 609.8,
-   "building": 140,
+   "x": 854.4,
+   "y": 825.4,
+   "building": 137,
    "base": {
     "name": "Храм Хагау",
     "type": "temple",
@@ -100214,9 +100214,9 @@
   {
    "id": "city-santareya-0",
    "mapId": "map-city-santareya",
-   "x": 1220,
-   "y": 1174.6,
-   "building": 1456,
+   "x": 1183.9,
+   "y": 666.8,
+   "building": 1134,
    "base": {
     "name": "Великий храм Сантареи",
     "type": "temple",
@@ -100233,9 +100233,9 @@
   {
    "id": "city-santareya-1",
    "mapId": "map-city-santareya",
-   "x": 1636.4,
-   "y": 1130.2,
-   "building": 1260,
+   "x": 1373.7,
+   "y": 964.7,
+   "building": 1130,
    "base": {
     "name": "Подземная библиотека",
     "type": "landmark",
@@ -100252,9 +100252,9 @@
   {
    "id": "city-santareya-2",
    "mapId": "map-city-santareya",
-   "x": 1176.1,
-   "y": 1171.1,
-   "building": 0,
+   "x": 900.5,
+   "y": 997.7,
+   "building": 1129,
    "base": {
     "name": "Палаццо Курии",
     "type": "assembly",
@@ -100271,9 +100271,9 @@
   {
    "id": "city-santareya-3",
    "mapId": "map-city-santareya",
-   "x": 1255.3,
-   "y": 1205.4,
-   "building": 51,
+   "x": 1141.2,
+   "y": 1141.8,
+   "building": 1131,
    "base": {
     "name": "Дом Святого ордена",
     "type": "castle",
@@ -100290,9 +100290,9 @@
   {
    "id": "city-santareya-4",
    "mapId": "map-city-santareya",
-   "x": 1147,
-   "y": 1161.1,
-   "building": 367,
+   "x": 1473.1,
+   "y": 673.2,
+   "building": 1132,
    "base": {
     "name": "Госпиталь Ордена Чаши",
     "type": "landmark",
@@ -100309,9 +100309,9 @@
   {
    "id": "city-santareya-5",
    "mapId": "map-city-santareya",
-   "x": 997.5,
-   "y": 895,
-   "building": 1018,
+   "x": 841.8,
+   "y": 1248,
+   "building": 1133,
    "base": {
     "name": "Пристань паломников",
     "type": "landmark",
