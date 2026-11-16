@@ -322,6 +322,40 @@ function StateCardBody({ id }: { id: string }) {
         )}
 
         {tab === 'power' && legislatures.map((l) => <PowerButton key={l.id} legislature={l} title={l.town ? `${l.name} (${l.town})` : undefined} />)}
+        {/* органы власти, которые не парламент: Сабельная ставка, Совет Десяти графа и другие государственные органы */}
+        {tab === 'power' &&
+          organs.map((o) => {
+            const of = resolve(o, date)
+            const open = (id: string): void => {
+              const e = world.entries.find((x) => x.id === id)
+              select({ type: 'entry', id })
+              setView(e?.kind ?? 'character')
+              close(null)
+            }
+            return (
+              <section key={o.id} className="sc-organ">
+                <div className="sc-organ-head">
+                  <h3>{of.name}</h3>
+                  <button className="link-btn" onClick={() => open(o.id)}>Открыть карточку</button>
+                </div>
+                {of.summary && <p className="sc-organ-summary">{of.summary}</p>}
+                {of.stavka && <StavkaView data={of.stavka} onOpen={open} />}
+                {of.ting && <TingView data={of.ting} onOpen={open} />}
+                {of.brood && <BroodView data={of.brood} onOpen={open} />}
+                {of.vault && <VaultView data={of.vault} onOpen={open} />}
+                {of.heights && <HeightsView data={of.heights} onOpen={open} />}
+                {of.urn && <UrnView data={of.urn} onOpen={open} />}
+                {of.fleet && <FleetView data={of.fleet} onOpen={open} />}
+                {of.lantern && <LanternView data={of.lantern} onOpen={open} />}
+                {of.threshold && <ThresholdView data={of.threshold} onOpen={open} />}
+                {of.wall && <WallView data={of.wall} onOpen={open} />}
+                {of.cart && <CartView data={of.cart} onOpen={open} />}
+                {of.ford && <FordsView data={of.ford} onOpen={open} />}
+                {of.willow && <WillowView data={of.willow} onOpen={open} />}
+                {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
+              </section>
+            )
+          })}
         {tab === 'power' && (
           <div className="sc-cols">
             <div className="sc-side">
@@ -333,6 +367,7 @@ function StateCardBody({ id }: { id: string }) {
                     <option key={g} value={g} />
                   ))}
                 </datalist>
+                {f.government.length > 30 && <span className="sc-gov-full">{f.government}</span>}
               </label>
               <TextField label="Титул правителя" value={f.rulerTitle} onChange={(rulerTitle) => set({ rulerTitle })} className={mark('rulerTitle')} />
               <RefField label="Правитель (персонаж)" value={f.rulerId} items={chars} onChange={(rulerId) => set({ rulerId })} />
@@ -380,40 +415,6 @@ function StateCardBody({ id }: { id: string }) {
             </div>
           </div>
         )}
-        {/* органы власти, которые не парламент: Сабельная ставка, Совет Десяти графа и другие государственные органы */}
-        {tab === 'power' &&
-          organs.map((o) => {
-            const of = resolve(o, date)
-            const open = (id: string): void => {
-              const e = world.entries.find((x) => x.id === id)
-              select({ type: 'entry', id })
-              setView(e?.kind ?? 'character')
-              close(null)
-            }
-            return (
-              <section key={o.id} className="sc-organ">
-                <div className="sc-organ-head">
-                  <h3>{of.name}</h3>
-                  <button className="link-btn" onClick={() => open(o.id)}>Открыть карточку</button>
-                </div>
-                {of.summary && <p className="hint">{of.summary}</p>}
-                {of.stavka && <StavkaView data={of.stavka} onOpen={open} />}
-                {of.ting && <TingView data={of.ting} onOpen={open} />}
-                {of.brood && <BroodView data={of.brood} onOpen={open} />}
-                {of.vault && <VaultView data={of.vault} onOpen={open} />}
-                {of.heights && <HeightsView data={of.heights} onOpen={open} />}
-                {of.urn && <UrnView data={of.urn} onOpen={open} />}
-                {of.fleet && <FleetView data={of.fleet} onOpen={open} />}
-                {of.lantern && <LanternView data={of.lantern} onOpen={open} />}
-                {of.threshold && <ThresholdView data={of.threshold} onOpen={open} />}
-                {of.wall && <WallView data={of.wall} onOpen={open} />}
-                {of.cart && <CartView data={of.cart} onOpen={open} />}
-                {of.ford && <FordsView data={of.ford} onOpen={open} />}
-                {of.willow && <WillowView data={of.willow} onOpen={open} />}
-                {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
-              </section>
-            )
-          })}
         {tab === 'power' && dynastyCouncil && (
           <SuccessionCouncilView
             council={dynastyCouncil}
