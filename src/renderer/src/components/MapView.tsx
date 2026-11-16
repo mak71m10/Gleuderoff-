@@ -23,6 +23,8 @@ const boundsOf = (m: MapDef): L.LatLngBoundsExpression => [
 ]
 
 const MAX_HANDLES = 1500
+/** Сторона картинки Серебряной Ивы в единицах карты (дерево — около 2/3 высоты кадра) */
+const WILLOW_SIZE = 54
 
 /** Какие места автора получают объёмную модель */
 const PLACE_MODEL: Partial<Record<string, SettlementType>> = {
@@ -269,7 +271,6 @@ export function MapView() {
       if (!(useStore.getState().tool.kind === 'paint' && provinces)) map.dragging.enable()
       const r = (map as unknown as { _renderer?: { _hoveredLayer?: unknown; _mouseHoverThrottled?: boolean; _draggableMoved?: unknown } })._renderer
       if (r) { r._hoveredLayer = null; r._mouseHoverThrottled = false }
-      ;(map as unknown as { _draggableMoved?: unknown })._draggableMoved = undefined
       ;(map as unknown as { _container: HTMLElement })._container.style.pointerEvents = ''
     })
     return () => cancelAnimationFrame(id)
@@ -373,9 +374,20 @@ export function MapView() {
         if (sel?.type === 'province' && sel.id === id && pv?.cityMapId) s.openMap(pv.cityMapId)
         else s.select({ type: 'province', id })
       }
+      // на телефоне нижняя панель закрывает низ экрана: поднять выбранное поселение выше неё,
+      // чтобы второй тап по нему открыл план
+      const keepVisible = (): void => {
+        const map = mapRef.current
+        if (!map || useStore.getState().mapId !== md.id) return // план уже открыт
+        const size = map.getSize()
+        if (size.x >= 700) return
+        const pt = map.latLngToContainerPoint(L.latLng(-y, x))
+        const want = size.y * 0.24
+        if (pt.y > want + 20) map.panBy([0, pt.y - want], { animate: true, duration: 0.3 })
+      }
       // поселение под пальцем важнее страны: город или деревня выбирается сразу
-      if (hit?.key?.startsWith('place:')) return pickPlace(hit.key.slice(6))
-      if (hit?.key?.startsWith('prov:')) return pickProv(Number(hit.key.slice(5)))
+      if (hit?.key?.startsWith('place:')) { pickPlace(hit.key.slice(6)); keepVisible(); return }
+      if (hit?.key?.startsWith('prov:')) { pickProv(Number(hit.key.slice(5))); keepVisible(); return }
       const raster = rasterRef.current
       const pid = raster && md.provinceMap ? provinceAt(raster, md.width, md.height, x, y) : 0
       // издалека на политической карте первый тап выбирает страну, второй по ней же — область
@@ -1153,19 +1165,15 @@ export function MapView() {
       console.warn('Ива: 3D не получилось', e)
       return
     }
-    // картинка квадратная, корень — в точке (ax, ay); размер как у крупного города, подпись мелкая
-    const ico = (px: number): L.DivIcon =>
-      L.divIcon({
-        className: 'willow-wrap',
-        html: `<div class="willow-tree" style="width:${px}px;height:${px}px"><img src="${spr.url}" alt="" draggable="false" style="width:100%;height:100%;display:block"/><span class="willow-name" style="top:${px * spr.ay + 2}px;font-size:${Math.max(10, Math.min(14, px / 6))}px">Серебряная Ива</span></div>`,
-        iconSize: [px, px],
-        iconAnchor: [px * spr.ax, px * spr.ay]
-      })
-    const sizeAt = (z: number): number => Math.round(Math.max(40, Math.min(110, 40 * Math.pow(2, (z + 1.5) * 0.7))))
-    const mk = L.marker(toLL([w.x, w.y]), { icon: ico(sizeAt(map.getZoom())), interactive: false, keyboard: false, zIndexOffset: -500 }).addTo(map)
-    const onZoom = (): void => { mk.setIcon(ico(sizeAt(map.getZoom()))) }
-    map.on('zoomend', onZoom)
-    return () => { map.off('zoomend', onZoom); mk.remove() }
+    // Ива — 3D-модель, лежащая на карте: постоянный размер в единицах карты (как Стена),
+    // растёт и уменьшается вместе с картой, без скачков при зуме. Корень — в точке (ax, ay) картинки.
+    const S = WILLOW_SIZE
+    const ov = L.imageOverlay(
+      spr.url,
+      L.latLngBounds(toLL([w.x - S * spr.ax, w.y - S * spr.ay]), toLL([w.x + S * (1 - spr.ax), w.y + S * (1 - spr.ay)])),
+      { pane: 'geo', interactive: false, className: 'willow-model' }
+    ).addTo(map)
+    return () => { ov.remove() }
   }, [world.places, date, mapDef.id])
 
   // --- правка вершин выбранного участка ---
