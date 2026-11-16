@@ -280,7 +280,8 @@ export function createLife(o: {
     if (p.look) p.look.skirt = c
   })
   // самые близкие к камере жители — подробные модели с лицом, причёской и суставами
-  const DETAIL = o.mobile ? 6 : 16
+  const DETAIL = o.mobile ? 8 : 24
+  const DETAIL_R = o.mobile ? 50 : 53 // до этого расстояния (м) житель — подробная модель, дальше — кубики
   const detailed = createPeople(scene, DETAIL)
   let near: Person[] = []
   let nearCheck = 0
@@ -521,7 +522,7 @@ export function createLife(o: {
     if (nearCheck <= 0) {
       nearCheck = 0.25
       near = boost < 2.2
-        ? people.filter((p) => p.shown && p.look && (p.dx - focus.x) ** 2 + (p.dz - focus.z) ** 2 < 45 * 45).sort((a, b) => (a.dx - focus.x) ** 2 + (a.dz - focus.z) ** 2 - ((b.dx - focus.x) ** 2 + (b.dz - focus.z) ** 2)).slice(0, DETAIL)
+        ? people.filter((p) => p.shown && p.look && (p.dx - focus.x) ** 2 + (p.dz - focus.z) ** 2 < DETAIL_R * DETAIL_R).sort((a, b) => (a.dx - focus.x) ** 2 + (a.dz - focus.z) ** 2 - ((b.dx - focus.x) ** 2 + (b.dz - focus.z) ** 2)).slice(0, DETAIL)
         : []
     }
     const live = near.filter((p) => p.shown)
