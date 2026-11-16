@@ -73,9 +73,10 @@ export function City3D({ mapDef, mode, setMode }: { mapDef: MapDef; mode: View3D
         await new Promise((r) => setTimeout(r, 40))
         if (!alive) return
         const renderer = new THREE.WebGLRenderer({ antialias: !mobile, powerPreference: 'high-performance' })
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2))
+        // телефон: меньше пикселей и простые тени — кадр в 2–3 раза дешевле
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.15 : 2))
         renderer.shadowMap.enabled = true
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        renderer.shadowMap.type = mobile ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap
         renderer.shadowMap.autoUpdate = false
         renderer.outputColorSpace = THREE.SRGBColorSpace
         // киношная цветокоррекция, как в «Семиземье»: мягкие света, плотные тени, тёплые середины

@@ -10,6 +10,7 @@ import { GlowRenderer, type GlowOptions } from './glowRenderer'
 import { ProvinceRenderer, SettlementRenderer, TextRenderer, type SettlementItem, type TextLabel } from './provinceRenderer'
 import { onPlanSpritesReady } from '../settlementPlans'
 import { onSpritesReady, SETTLEMENT_SCALE, SPRITE_LOGICAL, type SettlementType } from '../settlements3d'
+import { wallImage, willowSprite } from '../landmarks3d'
 import { buildLut, LUT_ROWS, computeStateLabels as provinceStateLabels, loadRaster, ownerAt, provinceAt, type ProvinceRaster } from '../provinces'
 import type { MapDef, Region, WorldData, WorldDate } from '../types'
 
@@ -360,28 +361,39 @@ export function MapView() {
     } else if (t.kind === 'select') {
       // клик по объёмному поселению: место автора или поселение провинции
       const hit = settleLayer.current?.hit(x, y)
-      // издалека на политической карте клик выбирает всю страну, вблизи — провинцию или поселение
+      const sel = s.selection
+      // повторный тап по уже выбранному: место или провинция с планом — открыть план
+      const pickPlace = (id: string): void => {
+        const pl = s.world!.places.find((q) => q.id === id)
+        if (sel?.type === 'place' && sel.id === id && pl?.innerMapId) s.openMap(pl.innerMapId)
+        else s.select({ type: 'place', id })
+      }
+      const pickProv = (id: number): void => {
+        const pv = s.world!.provinces?.find((q) => q.id === id)
+        if (sel?.type === 'province' && sel.id === id && pv?.cityMapId) s.openMap(pv.cityMapId)
+        else s.select({ type: 'province', id })
+      }
+      // поселение под пальцем важнее страны: город или деревня выбирается сразу
+      if (hit?.key?.startsWith('place:')) return pickPlace(hit.key.slice(6))
+      if (hit?.key?.startsWith('prov:')) return pickProv(Number(hit.key.slice(5)))
+      const raster = rasterRef.current
+      const pid = raster && md.provinceMap ? provinceAt(raster, md.width, md.height, x, y) : 0
+      // издалека на политической карте первый тап выбирает страну, второй по ней же — область
       const far = s.mapMode === 'political' && (mapRef.current?.getZoom() ?? 0) < -1.25
-      if (far && md.provinceMap && rasterRef.current) {
-        const pid = provinceAt(rasterRef.current, md.width, md.height, x, y)
-        const prov = pid ? s.world!.provinces?.find((p) => p.id === pid) : undefined
+      if (far && pid) {
+        const prov = s.world!.provinces?.find((p) => p.id === pid)
         const owner = prov ? ownerAt(prov, s.date) : null
-        if (owner) {
+        const sameState = sel?.type === 'state' && sel.id === owner
+        const inSameState = sel?.type === 'province' && (() => {
+          const sp = s.world!.provinces?.find((p) => p.id === sel.id)
+          return sp ? ownerAt(sp, s.date) === owner : false
+        })()
+        if (owner && !sameState && !inSameState) {
           s.select({ type: 'state', id: owner })
           return
         }
       }
-      if (hit?.key?.startsWith('place:')) {
-        s.select({ type: 'place', id: hit.key.slice(6) })
-        return
-      }
-      if (hit?.key?.startsWith('prov:')) {
-        s.select({ type: 'province', id: Number(hit.key.slice(5)) })
-        return
-      }
-      const raster = rasterRef.current
-      const pid = raster && md.provinceMap ? provinceAt(raster, md.width, md.height, x, y) : 0
-      if (pid && !regionId) s.select({ type: 'province', id: pid })
+      if (pid && !regionId) pickProv(pid)
       else s.select(regionId ? { type: 'region', id: regionId } : null)
     }
   }
@@ -1076,8 +1088,11 @@ export function MapView() {
       marker.on('click', (e) => {
         L.DomEvent.stop(e)
         const s = useStore.getState()
-        if (s.tool.kind === 'select') s.select({ type: 'place', id: p.id })
-        else handleMapClick(e.latlng)
+        if (s.tool.kind !== 'select') return handleMapClick(e.latlng)
+        // второй тап по уже выбранному месту — сразу открыть его план (двойной тап на телефоне ненадёжен)
+        const sel = s.selection
+        if (sel?.type === 'place' && sel.id === p.id && p.innerMapId) s.openMap(p.innerMapId)
+        else s.select({ type: 'place', id: p.id })
       })
       marker.on('dblclick', (e) => {
         L.DomEvent.stop(e)
@@ -1106,23 +1121,24 @@ export function MapView() {
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
-    const layer = L.layerGroup([]).addTo(map)
     const pts = world.places
       .filter((p) => p.mapId === mapDef.id && /^lore-el-(stone-|breach)/.test(p.id) && placeVisible(p, date))
       .sort((a, b) => a.x - b.x)
-    for (let i = 0; i + 1 < pts.length; i++) {
-      const a = pts[i], b = pts[i + 1]
-      const broken = a.id.includes('breach') || b.id.includes('breach')
-      const ll = [toLL([a.x, a.y]), toLL([b.x, b.y])]
-      if (broken) {
-        L.polyline(ll, { pane: 'geo', color: '#8c8f93', weight: 3, opacity: 0.8, dashArray: '2 9', interactive: false }).addTo(layer)
-      } else {
-        L.polyline(ll, { pane: 'geo', color: '#f1f4f8', weight: 11, opacity: 0.22, interactive: false }).addTo(layer)
-        L.polyline(ll, { pane: 'geo', color: '#3b4048', weight: 7, opacity: 0.95, interactive: false }).addTo(layer)
-        L.polyline(ll, { pane: 'geo', color: '#d8dde4', weight: 3, opacity: 1, interactive: false }).addTo(layer)
+    if (pts.length < 2) return
+    let ov: L.ImageOverlay | null = null
+    // 3D-модель стены рендерится один раз в картинку и лежит на карте, масштабируясь вместе с ней
+    const t = window.setTimeout(() => {
+      try {
+        const img = wallImage(
+          pts.map((p) => [p.x, p.y] as [number, number]),
+          pts.slice(0, -1).map((a, i) => a.id.includes('breach') || pts[i + 1].id.includes('breach'))
+        )
+        ov = L.imageOverlay(img.url, L.latLngBounds(toLL([img.x0, img.y0]), toLL([img.x1, img.y1])), { pane: 'geo', interactive: false }).addTo(map)
+      } catch (e) {
+        console.warn('Стена: 3D не получилось', e)
       }
-    }
-    return () => { layer.remove() }
+    }, 300)
+    return () => { clearTimeout(t); ov?.remove() }
   }, [world.places, date, mapDef.id])
 
   // --- Серебряная Ива: огромное дерево над Анорланте, видно издалека ---
@@ -1130,26 +1146,22 @@ export function MapView() {
     const map = mapRef.current
     const w = world.places.find((p) => p.id === 'lore-el-willow' && p.mapId === mapDef.id && placeVisible(p, date))
     if (!map || !w) return
-    const strands = Array.from({ length: 19 }, (_, i) => {
-      const x = 14 + i * 4.1
-      const h = 34 + ((i * 37) % 17) + Math.sin(i * 0.9) * 6
-      return `<path d="M${x} 44 q${i % 2 ? 2.4 : -2.4} ${h / 2} 0 ${h}" stroke="${i % 3 ? '#cfe3d6' : '#e8f1ea'}" stroke-width="1.7" fill="none" stroke-linecap="round" opacity="0.92"/>`
-    }).join('')
-    const svg = `<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 7px rgba(214,240,224,.9)) drop-shadow(0 3px 3px rgba(0,0,0,.65))">
-      <ellipse cx="50" cy="109" rx="30" ry="3.2" fill="#000" opacity=".35"/>
-      <path d="M43 109 C45 90 46 70 43 52 L57 52 C54 70 55 90 57 109 Z" fill="#5a4a3a"/>
-      <path d="M46 100 C42 92 36 88 31 86 M54 100 C58 91 64 88 69 85 M48 70 C42 62 37 58 33 55 M52 68 C58 61 63 57 67 54" stroke="#5a4a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      ${strands}
-      <ellipse cx="50" cy="38" rx="42" ry="22" fill="#9fc4a9"/><ellipse cx="33" cy="34" rx="24" ry="16" fill="#b9d8c1"/><ellipse cx="67" cy="33" rx="25" ry="17" fill="#aed0b7"/><ellipse cx="50" cy="26" rx="26" ry="15" fill="#d3e9da"/>
-    </svg>`
+    let spr: { url: string; ax: number; ay: number }
+    try {
+      spr = willowSprite()
+    } catch (e) {
+      console.warn('Ива: 3D не получилось', e)
+      return
+    }
+    // картинка квадратная, корень — в точке (ax, ay); размер как у крупного города, подпись мелкая
     const ico = (px: number): L.DivIcon =>
       L.divIcon({
         className: 'willow-wrap',
-        html: `<div class="willow-tree" style="width:${px}px;height:${px * 1.12}px">${svg}<span class="willow-name" style="font-size:${Math.max(13, Math.min(26, px / 7))}px">Серебряная Ива</span></div>`,
-        iconSize: [px, px * 1.12],
-        iconAnchor: [px / 2, px * 1.08]
+        html: `<div class="willow-tree" style="width:${px}px;height:${px}px"><img src="${spr.url}" alt="" draggable="false" style="width:100%;height:100%;display:block"/><span class="willow-name" style="top:${px * spr.ay + 2}px;font-size:${Math.max(10, Math.min(14, px / 6))}px">Серебряная Ива</span></div>`,
+        iconSize: [px, px],
+        iconAnchor: [px * spr.ax, px * spr.ay]
       })
-    const sizeAt = (z: number): number => Math.max(64, Math.min(300, 64 * Math.pow(2, z + 2.6)))
+    const sizeAt = (z: number): number => Math.round(Math.max(40, Math.min(110, 40 * Math.pow(2, (z + 1.5) * 0.7))))
     const mk = L.marker(toLL([w.x, w.y]), { icon: ico(sizeAt(map.getZoom())), interactive: false, keyboard: false, zIndexOffset: -500 }).addTo(map)
     const onZoom = (): void => { mk.setIcon(ico(sizeAt(map.getZoom()))) }
     map.on('zoomend', onZoom)

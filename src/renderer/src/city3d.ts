@@ -481,7 +481,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const peaks = Math.pow(Math.max(0, rg - 0.3) / 0.7, 1.5) * DROP * 1.5 * smooth(DROP * 0.3, DROP * 1.7, t)
     return -24 - (DROP - 24) * (1 - Math.pow(1 - u, 2.6)) * (0.72 + ridge * 0.5) + peaks + (n1(x * 0.05, z * 0.05) - 0.5) * 12 * smooth(0, 40, t)
   }
-  const GN = opts.mobile ? 180 : EW > 2500 ? 384 : 256
+  const GN = opts.mobile ? 150 : EW > 2500 ? 384 : 256
   const GM = Math.round((GN * EH) / EW)
   const hgrid = new Float32Array((GN + 1) * (GM + 1))
   for (let j = 0; j <= GM; j++) for (let i = 0; i <= GN; i++) hgrid[j * (GN + 1) + i] = rawHeight(x0 + (i / GN) * EW, z0 + (j / GM) * EH)
@@ -1129,7 +1129,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     return c
   }
   // детальность по размеру: столица в десять тысяч домов и деревня строятся по-разному
-  const detail = opts.mobile ? (N > 1500 ? 0 : N > 400 ? 1 : 2) : N > 5000 ? 0 : N > 1800 ? 1 : 2
+  const detail = opts.mobile ? (N > 900 ? 0 : N > 250 ? 1 : 2) : N > 5000 ? 0 : N > 1800 ? 1 : 2
 
   const tops = new Float32Array(N)
   const crenel = (ch: Chunk, a: P2, b: P2, y: number, col: string, t: number, step = 2.1): void => {
@@ -2485,7 +2485,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
 
   // ---------- деревья, кусты, скалы ----------
   const treeSpots: { x: number; z: number; y: number; h: number; t: number }[] = []
-  const cap = opts.mobile ? 900 : 2800
+  const cap = opts.mobile ? 600 : 2800
   const forest = Math.min(1, S.forest * 2.6)
   const paved = sampler(canvasMask((c) => {
     dists.forEach((r) => { trace(c, r); c.fill() })
