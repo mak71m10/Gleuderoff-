@@ -175,8 +175,6 @@ export async function autoCities(world, handmade) {
       // на юге — все поселения, включая деревни и рыбачьи посёлки (кроме развалин)
       // всё, кроме развалин: города, городки, порты, кастры, замки, храмы, деревни и рыбачьи посёлки
       if (s.type === 'ruins') continue
-      // Эльфборн: 226 провинций — планы только у городов, городков, портов, замков, храмов и башен
-      if (sn === 'Эльфборн' && ['village', 'fishing'].includes(s.type)) continue
       let slug = slugOf(p.name)
       if (takenSlugs.has(slug)) continue
       // «Драм-Кар» и «Драмкар» дают один и тот же slug — второму добавляем 2
