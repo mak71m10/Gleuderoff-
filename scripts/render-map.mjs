@@ -58,21 +58,62 @@ if (isMainThread) {
   const riv = new Uint8Array(N)
   for (let i = 0; i < N; i++) riv[i] = land[i] && timg[i * 4 + 2] ? 1 : 0
   const dRiv = edt(riv, 1)
-  const RV = new Uint8Array(shared(N))
-  {
-    const tmp = new Float32Array(N)
-    for (let i = 0; i < N; i++) tmp[i] = riv[i]
-    const b = blur(tmp, SW, SH, 1)
-    for (let i = 0; i < N; i++) RV[i] = Math.round(b[i] * 255)
+  // реки — векторные линии (scripts/rivers-vector.mjs): тонкие у истока, шире к устью, как на настоящих картах.
+  // Отрезки [x0,y0,x1,y1,hw0,hw1] разложены по сетке клеток RG×RG пикселей исходника (CSR: RCS — начала, RCI — номера).
+  const RG = 4, RGW = Math.ceil(SW / RG), RGH = Math.ceil(SH / RG)
+  const { readFileSync: readRiv } = await import('fs')
+  const rivJ = JSON.parse(readRiv('source-maps/rivers.json', 'utf8'))
+  const segArr = []
+  for (const l of rivJ.lines) for (let k = 0; k + 5 < l.length; k += 3) segArr.push(l[k], l[k + 1], l[k + 3], l[k + 4], l[k + 2], l[k + 5])
+  const NSEG = segArr.length / 6
+  const RSG = new Float32Array(shared(segArr.length * 4))
+  RSG.set(segArr)
+  const RCS = new Int32Array(shared((RGW * RGH + 1) * 4))
+  const segCells = (s, fn) => {
+    const o = s * 6, pad = Math.max(RSG[o + 4], RSG[o + 5]) + 1.5
+    const ax = Math.max(0, Math.floor((Math.min(RSG[o], RSG[o + 2]) - pad) / RG)), bx = Math.min(RGW - 1, Math.floor((Math.max(RSG[o], RSG[o + 2]) + pad) / RG))
+    const ay = Math.max(0, Math.floor((Math.min(RSG[o + 1], RSG[o + 3]) - pad) / RG)), by = Math.min(RGH - 1, Math.floor((Math.max(RSG[o + 1], RSG[o + 3]) + pad) / RG))
+    for (let gy = ay; gy <= by; gy++) for (let gx = ax; gx <= bx; gx++) fn(gy * RGW + gx)
   }
-  // долина: широкое плавное углубление вдоль русла (река «врезана» в рельеф, а не нарисована поверх)
+  for (let s = 0; s < NSEG; s++) segCells(s, (c) => RCS[c + 1]++)
+  for (let c = 0; c < RGW * RGH; c++) RCS[c + 1] += RCS[c]
+  const RCI = new Int32Array(shared(Math.max(1, RCS[RGW * RGH]) * 4))
+  {
+    const fill = RCS.slice(0, RGW * RGH)
+    for (let s = 0; s < NSEG; s++) segCells(s, (c) => { RCI[fill[c]++] = s })
+  }
+  // озёра — маска из rivers-vector.mjs
+  const LK = new Uint8Array(shared(N))
+  const LKD = new Uint8Array(shared(N))
+  {
+    const lk = await sharp('source-maps/lakes.png').greyscale().raw().toBuffer()
+    const tmp = new Float32Array(N)
+    for (let i = 0; i < N; i++) tmp[i] = lk[i] && land[i] ? 1 : 0
+    const b = blur(tmp, SW, SH, 1)
+    for (let i = 0; i < N; i++) LK[i] = Math.round(b[i] * 255)
+    // «глубина» озера: размытая маска — у берега ~0.5, в середине большого озера → 1
+    const d = blur(tmp, SW, SH, 5)
+    for (let i = 0; i < N; i++) LKD[i] = Math.round(d[i] * 255)
+  }
+  // долина: мягкое углубление вдоль русла, у крупных рек шире и глубже (река «врезана» в рельеф)
   const VAL = new Uint8Array(shared(N))
   {
     const tmp = new Float32Array(N)
-    for (let i = 0; i < N; i++) tmp[i] = riv[i]
-    const b1 = blur(tmp, SW, SH, 3), b2 = blur(tmp, SW, SH, 8)
-    for (let i = 0; i < N; i++) VAL[i] = Math.round(Math.min(1, b1[i] * 1.8 * 0.6 + b2[i] * 3.2 * 0.4) * 255)
+    for (let s = 0; s < NSEG; s++) {
+      const o = s * 6, x0 = RSG[o], y0 = RSG[o + 1], x1 = RSG[o + 2], y1 = RSG[o + 3]
+      const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 2))
+      for (let k = 0; k <= n; k++) {
+        const t = k / n, x = Math.round(x0 + (x1 - x0) * t), y = Math.round(y0 + (y1 - y0) * t)
+        if (x < 0 || y < 0 || x >= SW || y >= SH) continue
+        const v = Math.min(1, 0.25 + (RSG[o + 4] + (RSG[o + 5] - RSG[o + 4]) * t) * 0.9)
+        if (v > tmp[y * SW + x]) tmp[y * SW + x] = v
+      }
+    }
+    for (let i = 0; i < N; i++) if (LK[i] > 128 && tmp[i] < 0.8) tmp[i] = 0.8
+    const b1 = blur(tmp, SW, SH, 2.5), b2 = blur(tmp, SW, SH, 7)
+    for (let i = 0; i < N; i++) VAL[i] = Math.round(Math.min(1, b1[i] * 3.2 * 0.6 + b2[i] * 7 * 0.4) * 255)
   }
+  log(`реки: ${NSEG} отрезков`)
 
   // пашни вокруг поселений: чем крупнее поселение, тем шире круг наделов
   const FM = new Uint8Array(shared(N))
@@ -225,7 +266,7 @@ if (isMainThread) {
     const NZ = makeNoise()
     for (let i = 0; i < N; i++) {
       const mtn = MS[i], hill = CW[i * 7 + 3] / 255
-      hs[i] = coarse[i] + lumHP[i] * (hill * 0.45 + 0.12) * (1 - mtn) * 0.3 - VAL[i] / 255 * 0.05
+      hs[i] = coarse[i] + lumHP[i] * (hill * 0.45 + 0.12) * (1 - mtn) * 0.3 - VAL[i] / 255 * 0.1
       if (mtn > 0.01) hs[i] += mtnRelief(NZ, (i % SW) * 2, ((i / SW) | 0) * 2, mtn, MH[i])
     }
     const GAIN = 0.016 // подъём луча на пиксель исходника
@@ -257,7 +298,7 @@ if (isMainThread) {
   await Promise.all(
     Array.from({ length: nWorkers }, () =>
       new Promise((res, rej) => {
-        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RP: RP.buffer, RDT: RDT.buffer, RT: RT.buffer, SHD: SHD.buffer, FM: FM.buffer, RV: RV.buffer, VAL: VAL.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, MS: MS.buffer, MH: MH.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
+        const w = new Worker(fileURLToPath(import.meta.url), { workerData: { RP: RP.buffer, RDT: RDT.buffer, RT: RT.buffer, SHD: SHD.buffer, FM: FM.buffer, RSG: RSG.buffer, RCS: RCS.buffer, RCI: RCI.buffer, LK: LK.buffer, LKD: LKD.buffer, VAL: VAL.buffer, DB: DB.buffer, sdf: sdf.buffer, CW: CW.buffer, coarse: coarse.buffer, MS: MS.buffer, MH: MH.buffer, lumHP: lumHP.buffer, tint: tint.buffer, out: out.buffer, counter: counter.buffer } })
         w.on('message', (m) => process.stdout.write(`\r  полос: ${m}/${Math.ceil(OH / STRIP)}   `))
         w.on('error', rej)
         w.on('exit', res)
@@ -439,8 +480,39 @@ if (!isMainThread) {
   const sdf = new Float32Array(workerData.sdf)
   const CW = new Uint8Array(workerData.CW)
   const DB = new Uint8Array(workerData.DB)
-  const RV = new Uint8Array(workerData.RV)
+  const RSG = new Float32Array(workerData.RSG), RCS = new Int32Array(workerData.RCS), RCI = new Int32Array(workerData.RCI)
+  const LK = new Uint8Array(workerData.LK)
   const VAL = new Uint8Array(workerData.VAL)
+  const LKD = new Uint8Array(workerData.LKD)
+  const RG = 4, RGW = Math.ceil(SW / RG), RGH = Math.ceil(SH / RG)
+  // покрытие водой реки в точке (пиксели исходника), со сглаживанием края в один пиксель вывода.
+  // Нити тоньше пикселя не обрываются, а бледнеют. rivEdge — насколько точка у берега (0 середина, 1 край).
+  let rivEdge = 0
+  const MINHW = 0.75 / K
+  const riverCov = (px, py) => {
+    rivEdge = 0
+    const gx = Math.floor(px / RG), gy = Math.floor(py / RG)
+    if (gx < 0 || gy < 0 || gx >= RGW || gy >= RGH) return 0
+    const c = gy * RGW + gx
+    let best = 0
+    for (let j = RCS[c], je = RCS[c + 1]; j < je; j++) {
+      const o = RCI[j] * 6
+      const x0 = RSG[o], y0 = RSG[o + 1], dx = RSG[o + 2] - x0, dy = RSG[o + 3] - y0
+      const L2 = dx * dx + dy * dy
+      let t = L2 > 0 ? ((px - x0) * dx + (py - y0) * dy) / L2 : 0
+      t = t < 0 ? 0 : t > 1 ? 1 : t
+      const ex = px - x0 - dx * t, ey = py - y0 - dy * t
+      const d = Math.sqrt(ex * ex + ey * ey)
+      const hw = RSG[o + 4] + (RSG[o + 5] - RSG[o + 4]) * t
+      const he = Math.max(hw, MINHW)
+      let cv = (he - d) * K + 0.5
+      if (cv <= 0) continue
+      if (cv > 1) cv = 1
+      cv *= Math.min(1, hw / MINHW)
+      if (cv > best) { best = cv; rivEdge = Math.min(1, d / he) }
+    }
+    return best
+  }
   const FM = new Uint8Array(workerData.FM)
   const RP = new Uint8Array(workerData.RP)
   const RDT = new Uint8Array(workerData.RDT)
@@ -503,7 +575,7 @@ if (!isMainThread) {
   }
   const hex = (h) => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255]
   const P = {
-    river: hex('#2f6876'), deep: hex('#0c2131'), mid: hex('#163b52'), shallow: hex('#245f6c'), reef: hex('#3a7f80'), foam: hex('#9cc4bd'),
+    river: hex('#2b5d84'), deep: hex('#0c2131'), mid: hex('#163b52'), shallow: hex('#245f6c'), reef: hex('#3a7f80'), foam: hex('#9cc4bd'),
     plainA: hex('#7f8c4c'), plainB: hex('#9b9a5d'), plainC: hex('#687a40'), field: hex('#a8a067'),
     forestGround: hex('#2c3f26'), crownL: hex('#5d7d3f'), crownD: hex('#2a4122'), pineL: hex('#46663e'), pineD: hex('#1e3121'),
     hillA: hex('#8b8157'), hillB: hex('#76734c'),
@@ -631,9 +703,10 @@ if (!isMainThread) {
             const dune = f < 0.7 ? f / 0.7 : (1 - f) / 0.3
             h += des * dune * 0.03 * (0.6 + 0.4 * noise(lx * 0.03, ly * 0.03))
           }
-          const rv = bil(RV, sx + wx * 0.12, sy + wy * 0.12) / 255
+          const rv = Math.max(riverCov(sx + wx * 0.12, sy + wy * 0.12), bil(LK, sx + wx * 0.12, sy + wy * 0.12) / 255)
           const vl = bil(VAL, sx + wx * 0.12, sy + wy * 0.12) / 255
-          h -= vl * 0.055 + rv * 0.03
+          // долина врезана в рельеф, в горах — глубже (ущелья)
+          h -= vl * (0.07 + 0.06 * mtn) + rv * 0.03
           h = Math.max(0.002, h + Math.min(s, 3) * 0.004)
         } else {
           h = Math.max(-1, s * 0.004)
@@ -849,35 +922,51 @@ if (!isMainThread) {
             b += (sand2 - b) * bt
           }
           // река: вода с тёмными мокрыми берегами
-          const rv = bil(RV, sx + WX[i] * 0.12, sy + WY[i] * 0.12) / 255 + noise(lx * 0.4, ly * 0.4) * 0.06
+          // река — тонкая линия с мягким краем (riverCov), озёро — по маске
+          const rsx = sx + WX[i] * 0.12, rsy = sy + WY[i] * 0.12
+          const rcv = riverCov(rsx, rsy), redge = rivEdge
+          const lkRaw = bil(LK, rsx, rsy) / 255
+          // берег озера неровный: шум сдвигает кромку на пару пикселей
+          const lkv = sstep(0.42, 0.58, lkRaw + noise(lx * 0.15, ly * 0.15) * 0.1 + noise(lx * 0.6, ly * 0.6) * 0.04)
+          const rv = Math.max(rcv, lkv)
+          // мокрый тёмный берег сразу за кромкой озера
+          if (lkRaw > 0.05 && lkv < 1) {
+            const wb = sstep(0.08, 0.45, lkRaw) * (1 - lkv) * 0.22
+            r *= 1 - wb; g *= 1 - wb * 0.85; b *= 1 - wb * 0.7
+          }
           {
             // пойма: влажная тёмная земля и свежая зелень в долине, плавно уходящая в рельеф
             const vl = bil(VAL, sx + WX[i] * 0.12, sy + WY[i] * 0.12) / 255
-            const flood = sstep(0.08, 0.7, vl) * (1 - sstep(0.4, 0.8, wts[6]))
+            const flood = sstep(0.1, 0.8, vl) * (1 - sstep(0.4, 0.8, wts[6]))
             if (flood > 0.01) {
-              const gk = flood * 0.32
+              const gk = flood * 0.22
               r += (r * 0.8 + 0.024 - r) * gk
               g += (g * 1.02 + 0.039 - g) * gk
               b += (b * 0.72 - b) * gk
-              const dk = 1 - flood * 0.14
+              const dk = 1 - flood * 0.08
               r *= dk; g *= dk; b *= dk
             }
           }
-          if (rv > 0.2) {
-            const bank = sstep(0.2, 0.46, rv)
-            const wet = 1 - bank * 0.34
-            r *= wet
-            g *= wet
-            b *= wet
-            const water = sstep(0.46, 0.6, rv)
-            const depth = sstep(0.6, 1, rv) // середина русла глубже и темнее, у берега мельче и светлее
-            const ripple = 1 + noise(lx * 1.2, ly * 1.2) * 0.06
-            const dm = 1.12 - depth * 0.32
-            // вода подхватывает свет и тень врезанного рельефа
-            const lit = 1
-            r += (P.river[0] * ripple * dm * lit - r) * water
-            g += (P.river[1] * ripple * dm * lit - g) * water
-            b += (P.river[2] * ripple * dm * lit - b) * water
+          if (rv > 0.002) {
+            // у берега вода чуть темнее (тонкая линия контура), середина — ровный цвет без каймы на суше
+            const edge = rcv >= lkv ? sstep(0.55, 1, redge) : 0
+            const ripple = 1 + noise(lx * 1.2, ly * 1.2) * 0.04
+            const dm = ripple * (1 - edge * 0.18)
+            let wr = P.river[0], wg = P.river[1], wb = P.river[2]
+            if (lkv > rcv) {
+              // озеро: у берега мелко и бирюзово, к середине — глубокая синь
+              const dep = sstep(0.5, 0.97, bil(LKD, rsx, rsy) / 255)
+              const sh = 1 - sstep(0, 0.35, dep)
+              wr += (P.shallow[0] - wr) * sh * 0.55; wg += (P.shallow[1] - wg) * sh * 0.55; wb += (P.shallow[2] - wb) * sh * 0.55
+              const dd = sstep(0.3, 1, dep) * 0.6
+              wr += (P.mid[0] - wr) * dd; wg += (P.mid[1] - wg) * dd; wb += (P.mid[2] - wb) * dd
+              // светлая полоска прибоя у самой кромки
+              const rim = (1 - sstep(0.55, 0.85, lkv)) * sstep(0.05, 0.4, lkv) * 0.35
+              wr += (P.foam[0] - wr) * rim; wg += (P.foam[1] - wg) * rim; wb += (P.foam[2] - wb) * rim
+            }
+            r += (wr * dm - r) * rv
+            g += (wg * dm - g) * rv
+            b += (wb * dm - b) * rv
           }
           // дороги: тракт из серого камня с бордюром, грунтовка, тропа; над рекой — мост
           const dP = roadD(RP, lx, ly), dD = roadD(RDT, lx, ly), dT = roadD(RT, lx, ly)
@@ -965,6 +1054,11 @@ if (!isMainThread) {
             bilW(sx - 0.7 + WX[i], sy - 0.7 + WY[i])
             const edgeF = wts[2]
             if (edgeF > 0.35) shade *= 1 - sstep(0.35, 0.8, edgeF) * 0.22
+          }
+          // вода — ровная гладь: рельеф дна её не освещает, лишь чуть ложится тень гор
+          if (rv > 0.002) {
+            const ws = 1 - (bil(SHD, sx, sy) / 255) * 0.15
+            shade += (ws - shade) * rv
           }
           // ложбины темнее
           r *= shade
