@@ -24,6 +24,7 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const HARNMARK_STYLE = 'oil painting, Germanic imperial principality portrait, half-timbered stone town and a white tower with a red pennant behind, overcast amber light, muted reds, creams and slate, painterly, half-length portrait'
 const KULAGON_STYLE = 'oil painting, Frisian canal-country portrait, flat green plain with brick houses and a stone arch over a canal behind, low grey sky with silver light, muted greens and slate blues, painterly, half-length portrait'
 const KOGALYM_STYLE = 'oil painting, rural commune portrait, timber meeting hall with a notched tally stick and a wooden cart behind, warm daylight, earthy tones, visible brush strokes, detailed face, half-length portrait'
 const LYRIA_STYLE = 'oil painting, mountain-roman ducal portrait, white marble hall with a wall of small glowing tablets behind, warm lamp light, terracotta and cream tones, visible brush strokes, detailed face, half-length portrait'
@@ -35,6 +36,7 @@ const HIGHLAND_STYLE = 'oil painting, alpine noble portrait, cold clear mountain
 const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge light and brass lamps, carved stone pillars, dark background, visible brush strokes, detailed face, half-length portrait'
 // Эльфборн: светлый эльфийский двор — серебристая ива и белые арки за спиной, рассеянный зеленоватый свет
 const ELFBORN_STYLE = 'oil painting, high fantasy elven court portrait, pre-raphaelite style, soft silver-green light through willow leaves, pale stone arches behind, visible brush strokes, detailed face, half-length portrait'
+const SILVLAND_STYLE = 'oil painting, high fantasy forest portrait, deep green dappled light under giant ancient tree canopy, mossy roots and glowing fruit behind, visible brush strokes, detailed face, half-length portrait'
 const KREIT_STYLE ='oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
@@ -60,6 +62,28 @@ const CUSTOM = {
   'kl-geeske': 'elderly woman in her late sixties, white hair under a linen cap, shrewd calm eyes, dark wool dress',
   'kl-sjoukje': 'composed woman of forty-four, blond hair braided, grey dress, quiet clever expression',
   'kl-piebe': 'serious boy of ten, straw hair, grey tunic, solemn look',
+  // Сильвленд: сильва — растительные черты, эльфы и люди — северноевропейские лица
+  'sv-ilarion': 'tall stooped old elf looking about eighty, long grey hair, moss-green cloak, a staff of pale wood, wise sad eyes',
+  'sv-elenve': 'golden-eyed sun elf woman looking about fifty, red-gold hair, sunset-colored dress, proud calm face',
+  'sv-aelindor': 'weathered forest elf warrior looking about fifty, scar on the cheek, grey wolf-tooth amulet, dark green leather',
+  'sv-selinde': 'stern fair-haired high elf woman looking about thirty-five, blue gown, a small green leaf seal on a yew cord, composed face',
+  'sv-meriene': 'sturdy forest elf woman looking about seventy, thick braid with a fruit ribbon, dark green dress, steady eyes',
+  'sv-valenor': 'grey-haired high elf lord looking about eighty, blue doublet with a golden tower, stern commanding face',
+  'sv-kaelis': 'thin silent twilight elf looking about sixty-five, grey skin, a wreath of grass on the shoulder, tired eyes',
+  'sv-deirovan': 'stocky forest elf looking about fifty, grey eyes, wolf pelt on the shoulders, worried guilty face',
+  'sv-laerel': 'quick-eyed forest elf woman looking about forty, hair pinned up, ink on her fingers, a ledger of root-bark',
+  'sv-oriel': 'wiry elf woman archer looking about forty, burn scars on one cheek and neck, dark green leather, hard eyes',
+  'sv-nellavel': 'quiet elf healer woman looking about thirty-five, light linen shirt, gentle sorrowful eyes',
+  'sv-tis': 'ancient dark-green sylva elder, thick bark on the shoulders, red berries in the hair, slow wise amber eyes',
+  'sv-bereskl': 'tall thin sylva man, birch-white bark skin, pink fruits on the shoulders, a scroll of birch bark in hand',
+  'sv-malinnik': 'round sylva man with red berries growing in his palms, cheerful counting expression, green skin',
+  'sv-yasen': 'tall sylva guard with pale ash-grey bark, a spear of ash wood, calm watchful eyes',
+  'sv-buzina': 'small sylva woman healer with white flowers and black berries in her hair, kind eyes',
+  'sv-olkha': 'slim sylva woman with alder catkins in her hair, brave direct look, leaf-green skin',
+  'sv-kalina': 'young sylva woman merchant with clusters of red guelder-rose berries in the hair, smiling, market apron',
+  'sv-brusnika': 'small sylva girl, pale washed-out green skin, dull faded eyes, a single pale berry in the hair',
+  'sv-olger': 'ginger-bearded middle-aged human moneylender, dark coat with silver buttons, shrewd cold eyes',
+  'sv-benno': 'bald plump human friar in a grey robe, soft cunning smile',
   // Эльфборн: эльфы стареют медленно — в описании видимый возраст; северноевропейские лица, остроконечные уши
   'el-faeron': 'ageless elf lord looking about sixty, long silver-grey hair with a golden ribbon, rigid straight posture, spotless white cloak, stern regretful eyes',
   'el-romendil': 'broad-shouldered elf warrior looking about fifty, scar across the eyebrow, long grey braid, worn steel armor with a silver leaf, hard tired face',
@@ -570,7 +594,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон', 'Эльфборн'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон', 'Эльфборн', 'Сильвленд', 'Княжество Харнмарк'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 for (const e of chars) {
@@ -593,7 +617,9 @@ for (const e of chars) {
   const kogalym = e.base.tags.includes('Когалым')
   const kulagon = e.base.tags.includes('Кулагон')
   const elfborn = e.base.tags.includes('Эльфборн')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon || elfborn
+  const silvland = e.base.tags.includes('Сильвленд')
+  const harnmark = e.base.tags.includes('Княжество Харнмарк')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon || elfborn || silvland || harnmark
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -611,8 +637,13 @@ for (const e of chars) {
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
   const halfElf = /Полуэльф/.test(race), elfR = /эльф/i.test(race) && !halfElf
-  const prompt = elfborn
+  const sylvaR = /Сильва/.test(race)
+  const prompt = silvland
+    ? `${SILVLAND_STYLE}, portrait of ${sylvaR ? `a (sylva ${female ? 'woman' : 'man'}, living plant person:1.4), (green-tinted skin with bark texture on shoulders, leaves and berries growing in the hair, glowing amber eyes, a small carved root-shaped mark on the shoulder, plain coarse bast clothes, northern european facial features:1.3)` : elfR ? `an (elf ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, long pointed elf ears:1.3)` : halfElf ? `a (half-elf ${female ? 'woman' : 'man'}:1.35), (northern european human face, slightly pointed ears:1.25)` : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25)`}, ${CUSTOM[id] ?? subject}, (bareheaded:1.1)`
+    : elfborn
     ? `${ELFBORN_STYLE}, portrait of ${elfR ? `an (elf ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, long pointed elf ears:1.3)` : halfElf ? `a (half-elf ${female ? 'woman' : 'man'}:1.35), (northern european human face, slightly pointed ears:1.25)` : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25)`}, ${CUSTOM[id] ?? subject}${id === 'el-serelin' ? '' : ', (bareheaded:1.1)'}`
+    : harnmark
+    ? `${HARNMARK_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : kulagon
     ? `${KULAGON_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : kogalym

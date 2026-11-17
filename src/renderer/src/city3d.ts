@@ -73,6 +73,7 @@ export const STYLES: Record<string, Style> = {
   // Высокогорное Княжество: альпийские дома — белёный камень внизу, тёмное дерево наверху, широкие крыши из тёмного гонта;
   // kranz — то же на каменной платформе вокруг вершины (Венец), alpine — замки и городки людей ниже
   // Княжества Гарефорда: горный фахверк — белёная штукатурка, тёмный дуб, крутые сланцевые и красно-бурые крыши, медно-зелёные шпили
+  harn: { plaster: ['#efe6d2', '#e4d6bc', '#f2eadb', '#d9c9ae', '#e8dcc4'], roof: ['#7a2a26', '#6a2622', '#4a4650', '#5a2a22', '#8a3a2e'], timber: '#2a1c12', stone: '#8a867c', wall: '#a29c90', shutter: ['#c03538', '#2a4a7a', '#2f5a3a'], pitch: 1.1, framed: true, floors: 2, grass: '#6a8a48', grass2: '#789850', dirt: '#988666', pave: '#9c9688', lit: 0.45, conifer: 0.7, tower: '#c03538' },
   garef: { plaster: ['#f1ece0', '#e8dfcc', '#f4efe4', '#ddd3bf', '#ece4d2'], roof: ['#4a4650', '#3e3a44', '#7a3a2a', '#5a4a40', '#6a3226'], timber: '#2f2014', stone: '#8c8a82', wall: '#a6a298', shutter: ['#2f5a3a', '#7a2a22', '#c8a040'], pitch: 1.05, framed: true, floors: 1, grass: '#6a8c4a', grass2: '#76984f', dirt: '#9a8a68', pave: '#9e988a', lit: 0.45, conifer: 0.8, tower: '#4f8a74' },
   // Королевство Темерия: средневековый имперский фахверк — белёные стены на каменных низах, зелёные и тёмно-красные крыши
   temer: { plaster: ['#f0e8d4', '#e6dcc0', '#f4ecdc', '#dccfb0', '#ece2c8'], roof: ['#3f6a4a', '#2f5a3c', '#6a2a22', '#7a3328', '#4a5a3a'], timber: '#3a2614', stone: '#8f8a7c', wall: '#a8a496', shutter: ['#2f5a3a', '#7a2a22', '#c8a040'], pitch: 0.98, framed: true, floors: 1, grass: '#6f9a4a', grass2: '#7aa650', dirt: '#b09a72', pave: '#a8a08a', lit: 0.45, conifer: 0.5, tower: '#3f7a54' },
@@ -82,6 +83,7 @@ export const STYLES: Record<string, Style> = {
   kulag: { plaster: ['#e8e2d4', '#dcd4c0', '#f0ebdd', '#d4c8b0', '#e2dac6'], roof: ['#a8452f', '#9a3c28', '#b4503a', '#8a3424', '#6a2c20'], timber: '#2e2a26', stone: '#8a8478', wall: '#a8503a', shutter: ['#2a4a6a', '#3a5a3a', '#8a3a2a'], pitch: 1.15, framed: true, floors: 2, grass: '#6a9a48', grass2: '#76a652', dirt: '#9a8a64', pave: '#8e8672', lit: 0.4, conifer: 0.1, tower: '#8a3a28' },
   kogal: { plaster: ['#ece0c8', '#e0d2b4', '#f0e6d0', '#d8c8a8', '#e6d8bc'], roof: ['#b89a52', '#a88c48', '#c4a860', '#9a7e40', '#6a4a30'], timber: '#4a3420', stone: '#9a9484', wall: '#b0a890', shutter: ['#2f5a3a', '#8a6a2e', '#6a4a2a'], pitch: 1.1, framed: true, floors: 1, grass: '#74a04a', grass2: '#80aa52', dirt: '#a89268', pave: '#a09478', lit: 0.4, conifer: 0.4, tower: '#7a5a3a' },
   // Эльфборн: светлое дерево и белый камень, серебристо-зелёные крутые крыши, арки, много лиственных крон
+  silva: { plaster: ['#8a6a3a', '#7a5a30', '#9a7a44', '#6a4a2c', '#8a7a50'], roof: ['#4f7a34', '#5a8a3a', '#3f6a2e', '#6a9a3e', '#5a7a3a'], timber: '#6a4a2c', stone: '#8a7a5a', wall: '#7a5a3a', shutter: ['#7a8a3a', '#a86a3a', '#8a6a3a'], pitch: 1.4, framed: false, floors: 1, grass: '#4f7a34', grass2: '#5f8a3e', dirt: '#6a5a3a', pave: '#8a7a56', lit: 0.5, conifer: 0.35, tower: '#6a4a2c' },
   elf: { plaster: ['#eef0e4', '#e4ead8', '#f3f0e2', '#dfe6d4', '#e9ecdc'], roof: ['#5a8068', '#4a7470', '#6a8a5a', '#7a9a86', '#8aa0a0'], timber: '#b59a6a', stone: '#c8c6b8', wall: '#d6d4c6', shutter: ['#5d7f5a', '#4a6a70', '#b59a6a'], pitch: 1.4, framed: false, floors: 1, grass: '#6e9a52', grass2: '#7aa65a', dirt: '#a09272', pave: '#cfcbbc', lit: 0.42, conifer: 0.25, tower: '#5a8a7a' },
   alpine: { plaster: ['#efe9dc', '#e6dccb', '#f3eee4', '#d9cfbd', '#e9e1d0'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#6a4a34', '#46434a'], timber: '#3a2416', stone: '#8a877e', wall: '#a8a49a', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#6f8f4e', grass2: '#7a9a56', dirt: '#9a8a6a', pave: '#9a958a', lit: 0.4, conifer: 1, tower: '#3f4a5a' },
   kranz: { plaster: ['#f4f0e8', '#ebe5d8', '#f7f4ee', '#e2dacb', '#efe8da'], roof: ['#4a3426', '#5a3e2c', '#3f2c20', '#3a3a42', '#46434a'], timber: '#3a2416', stone: '#a9a598', wall: '#c8c3b6', shutter: ['#2f5a3a', '#8a2a22', '#2a4a6a'], pitch: 0.82, framed: true, floors: 1, grass: '#a6a294', grass2: '#b0ac9e', dirt: '#b8b2a2', pave: '#c4bfb2', lit: 0.4, conifer: 1, tower: '#2a3a5a' },
@@ -291,6 +293,7 @@ export interface CityPlace { id: string; name: string; x: number; y: number; bui
 
 export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: boolean; maxTexture: number; places: CityPlace[]; state: string; culture: string; gov?: string }): CityWorld {
   const S: PlanScene = plan.scene ?? { s: 1, style: 'empire', forest: 0.1, tower: 7.6, droof: [], citadel: -1, dist: [], water: [], fields: [], greens: [], squares: [], walls: [], roads: [], rivers: [], planks: [] }
+  if (S.style === 'silva') S.forest = Math.max(S.forest, 0.45)
   const st = STYLES[S.style] ?? STYLES.empire
   const R = rng(hashOf(seedName) + 1)
 
@@ -1069,7 +1072,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   type Cult = 'human' | 'gnome' | keyof typeof CULT_SHARE
   const dwStyle = S.style === 'dwarf' || S.style === 'deep'
   const gnStyle = S.style === 'gnome'
-  const elStyle = S.style === 'elf'
+  const elStyle = S.style === 'elf' || S.style === 'silva'
   const pickCult = (u: number, k: number): Cult => {
     let acc = 0
     for (const [c, s] of Object.entries(CULT_SHARE) as [Cult, number][]) {
@@ -1171,6 +1174,102 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     const pitch = flat ? 0 : rise / hw
     const topAt = (p: P2): number => { const v = Math.abs(toUV(p)[1]); return base + eave + Math.max(-1.5, rise - v * pitch) }
     tops[idx] = base + eave + rise + (flat ? 0.6 : 0)
+    // Сильвленд: каждый дом — живое дерево с дуплом; ни стен, ни крыш. Дверь, окна и лестница вырезаны в стволе
+    if (S.style === 'silva') {
+      const big = kind === 'keep' || kind === 'civic' || kind === 'temple'
+      const R = Math.min(3.8, (0.8 + Math.sqrt(area) * 0.13) * (big ? 1.45 : 1))
+      const sp = big ? (kind === 'temple' ? 1 : 0) : Math.floor(rv() * 6)
+      const H = 4.8 + floors * 2.9 + (big ? 4.5 : 0) + (sp === 4 ? 3 : 0)
+      const BARK = ['#6a4a2c', '#e2ded0', '#7a6a50', '#8a8478', '#5a4030', '#6a5a3e'][sp]
+      const LEAF = [['#4f7a34', '#5a8a3a', '#3f6a2e'], ['#8aae48', '#9ab852', '#7a9e42'], ['#6a9a3e', '#76a846', '#5a8a38'], ['#5a7a3a', '#8a7a2e', '#6a8a3a'], ['#2f5a3a', '#3a6a42', '#27503a'], ['#8aa050', '#9ab060', '#7a9444']][sp]
+      const lc = (): string => LEAF[Math.floor(rv() * LEAF.length)]
+      const rT = (y: number): number => R * (1 - 0.28 * ((y - base) / H))
+      // направление двери: к самой длинной стороне участка
+      let bi = 0, bl = 0
+      for (let i = 0; i < r.length; i++) { const l = Math.hypot(r[(i + 1) % r.length][0] - r[i][0], r[(i + 1) % r.length][1] - r[i][1]); if (l > bl) { bl = l; bi = i } }
+      const mx0 = (r[bi][0] + r[(bi + 1) % r.length][0]) / 2 - ctr[0], mz0 = (r[bi][1] + r[(bi + 1) % r.length][1]) / 2 - ctr[1]
+      const a0 = Math.atan2(mz0, mx0) + (rv() - 0.5) * 0.5
+      const cx0 = ctr[0], cz0 = ctr[1]
+      const polar = (a: number, d: number): [number, number] => [cx0 + Math.cos(a) * d, cz0 + Math.sin(a) * d]
+      // ствол и лёгкое расширение у корней
+      ch.solid.cyl(cx0, base - 0.5, cz0, R * 1.18, 1.3, 12, BARK, R, false)
+      ch.solid.cyl(cx0, base + 0.8, cz0, R, H - 0.8, 12, BARK, R * 0.72, true)
+      if (detail >= 1) {
+        for (let k = 0; k < 5; k++) {
+          const a = a0 + 0.6 + (k / 5) * Math.PI * 2 + (rx() - 0.5) * 0.4, [rx1, rz1] = polar(a, R * 0.8), [rx2, rz2] = polar(a, R + 1.5 + rx() * 1.2)
+          const px = -Math.sin(a) * 0.45, pz = Math.cos(a) * 0.45
+          ch.solid.tri([rx1, base + 1.5, rz1], [rx2 + px, base - 0.1, rz2 + pz], [rx2 - px, base - 0.1, rz2 - pz], BARK)
+          ch.solid.tri([rx1, base + 1.5, rz1], [rx2 - px, base - 0.1, rz2 - pz], [rx2 + px, base - 0.1, rz2 + pz], BARK)
+        }
+        if (sp === 1) for (let k = 0; k < 7; k++) { const a = rx() * 6.28, y = base + 0.8 + rx() * (H - 1.5), [qx, qz] = polar(a, rT(y) * 0.97); ch.solid.box(qx, y, qz, 0.1, 0.12, 0.5, '#2f2c28', a) }
+      }
+      // дверь в дупле, лестница из корней
+      const [dx0, dz0] = polar(a0, R * 0.95)
+      ch.solid.box(dx0, base, dz0, 0.26, 2.15, 1.25, mixHex(BARK, '#000', 0.4), a0)
+      ch.solid.box(dx0, base + 0.05, dz0, 0.34, 2.3, 1.45, mixHex(BARK, '#000', 0.2), a0)
+      ch.solid.box(dx0, base, dz0, 0.3, 2.1, 1.2, '#241a10', a0)
+      ch.glow.box(dx0, base + 0.6, dz0, 0.34, 0.7, 0.5, '#ffffff', a0)
+      for (let s = 0; s < 3; s++) { const [sx1, sz1] = polar(a0, R + 0.5 + s * 0.7); ch.solid.box(sx1, base - 0.15, sz1, 0.9, 0.3 + (2 - s) * 0.14, 1.5 - s * 0.2, mixHex(BARK, '#3a2a18', 0.3), a0) }
+      // окна-дупла по ярусам
+      if (detail >= 1) {
+        const nW = Math.min(3, floors + (big ? 1 : 0))
+        for (let k = 0; k < nW; k++) {
+          const y = base + 2.7 + k * 2.7
+          if (y > base + H - 1.4) break
+          for (const sg of [-1, 1]) {
+            const a = a0 + sg * (0.8 + k * 0.12), [qx, qz] = polar(a, rT(y) * 0.96)
+            ch.solid.box(qx, y, qz, 0.24, 0.95, 0.62, mixHex(BARK, '#000', 0.45), a)
+            ch.solid.box(qx, y + 0.06, qz, 0.28, 0.8, 0.5, '#1f1810', a)
+            if (rx() < 0.65) ch.glow.box(qx, y + 0.12, qz, 0.31, 0.62, 0.38, '#ffffff', a)
+          }
+        }
+      }
+      // крона
+      const cr = Math.min(8.5, R * 2.5 + 2.3 + (big ? 1.5 : 0))
+      const yb = base + H - 1
+      if (sp === 4) {
+        for (let t = 0; t < 4; t++) { const rr = cr * (0.95 - t * 0.2), y = base + H * 0.3 + t * H * 0.24; ch.solid.cyl(cx0, y, cz0, rr, H * 0.3, 9, lc(), 0.05, true) }
+      } else if (sp === 1) {
+        ch.solid.cyl(cx0, yb - 0.5, cz0, cr * 0.5, cr * 0.5, 8, lc(), cr * 0.8)
+        ch.solid.cyl(cx0, yb, cz0, cr * 0.8, cr * 0.7, 8, lc(), cr * 0.9)
+        ch.solid.cyl(cx0, yb + cr * 0.7, cz0, cr * 0.9, cr * 0.6, 8, lc(), cr * 0.25)
+      } else {
+        ch.solid.cyl(cx0, yb - 0.8, cz0, cr * 0.45, cr * 0.5, 9, lc(), cr * 0.95)
+        ch.solid.cyl(cx0, yb - 0.3, cz0, cr * 0.95, cr * 0.7, 9, lc(), cr)
+        ch.solid.cyl(cx0, yb + cr * 0.4, cz0, cr, cr * 0.6, 9, lc(), cr * 0.45)
+        if (detail >= 1) for (let k = 0; k < 3; k++) { const a = rx() * 6.28, [bx, bz] = polar(a, cr * 0.7); ch.solid.cyl(bx, yb - 0.2 + rx() * 1.2, bz, cr * 0.42, cr * 0.45, 7, lc(), cr * 0.2) }
+      }
+      if (sp === 5 && detail >= 1) for (let k = 0; k < 10; k++) { const a = (k / 10) * 6.28, [qx, qz] = polar(a, cr * 0.97), px = -Math.sin(a) * 0.3, pz = Math.cos(a) * 0.3; ch.solid.quad([qx - px, yb - 0.2, qz - pz], [qx + px, yb - 0.2, qz + pz], [qx + px, yb - 3.2, qz + pz], [qx - px, yb - 3.2, qz - pz], LEAF[1]) }
+      // фонари в кроне и лианный подъёмник
+      if (detail >= 1) {
+        for (let k = 0; k < (big ? 4 : 2); k++) { const a = a0 + 0.5 + k * 1.6, [lx, lz] = polar(a, cr * 0.55); ch.solid.box(lx, yb + 0.2, lz, 0.05, 1.2, 0.05, '#4a5a2a'); ch.glow.box(lx, yb - 0.4, lz, 0.34, 0.5, 0.34, '#ffffff', a) }
+        if (H > 8 && rx() < 0.55) { const a = a0 + 2.4, [lx, lz] = polar(a, R + 0.35); ch.solid.box(lx, base, lz, 0.06, H - 1, 0.06, '#5a6a2e'); ch.solid.box(lx, base + 0.6 + rx() * (H * 0.5), lz, 0.9, 0.12, 0.9, '#8a6a3a', a) }
+        if (first && rv() < 0.4 && chimneys.length < 400) chimneys.push([cx0, base + H * 0.6, cz0])
+      }
+      // ветви-мостки к соседним деревьям
+      if (detail >= 1) {
+        for (let k = 0; k < 4; k++) {
+          const a = a0 + k * Math.PI / 2 + 0.7
+          for (let dd = 4; dd <= 15; dd += 1.5) {
+            const [qx, qz] = polar(a, dd), v = gridAt(qx, qz)
+            if (v > 0 && v !== idx + 1) {
+              if (v - 1 < idx) break
+              const oc = centerOf(blds[v - 1].r), L = Math.hypot(oc[0] - cx0, oc[1] - cz0), an = Math.atan2(oc[1] - cz0, oc[0] - cx0)
+              const y = Math.max(base, heightAt(oc[0], oc[1])) + 4.6
+              const ln = L - R - 1.4
+              if (ln > 1.5 && ln < 16) {
+                const [px, pz] = polar(an, R + 0.7 + ln / 2)
+                ch.solid.box(px, y, pz, ln, 0.14, 1.0, '#7a5a30', an)
+                for (const sg of [-1, 1]) ch.solid.box(px - Math.sin(an) * sg * 0.5, y + 0.8, pz + Math.cos(an) * sg * 0.5, ln, 0.05, 0.05, '#5a6a2e', an)
+              }
+              break
+            }
+          }
+        }
+      }
+      tops[idx] = base + H + cr * 0.6
+      return
+    }
 
     // стены: каждую сторону делим на коньке, чтобы щипец вышел ровным
     const edges: { a: P2; b: P2; n: P2; len: number; hidden: boolean }[] = []
@@ -1883,7 +1982,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const vendors: { x: number; z: number; a: number }[] = []
   const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
   // Гарефорд: Светочная башня всегда встаёт на самую большую площадь
-  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag' || S.style === 'elf') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
+  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag' || S.style === 'elf' || S.style === 'silva' || S.style === 'harn') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
     if (area > 500 || si === garefSq) {
@@ -1897,6 +1996,29 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           ch.solid.cyl(px, y, pz, 0.38, 4.2, 6, st.timber)
           ch.solid.box(px, y + 3.3, pz, 0.9, 0.8, 0.9, '#6a2a1a', a)
         }
+      } else if (si === garefSq && S.style === 'silva') {
+        // Великая Мать Сильвленда: плетёное каменное кольцо, массивный ствол в корнях, ярусная крона и красные плоды
+        ch.solid.cyl(cx, y, cz, 9.8, 0.3, 32, st.stone)
+        ch.solid.cyl(cx, y + 0.3, cz, 8.2, 0.1, 32, '#7a9a4a')
+        ch.solid.cyl(cx, y + 0.4, cz, 3.4, 0.7, 14, '#6a4a2a')
+        for (let k = 0; k < 8; k++) {
+          const a = si + (k / 8) * 6.283
+          ch.solid.box(cx + Math.cos(a) * 3.0, y + 0.4, cz + Math.sin(a) * 3.0, 3.0, 0.9, 0.7, '#5a3e22', a)
+        }
+        ch.solid.cyl(cx, y + 1.0, cz, 2.1, 6.4, 12, '#6a4a2a', 0.9)
+        ch.solid.cyl(cx, y + 7.2, cz, 1.5, 2.2, 10, '#5a3e22', 0.7)
+        ch.solid.cyl(cx, y + 7.0, cz, 7.6, 2.0, 20, '#4f8a3a', 5.4)
+        ch.solid.cyl(cx, y + 8.8, cz, 6.2, 2.2, 18, '#5c9a3e', 3.6)
+        ch.solid.cyl(cx, y + 10.8, cz, 3.8, 1.8, 14, '#6aa846', 0.6)
+        for (let k = 0; k < 16; k++) {
+          const a = si * 0.4 + (k / 16) * 6.283, rr = 3.6 + (k % 3) * 1.6, bx = cx + Math.cos(a) * rr, bz = cz + Math.sin(a) * rr
+          ch.glow.box(bx, y + 7.0 + (k % 4) * 0.9, bz, 0.34, 0.34, 0.34, '#d84a3a', a)
+        }
+        for (let k = 0; k < 4; k++) {
+          const a = si + 0.4 + (k / 4) * 6.283
+          ch.solid.box(cx + Math.cos(a) * 9.2, y + 0.3, cz + Math.sin(a) * 9.2, 3.2, 0.45, 0.7, '#8a6a3a', a + Math.PI / 2)
+        }
+        fillLine([[cx - 9, cz], [cx + 9, cz]], 10, N + 2 + si)
       } else if (si === garefSq && S.style === 'elf') {
         // Серебряная Ива Эльфборна: белое каменное кольцо с водой, серебристый ствол с корнями, широкая крона
         // и двенадцать ниспадающих ветвей Домов — на конце каждой светится лист
@@ -1996,6 +2118,26 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         // скамьи приюта вокруг
         for (let k = 0; k < 6; k++) { const a = si + (k / 6) * 6.283, bx = cx + Math.cos(a) * 11, bz = cz + Math.sin(a) * 11; ch.solid.box(bx, y, bz, 3, 0.55, 0.8, st.timber, a + Math.PI / 2) }
         fillLine([[cx, cz], [cx + 0.1, cz]], 9, N + 2 + si)
+      } else if (si === garefSq && S.style === 'harn') {
+        // Дом Колыбелей Орельберга: длинный зал и пять башен под щипцами цветов Пяти Домов; в красной башне Харнов горит свет
+        const cols = ['#2a4a7a', '#2f5a3a', '#5a3a2a', '#1f5f6e', '#4a4a52']
+        const len = 17
+        ch.solid.box(cx, y, cz, len + 1, 1.0, 8, mixHex(st.stone, '#000', 0.1), si)
+        ch.solid.box(cx, y + 1.0, cz, len, 4.2, 7, st.plaster[0], si)
+        ch.solid.box(cx, y + 3.4, cz, len + 0.3, 0.4, 7.3, st.timber, si)
+        ch.roof.cyl(cx, y + 5.2, cz, 6.2, 3.2, 4, st.roof[0], 0, false, Math.PI / 4)
+        for (let k = 0; k < 5; k++) {
+          const tx = cx + (k - 2) * (len / 4.4), tz = cz - 4.4
+          ch.solid.box(tx, y + 1.0, tz, 2.6, 7.2, 2.6, st.plaster[1], si)
+          ch.solid.box(tx, y + 8.2, tz, 2.9, 0.4, 2.9, cols[k], si)
+          ch.roof.cyl(tx, y + 8.6, tz, 2.4, 3.2, 4, cols[k], 0, false, Math.PI / 4)
+          if (!opts.mobile || k === 2) ch.glow.box(tx, y + 5.2, tz + 1.32, 0.7, 1.1, 0.12, '#ffffff', si)
+        }
+        ch.solid.box(cx, y + 1.0, cz + 3.6, 3.2, 3.2, 0.3, st.timber, si)
+        ch.glow.box(cx, y + 1.0, cz + 3.8, 2.2, 3.0, 0.1, '#ffffff', si)
+        ch.solid.cyl(cx + len / 2 + 2, y, cz + 5, 0.4, 5, 8, st.timber)
+        ch.solid.box(cx + len / 2 + 2, y + 4.2, cz + 5.45, 0.12, 1.5, 0.9, '#c03538', si)
+        fillLine([[cx - len / 2, cz + 6], [cx + len / 2, cz + 6]], 5, N + 2 + si)
       } else if (si === garefSq) {
         // Светочная башня Гарефорда: каменный ствол, дубовая галерея, фонарная клеть с Пламенем, медный шпиль
         const tw = 4.6, th = 20

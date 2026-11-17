@@ -2097,3 +2097,48 @@ button.pw-chip:hover { background: var(--panel-2); }
   .wil-cards { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); } .wil-nights { grid-template-columns: 1fr; }
   .wil-svg { max-width: 420px; }
 }
+
+/* ---- Пять Колыбелей (Княжество Харнмарк) ---- */
+.hm { margin: 16px 0; padding: 14px; border: 1px solid #6a2a2c; border-radius: 10px; background: radial-gradient(ellipse at 50% 0%, #321a1a, #0e0a0a 80%); color: #ece4d4; }
+.hm-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hm-head small { display: block; color: #a8a888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.hm-head b { font-family: var(--serif); font-size: 20px; display: block; }
+.hm-sub { color: #b8b898; font-size: 13px; }
+.hm-status { padding: 6px 12px; border-radius: 8px; background: #1a1210; border: 1px solid; font-size: 14px; }
+.hm-slider { display: flex; align-items: center; gap: 10px; margin: 10px 0 4px; color: #a8a888; font-size: 13px; }
+.hm-slider input { flex: 1; accent-color: #c03538; }
+.hm-main { display: grid; grid-template-columns: minmax(240px, 380px) 1fr; gap: 14px; align-items: center; }
+.hm-wheel { width: 100%; max-width: 400px; display: block; margin: 0 auto; overflow: visible; }
+.hm-cradle { cursor: pointer; } .hm-cradle:hover circle:first-child { filter: brightness(1.25); }
+.hm-seat { fill: #d8d4be; font-size: 9px; font-family: var(--serif); } .hm-kid { fill: #a8a888; font-size: 9px; } .hm-void { fill: #7a7a68; font-size: 10px; }
+.hm-year { fill: #f4e6b8; font-size: 20px; font-family: var(--serif); font-weight: 700; } .hm-ring-name { fill: #9a9a7a; font-size: 9px; }
+.hm-baby { animation: hm-breath 3s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+.hm-star { animation: hm-pulse 1.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes hm-breath { from { transform: scale(1); } to { transform: scale(1.04); } }
+@keyframes hm-pulse { from { opacity: .6; } to { opacity: 1; } }
+.hm-card { padding: 10px; border: 1px solid #5a2a2c; border-radius: 8px; background: #160e0e; }
+.hm-card-text small { display: block; color: #a8a888; font-size: 12px; } .hm-card-text b { font-family: var(--serif); font-size: 17px; display: block; }
+.hm-years { display: block; color: #c8c0a0; font-size: 12px; } .hm-card-text p { margin: 6px 0 0; font-size: 13px; color: #d8d4be; }
+.hm-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.hm-btns button { min-height: 28px; padding: 3px 10px; border: 1px solid #6a2a2c; border-radius: 6px; background: #1e1212; color: #d8d4be; cursor: pointer; font-size: 12px; }
+.hm-btns button:hover { border-color: #c9a24a; }
+.hm-night { margin: 8px 0 0; padding: 8px 10px; border-left: 3px solid #d0604a; background: #1c1210; color: #f0e4c4; font-size: 14px; }
+.hm-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 10px 0 0; font-size: 12px; color: #a8a888; }
+.hm-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.hm-key-void { border: 1px dashed #8a8a70; } .hm-key-star { background: #f0c84a !important; border-radius: 50% !important; }
+.hm-h { font-family: var(--serif); margin: 14px 0 6px; font-size: 18px; color: #f6f2e0; }
+.hm-chart { display: flex; align-items: flex-end; gap: 2px; height: 56px; }
+.hm-bar { flex: 1; min-width: 4px; padding: 0; border: 0; border-radius: 2px 2px 0 0; cursor: pointer; opacity: .6; }
+.hm-bar.full { background: #6aaa7a; } .hm-bar.lean { background: #e8b84a; } .hm-bar.fall { background: #d0604a; } .hm-bar.on { opacity: 1; outline: 2px solid #fff; }
+.hm-pledges { display: grid; gap: 4px; }
+.hm-pledge { display: grid; grid-template-columns: 44px 1fr auto; gap: 2px 10px; padding: 6px 8px; border-radius: 6px; background: #160e0e; border: 1px solid #3c2a28; cursor: pointer; font-size: 13px; }
+.hm-pledge:hover, .hm-pledge.on { border-color: #c9a24a; } .hm-pledge-y { font-family: var(--serif); color: #f4e6b8; grid-row: span 2; align-self: center; }
+.hm-pledge-w { color: #b8b898; } .hm-pledge-s { grid-row: span 2; align-self: center; padding: 1px 8px; border: 1px solid; border-radius: 10px; font-size: 12px; }
+.hm-pledge small { grid-column: 2; color: #8a8a70; }
+.hm-art { margin: 10px 0 0; padding: 8px 10px; border-left: 3px solid #5a5a4a; background: #14120e; color: #b8b898; font-size: 14px; } .hm-art.on { border-color: #f0c84a; color: #f0e4c4; }
+.hm-rules { margin: 10px 0 0; padding-left: 18px; color: #b0b090; font-size: 13px; }
+@media (max-width: 560px) { .hm-main { grid-template-columns: 1fr !important; } }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .hm { padding: 10px; } .hm-head b { font-size: 16px; } .hm-status { font-size: 12px; }
+  .hm-main { grid-template-columns: minmax(200px, 300px) 1fr; } .hm-wheel { max-width: 320px; } .hm-pledge { grid-template-columns: 38px 1fr auto; }
+}
