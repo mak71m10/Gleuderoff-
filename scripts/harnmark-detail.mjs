@@ -99,5 +99,13 @@ if (zg) place('lore-hm-wolf', 'Двор Зигмарков', 'landmark', sx(zg),
 if (es) place('lore-hm-pass', 'Перевалы Эшенхольма', 'landmark', sx(es), 981, '**Пограничные перевалы.** Дом Эшенхольм вошёл в Хартию в 981 г. и держит дороги к Лирии и Империи; на склонах сторожевые башни, и каждую весну здесь собирают пошлину с обозов.', '', [-16, 12])
 if (eb) place('lore-hm-ship', 'Верфь Эльминов', 'landmark', sx(eb), 980, '**Верфь.** Маренна Эльмин строит здесь торговые когги для Республики и Лирии; в обмен на колыбельный залог Дом получил право на устьевую пошлину.', '', [16, -12])
 
+// ---------- походы ----------
+world.armies = (world.armies ?? []).filter((a) => !a.id.startsWith('lore-army-hm-'))
+const pt = (p, y) => { const s = sx(p); return { x: Math.round(s.x), y: Math.round(s.y), date: D(y) } }
+const unt = byName('Унтерельхольм'), zig = byName('Зигинхольм'), esch = byName('Эшенхольм')
+if (cap && unt) world.armies.push({ id: 'lore-army-hm-989', name: 'Грисхольмы и Ройвены увозят детей из Колыбелей (989)', mapId: 'world', stateId: st.id, color: '#8a6a3a', waypoints: [pt(cap, 989.0), pt(unt, 989.08), pt(unt, 989.3)] })
+if (cap && esch) world.armies.push({ id: 'lore-army-hm-eschen', name: 'Каспар Эшенхольм ведёт дружину за гробом сына (988)', mapId: 'world', stateId: st.id, color: '#6a6a4a', waypoints: [pt(cap, 988.95), pt(esch, 989.05)] })
+if (cap && unt && zig) world.armies.push({ id: 'lore-army-hm-1010', name: 'Ополчение Пяти Домов под Орельбергом (1010)', mapId: 'world', stateId: st.id, color: '#7a3a3a', waypoints: [pt(unt, 1010.3), pt(zig, 1010.4), pt(cap, 1010.5), pt(unt, 1010.8)] })
+
 writeFileSync(WORLD, JSON.stringify(world, null, 1))
 console.log(`Харнмарк: описаний ${n}, мест ${world.places.filter((p) => p.id.startsWith('lore-hm-')).length}`)
