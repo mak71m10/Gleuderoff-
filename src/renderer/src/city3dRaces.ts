@@ -100,6 +100,7 @@ const TABLES: Record<string, W> = {
   // Королевство Темерия: беглецы Империи — имперцы, лесные гладры и нерегулярные пришельцы
   temer: { imperials: 84, gladry: 5, nords: 3, dwarves: 2, gnomes: 1.5, 'wood-elves': 1.5, roma: 1, dalorians: 1 },
   // Княжества Гарефорда: горные имперцы, немного дварфов, гномов, нордов и гладров
+  harn: { imperials: 90, dwarves: 2, gnomes: 2, nords: 3, gladry: 2, dalorians: 1 },
   garef: { imperials: 86, dwarves: 3, gnomes: 2, nords: 3, gladry: 3, dalorians: 1 },
   // Крайдонианская Лига: элеоны, люди и немного эльфов и прочих — порт, где бывают все
   cray: { eleons: 58, imperials: 20, gladry: 6, 'high-elves': 5, 'wood-elves': 2, nords: 3, dwarves: 1.5, gnomes: 1.5, tabaxi: 0.8, roma: 1, goliaths: 0.7, dalorians: 2 },
@@ -117,6 +118,8 @@ const TABLES: Record<string, W> = {
   dwarven: { dwarves: 62, gnomes: 25, imperials: 6, nords: 4, gremlins: 3 },
   // Эльфборн: высшие и лесные эльфы в Книге Побегов; полуэльфов (вне Книги, серая лента) отдельной расы в 3D нет —
   // они видны как люди-имперцы и гладры; немного сильв, элуинов и гремлинов
+  // Сильвленд: сильва (люди-растения) и эльфы Домов-Опекунов
+  silva: { sylva: 40, 'wood-elves': 24, 'high-elves': 20, imperials: 8, gladry: 4, eluins: 2, gremlins: 2 },
   elf: { 'high-elves': 36, 'wood-elves': 30, imperials: 14, gladry: 6, sylva: 6, eluins: 4, gremlins: 3, eleons: 1 },
   elven: { 'high-elves': 35, 'wood-elves': 35, sylva: 12, gremlins: 8, imperials: 4, eleons: 4 },
   eluin: { eluins: 80, imperials: 12, 'high-elves': 5, gnomes: 3 },
