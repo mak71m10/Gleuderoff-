@@ -46,15 +46,15 @@ export const SPECS = [
   {
     dyn: 'sv-house-vey',
     people: [
-      P('svv-sol', 'Солариэль Вэйлин', 'm', 915, 990, null, null, 'svv-ami', 'Старый Опекун Эленнор', 'Солариэль построил второй придел храма Эленнор на плодовые пожертвования церкви. Умер в Алпрас, держа в руке ещё тёплый плод.', null, null, SO,
+      P('svv-sol', 'Солариэль Вэйлин', 'm', 915, 990, null, null, 'svv-ami', 'Старый Опекун Эленнор', 'Солариэль построил второй чертог Дома Света на плодовые пожертвования Опекунов. Умер в Алпрас, держа в руке ещё тёплый плод.', null, null, SO,
         'old sun elf with golden-white hair, warm amber eyes, fair freckled northern face, cream robe with red flame embroidery'),
       P('svv-ami', 'Амирэль Вэйлин', 'f', 922, 1005, null, null, 'svv-sol', 'Мать Эленвэ', 'Амирэль дожила до восьмидесяти трёх и успела благословить Круг на восстановление в 1004 г. Хоронили её рыжей прядью, срезанной внучкой.', null, null, SO,
         'elderly sun elf woman, hair faded to pale copper, amber eyes, kindly lined fair face, cream dress with red embroidery'),
       P('svv-tal', 'Талирион Вэйлин', 'm', 948, 1003, null, null, '@sv-elenve', 'Муж Эленвэ', 'Талирион умер в Падалицу 1003 г., в месяц Алпрас, когда Мать Эленнор дала пустой плод. Лекари сказали: сердце. Эленвэ сказала: Мать.', null, 'Талирион сам предложил Эленвэ сложить Печать в Падалицу, чтобы не допустить гражданской войны; она так и сделала, а потом назвала это своим решением.', SO,
         'tall sun elf with copper beard, warm amber eyes, fair freckled face, red and cream tunic, steady kind look'),
-      P('svv-dar', 'Дарвиэль Вэйлин', 'm', 955, null, 'svv-sol', 'svv-ami', null, 'Настоятель храма Эленнор', 'Дарвиэль, брат Эленвэ, ведёт службу в храме и принимает церковных послов. С Бенно дружит по расчёту.', null, 'Берёт с церкви плату за каждый плод сверх меры, записывая это как «пожертвование»; половина оседает у него.', SO,
+      P('svv-dar', 'Дарвиэль Вэйлин', 'm', 955, null, 'svv-sol', 'svv-ami', null, 'Хранитель Дома Света', 'Дарвиэль, брат Эленвэ, ведёт службу в Доме Света и принимает послов Опеки. С Бенно дружит по расчёту.', null, 'Берёт с Дома плату за каждый плод сверх меры, записывая это как «пожертвование»; половина оседает у него.', SO,
         'plump sun elf priest of fifty-five, thinning ginger hair, amber eyes, smooth fair face, cream and red vestments'),
-      P('svv-iri', 'Ирэйлин Вэйлин', 'f', 985, null, '@sv-elenve', 'svv-tal', null, 'Послушница храма Эленнор', 'Ирэйлин, дочь Эленвэ, учится у дяди и мечтает о Печати; мать смотрит на это без удовольствия.', null, null, SO,
+      P('svv-iri', 'Ирэйлин Вэйлин', 'f', 985, null, '@sv-elenve', 'svv-tal', null, 'Послушница Дома Света', 'Ирэйлин, дочь Эленвэ, учится у дяди и мечтает о Печати; мать смотрит на это без удовольствия.', null, null, SO,
         'young sun elf of twenty-five, long copper-red hair, amber eyes, freckles on fair skin, simple cream novice dress with a red ribbon'),
     ],
     patch: [
