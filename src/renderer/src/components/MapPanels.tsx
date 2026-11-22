@@ -20,14 +20,14 @@ export function StatePanel({ id }: { id: string }) {
   const date = useStore((s) => s.date)
   const openCard = useStore((s) => s.openStateCard)
   const st = world.states.find((s) => s.id === id)
-  const rep = useMemo(() => (st ? stateReport(world, st) : null), [world, st])
+  const rep = useMemo(() => (st ? stateReport(world, st, date) : null), [world, st, date])
   if (!st) return null
   const f = resolve(st, date)
   const e = f.econ
   const ruler = world.entries.find((x) => x.id === f.rulerId)
   const capital = world.places.find((p) => p.id === f.capitalId)
   const goods = rep ? GOODS.map((g) => ({ g, v: (rep.production[g.key] ?? 0) * g.price })).filter((x) => !['grain', 'cloth', 'tools'].includes(x.g.key)).sort((a, b) => b.v - a.v).slice(0, 4) : []
-  const foodPct = rep ? Math.round((100 * rep.food.produced) / Math.max(1, rep.food.need)) : 0
+  const foodPct = rep ? rep.food.yearPct : 0
   const tech = f.tech ? [...TECH_LINES].sort((a, b) => f.tech!.levels[b.key] - f.tech!.levels[a.key]).slice(0, 3) : []
   return (
     <div className="inspector-body mp">

@@ -2728,3 +2728,47 @@ button.pw-chip:hover { background: var(--panel-2); }
 .mp-row { display: grid; grid-template-columns: 1fr 1fr 70px; gap: 6px; align-items: center; font-size: 13px; padding: 2px 0; }
 .mp-num { text-align: right; color: var(--text-2); font-size: 12px; }
 .mp-gap { margin-top: 10px; }
+
+/* ---- экономика на дату (EconDashboard.tsx) ---- */
+.ed { display: flex; flex-direction: column; gap: 12px; }
+.eco-bar { display: flex; justify-content: flex-end; }
+.ed-when { padding: 8px 12px; border-radius: 8px; background: var(--bg-2); border-left: 3px solid var(--gold); font-size: 14px; }
+.ed-when b { font-family: var(--serif); font-size: 17px; color: var(--gold-2); }
+.ed-events { display: flex; flex-wrap: wrap; gap: 6px; }
+.ed-ev { padding: 4px 10px; border-radius: 14px; font-size: 13px; background: var(--bg-2); border: 1px solid var(--line); }
+.ed-ev-war, .ed-ev-disaster { border-color: #b0503a; color: #f0b49c; } .ed-ev-unrest, .ed-ev-raid { border-color: #c08a3a; color: #f0d09c; }
+.ed-ev-boom, .ed-ev-deal { border-color: #5a9a50; color: #b8e0a8; }
+.ed-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.ed-full .ed-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ed .ew-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ed-full .ew-tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.ed-select { background: var(--panel); color: var(--text); border: 1px solid var(--gold-dim); border-radius: 5px; padding: 2px 4px; font-size: 13px; }
+.ed-content { position: relative; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .07); margin-bottom: 3px; }
+.ed-content i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: #8fb87a; }
+.ed-content i.bad { background: #d0704a; }
+.ed-content em { position: absolute; top: -2px; bottom: -2px; width: 2px; background: #e8c26a; }
+.small { font-size: 12px; }
+.ed-tp { padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+.ed-tp-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.ed-tp-head .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.ed-tp-val { margin-left: auto; font-weight: 600; }
+.ed-tp-goods { display: flex; flex-direction: column; gap: 2px; font-size: 12px; margin-top: 4px; }
+.ed-tp-goods .out { color: #b8e0a8; } .ed-tp-goods .in { color: #9cc4f0; }
+.ed-coin { display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 8px; background: var(--bg-2); margin-bottom: 8px; }
+.ed-coin-face { font-size: 28px; } .ed-coin b { font-family: var(--serif); font-size: 17px; }
+.ed-h4 { margin: 12px 0 6px; font-weight: normal; color: var(--text-2); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+.ed-seal { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 6px 8px; border-radius: 6px; background: rgba(200, 100, 80, .08); margin-bottom: 4px; font-size: 13px; }
+.ed-seal.good { background: rgba(120, 190, 110, .08); }
+.ed-seal .small { grid-column: 1 / -1; }
+.ed-months { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 6px; }
+.ed-month { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; padding: 4px; border-radius: 6px; }
+.ed-month.cur { background: var(--bg-2); outline: 1px solid var(--gold); }
+.ed-month-bar { width: 22px; height: 70px; border-radius: 4px; background: rgba(255, 255, 255, .06); display: flex; align-items: flex-end; overflow: hidden; }
+.ed-month-bar i { display: block; width: 100%; background: #8fb87a; } .ed-month-bar i.low { background: #d0904a; }
+.ed-month b { font-weight: 600; } .ed-month span { color: var(--muted); }
+.ew-areas { margin-top: 12px; }
+@media (max-width: 1100px) { .ed-full .ed-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ed-full .ew-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .ed-grid, .ed-full .ed-grid { grid-template-columns: 1fr; } .ed .ew-tiles, .ed-full .ew-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.eco { display: flex; flex-direction: column; gap: 10px; }

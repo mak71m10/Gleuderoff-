@@ -226,7 +226,7 @@ for (const s of live) {
     strengths,
     treasury: M.treasury ?? Math.round((total * (0.4 + money * 0.5)) / 100 / 10) * 10,
     taxes: Object.fromEntries(Object.keys(names).map((r) => [r, M.taxes?.[r] ?? 'обычные'])),
-    debts: old.debts ?? M.debts ?? [],
+    debts: M.debts ?? old.debts ?? [],
     history: old.history ?? [],
     special: M.special ?? []
   }

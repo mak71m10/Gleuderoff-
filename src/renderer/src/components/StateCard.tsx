@@ -513,7 +513,7 @@ function StateCardBody({ id }: { id: string }) {
 
         {tab === 'tech' && <TechView tech={f.tech} onChange={(tech) => set({ tech })} />}
 
-        {tab === 'economy' && <EconomyView f={f} set={set} st={st} />}
+        {tab === 'economy' && <EconomyView st={st} />}
 
         {tab === 'military' && (
           <div className="sc-side sc-army">
