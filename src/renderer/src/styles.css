@@ -2594,3 +2594,65 @@ button.pw-chip:hover { background: var(--panel-2); }
 @media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
   .sil, .ldg, .key { padding: 10px; } .sil-head b, .ldg-head b, .key-head b { font-size: 16px; } .sil-words { grid-template-columns: 1fr; } .ldg-debt { grid-template-columns: 110px 1fr 100px; }
 }
+
+/* ---- «Технологии» — Век Шестерни (Tech.tsx) ---- */
+.tech { display: flex; flex-direction: column; gap: 10px; }
+.tech-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.tech-epoch { font-family: var(--serif); font-size: 18px; color: var(--gold-2); }
+.tech-att { padding: 3px 10px; border-radius: 12px; border: 1px solid var(--line); color: var(--text-2); font-size: 13px; }
+.tech-att b { color: var(--text); }
+.tech-att-оружие { border-color: #c0603a; } .tech-att-запрет, .tech-att-ересь { border-color: #8a5fc0; }
+.tech-att-ремесло { border-color: #c9a24a; } .tech-att-праздник { border-color: #d07a3a; } .tech-att-контрабанда { border-color: #6a6a6a; }
+.tech-att-text { margin: 0; color: var(--muted); font-size: 13px; }
+.tech-lines { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.tech-line + .tech-line { border-top: 1px solid var(--line); }
+.tech-row { display: grid; grid-template-columns: 26px 130px 92px 1fr; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; background: none; border: 0; color: var(--text); text-align: left; cursor: pointer; }
+.tech-row:hover, .tech-line.open .tech-row { background: var(--bg-2); }
+.tech-ico { font-size: 16px; text-align: center; color: var(--gold); }
+.tech-name { font-family: var(--serif); font-size: 15px; }
+.tech-dots { display: flex; gap: 4px; }
+.tech-dots i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--gold-dim); }
+.tech-dots i.on { background: var(--gold); border-color: var(--gold); }
+.tech-lvl { color: var(--text-2); font-size: 13px; line-height: 1.3; }
+.tech-more { padding: 4px 14px 12px 44px; background: var(--bg-2); }
+.tech-about { margin: 4px 0 6px; color: var(--muted); font-size: 13px; }
+.tech-more ol { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+.tech-more li { margin: 2px 0; } .tech-more li.done { color: var(--text-2); } .tech-more li.cur { color: var(--gold-2); font-weight: 600; }
+.tech-edit { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.tech-edit input { flex: 1; min-width: 160px; padding: 5px 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--text); }
+.tech-edit button { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--gold-dim); background: var(--panel); color: var(--gold-2); cursor: pointer; }
+.tech-edit button:disabled { opacity: .35; cursor: default; }
+.tech-note p { margin: 0 0 8px; line-height: 1.5; }
+.tech-next { padding: 8px 12px; border-left: 3px solid var(--gold); background: var(--bg-2); border-radius: 0 6px 6px 0; font-size: 14px; }
+.tech-log h4 { margin: 6px 0; font-family: var(--serif); color: var(--gold-2); font-weight: normal; }
+.tech-log-row { display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px; padding: 3px 0; }
+.tech-log-row.up { color: #9fd08a; } .tech-log-row.down { color: #e08a6a; }
+.tech-log-y { color: var(--muted); min-width: 60px; } .tech-log-n { color: var(--text-2); }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .tech-row { grid-template-columns: 22px 96px 1fr; }
+  .tech-lvl { grid-column: 2 / -1; }
+  .tech-more { padding-left: 14px; }
+}
+
+/* разделы внутри вкладок карточки страны (Хроника и Свои поля в «Обзоре», Фракции во «Власти») */
+.sc-part { margin-top: 26px; }
+.sc-part::before { content: attr(data-title); display: block; grid-column: 1 / -1; margin-bottom: 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); font-family: var(--serif); font-size: 19px; color: var(--gold-2); }
+.sc-army { max-width: 640px; }
+
+/* ---- «Экономика» (Economy.tsx) ---- */
+.eco { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.eco-sec { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-2); }
+.eco-sec:first-child { grid-column: 1 / -1; }
+.eco-sec h3 { margin: 0; font-family: var(--serif); font-weight: normal; color: var(--gold-2); font-size: 19px; }
+.eco-intro { margin: 0; line-height: 1.5; }
+.eco-goods { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.eco-good { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 6px; background: var(--panel); border-left: 3px solid var(--gold); }
+.eco-good b { font-family: var(--serif); font-size: 16px; color: var(--text); }
+.eco-good span { color: var(--text-2); font-size: 13px; line-height: 1.4; }
+.eco-empty { margin: 0; color: var(--muted); font-style: italic; }
+.eco-level { display: grid; grid-template-columns: 140px 80px 1fr; gap: 8px; align-items: center; font-size: 13px; }
+.eco-level-name { font-family: var(--serif); font-size: 15px; } .eco-level-text { color: var(--text-2); }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .eco { grid-template-columns: 1fr; }
+  .eco-level { grid-template-columns: 110px 1fr; } .eco-level-text { grid-column: 1 / -1; }
+}

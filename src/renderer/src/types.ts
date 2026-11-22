@@ -1,3 +1,5 @@
+import type { StateTech } from './tech'
+
 /** Дата мира — целое число дней от 1-го дня 1-го года после смерти последнего дракона (день 0). */
 export type WorldDate = number
 
@@ -99,6 +101,12 @@ export interface StateFields {
   /** Флаг и герб, собранные генератором (если нет картинки) */
   heraldry?: Heraldry
   customFields: { label: string; value: string }[]
+  /** Экономика: подати и долги, торговля, деньги и банки (вкладка «Экономика») */
+  taxes?: string
+  trade?: string
+  banks?: string
+  /** Технологии страны в Век Шестерни (src/renderer/src/tech.ts, docs/технологии.md) */
+  tech?: StateTech
 }
 
 export type FlagLayout =

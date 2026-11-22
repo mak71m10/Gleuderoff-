@@ -45,17 +45,18 @@ import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
 import { Icon, type IconName } from './Icon'
+import { TechView } from './Tech'
+import { EconomyView } from './Economy'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
 
-type Tab = 'overview' | 'power' | 'military' | 'factions' | 'diplomacy' | 'custom' | 'chronicle'
+type Tab = 'overview' | 'power' | 'economy' | 'military' | 'diplomacy' | 'tech'
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'overview', label: 'Обзор', icon: 'eye' },
   { id: 'power', label: 'Власть и законы', icon: 'crown' },
-  { id: 'military', label: 'Армия и казна', icon: 'sword' },
-  { id: 'factions', label: 'Фракции и парламент', icon: 'people' },
+  { id: 'economy', label: 'Экономика', icon: 'coins' },
+  { id: 'military', label: 'Армия', icon: 'sword' },
   { id: 'diplomacy', label: 'Дипломатия', icon: 'balance' },
-  { id: 'custom', label: 'Свои поля', icon: 'note' },
-  { id: 'chronicle', label: 'Хроника', icon: 'hourglass' }
+  { id: 'tech', label: 'Технологический прогресс', icon: 'gear' }
 ]
 
 export function StateCard() {
@@ -274,6 +275,7 @@ function StateCardBody({ id }: { id: string }) {
               <TextField label="Культура и народы" value={f.culture} onChange={(culture) => set({ culture })} className={mark('culture')} />
               <TextField label="Языки" value={f.languages} onChange={(languages) => set({ languages })} />
               <RefField label="Столица" value={f.capitalId} items={placeItems} onChange={(capitalId) => set({ capitalId })} />
+              <TextField label="Население" value={f.population} onChange={(population) => set({ population })} className={mark('population')} />
               <div className="mini-facts">
                 <div>
                   {world.provinces?.length ? (
@@ -511,22 +513,19 @@ function StateCardBody({ id }: { id: string }) {
           />
         )}
 
+        {tab === 'tech' && <TechView tech={f.tech} onChange={(tech) => set({ tech })} />}
+
+        {tab === 'economy' && <EconomyView f={f} set={set} />}
+
         {tab === 'military' && (
-          <div className="sc-cols">
-            <div className="sc-side">
-              <TextField label="Численность армии" value={f.army} onChange={(army) => set({ army })} className={mark('army')} />
-              <TextField label="Флот" value={f.navy} onChange={(navy) => set({ navy })} className={mark('navy')} />
-              <TextField label="Население" value={f.population} onChange={(population) => set({ population })} className={mark('population')} />
-              <TextField label="Казна" value={f.treasury} onChange={(treasury) => set({ treasury })} className={mark('treasury')} />
-            </div>
-            <div className="parchment">
-              <TextField label="Экономика, ресурсы, торговля" multiline rows={14} value={f.economy} onChange={(economy) => set({ economy })} className={mark('economy')} />
-            </div>
+          <div className="sc-side sc-army">
+            <TextField label="Численность армии" multiline rows={3} value={f.army} onChange={(army) => set({ army })} className={mark('army')} />
+            <TextField label="Флот" multiline rows={2} value={f.navy} onChange={(navy) => set({ navy })} className={mark('navy')} />
           </div>
         )}
 
-        {tab === 'factions' && (
-          <div>
+        {tab === 'power' && (
+          <div className="sc-part" data-title="Фракции и парламент">
             <div className="faction-grid">
               {st.factions.map((fa, i) => (
                 <div key={fa.id} className="faction-card">
@@ -582,8 +581,8 @@ function StateCardBody({ id }: { id: string }) {
           </div>
         )}
 
-        {tab === 'custom' && (
-          <div className="custom-fields">
+        {tab === 'overview' && (
+          <div className="custom-fields sc-part" data-title="Свои поля">
             {f.customFields.map((cf, i) => (
               <div key={i} className="custom-row">
                 <TextField
@@ -609,8 +608,8 @@ function StateCardBody({ id }: { id: string }) {
           </div>
         )}
 
-        {tab === 'chronicle' && (
-          <div className="sc-cols">
+        {tab === 'overview' && (
+          <div className="sc-cols sc-part" data-title="Хроника">
             <div className="sc-side">
               <DateField label="Основано" value={st.from} onChange={(from) => edit((s) => (s.from = from))} />
               <DateField label="Пало / распалось" value={st.to} onChange={(to) => edit((s) => (s.to = to))} />

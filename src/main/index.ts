@@ -1026,6 +1026,36 @@ async function migrateWorld(dir: string): Promise<void> {
     // v61: Ла Роше — Сёстры Лозы (Аматерасу) под двумя ключами, Тореццо и Дом Лозы
     moveCountry('Ла Роше', 'lrs')
   }
+  if ((user.version ?? 1) < 62) {
+    // v62 (0.46): поселения — 496 потерянных при слиянии «Графики» (0.44.0) возвращены, стоявшие в воде перенесены
+    // на сушу, Империум у моря (обмен с Хагербергом, провинции 2062 ↔ 2139). Сдвиг — только если игрок сам не двигал.
+    const MOVED: Record<string, [number, number]> = {"967":[2727,1143],"1023":[2659,1173],"1192":[4477,1309],"1219":[5735,1355],"1244":[6087,1367],"1282":[3475,1413],"1338":[3909,1469],"1341":[3549,1455],"1370":[3489,1489],"1384":[4233,1501],"1482":[3525,1599],"1483":[3457,1603],"1586":[5043,1657],"1773":[4610,1853],"1798":[3331,1883],"1815":[3217,1889],"1821":[3165,1897],"1849":[2959,1923],"1903":[4664,1966],"1927":[4625,1986],"1954":[4557,2005],"1989":[3103,2033],"2052":[4279,2089],"2080":[2943,2125],"2128":[3233,2149],"2137":[4499,2171],"2139":[4889,2189],"2147":[3277,2169],"2183":[3219,2187],"2195":[1907,2215],"2197":[3259,2211],"2433":[2841,2421],"2436":[5335,2435],"2450":[3317,2451],"3152":[6925,3317]}
+    const MOVED_PLACES: Record<string, [number, number]> = {"lore-santareya":[3935,3335],"lore-battle-north-cities":[4233,249],"lore-battle-rp-kaswald":[4449,2201],"lore-rp-border-forts":[5505,2513],"lore-rp-hunt-10":[5687,2211],"lore-rp-strike-2":[5706,2436],"lore-rp-strike-4":[5511,2517],"lore-rp-strike-5":[5706,2436],"lore-rp-strike-8":[5745,2215],"lore-ch-battle-corina":[5055,2465],"lore-ch-burn-2486":[5055,2465],"lore-sty-capital":[4244,1296],"lore-sty-tower":[4258,1306],"lore-ex-fort-0":[5483,295],"lore-ex-fort-1":[5561,279],"lore-ex-fort-3":[5383,327],"lore-cr-tilhaven":[5787,1983],"lore-ly-silence":[4624,1865],"lore-el-stone-10":[6870,2225],"lore-hm-ship":[4631,2289],"lore-hm-roll":[4599,1963],"lore-fn-ridge":[4787,2022],"lore-uu-stone":[4197,275],"lore-gs-pact":[4991,703],"lore-gs-wreck":[5157,497],"lore-gs-war976":[5125,497],"lore-nt-library":[5231,679],"lore-nt-needle":[5229,705],"lore-bz-stair":[4101,199],"lore-mn-night":[5709,2023],"lore-ky-capital":[4893,2108],"lore-lrs-house":[4799,2629],"lore-lrs-smugglers":[5023,2811]}
+    const defProv = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const d = defProv.get(p.id)
+      if (!d) continue
+      if (p.id === 2062 || p.id === 2139) {
+        p.name = d.name; p.px = d.px; p.settlement = structuredClone(d.settlement ?? null); p.description = d.description
+        if (d.cityMapId) p.cityMapId = d.cityMapId; else delete p.cityMapId
+        continue
+      }
+      if (!p.settlement && d.settlement) { p.settlement = structuredClone(d.settlement); if (d.cityMapId) p.cityMapId = d.cityMapId; continue }
+      const m = MOVED[p.id]
+      if (m && p.settlement && p.settlement.x === m[0] && p.settlement.y === m[1] && d.settlement) { p.settlement.x = d.settlement.x; p.settlement.y = d.settlement.y }
+    }
+    const defPlace = new Map<string, Json>((def.places ?? []).map((p: Json) => [p.id, p]))
+    for (const pl of user.places ?? []) {
+      const m = MOVED_PLACES[pl.id], d = defPlace.get(pl.id)
+      if (m && d && pl.x === m[0] && pl.y === m[1]) { pl.x = d.x; pl.y = d.y }
+    }
+    // v62: «Век Шестерни» — технологии стран (вкладка «Технологии»), если своих у страны ещё нет
+    const defStates = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
+    for (const st of user.states ?? []) {
+      const d = defStates.get(st.id)
+      if (d?.base?.tech && !st.base.tech) st.base.tech = structuredClone(d.base.tech)
+    }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))
