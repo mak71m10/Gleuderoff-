@@ -28,6 +28,11 @@ import kulagonLore from './lore/kulagon.mjs'
 import elfbornLore from './lore/elfborn.mjs'
 import silvlandLore from './lore/silvland.mjs'
 import harnmarkLore from './lore/harnmark.mjs'
+import kagiaLore from './lore/kagia.mjs'
+import redaniaLore from './lore/redania.mjs'
+import pavilionLore from './lore/pavilion.mjs'
+import tavarvaitLore from './lore/tavarvait.mjs'
+import feinokoLore from './lore/feinoko.mjs'
 import familiesLore from './lore/families.mjs'
 import geo from './lore/geo.mjs'
 
@@ -71,6 +76,11 @@ const E = (id, kind, name, f = {}) => {
       ...(f.cart ? { cart: f.cart } : {}),
       ...(f.ford ? { ford: f.ford } : {}),
       ...(f.willow ? { willow: f.willow } : {}),
+      ...(f.auction ? { auction: f.auction } : {}),
+      ...(f.ridge ? { ridge: f.ridge } : {}),
+      ...(f.pledge ? { pledge: f.pledge } : {}),
+      ...(f.reserve ? { reserve: f.reserve } : {}),
+      ...(f.star ? { star: f.star } : {}),
       ...(f.bans ? { bans: f.bans } : {})
     },
     history: [],
@@ -174,7 +184,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 43
+world.version = 54
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })
@@ -198,6 +208,11 @@ kulagonLore({ E, Y, world })
 elfbornLore({ E, Y, world })
 silvlandLore({ E, Y, world })
 harnmarkLore({ E, Y, world })
+kagiaLore({ E, Y, world })
+redaniaLore({ E, Y, world })
+pavilionLore({ E, Y, world })
+tavarvaitLore({ E, Y, world })
+feinokoLore({ E, Y, world })
 familiesLore({ E, Y, entries })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })

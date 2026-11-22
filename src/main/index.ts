@@ -875,6 +875,49 @@ async function migrateWorld(dir: string): Promise<void> {
       if (dp && sids.has(dp.owners?.at(-1)?.[1])) { p.description = dp.description; if (dp.settlement) p.settlement = structuredClone(dp.settlement) }
     }
   }
+  // v50–v54: волна 2 Лоры (центр) — страна целиком из стартового мира: поля страны, записи по префиксам, поселения, планы городов, места, походы
+  const migrateCountry = (name: string, prefixes: string[]): void => {
+    const ds = (def.states ?? []).find((s: Json) => s.base.name === name)
+    if (!ds) return
+    const us = user.states.find((s: Json) => s.id === ds.id)
+    if (us) { us.base = { ...us.base, ...structuredClone(ds.base) }; us.factions = structuredClone(ds.factions ?? []); us.history = structuredClone(ds.history ?? []) }
+    const ours = (id: unknown): boolean => prefixes.some((p) => String(id).startsWith(p))
+    const fresh = (def.entries ?? []).filter((e: Json) => ours(e.id) || String(e.id).startsWith('lore-book-'))
+    const ids = new Set(fresh.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !ids.has(e.id)), ...structuredClone(fresh)]
+    const ourMaps = new Set<string>()
+    const defProvs = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProvs.get(p.id)
+      if (dp && dp.owners?.at(-1)?.[1] === ds.id) {
+        p.name = dp.name; p.settlement = structuredClone(dp.settlement ?? null); p.description = dp.description
+        if (dp.cityMapId) { p.cityMapId = dp.cityMapId; ourMaps.add(dp.cityMapId) }
+      }
+    }
+    const defAreas = new Map<string, Json>((def.adminRegions ?? []).map((a: Json) => [a.id, a]))
+    for (const a of user.adminRegions ?? []) { const da = defAreas.get(a.id); if (da && da.name.startsWith('Округ ') && (user.provinces ?? []).some((p: Json) => p.areaId === a.id && defProvs.get(p.id)?.owners?.at(-1)?.[1] === ds.id)) a.name = da.name }
+    const cityMaps = (def.maps ?? []).filter((m: Json) => ourMaps.has(m.id))
+    const mapIds = new Set(cityMaps.map((m: Json) => m.id))
+    user.maps = [...user.maps.filter((m: Json) => !mapIds.has(m.id)), ...structuredClone(cityMaps)]
+    const army = prefixes.map((p) => p.replace('lore-', 'lore-army-'))
+    const isOurs = (x: Json): boolean => ours(x.id) || army.some((p) => String(x.id).startsWith(p)) || ourMaps.has(x.mapId)
+    const newPlaces = (def.places ?? []).filter(isOurs)
+    const pIds = new Set(newPlaces.map((p: Json) => p.id))
+    user.places = [...(user.places ?? []).filter((p: Json) => !pIds.has(p.id)), ...structuredClone(newPlaces)]
+    const newArmies = (def.armies ?? []).filter(isOurs)
+    const aIds = new Set(newArmies.map((a: Json) => a.id))
+    user.armies = [...(user.armies ?? []).filter((a: Json) => !aIds.has(a.id)), ...structuredClone(newArmies)]
+  }
+  // v50: Империя Кагия — Ворота Торга (трон на торгах у Семи ворот), дома и родословные, поселения, Ворота Торга на площади
+  if ((user.version ?? 1) < 50) migrateCountry('Империя Кагия', ['lore-kj-', 'lore-fm-kK-', 'lore-fm-kS-', 'lore-fm-kB-', 'lore-fm-kH-', 'lore-fm-kW-', 'lore-fm-kR-'])
+  // v51: Королевство Редания — Мостовые и Звёздная ночь, Тревенбург, Нойбрюк, Оксенау; Звёздная вышка на площади
+  if ((user.version ?? 1) < 51) migrateCountry('Королевство Редания', ['lore-rd-', 'lore-fm-rR-', 'lore-fm-rF-', 'lore-fm-rS-', 'lore-fm-rM-'])
+  // v52: Павильон Грёз — Золотой запас и Грёзы, Сингор, Сонное Хранилище в 3D
+  if ((user.version ?? 1) < 52) migrateCountry('Павильон Грёз', ['lore-pv-', 'lore-fm-pR-', 'lore-fm-pK-', 'lore-fm-pY-'])
+  // v53: Таварвайт — Лесные паи и Заложенный венец, Аваллонэ, Палата Паёв в 3D
+  if ((user.version ?? 1) < 53) migrateCountry('Таварвайт', ['lore-tw-', 'lore-fm-tT-', 'lore-fm-tN-'])
+  // v54: Фейноко — Гряда Великанов, Фейн, Ниото, Мориока, Вокио; Гряда в 3D
+  if ((user.version ?? 1) < 54) migrateCountry('Фейноко', ['lore-fn-', 'lore-fm-fM-', 'lore-fm-fO-'])
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

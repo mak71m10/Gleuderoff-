@@ -1,3 +1,4 @@
+import { ORGANIC_CENTR } from './organic-centr.mjs'
 // Карты городов: параметры генератора Watabou (с учётом местности вокруг города на карте мира) и
 // наша переработка — русские названия кварталов, примечательные здания и их описания.
 // Придумано по поручению автора (02.11.2026), тег «черновик». Сторону моря (sea) считает city-maps.mjs
@@ -13,6 +14,7 @@
 // города, которые строятся общим генератором city-organic.mjs (docs/мастерская/8-как-строить-города.md).
 // grow: type river|road|port, houses, outside, axis (градусы, y вниз: река вдоль axis, у порта море со стороны axis+90), roads, water
 export const ORGANIC = {
+  ...ORGANIC_CENTR,
   kulagbryug: { type: 'river', houses: 520, outside: 0.35, axis: 30, roads: 4, water: 22 },
   heiddalen: { type: 'port', houses: 220, outside: 0.3, axis: 60, roads: 3 },
   albanana: { type: 'port', houses: 130, outside: 0.3, axis: 168, roads: 2 },
