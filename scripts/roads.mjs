@@ -4,7 +4,7 @@
 // Виды: paved — мощёный тракт (имперцы, южане, церковь, элеоны, златайцы, цинь, юты; у дварфов — и в горах),
 //       dirt — грунтовая дорога, trail — горная тропа и тропинки к деревням.
 // Запуск после terrain.mjs: node --max-old-space-size=8192 scripts/roads.mjs → source-maps/roads.json
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync } from 'fs'
 import sharp from 'sharp'
 
 const t0 = Date.now()
@@ -12,6 +12,9 @@ const log = (m) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s] ${m}
 const world = JSON.parse(readFileSync('resources/default-world/world.json', 'utf8'))
 const { data: pimg, info } = await sharp('resources/default-world/maps/provinces.png').raw().toBuffer({ resolveWithObject: true })
 const { data: timg } = await sharp('resources/default-world/maps/terrain.png').raw().toBuffer({ resolveWithObject: true })
+// озёра (rivers-vector.mjs) — вода: дорога обходит озеро, а не идёт по нему
+// маска озёр рваная (полосы через строку) — расширяем на пиксель, иначе дорога проскакивает по щелям
+const lakes = existsSync('source-maps/lakes.png') ? (await (async () => { const src = await sharp('source-maps/lakes.png').greyscale().raw().toBuffer(), out = new Uint8Array(src.length), w = info.width, h = src.length / w; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 0; for (let dy = -1; dy <= 1 && !v; dy++) for (let dx = -1; dx <= 1; dx++) { const X = x + dx, Y = y + dy; if (X >= 0 && Y >= 0 && X < w && Y < h && src[Y * w + X]) { v = 255; break } } out[y * w + x] = v } return out })()) : null
 const SW = info.width, SH = info.height
 // сетка дорог — вдвое мельче растра провинций: клетка = 4 логические единицы
 const D = 2
@@ -43,7 +46,7 @@ for (let gy = 0; gy < GH; gy++)
     for (let dy = 0; dy < D; dy++)
       for (let dx = 0; dx < D; dx++) {
         const i = (gy * D + dy) * SW + gx * D + dx
-        const c = pimg[i * 4 + 3] ? pimg[i * 4 + 2] : 0
+        const c = pimg[i * 4 + 3] && !(lakes && lakes[i]) ? pimg[i * 4 + 2] : 0
         cnt[c]++
         if (timg[i * 4 + 2]) rv++
         if (pimg[i * 4 + 3]) pid = (pimg[i * 4] << 8) | pimg[i * 4 + 1]

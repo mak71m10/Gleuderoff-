@@ -15,12 +15,12 @@ import { ORGANIC_CENTR } from './organic-centr.mjs'
 // grow: type river|road|port, houses, outside, axis (градусы, y вниз: река вдоль axis, у порта море со стороны axis+90), roads, water
 export const ORGANIC = {
   ...ORGANIC_CENTR,
-  kulagbryug: { type: 'river', houses: 520, outside: 0.35, axis: 30, roads: 4, water: 22 },
+  kulagbryug: { type: 'road', houses: 520, outside: 0.35, axis: 30, roads: 4 }, // реки на карте рядом нет (22.11.2026)
   heiddalen: { type: 'port', houses: 220, outside: 0.3, axis: 60, roads: 3 },
   albanana: { type: 'port', houses: 130, outside: 0.3, axis: 168, roads: 2 },
   tingvell: { type: 'road', houses: 380, outside: 0.3, axis: 15, roads: 4 },
   aurhafen: { type: 'port', houses: 2000, outside: 0.35, axis: 290, roads: 3, stretch: 1.6 },
-  norershtadt: { type: 'river', houses: 1200, outside: 0.3, axis: 135, roads: 3, water: 20, seed: 5 },
+  norershtadt: { type: 'road', houses: 1200, outside: 0.3, axis: 135, roads: 3, seed: 5 }, // реки на карте рядом нет (22.11.2026)
   landveiler: { type: 'hill', houses: 800, outside: 0.3, axis: 100, roads: 3 },
   lauenvald: { type: 'port', houses: 440, outside: 0.3, axis: 125, roads: 2 },
   mitmyunde: { type: 'castle', houses: 180, outside: 0.3, axis: 85, roads: 2, seed: 2 },

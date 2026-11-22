@@ -19,7 +19,7 @@ export const ORGANIC_CENTR = {
   ostelholm: { type: 'village', houses: 51, axis: 200, layout: 'cluster' },
   landburg: { type: 'village', houses: 19, axis: 40, layout: 'cluster' },
   erlage: { type: 'village', houses: 24, axis: 205, layout: 'cluster' },
-  trevenburg: { type: 'river', houses: 1100, outside: 0.4, axis: 140, roads: 3, water: 18 },
+  trevenburg: { type: 'road', houses: 1100, outside: 0.4, axis: 140, roads: 3 }, // реки на карте рядом нет (22.11.2026)
   oksenau: { walls: 0, type: 'road', houses: 150, outside: 0.3, axis: 140, roads: 2, water: 18, stretch: 1.7 },
   gryuningard: { type: 'castle', houses: 134, outside: 0.25, axis: 15, roads: 2 },
   talerhaim: { type: 'village', houses: 15, axis: 355, layout: 'cluster' },
@@ -47,5 +47,5 @@ export const ORGANIC_CENTR = {
   fein: { type: 'hill', houses: 450, outside: 0.15, axis: 180, roads: 2, water: 26 },
   nioto: { walls: 0, type: 'road', houses: 150, outside: 0.3, axis: 195, roads: 2, water: 26, stretch: 1.8 },
   vedelgard: { type: 'village', houses: 20, axis: 165, layout: 'terrace', seed: 3 },
-  vokio: { type: 'river', houses: 80, outside: 0.3, axis: 200, roads: 2, water: 14 },
+  vokio: { type: 'road', houses: 80, outside: 0.3, axis: 200, roads: 2 }, // реки на карте рядом нет (22.11.2026)
 }

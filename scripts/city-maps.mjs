@@ -37,7 +37,12 @@ const anchor = (c) => {
     const pl = world.places.find((x) => x.id === c.place)
     return { p, x: pl.x, y: pl.y, place: pl }
   }
-  return { p, x: p.settlement.x, y: p.settlement.y }
+  if (p?.settlement) return { p, x: p.settlement.x, y: p.settlement.y }
+  // поселения в провинции нет (например, после новой карты 0.44.3) — ищем место, у которого это внутренняя карта
+  const pl = world.places.find((x) => x.mapId === 'world' && x.innerMapId === `map-city-${c.slug}`)
+  if (pl) return { p, x: pl.x, y: pl.y, place: pl }
+  if (p) console.log(`  ${c.name}: в провинции «${c.province}» нет поселения — план собран по центру провинции`)
+  return p ? { p, x: p.x, y: p.y } : null
 }
 
 /** Сторона моря по карте рельефа (альфа = суша): угол генератора sea — доля π против часовой от востока */
@@ -63,6 +68,7 @@ export async function genUrls() {
   const out = []
   for (const c of CITIES.filter((c) => !c.custom)) {
     const a = anchor(c)
+    if (!a) continue
     const sea = c.gen.coast ? (c.sea ?? (await seaOf(a.x, a.y)) ?? 0) : 0
     const q = new URLSearchParams({ seed: String(c.seed ?? seedOf(c.slug)), ...Object.fromEntries(Object.entries(c.gen).map(([k, v]) => [k, String(v)])), sea: String(sea), export: 'json' })
     out.push({ slug: c.slug, query: String(q) })
@@ -347,6 +353,7 @@ for (const c of CITIES) {
   // свой план вместо генератора Watabou (Хауссер): собирается скриптом из c.custom при каждом запуске
   if (c.custom) {
     const a = anchor(c)
+    if (!a) { console.log(`${c.name}: нет места на карте — пропущен`); continue }
     const J = (await import(`./${c.custom}`)).default(c, c.sea ?? (await seaOf(a.x, a.y)))
     const old = existsSync(src) ? readFileSync(src, 'utf8') : ''
     if (JSON.stringify(J) !== old) writeFileSync(src, JSON.stringify(J))
@@ -398,6 +405,7 @@ for (const { c, H, marks } of made) {
   const state = world.states.find((s) => s.base.name === (c.state ?? 'Республика'))
   const id = `map-city-${c.slug}`
   const a = anchor(c)
+  if (!a) continue
   const def = { id, name: `${c.name} — план города`, kind: 'city', image: `maps/cities/${c.slug}.webp`, width: W, height: H, plan: `maps/cities/${c.slug}.plan.json` }
   if (a.place) def.placeId = a.place.id
   const i = world.maps.findIndex((m) => m.id === id)

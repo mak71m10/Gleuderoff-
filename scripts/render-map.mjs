@@ -120,10 +120,10 @@ if (isMainThread) {
   {
     const { readFileSync } = await import('fs')
     const world = JSON.parse(readFileSync('resources/default-world/world.json', 'utf8'))
-    const R = { village: 11, fishing: 8, town: 22, city: 32, capital: 42, castle: 10, port: 20, temple: 8, ruins: 0, tower: 5 }
+    const R = { village: 7, fishing: 6, town: 22, city: 32, capital: 42, castle: 10, port: 20, temple: 8, ruins: 0, tower: 5 }
     const pts = []
-    // деревни дают пашни, но не вырубают лес (сила 0.5 < порога вырубки)
-    const AMP = { village: 0.5, fishing: 0.5 }
+    // деревни дают пашни и небольшую прогалину в лесу (сила 0.75: вырубка ~ половины радиуса) — не лежат на лесе наклейкой
+    const AMP = { village: 0.75, fishing: 0.75 }
     for (const p of world.provinces ?? []) if (p.settlement) pts.push([p.settlement.x / 2, p.settlement.y / 2, R[p.settlement.type] ?? 8, AMP[p.settlement.type] ?? 1])
     for (const pl of world.places ?? []) if (pl.mapId === 'world') pts.push([pl.x / 2, pl.y / 2, R[pl.base?.type] ?? 10, 1])
     const tmp = new Float32Array(N)

@@ -20,14 +20,20 @@ export async function loadGrowMaps(worldWidth = 8192) {
     for (const [x, y] of r.pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y) }
     return { ...r, box: [x0, y0, x1, y1] }
   })
-  return { data, info, k: info.width / worldWidth, roads }
+  // озёра (source-maps/lakes.png, тот же размер, что terrain.png) — тоже вода: город у озера встаёт к берегу, а не в озеро
+  const lakes = (await (async () => { const src = await sharp('source-maps/lakes.png').greyscale().raw().toBuffer(), out = new Uint8Array(src.length), w = info.width, h = src.length / w; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 0; for (let dy = -1; dy <= 1 && !v; dy++) for (let dx = -1; dx <= 1; dx++) { const X = x + dx, Y = y + dy; if (X >= 0 && Y >= 0 && X < w && Y < h && src[Y * w + X]) { v = 255; break } } out[y * w + x] = v } return out })()) // маска рваная — расширена на пиксель
+  // реки — те же векторные линии, что рисуются на карте (rivers-vector.mjs, пиксели 4096-растра, [x, y, полуширина, …])
+  const rv = JSON.parse(readFileSync('source-maps/rivers.json', 'utf8'))
+  const rsegs = []
+  for (const l of rv.lines) for (let i = 3; i < l.length; i += 3) if (Math.max(l[i - 1], l[i + 2]) >= 0.12) rsegs.push([l[i - 3], l[i - 2], l[i], l[i + 1], (l[i - 1] + l[i + 2]) / 2])
+  return { data, info, k: info.width / worldWidth, roads, lakes, rsegs }
 }
 
-function sampler({ data, info, k }) {
+function sampler({ data, info, k, lakes }) {
   return (x, y) => {
     const X = Math.max(0, Math.min(info.width - 1, Math.round(x * k))), Y = Math.max(0, Math.min(info.height - 1, Math.round(y * k)))
     const i = (Y * info.width + X) * info.channels
-    return { h: data[i], cls: Math.round(data[i + 1] / 40), river: data[i + 2] > 128 && data[i + 3] >= 128, sea: data[i + 3] < 128 }
+    return { h: data[i], cls: Math.round(data[i + 1] / 40), river: data[i + 2] > 128 && data[i + 3] >= 128, sea: data[i + 3] < 128 || (lakes ? lakes[Y * info.width + X] > 0 : false) }
   }
 }
 
@@ -40,6 +46,23 @@ function seaDir(at, x, y) {
   }
   if (n < 3 || Math.hypot(sx, sy) < 0.5) return null
   return { angle: Math.atan2(sy, sx) / D, near, share: n / (10 * 36) }
+}
+
+/** река по видимым на карте линиям: ближайший отрезок в R ед.; ось — по отрезку, сторона воды — к нему */
+function riverVec(maps, x, y, R = 18) {
+  const k = maps.k, px = x * k, py = y * k, r = R * k
+  let best = null
+  for (const [ax, ay, bx, by, hw] of maps.rsegs) {
+    if (Math.min(ax, bx) > px + r || Math.max(ax, bx) < px - r || Math.min(ay, by) > py + r || Math.max(ay, by) < py - r) continue
+    const dx = bx - ax, dy = by - ay, t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1)))
+    const qx = ax + t * dx, qy = ay + t * dy, d = Math.hypot(px - qx, py - qy)
+    if (d <= r && (!best || d < best.d)) best = { d, qx, qy, dx, dy, hw }
+  }
+  if (!best) return null
+  let axis = (Math.atan2(best.dy, best.dx) / D)
+  const vx = -Math.sin(axis * D), vy = Math.cos(axis * D)
+  if ((best.qx - px) * vx + (best.qy - py) * vy < 0) axis += 180
+  return { axis: norm(axis), near: Math.round(best.d / k), count: Math.round(best.hw * 90) }
 }
 
 /** река: ближайшие речные пиксели в круге R (≈ провинция); ось — главная компонента, сторона воды — к их центру */
@@ -110,14 +133,21 @@ const CASTLE = /замок дома|замковая гора|гнездо|ка�
  * o: { capital, text, terrain (1–6 провинции), seed }.
  * Возвращает { grow, why } — why: короткая строка «что увидели на карте».
  */
+/** вода (море или озеро) ближе R ед.? — для раскладок «рыбацкая деревня» в настройках стран */
+export function waterNear(maps, x, y, R = 24) {
+  const d = seaDir(sampler(maps), x, y)
+  return !!d && d.near <= R
+}
+
 export function growFor(maps, s, o = {}) {
   const at = sampler(maps)
   const seed = o.seed ?? 1
   const text = o.text ?? ''
   const here = at(s.x, s.y)
   const sea = seaDir(at, s.x, s.y)
-  const riv = riverDir(at, s.x, s.y)
-  const rivText = !riv && RIVER.test(text)
+  const riv = maps.rsegs ? riverVec(maps, s.x, s.y) : riverDir(at, s.x, s.y)
+  // реку «по описанию» больше не выдумываем: в плане вода только там, где она есть на карте
+  const rivText = false && !riv && RIVER.test(text)
   const ex = roadExits(maps.roads, s.x, s.y)
   const big = ex.filter((e) => e.rank >= 2)
   const main = (big.length ? big : ex)[0] ?? null
@@ -125,7 +155,8 @@ export function growFor(maps, s, o = {}) {
   const mountain = here.cls >= 4 || (o.terrain ?? 0) >= 4
   const highland = mountain && (here.h > 90 || sl.drop > 25)
   const kind = o.capital ? 'capital' : s.type
-  const coastOk = sea && (s.type === 'port' || s.type === 'fishing' || o.coastal || sea.near <= 16)
+  // берег в плане — только если вода и правда рядом: раньше «прибрежная» провинция давала море городу в 40 ед. от воды
+  const coastOk = sea && (sea.near <= 16 || ((s.type === 'port' || s.type === 'fishing') && sea.near <= 24))
 
   // размер по разделу 2 (домов всего / доля вне стен)
   const span = (lo, hi) => lo + (seed % (hi - lo + 1))
