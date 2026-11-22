@@ -257,6 +257,56 @@ export interface EntryFields {
     nights: { y: number; title: string; green: number; note: string }[]
     rules: string[]
   }
+  /** «Колодец и Лестница» Братства Бездны: наборы-ступени, живые братья по годам, Магистр по стажу */
+  descent?: {
+    yearFrom: number; yearTo: number; period: number; fullShare: number
+    classes: { key: string; year: number; name: string; taken: number; text: string; stair: string; color: string }[]
+    years: { y: number; alive: Record<string, number>; total: number; elder: string | null; ruler: string; rulerId: string }[]
+    losses: { y: number; share: number; name: string }[]
+    nights: { y: number; title: string; note: string }[]
+    rulers: { from: number; to: number | null; name: string; id: string; note: string }[]
+    rules: string[]
+  }
+  /** «Великое испытание» Северной Башни: двенадцать кафедр, баллы испытаний, Магистр и Хранитель Ключа */
+  tower?: {
+    yearFrom: number; yearTo: number; maxScore: number; passScore: number; floors: number
+    chairs: { key: string; name: string; floor: number; color: string; desc: string; holder: string | null }[]
+    exams: { y: number; title: string; kind: string; top: { id: string | null; name: string; score: number }[]; note: string; pending?: boolean; passed: boolean }[]
+    years: { y: number; ruler: string; rulerId: string }[]
+    rulers: { from: number; to: number | null; name: string; id: string; note: string }[]
+    rules: string[]
+  }
+  /** «Стяг Саренто и чистая вода» Гренинсворда: пять полисов, чистые дни гаваней, доля года, Набаты, Белый год */
+  ice?: {
+    yearFrom: number; yearTo: number; whiteLimit: number; yearDays: number; needBells: number
+    polis: { key: string; name: string; color: string; bg: string; fg: string; emblem: string; arms: string; text: string; consul: string | null }[]
+    years: { y: number; days: Record<string, number>; share: Record<string, number>; white: boolean; skipped: string[]; top: string }[]
+    bells: { y: number; against: string; rung: string[]; note: string; passed: boolean }[]
+    rulers: { from: number; to: number | null; name: string; id: string; note: string }[]
+    nights: { y: number; title: string; note: string }[]
+    rules: string[]
+  }
+  /** «Ворота и дымы» Уунааша: шесть владетелей, живые и дальние дымы по годам, присяга князю, переносы Дня Ворот */
+  smoke?: {
+    yearFrom: number; yearTo: number; farWeight: number; winterShare: number
+    sides: { key: string; name: string; color: string; who: string }[]
+    lords: { key: string; name: string; seat: string; side: string; color: string; bg: string; emblem: string; arms: string; houseId: string; head: string | null }[]
+    years: { y: number; lords: Record<string, { live: number; far: number }>; oath: string[]; live: number; far: number; prince: number; total: number; open: boolean; winter: boolean; ruler: string; rulerId: string }[]
+    passes: { y: number; title: string; moved: number; note: string }[]
+    rulers: { from: number; to: number | null; name: string; id: string; note: string }[]
+    rules: string[]
+  }
+  /** «Белая нить» Олекохта: девять сфер совета, узлы нерешённых жалоб Ясного дня, тёмные сферы, нить Эрэдама */
+  knots?: {
+    yearFrom: number; yearTo: number; darkLimit: number; sphereLimit: number; crownLimit: number; perTroupe: number
+    sides: { key: string; name: string; color: string; who: string }[]
+    spheres: { key: string; name: string; desc: string; holders: { from: number; to: number | null; name: string; id: string | null; side: string }[] }[]
+    troupes: { key: string; name: string; color: string; side: string; text: string; head: string }[]
+    years: { y: number; spheres: Record<string, { holder: string; id: string | null; side: string; knots: number }>; dark: number; crown: number; ruler: string; rulerId: string; staged: Record<string, number> }[]
+    nights: { y: number; title: string; note: string }[]
+    rulers: { from: number; to: number | null; name: string; id: string; note: string }[]
+    rules: string[]
+  }
   /** «Круг Плодов» Сильвленда: пять Великих Матерей, урожай 0–2, Мерка года 0–10 */
   circle?: {
     yearFrom: number; yearTo: number; fullScore: number; leanScore: number

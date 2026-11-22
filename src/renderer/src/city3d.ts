@@ -75,6 +75,11 @@ export const STYLES: Record<string, Style> = {
   // Высокогорное Княжество: альпийские дома — белёный камень внизу, тёмное дерево наверху, широкие крыши из тёмного гонта;
   // kranz — то же на каменной платформе вокруг вершины (Венец), alpine — замки и городки людей ниже
   // Княжества Гарефорда: горный фахверк — белёная штукатурка, тёмный дуб, крутые сланцевые и красно-бурые крыши, медно-зелёные шпили
+  bezd: { plaster: ['#6a6670', '#5a5660', '#7a7680', '#4e4a58', '#867f8a'], roof: ['#2a2630', '#34303c', '#1e1a26', '#3e3a48', '#4a3844'], timber: '#2a2024', stone: '#5a5660', wall: '#6a6670', shutter: ['#6a3a4a', '#2a2a3a', '#4a3a2a'], pitch: 1.05, framed: false, floors: 1, grass: '#6a7a62', grass2: '#788870', dirt: '#7a7068', pave: '#6a6870', lit: 0.4, conifer: 0.5, tower: '#c8788a' },
+  ntow: { plaster: ['#8e8e98', '#7e7e88', '#9a9aa4', '#6e6e7a', '#a4a4ae'], roof: ['#3a3a52', '#2e2e44', '#464660', '#2a2a3c', '#52526a'], timber: '#2a2a32', stone: '#7a7a84', wall: '#868690', shutter: ['#4a4a7a', '#7a7aa8', '#2e2e44'], pitch: 1.3, framed: false, floors: 2, grass: '#7a8a78', grass2: '#8a9a86', dirt: '#8a8478', pave: '#82828c', lit: 0.6, conifer: 0.8, tower: '#c8c8e8' },
+  gren: { plaster: ['#e8e2d6', '#d8d0c0', '#c8c4bc', '#dcd4c4', '#b8b4ac'], roof: ['#3a4a5a', '#2e3a48', '#5a4a3a', '#4a5a5a', '#7a3a2e'], timber: '#2e2a26', stone: '#8a8c8e', wall: '#94968e', shutter: ['#3a6ac8', '#c83a3a', '#3a9a4a', '#d8b83a'], pitch: 1.0, framed: false, floors: 2, grass: '#7a8a6a', grass2: '#8a9a72', dirt: '#948c7c', pave: '#8a8c8a', lit: 0.5, conifer: 0.75, tower: '#c83a3a' },
+  uuna: { plaster: ['#c8c0b0', '#b8b0a0', '#d4ccbc', '#a8a090', '#c0b8a4'], roof: ['#3a3e48', '#44474f', '#2e3038', '#4a4440', '#5a3a30'], timber: '#3a3028', stone: '#8a8680', wall: '#9a948a', shutter: ['#1f3a6a', '#5a2a4a', '#3a5a2a'], pitch: 1.2, framed: false, floors: 2, grass: '#7a8a68', grass2: '#8a9874', dirt: '#948a78', pave: '#8c8880', lit: 0.55, conifer: 0.85, tower: '#1f3a6a' },
+  olek: { plaster: ['#8a6a48', '#7a5c3e', '#94724e', '#6e5236', '#a07c56'], roof: ['#3a3430', '#4a4038', '#2e2a28', '#5a4a3a', '#6a2a26'], timber: '#3a2818', stone: '#8a8a88', wall: '#7a7470', shutter: ['#c8303a', '#e8dcc0', '#3a5a6a'], pitch: 1.35, framed: false, floors: 1, grass: '#8a9a78', grass2: '#a8b49a', dirt: '#9a9080', pave: '#8e8a84', lit: 0.5, conifer: 0.95, tower: '#c8303a' },
   harn: { plaster: ['#efe6d2', '#e4d6bc', '#f2eadb', '#d9c9ae', '#e8dcc4'], roof: ['#7a2a26', '#6a2622', '#4a4650', '#5a2a22', '#8a3a2e'], timber: '#2a1c12', stone: '#8a867c', wall: '#a29c90', shutter: ['#c03538', '#2a4a7a', '#2f5a3a'], pitch: 1.1, framed: true, floors: 2, grass: '#6a8a48', grass2: '#789850', dirt: '#988666', pave: '#9c9688', lit: 0.45, conifer: 0.7, tower: '#c03538' },
   garef: { plaster: ['#f1ece0', '#e8dfcc', '#f4efe4', '#ddd3bf', '#ece4d2'], roof: ['#4a4650', '#3e3a44', '#7a3a2a', '#5a4a40', '#6a3226'], timber: '#2f2014', stone: '#8c8a82', wall: '#a6a298', shutter: ['#2f5a3a', '#7a2a22', '#c8a040'], pitch: 1.05, framed: true, floors: 1, grass: '#6a8c4a', grass2: '#76984f', dirt: '#9a8a68', pave: '#9e988a', lit: 0.45, conifer: 0.8, tower: '#4f8a74' },
   // Королевство Темерия: средневековый имперский фахверк — белёные стены на каменных низах, зелёные и тёмно-красные крыши
@@ -1185,6 +1190,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
     if (dwStyle) return 'dwarf'
     if (gnStyle) return 'gnome'
     if (elStyle) return u < 0.85 ? 'elf' : 'human'
+    if (S.style === 'olek') return 'human' // элуины строят срубы, а не эльфийские дома
     const dc = distCult[blds[idx].d] ?? 'human'
     if (dc !== 'human') return u < 0.75 ? dc : 'human'
     return pickCult(u, 0.35)
@@ -2407,7 +2413,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const vendors: { x: number; z: number; a: number }[] = []
   const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
   // Гарефорд: Светочная башня всегда встаёт на самую большую площадь
-  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag' || S.style === 'elf' || S.style === 'silva' || S.style === 'harn') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
+  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag' || S.style === 'elf' || S.style === 'silva' || S.style === 'harn' || S.style === 'olek' || S.style === 'uuna' || S.style === 'gren' || S.style === 'ntow' || S.style === 'bezd') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
     if (area > 500 || si === garefSq) {
@@ -2543,6 +2549,141 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         // скамьи приюта вокруг
         for (let k = 0; k < 6; k++) { const a = si + (k / 6) * 6.283, bx = cx + Math.cos(a) * 11, bz = cz + Math.sin(a) * 11; ch.solid.box(bx, y, bz, 3, 0.55, 0.8, st.timber, a + Math.PI / 2) }
         fillLine([[cx, cz], [cx + 0.1, cz]], 9, N + 2 + si)
+      } else if (si === garefSq && S.style === 'bezd') {
+        // Колодец Дальберга: круглая каменная шахта с чёрной водой, чёрные ворота с цепью, ворот с канатами и клетью, вокруг — шесть ступеней-платформ по наборам
+        ch.solid.cyl(cx, y, cz, 8.4, 0.7, 20, mixHex(st.stone, '#000', 0.25))
+        ch.solid.cyl(cx, y + 0.7, cz, 5.4, 0.2, 20, '#07070c')
+        for (let k = 0; k < 6; k++) {
+          const a = si + (k / 6) * 6.283, rr = 6.4 + k * 0.25
+          ch.solid.box(cx + Math.cos(a) * rr, y + 0.7, cz + Math.sin(a) * rr, 2.4, 0.3 + k * 0.28, 1.6, ['#8a8a96', '#c8785a', '#c8a85a', '#7aa87a', '#6a98c8', '#a878c8'][k], a + Math.PI / 2)
+        }
+        for (const sd of [-3.6, 3.6]) ch.solid.box(cx + sd, y + 0.7, cz, 0.6, 7, 0.6, st.timber, si)
+        ch.solid.box(cx, y + 7.7, cz, 8.2, 0.5, 0.7, st.timber, si)
+        ch.solid.cyl(cx, y + 7.0, cz, 0.6, 1.2, 8, '#2a2a30')
+        ch.solid.box(cx, y + 3.2, cz, 0.12, 4, 0.12, '#1a1a1e')
+        ch.glow.box(cx, y + 2.6, cz, 0.7, 0.7, 0.7, '#ffffff', si)
+        for (let k = 0; k < 4; k++) { const a = si + (k * Math.PI) / 2 + 0.4; ch.glow.box(cx + Math.cos(a) * 8.9, y + 0.7, cz + Math.sin(a) * 8.9, 0.35, 0.9, 0.35, '#ffffff', a) }
+        fillLine([[cx - 8.4, cz], [cx + 8.4, cz]], 16.8, N + 2 + si)
+      } else if (si === garefSq && S.style === 'ntow') {
+        // Северная Башня: огромная, широкая, ярусная; двенадцать ярусов сужаются кверху, на каждом пояс окон, у вершины — купол и звёздный шпиль
+        const tiers = 12, th = 5.2
+        ch.solid.cyl(cx, y, cz, 11.5, 1.4, 20, mixHex(st.stone, '#000', 0.12))
+        for (let k = 0; k < tiers; k++) {
+          const r0 = 10 - k * 0.55, y0 = y + 1.4 + k * th
+          ch.solid.cyl(cx, y0, cz, r0, th, 20, k % 2 ? st.wall : st.plaster[0], r0 - 0.5)
+          ch.solid.cyl(cx, y0 + th - 0.35, cz, r0 + 0.2, 0.35, 20, st.stone)
+          const wn = opts.mobile ? 8 : 14
+          for (let w = 0; w < wn; w++) {
+            const a = si + (w / wn) * 6.283 + k * 0.2
+            ch.glow.box(cx + Math.cos(a) * (r0 - 0.2), y0 + 1.5, cz + Math.sin(a) * (r0 - 0.2), 0.7, 1.5, 0.35, '#ffffff', a + Math.PI / 2)
+          }
+        }
+        const ty = y + 1.4 + tiers * th
+        ch.roof.cyl(cx, ty, cz, 4.4, 3.6, 16, st.roof[0], 0.6)
+        ch.solid.cyl(cx, ty + 3.4, cz, 0.18, 6.2, 6, '#c8c8d0')
+        ch.glow.box(cx, ty + 9.4, cz, 0.9, 0.9, 0.9, '#ffffff', si)
+        for (let k = 0; k < 4; k++) { const a = si + (k * Math.PI) / 2; ch.solid.box(cx + Math.cos(a) * 11.8, y, cz + Math.sin(a) * 11.8, 1.8, 6, 1.8, st.stone, a) }
+        fillLine([[cx - 11.5, cz], [cx + 11.5, cz]], 23, N + 2 + si)
+      } else if (si === garefSq && S.style === 'gren' && seedName === 'map-city-drogenmau') {
+        // Маяк Иссикара Дрогенмау: круглая белая башня в полосах, галерея, фонарь с огнём, бронзовый трезубец; у подножия — Стяг Саренто
+        const th = 22
+        ch.solid.cyl(cx, y, cz, 4.2, 1.2, 16, mixHex(st.stone, '#000', 0.12))
+        for (let k = 0; k < 4; k++) ch.solid.cyl(cx, y + 1.2 + k * (th / 4), cz, 3.0 - k * 0.3, th / 4, 14, k % 2 ? '#c83a3a' : '#f0ece4', 2.7 - k * 0.3)
+        ch.solid.cyl(cx, y + 1.2 + th, cz, 2.8, 0.4, 14, st.timber)
+        ch.glow.box(cx, y + 1.6 + th, cz, 2.0, 2.2, 2.0, '#ffffff', si)
+        ch.roof.cyl(cx, y + 3.8 + th, cz, 2.0, 2.0, 10, '#4a6a7a', 0)
+        ch.solid.cyl(cx, y + 5.8 + th, cz, 0.12, 2.4, 6, '#b08a3a')
+        ch.solid.box(cx, y + 7.6 + th, cz, 1.4, 0.18, 0.14, '#b08a3a', si)
+        for (const sd of [-0.65, 0, 0.65]) ch.solid.box(cx + sd * Math.cos(si), y + 7.6 + th, cz + sd * Math.sin(si), 0.12, 0.8, 0.12, '#b08a3a', si)
+        ch.solid.cyl(cx + 6, y, cz + 2, 0.12, 7, 6, st.timber)
+        ch.solid.box(cx + 6.9, y + 5.6, cz + 2, 1.8, 1.1, 0.06, '#e8c860', si)
+        fillLine([[cx - 4.2, cz], [cx + 4.2, cz]], 8.4, N + 2 + si)
+      } else if (si === garefSq && S.style === 'gren') {
+        // колокол Набата на площади полиса: деревянная рама с колоколом и шест со Стягом
+        ch.solid.box(cx, y, cz, 3.6, 0.3, 2.2, st.stone, si)
+        for (const sd of [-1.4, 1.4]) ch.solid.box(cx + sd * Math.cos(si), y + 0.3, cz + sd * Math.sin(si), 0.35, 4.2, 0.35, st.timber, si)
+        ch.solid.box(cx, y + 4.5, cz, 3.4, 0.35, 0.45, st.timber, si)
+        ch.solid.cyl(cx, y + 3.0, cz, 0.75, 1.4, 12, '#a8803a', 0.35)
+        ch.solid.cyl(cx + 3, y, cz + 1.6, 0.1, 6, 6, st.timber)
+        ch.solid.box(cx + 3.7, y + 4.9, cz + 1.6, 1.4, 0.9, 0.05, '#e8c860', si)
+        fillLine([[cx - 1.8, cz], [cx + 1.8, cz]], 3.6, N + 2 + si)
+      } else if (si === garefSq && S.style === 'uuna' && seedName === 'map-city-avel') {
+        // Стена Ключей Авеля: длинная каменная стена с воротной аркой, на ней ряды ключей (светятся ночью),
+        // перед ней шесть очагов владетелей — каменные горшки с углями и столбами дыма; посередине стол Книги Дымов
+        const len = Math.max(14, Math.min(24, Math.sqrt(area) * 0.7))
+        ch.solid.box(cx, y, cz, len + 2, 0.4, 5, mixHex(st.stone, '#000', 0.12), si)
+        for (const sd of [-1, 1]) ch.solid.box(cx + sd * (len / 4 + 1.6), y + 0.4, cz - 1.2, len / 2 - 3.2, 4.4, 1.2, st.wall, si)
+        for (const sd of [-1, 1]) ch.solid.box(cx + sd * 1.8, y + 0.4, cz - 1.2, 0.9, 6.2, 1.4, st.stone, si)
+        ch.solid.box(cx, y + 6.2, cz - 1.2, 4.6, 1.0, 1.6, st.stone, si)
+        ch.solid.box(cx, y + 7.2, cz - 1.2, 2.6, 0.6, 1.0, st.tower, si)
+        const rk = rng(hashOf(seedName) + si + 31), keys = opts.mobile ? 40 : 110
+        for (let k = 0; k < keys; k++) {
+          const kx = cx + (rk() - 0.5) * (len - 1), ky = y + 1.2 + rk() * 3.0
+          if (Math.abs(kx - cx) < 2.6) continue
+          if (rk() < 0.35) ch.glow.box(kx, ky, cz - 0.55, 0.12, 0.34, 0.06, '#ffffff', si)
+          else ch.solid.box(kx, ky, cz - 0.55, 0.12, 0.34, 0.06, '#c9a24a', si)
+        }
+        for (let k = 0; k < 6; k++) {
+          const hx = cx - len / 2 + 1.6 + (k * (len - 3.2)) / 5, hz = cz + 2.6
+          ch.solid.cyl(hx, y + 0.4, hz, 0.75, 0.9, 10, st.stone, 0.95)
+          ch.glow.box(hx, y + 1.25, hz, 0.8, 0.15, 0.8, '#ffffff', si)
+          if (!opts.mobile) for (let j = 0; j < 3; j++) ch.solid.cyl(hx + Math.sin(j + k) * 0.25, y + 2.0 + j * 1.1, hz, 0.45 + j * 0.12, 0.7, 7, '#d8d4cc', 0.3 + j * 0.1)
+        }
+        ch.solid.box(cx, y + 0.4, cz + 4.4, 2.2, 1.0, 1.2, st.timber, si)
+        ch.solid.box(cx, y + 1.4, cz + 4.4, 1.6, 0.25, 1.0, '#e8dcc0', si)
+        fillLine([[cx - len / 2, cz], [cx + len / 2, cz]], 6, N + 2 + si)
+      } else if (si === garefSq && S.style === 'uuna') {
+        // очаг владетеля на площади: каменный горшок с углями под навесом, куда в День Ворот несут дым
+        ch.solid.box(cx, y, cz, 4.4, 0.35, 4.4, st.stone, si)
+        ch.solid.cyl(cx, y + 0.35, cz, 1.0, 1.1, 10, mixHex(st.stone, '#000', 0.15), 0.9)
+        ch.glow.box(cx, y + 1.45, cz, 1.0, 0.18, 1.0, '#ffffff', si)
+        for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) ch.solid.box(cx + dx * 1.9, y + 0.35, cz + dz * 1.9, 0.3, 3.4, 0.3, st.timber, si)
+        ch.roof.cyl(cx, y + 3.75, cz, 3.0, 1.6, 4, st.roof[0], 0, false, si + Math.PI / 4)
+        fillLine([[cx - 2.2, cz], [cx + 2.2, cz]], 4.4, N + 2 + si)
+      } else if (si === garefSq && S.style === 'olek' && seedName === 'map-city-antsla') {
+        // Арена Ясного дня Антслы: деревянный амфитеатр (ряды поднимаются наружу), песок, три шатра трупп
+        // (белый Валгус, рыжий Кая, лиловый Тули), посередине — Тулакрол с красной кроной, жаровни по кругу
+        const R = Math.max(8, Math.min(12, Math.sqrt(area) * 0.36)), segs = opts.mobile ? 18 : 28
+        ch.solid.cyl(cx, y, cz, R + 1.4, 0.25, 32, st.stone)
+        ch.solid.cyl(cx, y + 0.25, cz, R - 3.2, 0.08, 32, '#d8c8a0')
+        for (let t = 0; t < 4; t++) {
+          const rr = R - 2.6 + t * 1.0, hh = 0.6 + t * 0.7
+          for (let k = 0; k < segs; k++) {
+            const a = si + (k / segs) * 6.283
+            if (k % Math.floor(segs / 3) === 0 && t < 3) continue // три прохода
+            ch.solid.box(cx + Math.cos(a) * rr, y + 0.25, cz + Math.sin(a) * rr, (6.283 * rr) / segs + 0.15, hh, 1.0, t % 2 ? st.timber : mixHex(st.timber, '#fff', 0.18), a + Math.PI / 2)
+          }
+        }
+        for (let k = 0; k < segs; k += 2) {
+          const a = si + (k / segs) * 6.283
+          ch.solid.box(cx + Math.cos(a) * (R + 0.9), y + 0.25, cz + Math.sin(a) * (R + 0.9), 0.3, 4.2, 0.3, st.timber, a)
+        }
+        const TENT = ['#f0ece0', '#d8883a', '#8a50b8']
+        for (let k = 0; k < 3; k++) {
+          const a = si + 0.5 + (k / 3) * 6.283, tx = cx + Math.cos(a) * (R + 2.4), tz = cz + Math.sin(a) * (R + 2.4)
+          ch.solid.cyl(tx, y, tz, 1.9, 1.5, 10, TENT[k])
+          ch.roof.cyl(tx, y + 1.5, tz, 2.2, 2.4, 10, TENT[k], 0)
+          ch.solid.cyl(tx, y + 4.2, tz, 0.06, 1.2, 4, st.timber)
+          ch.solid.box(tx, y + 4.9, tz, 0.05, 0.5, 0.8, TENT[k], a)
+        }
+        ch.solid.cyl(cx, y + 0.3, cz, 0.55, 3.6, 8, '#3a2418', 0.4)
+        ch.solid.cyl(cx, y + 3.4, cz, 3.0, 1.6, 12, '#b8202c', 2.2)
+        ch.solid.cyl(cx, y + 5.0, cz, 2.2, 1.4, 10, '#c8303a', 0.9)
+        ch.solid.cyl(cx, y + 6.4, cz, 0.9, 0.8, 8, '#d84048', 0.1)
+        for (let k = 0; k < 6; k++) {
+          const a = si + (k / 6) * 6.283
+          ch.solid.cyl(cx + Math.cos(a) * (R - 3.6), y + 0.25, cz + Math.sin(a) * (R - 3.6), 0.35, 0.9, 6, '#2a2a30')
+          ch.glow.box(cx + Math.cos(a) * (R - 3.6), y + 1.15, cz + Math.sin(a) * (R - 3.6), 0.45, 0.35, 0.45, '#ffffff', a)
+        }
+        fillLine([[cx - R, cz], [cx + R, cz]], R * 2, N + 2 + si)
+      } else if (si === garefSq && S.style === 'olek') {
+        // Тулакрол на площади: каменное кольцо-скамья и дерево с вечнокрасной кроной
+        ch.solid.cyl(cx, y, cz, 3.6, 0.5, 18, st.stone)
+        ch.solid.cyl(cx, y + 0.5, cz, 2.9, 0.08, 18, '#5a6a3a')
+        ch.solid.cyl(cx, y + 0.5, cz, 0.4, 2.8, 8, '#3a2418', 0.3)
+        ch.solid.cyl(cx, y + 2.8, cz, 2.4, 1.3, 10, '#b8202c', 1.6)
+        ch.solid.cyl(cx, y + 4.1, cz, 1.5, 1.1, 8, '#c8303a', 0.2)
+        fillLine([[cx - 3.6, cz], [cx + 3.6, cz]], 7.2, N + 2 + si)
       } else if (si === garefSq && S.style === 'harn') {
         // Дом Колыбелей Орельберга: длинный зал и пять башен под щипцами цветов Пяти Домов; в красной башне Харнов горит свет
         const cols = ['#2a4a7a', '#2f5a3a', '#5a3a2a', '#1f5f6e', '#4a4a52']

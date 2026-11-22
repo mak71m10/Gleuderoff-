@@ -158,6 +158,37 @@ export const EMBLEMS: Record<string, { label: string; draw: (fg: string, bg: str
         <ellipse cx="50" cy="14" rx="5" ry="9" />
       </g>
     )
+  },
+  // Олекохт: четыре лепестка Тулакрола, сфера-глаз Элу, узел белой нити Кайри
+  tulakrol: {
+    label: 'Тулакрол',
+    draw: (fg, bg) => (
+      <g>
+        {[0, 1, 2, 3].map((i) => <path key={i} fill={fg} d="M50 48C38 36 38 16 50 8c12 8 12 28 0 40z" transform={`rotate(${i * 90 + 45} 50 50)`} />)}
+        <circle cx="50" cy="50" r="7" fill={bg} />
+        <circle cx="50" cy="50" r="3.5" fill={fg} />
+      </g>
+    )
+  },
+  eye: {
+    label: 'Сфера-глаз',
+    draw: (fg, bg) => (
+      <g>
+        <circle cx="50" cy="50" r="34" fill={fg} />
+        <path d="M24 50c8-12 18-18 26-18s18 6 26 18c-8 12-18 18-26 18s-18-6-26-18z" fill={bg} />
+        <circle cx="50" cy="50" r="9" fill={fg} />
+      </g>
+    )
+  },
+  knot: {
+    label: 'Узел',
+    draw: (fg) => (
+      <g fill="none" stroke={fg} strokeWidth="6" strokeLinecap="round">
+        <path d="M10 70C30 70 34 30 50 30s20 40 40 40" />
+        <circle cx="50" cy="44" r="12" />
+        <path d="M10 30c22 0 26 40 40 40s18-40 40-40" />
+      </g>
+    )
   }
 }
 

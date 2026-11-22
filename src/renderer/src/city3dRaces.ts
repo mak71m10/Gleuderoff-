@@ -100,6 +100,11 @@ const TABLES: Record<string, W> = {
   // Королевство Темерия: беглецы Империи — имперцы, лесные гладры и нерегулярные пришельцы
   temer: { imperials: 84, gladry: 5, nords: 3, dwarves: 2, gnomes: 1.5, 'wood-elves': 1.5, roma: 1, dalorians: 1 },
   // Княжества Гарефорда: горные имперцы, немного дварфов, гномов, нордов и гладров
+  bezd: { imperials: 92, gladry: 3, nords: 3, dwarves: 1, gnomes: 1 },
+  ntow: { nords: 74, imperials: 16, gladry: 3, dwarves: 3, gnomes: 2, 'high-elves': 2 },
+  gren: { nords: 70, imperials: 24, gladry: 3, dwarves: 1.5, gnomes: 1.5 },
+  uuna: { imperials: 92, gladry: 3, nords: 2, dwarves: 1.5, gnomes: 1.5 },
+  olek: { eluins: 78, imperials: 16, nords: 4, gladry: 2 },
   harn: { imperials: 90, dwarves: 2, gnomes: 2, nords: 3, gladry: 2, dalorians: 1 },
   garef: { imperials: 86, dwarves: 3, gnomes: 2, nords: 3, gladry: 3, dalorians: 1 },
   // Крайдонианская Лига: элеоны, люди и немного эльфов и прочих — порт, где бывают все
