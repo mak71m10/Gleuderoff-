@@ -25,11 +25,11 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
 const HARNMARK_STYLE = 'oil painting, Germanic imperial principality portrait, half-timbered stone town and a white tower with a red pennant behind, overcast amber light, muted reds, creams and slate, painterly, half-length portrait'
-const FEINOKO_STYLE = 'oil painting, mountain island kingdom portrait, grey stone terraces and paper lanterns behind, misty blue dusk light, slate blue and grey tones, visible brush strokes, detailed face, half-length portrait'
-const TAVAR_STYLE = 'oil painting, forest elf kingdom portrait, a vast ancient yew tree with carved trunk behind, dappled green forest light, muted greens and browns, visible brush strokes, detailed face, half-length portrait'
-const PAVIL_STYLE = 'oil painting, golden-lit music pavilion portrait, a gilded gallery with seven glowing windows behind, warm candlelight, gold and plum tones, visible brush strokes, detailed face, half-length portrait'
-const REDANIA_STYLE = 'oil painting, river kingdom portrait, stone bridge over a dark river at dusk behind, first stars in the sky, cold blue and warm lamp tones, visible brush strokes, detailed face, half-length portrait'
-const KAGIA_STYLE = 'oil painting, imperial merchant-empire portrait, ochre plaster hall with a huge crimson gate behind, warm dusty sunlight, crimson, ochre and gold tones, visible brush strokes, detailed face, half-length portrait'
+const FEINOKO_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), mountain island kingdom portrait, grey stone terraces and paper lanterns behind, misty blue dusk light, slate blue and grey tones, visible brush strokes, detailed face, half-length portrait'
+const TAVAR_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), forest elf kingdom portrait, a vast ancient yew tree with carved trunk behind, dappled green forest light, muted greens and browns, visible brush strokes, detailed face, half-length portrait'
+const PAVIL_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), golden-lit music pavilion portrait, a gilded gallery with seven glowing windows behind, warm candlelight, gold and plum tones, visible brush strokes, detailed face, half-length portrait'
+const REDANIA_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), river kingdom portrait, stone bridge over a dark river at dusk behind, first stars in the sky, cold blue and warm lamp tones, visible brush strokes, detailed face, half-length portrait'
+const KAGIA_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), imperial merchant-empire portrait, ochre plaster hall with a huge crimson gate behind, warm dusty sunlight, crimson, ochre and gold tones, visible brush strokes, detailed face, half-length portrait'
 const KULAGON_STYLE = 'oil painting, Frisian canal-country portrait, flat green plain with brick houses and a stone arch over a canal behind, low grey sky with silver light, muted greens and slate blues, painterly, half-length portrait'
 const KOGALYM_STYLE = 'oil painting, rural commune portrait, timber meeting hall with a notched tally stick and a wooden cart behind, warm daylight, earthy tones, visible brush strokes, detailed face, half-length portrait'
 const LYRIA_STYLE = 'oil painting, mountain-roman ducal portrait, white marble hall with a wall of small glowing tablets behind, warm lamp light, terracotta and cream tones, visible brush strokes, detailed face, half-length portrait'
@@ -242,6 +242,58 @@ const CUSTOM = {
   'fn-rin': 'woman of forty-two, white layered robe, a crane feather pin, cold clear eyes',
   'fn-kai': 'broad fisherman of fifty, a fishing net over his shoulder, wave-blue vest, tanned face, wry smile',
   'fn-walter': 'old human clerk of sixty, ink-stained hands, imperial grey coat, a pen behind his ear, weary eyes',
+  // Контроль качества центра: свои описания по биографиям (22.11.2026)
+  'kj-romilda': 'dignified old widow in her late sixties, grey hair under a crimson-trimmed veil, deep lines at the mouth, dark red gown, a small iron coin-box key in her hands, patient stern eyes',
+  'fm-kK-luc': 'severe old prefect in his sixties, thin white hair, long nose, crimson cloak with a bronze eagle clasp, a handful of customs tokens, sharp suspicious eyes',
+  'fm-kK-tit': 'young soldier of nineteen, short brown hair, first beard fluff, crimson guard cloak over mail, a spear, brave uncertain look',
+  'fm-kK-jul': 'young noblewoman of twenty, dark hair in a braid with a crimson ribbon, ochre gown, a sealed letter in hand, secretive half-smile',
+  'fm-kK-rom': 'girl of fifteen, long chestnut braid, plain ochre dress, an open book of statutes, stubborn clever look',
+  'fm-kS-hein': 'burly old stonecutter in his sixties, grey stubble, dusty leather apron, a stone mallet, calm hard eyes',
+  'fm-kS-mar': 'old woman in her sixties, grey hair under a plain cap, soot-streaked cheeks, a wooden spoon and a charcoal stick, tired kind eyes',
+  'fm-kS-ilse': 'young noblewoman of seventeen, loose light brown hair, grey-blue gown, a silver gate pendant, silent defiant look',
+  'fm-kS-bert': 'rough quarry master in his late forties, short dark beard, grey stone dust in his hair, leather tunic, a stone chisel, shrewd smile',
+  'fm-kB-mar': 'tired woman in her mid forties, dark hair with early grey, ochre travel gown, feverish pale face, a copper button in her hand',
+  'fm-kB-rein': 'weathered caravan driver in his fifties, sun-bleached beard, long leather coat, a mule halter, silent steady eyes',
+  'fm-kB-auf': 'young merchant of twenty, curly blond hair, ochre coat with copper buttons, a map of wells, eager open face',
+  'fm-kH-bri': 'old seamstress in her fifties, grey hair pinned up, crimson cloth over her knees, a needle and thread, proud tender eyes',
+  'fm-kH-wen': 'big red-haired guard captain in his mid forties, silver in his beard, crimson cloak over mail, hand on a spear, uneasy look',
+  'fm-kH-ort': 'sixteen year old spear-bearer, auburn hair, an oversized crimson cloak, a new spear, proud nervous look',
+  'fm-kW-hel': 'composed woman in her late fifties, grey hair in a coif, dark blue wool dress, a set of small brass scales, head tilted listening',
+  'fm-kW-luk': 'ink-stained clerk in his forties, light brown hair, short beard, dark blue robe, a black draft ledger, anxious attentive eyes',
+  'fm-kR-ekk': 'old village reeve in his fifties, white hair, lined face, green-brown coat, a wooden well bucket, steady eyes',
+  'fm-kR-ann': 'sturdy woman in her mid thirties, blond braid, linen blouse and leather vest, a ring of keys, sharp clever eyes',
+  'fm-kR-max': 'boy of eleven, messy dark blond hair, simple shirt, a pebble in his fist, mischievous grin',
+  'fm-rR-alb': 'imperial count in his sixties, grey hair, heavy jaw, dark red coat with a silver bridge brooch, a bundle of white passes, cold proud eyes',
+  'fm-rR-ilse': 'slender pale countess in her fifties, light grey hair under a thin veil, high-collared grey-blue gown, singing softly, a hint of sadness',
+  'fm-rR-kat': 'abbess in her mid thirties, grey habit, wooden rosary, plain pale face, a pen and a letter, calm eyes',
+  'fm-rR-gun': 'young knight of twenty-two, short blond hair, blue river-guard cloak over mail, a scorched sword, grim brave look',
+  'fm-rR-eli': 'girl of nine, blond hair with a blue ribbon, a small red dress, looking up at stars, wondering look',
+  'fm-rR-kon': 'loud red-haired man in his early forties, ruddy face, brown doublet, a beer tankard, a bitter smile',
+  'fm-rR-hed': 'plain woman in her forties, brown hair under a kerchief, simple dark red dress, a ring of toll tokens, kind tired eyes',
+  'fm-rF-karl': 'strong young ferryman of twenty-eight, wet dark hair, oilskin coat, a ferry rope, proud sleepless eyes',
+  'fm-rF-gre': 'stout woman in her fifties, grey-brown hair in a scarf, apron over a blue dress, an account tally stick, no-nonsense look',
+  'fm-rS-kon': 'stern young bridge captain of thirty-two, short dark hair, black coat, an oversized copper seal, uneasy look',
+  'fm-rM-gun': 'old flour-dusted miller in his sixties, one eye squinting, white eyebrows, brown apron, a bag of flour, bitter resigned look',
+  'fm-rM-liz': 'young miller girl of twenty, brown braid, flour on her cheek, plain linen dress, reciting from a charter, earnest look',
+  'fm-pR-giu': 'old community elder in his sixties, white beard, plain grey coat, a heavy leather purse and a wooden stick, thoughtful eyes',
+  'fm-pR-lia': 'young singer of twenty-five, auburn hair in a loose braid, deep yellow gown, a lute, bright calm smile',
+  'fm-pR-ing': 'strong young woman of twenty-six, dark hair tied back, grey riding cloak with a white key badge, hand on a rein, alert eyes',
+  'fm-pR-mar': 'little boy of five, brown curls, yellow tunic, counting on his fingers, serious bright eyes',
+  'fm-pK-han': 'middle-aged fiddler of forty-five, thinning sandy hair, plum waistcoat, a violin under his chin, amiable look',
+  'fm-pK-mia': 'young scribe of twenty-two, red hair in a bun, ink-stained fingers, plum dress, a book of windows, worried clever eyes',
+  'fm-pY-vit': 'old auditor in his seventies, white hair, clean shaven, dark red caftan with a silver key button, three small brass scales, exacting eyes',
+  'fm-tT-aur': 'old wood elf who looks about sixty, grey-silver hair, lined worn face, tattered ragged cloak, a rope of nomad knots, tired eyes',
+  'fm-tT-liran': 'wood elf woman who looks about thirty, silver-white braid, green gown, a thick book, quiet serious eyes',
+  'fm-tT-elen': 'wood elf woman who looks about thirty, dark hair in two braids, grey-green archer leather, a small bow, defiant eyes',
+  'fm-tT-ila': 'young wood elf who looks about twenty, tousled blond hair, a long yew bow, bark brown jerkin, mischievous eyes',
+  'fm-tN-roda': 'wood elf bowmaker who looks about forty, grey streaks in dark hair, leather apron, a half-finished yew bow, steady proud eyes',
+  'fm-tN-ola': 'wood elf archer woman who looks about twenty-five, dark hair in a ponytail, grey-green cloak, a quiver of white-fletched arrows, intense eyes',
+  'fm-fM-ryu': 'weathered man in his fifties, black hair streaked grey, dark blue quilted coat, climbing rope and an ice pick, calm eyes',
+  'fm-fM-sa': 'old woman of eighty-five, white hair, wrinkled face, dark blue robe, smooth grey stone beads, patient eyes',
+  'fm-fM-kei': 'young warrior of twenty-two, black hair, plaited leather armour, a short spear, grim brave look',
+  'fm-fM-aya': 'little girl of eight, black hair, pale blue robe, counting on her fingers, quiet wondering look',
+  'fm-fO-ume': 'sharp woman of thirty-eight, black hair pinned with a fish pin, yellow-brown robe, a folding fan, quick eyes',
+  'fm-fO-rai': 'cautious man of forty, black hair, simple dark robe, hands folded, careful modest look',
   // Протекторат Лирия: римско-горная знать, северноевропейские лица
   'ly-gaius7': 'broad-shouldered duke in his mid forties, short dark brown hair with grey at the temples, strong jaw, clean shaven, deep red tunic with a gold eagle brooch and a thin iron torque, a calm orator look, marble wall behind',
   'ly-gaius6': 'stern old duke in his sixties, white short hair, deep lines, red toga with a gold eagle, an iron circlet on the table, tired proud eyes',
@@ -738,9 +790,9 @@ for (const e of chars) {
     : pavil
     ? `${PAVIL_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : tavarvait
-    ? `${TAVAR_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    ? `${TAVAR_STYLE}, portrait of ${/эльф/i.test(race) ? `an (elf ${female ? 'woman' : 'man'}:1.35), (wood elf of a forest folk, northern european features, pale skin, tall slender, long pointed elf ears:1.35)` : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european human, germanic features, pale skin:1.25)`}, ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : feinoko
-    ? `${FEINOKO_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    ? `${FEINOKO_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, black hair:1.25), ${/Момит/.test(race) ? '(high black topknot tied with a blue cord:1.25), (small white bone pendant on a thin cord around the neck:1.2), ' : ''}${CUSTOM[id] ?? subject}, (no hat:1.3)`
     : harnmark
     ? `${HARNMARK_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : kulagon
