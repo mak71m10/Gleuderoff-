@@ -65,13 +65,13 @@ const E = (id, kind, name, f = {}) => {
       ...(f.urn ? { urn: f.urn } : {}),
       ...(f.fleet ? { fleet: f.fleet } : {}),
       ...(f.lantern ? { lantern: f.lantern } : {}),
-      ...(f.hostages ? { hostages: f.hostages } : {}),
+      ...(f.razryad ? { razryad: f.razryad } : {}),
       ...(f.threshold ? { threshold: f.threshold } : {}),
       ...(f.wall ? { wall: f.wall } : {}),
       ...(f.cart ? { cart: f.cart } : {}),
       ...(f.ford ? { ford: f.ford } : {}),
       ...(f.willow ? { willow: f.willow } : {}),
-      ...(f.circle ? { circle: f.circle } : {})
+      ...(f.bans ? { bans: f.bans } : {})
     },
     history: [],
     from: f.from ?? null,
@@ -174,7 +174,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 42
+world.version = 43
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })

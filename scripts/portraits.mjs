@@ -51,6 +51,7 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 
 // особые описания ключевых персонажей
 const CUSTOM = {
+  'hm-baltasar': 'thin stooped clerk about forty, short dark beard, short dark hair, (no hat:1.4), red-rimmed tired eyes, ink-stained fingers, plain dark wool doublet with a white linen collar, a small scraping knife on the belt, holding a quill',
   'fm-lA-eg': 'sturdy woman in her fifties, long dark brown hair tied back, full head of hair, plain brown wool dress, a simple pendant, tired practical eyes',
   'fm-lF-old': 'dignified landowner-judge in his sixties, short white hair, grey beard, dark toga, a scroll in hand, plain stone wall behind, no frame',
   'fm-lF-w': 'practical widow in her fifties, brown hair streaked with grey tied in a bun, olive dress, vineyard basket, calm tired eyes',

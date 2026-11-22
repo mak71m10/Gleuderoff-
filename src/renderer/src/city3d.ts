@@ -2443,6 +2443,18 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
           const a = si + 0.4 + (k / 4) * 6.283
           ch.solid.box(cx + Math.cos(a) * 9.2, y + 0.3, cz + Math.sin(a) * 9.2, 3.2, 0.45, 0.7, '#8a6a3a', a + Math.PI / 2)
         }
+        // Шнуровой столб у корней: белый ствол без коры, перекладина и пять шнуров Опекунов с узлами-запретами
+        {
+          const px = cx + Math.cos(si + 2.2) * 8.4, pz = cz + Math.sin(si + 2.2) * 8.4
+          ch.solid.cyl(px, y, pz, 0.45, 7.4, 8, '#e4e0d0')
+          ch.solid.box(px, y + 7.0, pz, 5.2, 0.3, 0.3, '#d8d4c4', si + 2.2 + Math.PI / 2)
+          const cords = ['#2f6b3a', '#e8d9a0', '#c0392b', '#d9c9a0', '#9fb28a'], knots = [7, 10, 4, 5, 8]
+          for (let k = 0; k < 5; k++) {
+            const off = (k - 2) * 1.1, qx = px + Math.cos(si + 2.2 + Math.PI / 2) * off, qz = pz + Math.sin(si + 2.2 + Math.PI / 2) * off
+            ch.solid.box(qx, y + 2.6, qz, 0.06, 4.4, 0.06, cords[k])
+            for (let j = 0; j < (opts.mobile ? Math.min(knots[k], 4) : knots[k]); j++) ch.glow.box(qx, y + 6.7 - j * 0.42, qz, 0.2, 0.2, 0.2, cords[k], si)
+          }
+        }
         fillLine([[cx - 9, cz], [cx + 9, cz]], 10, N + 2 + si)
       } else if (si === garefSq && S.style === 'elf') {
         // Серебряная Ива Эльфборна: белое каменное кольцо с водой, серебристый ствол с корнями, широкая крона
@@ -2544,25 +2556,34 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         for (let k = 0; k < 6; k++) { const a = si + (k / 6) * 6.283, bx = cx + Math.cos(a) * 11, bz = cz + Math.sin(a) * 11; ch.solid.box(bx, y, bz, 3, 0.55, 0.8, st.timber, a + Math.PI / 2) }
         fillLine([[cx, cz], [cx + 0.1, cz]], 9, N + 2 + si)
       } else if (si === garefSq && S.style === 'harn') {
-        // Дом Колыбелей Орельберга: длинный зал и пять башен под щипцами цветов Пяти Домов; в красной башне Харнов горит свет
-        const cols = ['#2a4a7a', '#2f5a3a', '#5a3a2a', '#1f5f6e', '#4a4a52']
-        const len = 17
-        ch.solid.box(cx, y, cz, len + 1, 1.0, 8, mixHex(st.stone, '#000', 0.1), si)
-        ch.solid.box(cx, y + 1.0, cz, len, 4.2, 7, st.plaster[0], si)
-        ch.solid.box(cx, y + 3.4, cz, len + 0.3, 0.4, 7.3, st.timber, si)
-        ch.roof.cyl(cx, y + 5.2, cz, 6.2, 3.2, 4, st.roof[0], 0, false, Math.PI / 4)
-        for (let k = 0; k < 5; k++) {
-          const tx = cx + (k - 2) * (len / 4.4), tz = cz - 4.4
-          ch.solid.box(tx, y + 1.0, tz, 2.6, 7.2, 2.6, st.plaster[1], si)
-          ch.solid.box(tx, y + 8.2, tz, 2.9, 0.4, 2.9, cols[k], si)
-          ch.roof.cyl(tx, y + 8.6, tz, 2.4, 3.2, 4, cols[k], 0, false, Math.PI / 4)
-          if (!opts.mobile || k === 2) ch.glow.box(tx, y + 5.2, tz + 1.32, 0.7, 1.1, 0.12, '#ffffff', si)
+        // Разрядная палата Харнмарка: каменный зал со ступенчатыми щипцами, крыльцо со светом и шесть шестов со знамёнами
+        // Домов перед фасадом — по ступеням Разрядной книги: чем выше Дом в книге, тем выше шест (Харн, Ройвен, Грисхольм, Зигмарк, Эшенхольм, Эльмин)
+        const cols = ['#c03538', '#2a4a7a', '#5a3a2a', '#2f5a3a', '#4a4a52', '#1f5f6e']
+        const len = 16, dep = 8, wallH = 5.2
+        const ca = Math.cos(si), sa = Math.sin(si)
+        const at = (lx: number, lz: number): [number, number] => [cx + lx * ca - lz * sa, cz + lx * sa + lz * ca]
+        ch.solid.box(cx, y, cz, len + 1, 0.9, dep + 1, mixHex(st.stone, '#000', 0.1), si)
+        ch.solid.box(cx, y + 0.9, cz, len, wallH, dep, st.stone, si)
+        for (const k of [-5, 0, 5]) { const [rx, rz] = at(k, 0); ch.roof.cyl(rx, y + 0.9 + wallH, rz, dep * 0.6, 3.6, 4, st.roof[0], 0, false, si + Math.PI / 4) }
+        // ступенчатые щипцы на торцах
+        for (const s of [-1, 1]) for (let k = 0; k < 4; k++) {
+          const [gx, gz] = at(s * (len / 2 + 0.15), 0)
+          const w = dep - k * 2
+          ch.solid.box(gx, y + 0.9 + wallH + k * 1.0, gz, 0.5, 1.0, w, mixHex(st.stone, '#fff', 0.08), si)
         }
-        ch.solid.box(cx, y + 1.0, cz + 3.6, 3.2, 3.2, 0.3, st.timber, si)
-        ch.glow.box(cx, y + 1.0, cz + 3.8, 2.2, 3.0, 0.1, '#ffffff', si)
-        ch.solid.cyl(cx + len / 2 + 2, y, cz + 5, 0.4, 5, 8, st.timber)
-        ch.solid.box(cx + len / 2 + 2, y + 4.2, cz + 5.45, 0.12, 1.5, 0.9, '#c03538', si)
-        fillLine([[cx - len / 2, cz + 6], [cx + len / 2, cz + 6]], 5, N + 2 + si)
+        // окна и крыльцо
+        for (let k = -2; k <= 2; k++) { const [wx, wz] = at(k * 3, dep / 2 + 0.05); if (!opts.mobile || k === 0) ch.glow.box(wx, y + 3.2, wz, 0.9, 1.5, 0.08, '#ffffff', si) }
+        { const [dx, dz] = at(0, dep / 2 + 1.2); ch.solid.box(dx, y, dz, 4, 0.5, 2.2, mixHex(st.stone, '#000', 0.15), si); const [gx, gz] = at(0, dep / 2 + 0.06); ch.glow.box(gx, y + 0.9, gz, 2.2, 3.0, 0.1, '#ffffff', si) }
+        // шесть шестов: высота по ступени книги
+        for (let k = 0; k < 6; k++) {
+          const [fx, fz] = at(-7.5 + k * 3, dep / 2 + 4.2)
+          const hh = 9.5 - k * 1.1
+          ch.solid.cyl(fx, y, fz, 0.16, hh, 6, st.timber)
+          ch.solid.cyl(fx, y + hh, fz, 0.3, 0.3, 6, '#c9a24a')
+          const [bx, bz] = at(-7.5 + k * 3 + 0.75, dep / 2 + 4.2)
+          ch.solid.box(bx, y + hh - 1.9, bz, 1.4, 1.6, 0.08, cols[k], si)
+        }
+        fillLine([[cx - len / 2, cz + dep / 2 + 6], [cx + len / 2, cz + dep / 2 + 6]], 5, N + 2 + si)
       } else if (si === garefSq) {
         // Светочная башня Гарефорда: каменный ствол, дубовая галерея, фонарная клеть с Пламенем, медный шпиль
         const tw = 4.6, th = 20

@@ -19,13 +19,13 @@ import { HeightsView } from './Heights'
 import { UrnView } from './Urn'
 import { FleetView } from './Fleet'
 import { LanternView } from './Lantern'
-import { HostagesView } from './Hostages'
+import { RazryadView } from './Razryad'
 import { ThresholdView } from './Threshold'
 import { WallView } from './Wall'
 import { CartView } from './Cart'
 import { FordsView } from './Fords'
 import { WillowView } from './Willow'
-import { CircleView } from './Circle'
+import { BansView } from './Bans'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { renderBody } from './prose'
@@ -343,13 +343,13 @@ function EntryEditor({ id }: { id: string }) {
                 {f.urn && <UrnView data={f.urn} onOpen={goto} />}
                 {f.fleet && <FleetView data={f.fleet} onOpen={goto} />}
                 {f.lantern && <LanternView data={f.lantern} onOpen={goto} />}
-                {f.hostages && <HostagesView data={f.hostages} onOpen={goto} />}
+                {f.razryad && <RazryadView data={f.razryad} onOpen={goto} />}
                 {f.threshold && <ThresholdView data={f.threshold} onOpen={goto} />}
                 {f.wall && <WallView data={f.wall} onOpen={goto} />}
                 {f.cart && <CartView data={f.cart} onOpen={goto} />}
                 {f.ford && <FordsView data={f.ford} onOpen={goto} />}
                 {f.willow && <WillowView data={f.willow} onOpen={goto} />}
-                {f.circle && <CircleView data={f.circle} onOpen={goto} />}
+                {f.bans && <BansView data={f.bans} onOpen={goto} />}
           {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}
