@@ -9,6 +9,7 @@ import { formatDate } from '../calendar'
 import { CULTURE_INFO, TERRAIN_INFO, ownerAt } from '../provinces'
 import type { PlaceFields, PlaceType } from '../types'
 import { newPlace } from '../model'
+import { StatePanel, ProvinceEcon } from './MapPanels'
 
 export function Inspector() {
   const selection = useStore((s) => s.selection)
@@ -41,7 +42,7 @@ export function Inspector() {
       {selection.type === 'place' && <PlaceInspector id={selection.id} />}
       {selection.type === 'building' && <BuildingInspector id={selection.id} />}
       {selection.type === 'region' && <RegionInspector id={selection.id} />}
-      {selection.type === 'state' && <StateSummary id={selection.id} />}
+      {selection.type === 'state' && <StatePanel id={selection.id} />}
       {selection.type === 'label' && <LabelInspector id={selection.id} />}
       {selection.type === 'province' && <ProvinceInspector id={selection.id} />}
     </aside>
@@ -352,6 +353,7 @@ function ProvinceInspector({ id }: { id: number }) {
           <span>{TERRAIN_INFO[p.terrain]?.name}</span>
         </div>
       </div>
+      <ProvinceEcon p={p} />
       {p.cityMapId && <CityMapButton mapId={p.cityMapId} />}
       {/* столицы и порты (Хауссер, Аурхафен…) стоят меткой на карте мира: их план — у метки, показываем его и в провинции */}
       {placePlans.filter((m) => m !== p.cityMapId).map((m) => <CityMapButton key={m} mapId={m} />)}
@@ -500,28 +502,6 @@ function LabelInspector({ id }: { id: string }) {
       >
         Удалить подпись
       </Button>
-    </div>
-  )
-}
-
-function StateSummary({ id }: { id: string }) {
-  const world = useStore((s) => s.world!)
-  const date = useStore((s) => s.date)
-  const openCard = useStore((s) => s.openStateCard)
-  const st = world.states.find((s) => s.id === id)
-  if (!st) return null
-  const f = resolve(st, date)
-  return (
-    <div className="inspector-body">
-      <div className="inspector-kicker">Государство</div>
-      <h2 className="inspector-title" style={{ color: f.color }}>
-        {f.name}
-      </h2>
-      <p className="muted">{f.government || 'Строй не указан'}</p>
-      <Button icon="crown" variant="primary" onClick={() => openCard(id)}>
-        Открыть карточку
-      </Button>
-      <p className="hint">Инструмент «Перо» нарисует новый участок, он сразу будет принадлежать этому государству.</p>
     </div>
   )
 }

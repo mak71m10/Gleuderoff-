@@ -1056,6 +1056,16 @@ async function migrateWorld(dir: string): Promise<void> {
       if (d?.base?.tech && !st.base.tech) st.base.tech = structuredClone(d.base.tech)
     }
   }
+  if ((user.version ?? 1) < 63) {
+    // v63: экономика ВПИ (docs/впи-экономика.md) — промыслы и население провинций, население и амбары областей,
+    // монета, сословия, казна, беды и силы стран; только там, где своих данных ещё нет
+    const dp = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) { const d = dp.get(p.id); if (d?.res && !p.res) { p.res = structuredClone(d.res); p.pop = d.pop } }
+    const da = new Map<string, Json>((def.adminRegions ?? []).map((a: Json) => [a.id, a]))
+    for (const a of user.adminRegions ?? []) { const d = da.get(a.id); if (d?.econ && !a.econ) a.econ = structuredClone(d.econ) }
+    const ds = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
+    for (const st of user.states ?? []) { const d = ds.get(st.id); if (d?.base?.econ && !st.base.econ) st.base.econ = structuredClone(d.base.econ) }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

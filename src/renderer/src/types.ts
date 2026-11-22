@@ -1,4 +1,5 @@
 import type { StateTech } from './tech'
+import type { AreaEcon, ProvinceRes, StateEcon } from './economy'
 
 /** Дата мира — целое число дней от 1-го дня 1-го года после смерти последнего дракона (день 0). */
 export type WorldDate = number
@@ -107,6 +108,8 @@ export interface StateFields {
   banks?: string
   /** Технологии страны в Век Шестерни (src/renderer/src/tech.ts, docs/технологии.md) */
   tech?: StateTech
+  /** Экономика ВПИ: монета, сословия, казна, подати, беды и сильные стороны, летопись */
+  econ?: StateEcon
 }
 
 export type FlagLayout =
@@ -436,6 +439,9 @@ export interface Province {
   description?: string
   /** Карта города этой провинции */
   cityMapId?: string
+  /** Экономика ВПИ: промысел провинции и сколько в ней живёт (docs/впи-экономика.md) */
+  res?: ProvinceRes
+  pop?: number
   /** Особое место (например, «aurhafen» — поселение заменено местом автора) */
   landmark?: string
   /** Владельцы по датам: [дата | null, id страны | null] */
@@ -453,6 +459,8 @@ export interface AdminRegion {
   houseId?: string
   description?: string
   descAuto?: boolean
+  /** Экономика области (только у level = 'area'): население по расам и сословиям, довольство, амбар, постройки */
+  econ?: AreaEcon
 }
 
 export interface Army {

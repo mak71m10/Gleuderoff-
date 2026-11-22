@@ -47,6 +47,7 @@ import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
 import { Icon, type IconName } from './Icon'
 import { TechView } from './Tech'
 import { EconomyView } from './Economy'
+import { fmtMarks } from '../economy'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
 
 type Tab = 'overview' | 'power' | 'economy' | 'military' | 'diplomacy' | 'tech'
@@ -187,10 +188,7 @@ function StateCardBody({ id }: { id: string }) {
       </header>
 
       <div className="sc-stats">
-        <Stat icon="people" label="Население" value={f.population} />
-        <Stat icon="sword" label="Армия" value={f.army} />
-        <Stat icon="target" label="Флот" value={f.navy} />
-        <Stat icon="coins" label="Казна" value={f.treasury} />
+        <Stat icon="coins" label="Казна" value={f.econ ? fmtMarks(f.econ.treasury) : f.treasury} />
         <Stat
           icon="pin"
           label="Столица"
@@ -515,7 +513,7 @@ function StateCardBody({ id }: { id: string }) {
 
         {tab === 'tech' && <TechView tech={f.tech} onChange={(tech) => set({ tech })} />}
 
-        {tab === 'economy' && <EconomyView f={f} set={set} />}
+        {tab === 'economy' && <EconomyView f={f} set={set} st={st} />}
 
         {tab === 'military' && (
           <div className="sc-side sc-army">

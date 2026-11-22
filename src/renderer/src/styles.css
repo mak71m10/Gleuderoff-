@@ -2656,3 +2656,75 @@ button.pw-chip:hover { background: var(--panel-2); }
   .eco { grid-template-columns: 1fr; }
   .eco-level { grid-template-columns: 110px 1fr; } .eco-level-text { grid-column: 1 / -1; }
 }
+
+/* ---- окно экономики страны (EconWindow.tsx) ---- */
+.eco-top { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.eco-top-facts { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; color: var(--text-2); }
+.eco-top-facts b { color: var(--text); }
+.eco-open { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--gold); background: var(--panel); color: var(--gold-2); font-family: var(--serif); font-size: 16px; cursor: pointer; }
+.eco-open:hover { background: var(--gold-dim); color: var(--text); }
+.econ-win-back { position: fixed; inset: 0; z-index: 2500; background: rgba(0, 0, 0, .7); display: flex; align-items: stretch; justify-content: center; padding: 2vh 2vw; }
+.econ-win { width: 100%; max-width: 1500px; overflow: auto; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+.ew-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.ew-head .modal-close { position: static; }
+.ew-title { font-family: var(--serif); font-size: 28px; color: var(--gold-2); }
+.ew-sub { color: var(--muted); font-size: 14px; }
+.ew-tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+.ew-tile { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); }
+.ew-tile span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.ew-tile b { font-family: var(--serif); font-size: 19px; color: var(--text); }
+.ew-tile i { font-style: normal; font-size: 12px; color: var(--muted); }
+.ew-tile.bad { border-color: #b0503a; } .ew-tile.bad b { color: #e08a6a; }
+.ew-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 14px; }
+.ew-sec { padding: 12px 14px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); min-width: 0; }
+.ew-sec h3 { margin: 0 0 10px; font-family: var(--serif); font-weight: normal; font-size: 19px; color: var(--gold-2); }
+.ew-h-gap { margin-top: 16px !important; }
+.ew-wide { grid-column: 1 / -1; }
+.ew-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ew-table th { text-align: left; color: var(--muted); font-weight: normal; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+.ew-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255, 255, 255, .04); vertical-align: middle; }
+.ew-table td.bad, .ew-list.bad li::marker { color: #e08a6a; }
+.ew-muted { color: var(--muted); }
+.ew-row { display: grid; grid-template-columns: 150px 1fr 60px; gap: 8px; align-items: center; font-size: 13px; padding: 2px 0; }
+.ew-num { text-align: right; color: var(--text-2); }
+.ew-bar { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .06); overflow: hidden; min-width: 40px; }
+.ew-bar i { display: block; height: 100%; background: #7fa6c9; border-radius: 4px; }
+.ew-bar.gold i { background: var(--gold); }
+.ew-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; }
+.ew-list.good li::marker { color: #9fd08a; }
+.ew-foot { margin: 12px 0 0; font-size: 12px; }
+@media (max-width: 1100px) { .ew-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ew-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .econ-win-back { padding: 0; } .econ-win { border-radius: 0; padding: 12px; }
+  .ew-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ew-grid { grid-template-columns: 1fr; }
+  .ew-row { grid-template-columns: 120px 1fr 50px; }
+}
+.ew-tile i.neg { color: #e08a6a; } .ew-tile i.pos { color: #9fd08a; }
+.ew-budget { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ew-budget h4 { margin: 0 0 6px; font-weight: normal; color: var(--text-2); font-size: 13px; }
+.ew-bl { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 2px 0; border-bottom: 1px dotted rgba(255, 255, 255, .06); }
+.ew-bl b { font-weight: normal; white-space: nowrap; }
+.ew-net { margin-top: 10px; padding: 6px 10px; border-radius: 6px; font-size: 14px; }
+.ew-net.pos { background: rgba(120, 190, 110, .12); color: #9fd08a; } .ew-net.neg { background: rgba(200, 100, 80, .12); color: #e08a6a; }
+.ew-table td.good { color: #9fd08a; }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) { .ew-budget { grid-template-columns: 1fr; } }
+
+/* ---- панели карты: страна, провинция и область (MapPanels.tsx) ---- */
+.mp { display: flex; flex-direction: column; gap: 10px; }
+.mp-head { display: flex; gap: 12px; align-items: center; }
+.mp-flag { width: 84px; border-radius: 3px; box-shadow: 0 1px 4px rgba(0, 0, 0, .5); }
+.mp-ruler { display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 8px; background: var(--bg-2); }
+.mp-ruler img { width: 52px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid var(--gold-dim); }
+.mp-ruler b { font-family: var(--serif); font-size: 16px; }
+.mp-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mp-facts > div { display: flex; flex-direction: column; gap: 1px; padding: 6px 8px; border-radius: 6px; background: var(--bg-2); min-width: 0; }
+.mp-facts span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+.mp-facts b { font-weight: 600; font-size: 14px; } .mp-facts i { font-style: normal; font-size: 12px; color: var(--muted); }
+.mp-facts .neg, .mp-num.neg { color: #e08a6a; } .mp-facts i.pos { color: #9fd08a; } .mp-facts i.neg { color: #e08a6a; }
+.mp-block .chip-list { margin-top: 4px; }
+.mp-list { margin: 4px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }
+.mp-list.bad li::marker { color: #e08a6a; }
+.mp-area { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); }
+.mp-row { display: grid; grid-template-columns: 1fr 1fr 70px; gap: 6px; align-items: center; font-size: 13px; padding: 2px 0; }
+.mp-num { text-align: right; color: var(--text-2); font-size: 12px; }
+.mp-gap { margin-top: 10px; }

@@ -105,7 +105,6 @@ export function MapView() {
   const g = useRef<{
     base?: L.ImageOverlay
     tiles?: L.TileLayer
-    ref?: L.ImageOverlay
     regions: L.LayerGroup
     labels: L.LayerGroup
     geo: L.LayerGroup
@@ -206,14 +205,13 @@ export function MapView() {
     }
   }, [])
 
-  // --- подложка и калька ---
+  // --- подложка ---
   useEffect(() => {
     const map = mapRef.current
     if (!map || !mapDef || !g.current) return
     g.current.base?.remove()
     g.current.tiles?.remove()
     g.current.tiles = undefined
-    g.current.ref?.remove()
     const b = boundsOf(mapDef)
     // превью всей карты — мгновенно, ПОД плитками высокого разрешения (своя панель ниже tilePane);
     // если оно лежит сверху, растянутые 4096 px размывают всю карту в кашу
@@ -233,7 +231,6 @@ export function MapView() {
         className: 'map-base map-tiles'
       }).addTo(map)
     }
-    if (mapDef.reference) g.current.ref = L.imageOverlay(assetUrl(mapDef.reference), b, { className: 'map-ref' })
     const lb = L.latLngBounds(b as L.LatLngBoundsLiteral)
     const saved = savedViews.get(mapDef.id)
     curMapId.current = null
@@ -245,17 +242,12 @@ export function MapView() {
     polys.current.forEach((p) => p.poly.remove())
     polys.current.clear()
     refreshZoomStyles()
-  }, [mapDef?.id, mapDef?.image, mapDef?.reference, mapDef?.width, mapDef?.height, mapDef?.tiles?.path])
+  }, [mapDef?.id, mapDef?.image, mapDef?.width, mapDef?.height, mapDef?.tiles?.path])
 
   useEffect(() => {
-    const map = mapRef.current
-    const ref = g.current?.ref
     g.current?.base?.setOpacity(layers.base ? 1 : 0.15)
     g.current?.tiles?.setOpacity(layers.base ? 1 : 0)
-    if (!map || !ref) return
-    if (layers.reference) ref.addTo(map).setOpacity(layers.referenceOpacity)
-    else ref.remove()
-  }, [layers.base, layers.reference, layers.referenceOpacity, mapDef?.reference])
+  }, [layers.base])
 
   // 3D-вид поселения поверх карты; при переходе на другую карту — снова план
   const [view3d, setView3d] = useState<View3D | null>(null)

@@ -33,8 +33,6 @@ export interface Layers {
   cities: boolean
   settlements: boolean
   poi: boolean
-  reference: boolean
-  referenceOpacity: number
   politicalOpacity: number
 }
 
@@ -97,8 +95,6 @@ const defaultLayers: Layers = {
   cities: true,
   settlements: true,
   poi: true,
-  reference: false,
-  referenceOpacity: 0.5,
   politicalOpacity: 0.32
 }
 

@@ -1,8 +1,10 @@
-import { type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useStore } from '../store'
 import { TECH_LINES } from '../tech'
 import { TextField } from './ui'
-import type { StateFields } from '../types'
+import { EconWindow } from './EconWindow'
+import { fmtMarks } from '../economy'
+import type { StateFields, WorldState } from '../types'
 
 const bold = (s: string): ReactNode[] => s.split(/\*\*(.+?)\*\*/g).map((t, i) => (i % 2 ? <b key={i}>{t}</b> : t))
 
@@ -31,11 +33,23 @@ function Level({ line, value }: { line: 'money' | 'sea'; value: number }) {
  * Вкладка «Экономика» карточки страны: товары и доходы (из текста экономики — **Товар** — пояснение),
  * казна и подати, торговля, деньги и банки (уровни «Деньги и торговля» и «Мореходство» из Века Шестерни).
  */
-export function EconomyView({ f, set }: { f: StateFields; set: (p: Partial<StateFields>) => void }) {
+export function EconomyView({ f, set, st }: { f: StateFields; set: (p: Partial<StateFields>) => void; st?: WorldState }) {
   const master = useStore((s) => s.masterMode)
+  const [win, setWin] = useState(false)
   const g = goods(f.economy ?? '')
   return (
     <div className="eco">
+      {f.econ && (
+        <div className="eco-sec eco-top">
+          <div className="eco-top-facts">
+            <span>Монета: <b>{f.econ.coin.name}</b> (1 = {String(f.econ.coin.perMark).replace('.', ',')} марки)</span>
+            <span>Казна: <b>{fmtMarks(f.econ.treasury)}</b></span>
+            <span>Сословия: <b>{Object.values(f.econ.estates).join(', ')}</b></span>
+          </div>
+          {st && <button className="eco-open" onClick={() => setWin(true)}>Открыть окно экономики</button>}
+          {win && st && <EconWindow st={st} onClose={() => setWin(false)} />}
+        </div>
+      )}
       <section className="eco-sec">
         <h3>Товары и доходы</h3>
         {g.intro && <p className="eco-intro">{bold(g.intro)}</p>}

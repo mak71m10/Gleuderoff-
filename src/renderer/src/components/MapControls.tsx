@@ -118,8 +118,7 @@ const LAYER_ROWS: { key: keyof Layers; label: string }[] = [
   { key: 'geoLabels', label: 'География: моря, горы, реки' },
   { key: 'cities', label: 'Города и крепости' },
   { key: 'settlements', label: 'Посёлки, деревни, порты' },
-  { key: 'poi', label: 'Точки интереса' },
-  { key: 'reference', label: 'Калька: старая политическая карта' }
+  { key: 'poi', label: 'Точки интереса' }
 ]
 
 const PANEL_POS_KEY = 'gleuderoff.layersPanel'
@@ -219,19 +218,6 @@ export function LayersPanel() {
               onChange={(e) => setLayer('politicalOpacity', Number(e.target.value))}
             />
           </label>
-          {layers.reference && (
-            <label className="layer-slider">
-              <span>Прозрачность кальки</span>
-              <input
-                type="range"
-                min={0.1}
-                max={1}
-                step={0.05}
-                value={layers.referenceOpacity}
-                onChange={(e) => setLayer('referenceOpacity', Number(e.target.value))}
-              />
-            </label>
-          )}
         </div>
       )}
     </div>
