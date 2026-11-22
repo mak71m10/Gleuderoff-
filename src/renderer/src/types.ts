@@ -1,5 +1,6 @@
 import type { StateTech } from './tech'
 import type { AreaEcon, ProvinceRes, StateEcon } from './economy'
+import type { StateMilitary } from './military'
 
 /** Дата мира — целое число дней от 1-го дня 1-го года после смерти последнего дракона (день 0). */
 export type WorldDate = number
@@ -110,6 +111,8 @@ export interface StateFields {
   tech?: StateTech
   /** Экономика ВПИ: монета, сословия, казна, подати, беды и сильные стороны, летопись */
   econ?: StateEcon
+  /** Войско ВПИ: лестница, закон призыва, уставы рот, роты и соединения (docs/впи-армия.md) */
+  military?: StateMilitary
 }
 
 export type FlagLayout =

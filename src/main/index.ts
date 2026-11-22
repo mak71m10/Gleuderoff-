@@ -1066,6 +1066,11 @@ async function migrateWorld(dir: string): Promise<void> {
     const ds = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
     for (const st of user.states ?? []) { const d = ds.get(st.id); if (d?.base?.econ && !st.base.econ) st.base.econ = structuredClone(d.base.econ) }
   }
+  if ((user.version ?? 1) < 64) {
+    // v64: войско ВПИ (docs/впи-армия.md) — лестница, закон призыва, уставы рот, роты и соединения стран; только где своего ещё нет
+    const ds = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
+    for (const st of user.states ?? []) { const d = ds.get(st.id); if (d?.base?.military && !st.base.military) st.base.military = structuredClone(d.base.military) }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))
