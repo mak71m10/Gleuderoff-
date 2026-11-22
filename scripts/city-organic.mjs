@@ -99,19 +99,24 @@ function build(c, hint, dens) {
   const sea = type === 'port' || LAY === 'fishing' // у воды: берег моря, сваи и мостки
   const useTerr = type === 'hill' || LAY === 'terrace'
   const oneGate = LAY === 'round' || LAY === 'glade'
+  // городок без стен (G.walls:0): рыночное местечко у перекрёстка или моста; невидимая граница держит форму
+  const noWall = G.walls === 0 && type !== 'village' && type !== 'shrine' && type !== 'castle' && type !== 'hill'
   const noMainHouses = LAY === 'glade' || LAY === 'farmsteads', noPlazaHouses = noMainHouses || LAY === 'round'
   const open = type === 'shrine' || type === 'village', older = type === 'river' || type === 'road' || type === 'port'
-  const N = G.houses || (type === 'village' ? 40 : 250), OUT = G.outside ?? ({ cross: 0.35, castle: 0.28, hill: 0.25, shrine: 0, village: 0 }[type] ?? 0.3)
+  const N = G.houses || (type === 'village' ? 40 : 250), OUT = G.outside ?? (noWall ? 0 : { cross: 0.35, castle: 0.28, hill: 0.25, shrine: 0, village: 0 }[type] ?? 0.3)
   const Nin = Math.round(N * (1 - OUT)), Nout = N - Nin
   const R = Math.sqrt((Nin * 65) / (dens ?? G.density ?? 0.33) / Math.PI)
-  const el = G.stretch ?? ({ road: 1.4, cross: 1, castle: 1.45, hill: 1.9, shrine: 1.7, village: { cluster: 1.3, round: 1, fishing: 2.4, terrace: 2.4, farmsteads: 1.5, glade: 1 }[LAY] ?? 2.4 }[type] ?? 1.12), Ru = R * Math.sqrt(el), Rv = R / Math.sqrt(el)
+  const el = G.stretch ?? ({ road: 1.4, cross: 1, castle: 1.45, hill: 2.7, shrine: 1.7, village: { cluster: 1.3, round: 1, fishing: 2.4, terrace: 2.4, farmsteads: 1.5, glade: 1 }[LAY] ?? 2.4 }[type] ?? 1.12), Ru = R * Math.sqrt(el), Rv = R / Math.sqrt(el)
   const ph = [between(0, 6.3), between(0, 6.3)]
   const norm = (a) => ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)
   const adiff = (a, b) => Math.abs(norm(a - b + Math.PI) - Math.PI)
   const tc0 = G.citadelAngle ?? (type === 'castle' ? Math.PI : -Math.PI / 2 - 0.62)
   // перекрёсток — выступы к воротам; замок — узко у замка, веер к нижним воротам
   let gates = []
-  const shapeK = type === 'cross' ? (t) => 1 + 0.2 * gates.reduce((a, g) => a + Math.exp(-((adiff(t, g.a) / 0.42) ** 2)), 0) : type === 'castle' ? (t) => 1 - 0.17 * Math.cos(t - tc0) : () => 1
+  // стена — не эллипс: выступы к воротам и две-три крупные лопасти (отдельный датчик — прочие города не сдвигаются)
+  const lobe = [between2(0, 6.3), between2(0, 6.3)]
+  const gateBulge = (t) => gates.reduce((a, g) => a + Math.exp(-((adiff(t, g.a) / 0.42) ** 2)), 0)
+  const shapeK = open ? () => 1 : type === 'castle' ? (t) => 1 - 0.17 * Math.cos(t - tc0) : (t) => (1 + 0.16 * gateBulge(t)) * (1 + 0.12 * Math.sin(2 * t + lobe[0]) + 0.08 * Math.sin(3 * t + lobe[1]))
   const rBase = (t) => (1 / Math.hypot(Math.cos(t) / Ru, Math.sin(t) / Rv)) * (1 + 0.05 * Math.sin(3 * t + ph[0]) + 0.035 * Math.sin(5 * t + ph[1])) * shapeK(t)
   const log = []
 
@@ -147,7 +152,7 @@ function build(c, hint, dens) {
   for (const g of gates) { g.d = 15 / rWall(g.a); angs.push([norm(g.a - g.d), 1], [norm(g.a + g.d), 1]) }
   const nearGate = (a) => gates.some((g) => adiff(a, g.a) < g.d + 0.09)
   // у перекрёстка стена — неправильный многоугольник: реже углы и неровный радиус
-  for (let a = between(0, 0.2); a < 2 * Math.PI; a += type === 'cross' ? between(0.5, 0.8) : between(0.26, 0.4)) if (!nearGate(a)) angs.push([a, type === 'cross' ? between(0.93, 1.05) : 1])
+  for (let a = between(0, 0.2); a < 2 * Math.PI; a += type === 'castle' ? between(0.26, 0.4) : between(0.45, 0.75)) if (!nearGate(a)) angs.push([a, type === 'castle' ? 1 : between(0.92, 1.05)])
   angs.sort((a, b) => a[0] - b[0])
   const wall = angs.map(([t, k]) => polar(rWall(t) * k, t))
   for (const g of gates) { g.p = lerp(polar(rWall(g.a - g.d), g.a - g.d), polar(rWall(g.a + g.d), g.a + g.d), 0.5); g.dir = polar(1, g.a) }
@@ -193,6 +198,12 @@ function build(c, hint, dens) {
     spots.push({ lm: hallLm, c: P(0, hy), u: pd, L: hallLm.L, W: hallLm.W })
   }
   const plazaIn = P(-pl / 2, -pw / 4), plazaOut = P(pl / 2, -pw / 4)
+  // рыночная площадь за главными воротами — слобода растёт вокруг неё
+  let market = null
+  if (!open && !noWall && N >= 100 && Nout > 0 && gates[0]) {
+    const g0 = gates[0], mc = [g0.p[0] + g0.dir[0] * 36, g0.p[1] + g0.dir[1] * 36], mL = 34, mW = 22
+    market = rect(mc[0], mc[1], g0.dir[0], g0.dir[1], mL, mW)
+  }
 
   // ---- магистрали: от ворот к площади и центру, за стеной — к полям или за мост ----
   const O = [0, 0]
@@ -342,7 +353,7 @@ function build(c, hint, dens) {
     return out
   }
   // улица вдоль стены изнутри (у стены всегда был проход для стражи)
-  if (!open) {
+  if (!open && !noWall) {
     const ringIn = dense([...wall, wall[0]], 6).map((p) => { const d = Math.hypot(p[0], p[1]) || 1, k = Math.max(0, d - 13) / d; return [p[0] * k, p[1] * k] })
     for (const run of clipRuns(ringIn, streetOk)) streets.push({ r: run, w: 4.5 })
   }
@@ -405,6 +416,12 @@ function build(c, hint, dens) {
     // мостки в воду; сараи ставим между ними
     for (let u = -Ru * 0.8 + between2(0, 20); u < Ru * 0.8; u += between2(30, 46)) jetU.push(u)
   }
+  // след роста у крупного города: старое ядро — кольцевая улица там, где стояла первая стена (стену снесли, улица осталась)
+  if (!open && N >= 400) {
+    const f1 = between2(0, 6.3), pts = []
+    for (let a = 0; a <= 2 * Math.PI + 0.05; a += 0.1) pts.push(polar(rWall(a) * (0.5 + 0.04 * Math.sin(4 * a + f1)), a))
+    for (const run of clipRuns(pts, streetOk)) streets.push({ r: run, w: 6 })
+  }
   for (let k = 0; k < terr.length; k++) {
     const row = []
     for (let v = -rMax; v <= rMax; v += 6) row.push([terr[k](v), v])
@@ -452,7 +469,7 @@ function build(c, hint, dens) {
     return cand
   }
   const common = (q) => {
-    for (const p of samples(q)) if (wetDist(p) < 3 || pip(p, plaza) || edgeDist(p, plaza) < 0.6 || roadIdx.clear(p) < 0.4 || !offCit(p, 5.5)) return false
+    for (const p of samples(q)) if (wetDist(p) < 3 || pip(p, plaza) || edgeDist(p, plaza) < 0.6 || (market && (pip(p, market) || edgeDist(p, market) < 0.6)) || roadIdx.clear(p) < 0.4 || !offCit(p, 5.5)) return false
     return !reserved.some((z) => sat(q, z)) && !hit(q)
   }
   const okIn = (q) => samples(q).every((p) => inWall(p, 6.5)) && common(q)
@@ -502,22 +519,34 @@ function build(c, hint, dens) {
     if (m.nOut === undefined) continue
     if (!older && (Nout === 0 || (type === 'castle' && !m.gate.main))) continue
     const outer = m.r.slice(0, m.nOut + 1)
-    outLines.push({ r: outer, w: m.w })
     const Pth = pathAt(outer.slice().reverse()) // от ворот наружу
-    let side = rand() < 0.5 ? -1 : 1
-    const reach = between2(0.65, 1.25) // у каждой дороги посад вытягивается по-своему — край неровный, не овал
-    for (let x = between(25, 40); x < Math.min(Pth.len - 20, R * (type === 'cross' ? 1.8 : 1.3) * reach); x += between(32, 58)) {
-      if (rand() < 0.35) continue
-      const { p, d } = Pth.at(x), n = [-d[1] * side, d[0] * side], L = between(30, 70), b = between(-0.25, 0.25)
-      const end = [p[0] + (n[0] + d[0] * b) * L, p[1] + (n[1] + d[1] * b) * L]
-      for (const run of clipRuns(dense([p, end], 6).slice(1), (q) => !pip(q, wall) && edgeDist(q, wall) >= 14 && wetDist(q) >= 6 && offCit(q, 9))) { outLines.push({ r: [p, ...run], w: 4.5, lane: true }); roadIdx.add([p, ...run], 4.5) }
-      side = -side
+    // слобода: по обе стороны дороги кривые проулки, их концы сшиты задними улицами — получаются кварталы в 4–8 рядов
+    const reach = between2(0.75, 1.3) // у каждой дороги слобода своего размера — край неровный
+    const gw = m.gate?.main ? 1.6 : N >= 400 ? 1 : 0.6
+    const ends = { '-1': [], 1: [] }
+    const farOk = (q) => !pip(q, wall) && edgeDist(q, wall) >= 14 && wetDist(q) >= 6 && offCit(q, 9) && !(market && pip(q, market))
+    outLines.push({ r: outer, w: m.w, gw })
+    for (let x = between(22, 34); x < Math.min(Pth.len - 20, R * (type === 'cross' ? 1.8 : 1.3) * reach); x += between(17, 27)) {
+      for (const side of [-1, 1]) {
+        if (rand() < 0.12) continue
+        const { p, d } = Pth.at(x), n = [-d[1] * side, d[0] * side], L = between(42, 95) * (0.6 + 0.4 * gw), b = between(-0.35, 0.35)
+        const end = [p[0] + (n[0] + d[0] * b) * L, p[1] + (n[1] + d[1] * b) * L]
+        const lane = wobble(p, end, between(3, 7), 7)
+        const runs = clipRuns(lane.slice(1), farOk)
+        for (const run of runs) if (Math.hypot(run[0][0] - p[0], run[0][1] - p[1]) < 10) { const r = [p, ...run]; outLines.push({ r, w: 4.5, lane: true, gw }); roadIdx.add(r, 4.5); ends[side].push(r[Math.floor(r.length * 0.8)]) }
+      }
+    }
+    for (const side of [-1, 1]) for (let i = 1; i < ends[side].length; i++) {
+      const A = ends[side][i - 1], B = ends[side][i]
+      if (Math.hypot(A[0] - B[0], A[1] - B[1]) > 80) continue
+      for (const run of clipRuns(wobble(A, B, 3, 7), farOk)) { outLines.push({ r: run, w: 4, lane: true, gw }); roadIdx.add(run, 4) }
     }
   }
+  if (market) outLines.push({ r: ring(market), w: 0, gw: 1.6 })
   const cand = []
   for (const m of outLines) for (const h of frontage(m.r, m.w)) {
     const dw = edgeDist(h.at, wall)
-    cand.push({ q: h.q, key: Math.pow(rand(), 1 / Math.max(0.02, Math.exp(-dw / (0.42 * R)))) })
+    cand.push({ q: h.q, key: Math.pow(rand(), 1 / Math.max(0.02, (m.gw ?? 1) * Math.exp(-dw / (0.55 * R)))) })
   }
   cand.sort((a, b) => b.key - a.key)
   let outN = 0
@@ -550,6 +579,14 @@ function build(c, hint, dens) {
     }
     const cut = outs.length - keep
     if (cut > 0) { outs.slice(keep).forEach(({ i }) => { houses[i] = null }); outN -= cut; log.push(`пригород ужат на ${cut} домов ради разноса особых зданий`) }
+  }
+  // проулки слободы, у которых не оказалось домов, убираем — дорога в никуда не нужна
+  {
+    const oc = houses.filter((h) => h && h.out).map((h) => lerp(h.q[0], h.q[2], 0.5))
+    for (let i = outLines.length - 1; i >= 0; i--) {
+      const m = outLines[i]
+      if (m.lane && !oc.some((cc2) => { for (let j = 1; j < m.r.length; j++) if (segDist(cc2, m.r[j - 1], m.r[j]) < 13) return true; return false })) outLines.splice(i, 1)
+    }
   }
   const lanes = outLines.filter((m) => m.lane)
 
@@ -712,7 +749,7 @@ function build(c, hint, dens) {
     }
   }
 
-  return { R, el, ww, wall, open, cit, plaza, mains, streets, lanes, houses: live, spots, anchors, prisms, fields, greens, districts, rivers, water, planks, bridges, ce, log, inCount, outN, Nin, Nout, minD }
+  return { R, el, ww, wall, open, noWall, market, cit, plaza, mains, streets, lanes, houses: live, spots, anchors, prisms, fields, greens, districts, rivers, water, planks, bridges, ce, log, inCount, outN, Nin, Nout, minD }
 }
 
 export default function organic(c) {
@@ -720,6 +757,7 @@ export default function organic(c) {
   // тип решает, что city-maps считает цитаделью: у замка — второе кольцо, у святыни — единственное (монастырь)
   const genBy = { castle: { citadel: 1, walls: 1 }, shrine: { citadel: 1, walls: 0 }, village: { citadel: 0, walls: 0 }, cross: { walls: 1 }, hill: { walls: 1 } }[G.type]
   if (genBy) c.gen = { ...(c.gen || {}), ...genBy }
+  if (G.walls === 0 && ['road', 'cross', 'river', 'port'].includes(G.type || 'road')) c.gen = { ...(c.gen || {}), walls: 0 }
   // плотность подбираем: если внутри стены дома не помещаются (река, цитадель, площадь съели место) — город шире
   let dens = G.density ?? ({ farmsteads: 0.1, glade: 0.2 })[G.layout] ?? 0.33, L = null
   for (let k = 0; k < 6; k++) {
@@ -786,13 +824,13 @@ export default function organic(c) {
       { type: 'Feature', id: 'values', roadWidth: 5, towerRadius: 7, wallThickness: 8, riverWidth: L.ww || 18, generator: 'gleuderoff-organic' },
       { type: 'Polygon', id: 'earth', coordinates: [ring(T([[-E, -E], [E, -E], [E, E], [-E, E]]))] },
       { type: 'GeometryCollection', id: 'roads', geometries: lines([...L.mains, ...L.lanes, ...L.streets]) },
-      { type: 'GeometryCollection', id: 'walls', geometries: (L.open ? [L.cit] : [L.wall, L.cit]).filter(Boolean).map((w, i) => ({ type: 'Polygon', width: i || L.open ? 6 : 8, coordinates: [ring(T(w))] })) },
+      { type: 'GeometryCollection', id: 'walls', geometries: (L.open ? [L.cit] : L.noWall ? [L.cit] : [L.wall, L.cit]).filter(Boolean).map((w, i) => ({ type: 'Polygon', width: i || L.open ? 6 : 8, coordinates: [ring(T(w))] })) },
       { type: 'GeometryCollection', id: 'rivers', geometries: lines(L.rivers) },
       { type: 'GeometryCollection', id: 'planks', geometries: lines(L.planks) },
       { type: 'GeometryCollection', id: 'bridges', geometries: lines(L.bridges) },
       { type: 'MultiPolygon', id: 'buildings', coordinates: poly(buildings) },
       { type: 'MultiPolygon', id: 'prisms', coordinates: poly(L.prisms) },
-      { type: 'MultiPolygon', id: 'squares', coordinates: poly([L.plaza]) },
+      { type: 'MultiPolygon', id: 'squares', coordinates: poly(L.market ? [L.plaza, L.market] : [L.plaza]) },
       { type: 'MultiPolygon', id: 'greens', coordinates: poly(L.greens) },
       { type: 'MultiPolygon', id: 'fields', coordinates: poly(L.fields) },
       { type: 'MultiPoint', id: 'trees', coordinates: [] },

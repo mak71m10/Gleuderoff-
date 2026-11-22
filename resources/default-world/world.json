@@ -23193,7 +23193,7 @@
    "kind": "city",
    "image": "maps/cities/tselvedel.webp",
    "width": 2048,
-   "height": 2632,
+   "height": 2129,
    "plan": "maps/cities/tselvedel.plan.json",
    "placeId": "lore-kj-capital"
   },
@@ -23248,7 +23248,7 @@
    "kind": "city",
    "image": "maps/cities/verelveiler.webp",
    "width": 2048,
-   "height": 1496,
+   "height": 1688,
    "plan": "maps/cities/verelveiler.plan.json"
   },
   {
@@ -23266,7 +23266,7 @@
    "kind": "city",
    "image": "maps/cities/shtainerrit.webp",
    "width": 2048,
-   "height": 1620,
+   "height": 1577,
    "plan": "maps/cities/shtainerrit.plan.json"
   },
   {
@@ -23284,7 +23284,7 @@
    "kind": "city",
    "image": "maps/cities/noibryuk.webp",
    "width": 2048,
-   "height": 1936,
+   "height": 1870,
    "plan": "maps/cities/noibryuk.plan.json"
   },
   {
@@ -23320,7 +23320,7 @@
    "kind": "city",
    "image": "maps/cities/trevenburg.webp",
    "width": 2048,
-   "height": 2675,
+   "height": 2558,
    "plan": "maps/cities/trevenburg.plan.json",
    "placeId": "lore-rd-capital"
   },
@@ -23330,7 +23330,7 @@
    "kind": "city",
    "image": "maps/cities/oksenau.webp",
    "width": 2048,
-   "height": 1941,
+   "height": 1761,
    "plan": "maps/cities/oksenau.plan.json"
   },
   {
@@ -23339,7 +23339,7 @@
    "kind": "city",
    "image": "maps/cities/gryuningard.webp",
    "width": 2048,
-   "height": 1263,
+   "height": 1338,
    "plan": "maps/cities/gryuningard.plan.json"
   },
   {
@@ -23393,7 +23393,7 @@
    "kind": "city",
    "image": "maps/cities/singor.webp",
    "width": 2048,
-   "height": 2393,
+   "height": 2427,
    "plan": "maps/cities/singor.plan.json",
    "placeId": "lore-pv-capital"
   },
@@ -23466,7 +23466,7 @@
    "kind": "city",
    "image": "maps/cities/avallone.webp",
    "width": 2048,
-   "height": 1627,
+   "height": 1520,
    "plan": "maps/cities/avallone.plan.json",
    "placeId": "lore-tw-capital"
   },
@@ -23476,7 +23476,7 @@
    "kind": "city",
    "image": "maps/cities/tirion.webp",
    "width": 2048,
-   "height": 2406,
+   "height": 2210,
    "plan": "maps/cities/tirion.plan.json"
   },
   {
@@ -23485,7 +23485,7 @@
    "kind": "city",
    "image": "maps/cities/valimar.webp",
    "width": 2048,
-   "height": 1109,
+   "height": 1199,
    "plan": "maps/cities/valimar.plan.json"
   },
   {
@@ -23494,7 +23494,7 @@
    "kind": "city",
    "image": "maps/cities/ilmarion.webp",
    "width": 2048,
-   "height": 2040,
+   "height": 2158,
    "plan": "maps/cities/ilmarion.plan.json"
   },
   {
@@ -23512,7 +23512,7 @@
    "kind": "city",
    "image": "maps/cities/brukelrit.webp",
    "width": 2048,
-   "height": 1587,
+   "height": 1607,
    "plan": "maps/cities/brukelrit.plan.json"
   },
   {
@@ -23539,7 +23539,7 @@
    "kind": "city",
    "image": "maps/cities/morioka.webp",
    "width": 2048,
-   "height": 1525,
+   "height": 1600,
    "plan": "maps/cities/morioka.plan.json"
   },
   {
@@ -23548,7 +23548,7 @@
    "kind": "city",
    "image": "maps/cities/fein.webp",
    "width": 2048,
-   "height": 1237,
+   "height": 1128,
    "plan": "maps/cities/fein.plan.json",
    "placeId": "lore-fn-capital"
   },
@@ -23558,7 +23558,7 @@
    "kind": "city",
    "image": "maps/cities/nioto.webp",
    "width": 2048,
-   "height": 1139,
+   "height": 1218,
    "plan": "maps/cities/nioto.plan.json"
   },
   {
@@ -23576,7 +23576,7 @@
    "kind": "city",
    "image": "maps/cities/vokio.webp",
    "width": 2048,
-   "height": 1670,
+   "height": 1235,
    "plan": "maps/cities/vokio.plan.json"
   }
  ],
@@ -115072,139 +115072,6 @@
    "to": null
   },
   {
-   "id": "city-tselvedel-0",
-   "mapId": "map-city-tselvedel",
-   "x": 1245.1,
-   "y": 1299.6,
-   "building": 910,
-   "base": {
-    "name": "Семь ворот",
-    "type": "landmark",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Имперская таможня с семью арками: здесь продают трон и считают взносы.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tselvedel-1",
-   "mapId": "map-city-tselvedel",
-   "x": 980.3,
-   "y": 1073.2,
-   "building": 912,
-   "base": {
-    "name": "Ценовая палата",
-    "type": "assembly",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Меняльная контора Векслеров: залоги и Ценовая книга.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tselvedel-2",
-   "mapId": "map-city-tselvedel",
-   "x": 927.5,
-   "y": 1577.5,
-   "building": 915,
-   "base": {
-    "name": "Капелла Ворот",
-    "type": "temple",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "На стене — свинцовые бирки с ценой каждого императора.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tselvedel-3",
-   "mapId": "map-city-tselvedel",
-   "x": 750,
-   "y": 1267.7,
-   "building": 911,
-   "base": {
-    "name": "Казармы Багряной гвардии",
-    "type": "castle",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Полторы тысячи копий в багряных плащах.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tselvedel-4",
-   "mapId": "map-city-tselvedel",
-   "x": 1263.2,
-   "y": 1009.4,
-   "building": 913,
-   "base": {
-    "name": "Контора Каяя",
-    "type": "landmark",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Расписки трёх императоров.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tselvedel-5",
-   "mapId": "map-city-tselvedel",
-   "x": 1428.6,
-   "y": 1479.1,
-   "building": 914,
-   "base": {
-    "name": "Ратуша Целведель",
-    "type": "assembly",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tselvedel-6",
-   "mapId": "map-city-tselvedel",
-   "x": 1238.9,
-   "y": 1638.8,
-   "building": 916,
-   "base": {
-    "name": "Храм Целведель",
-    "type": "temple",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
    "id": "city-oberelholm-0",
    "mapId": "map-city-oberelholm",
    "x": 728.2,
@@ -115338,63 +115205,6 @@
    "to": null
   },
   {
-   "id": "city-verelveiler-0",
-   "mapId": "map-city-verelveiler",
-   "x": 1554.6,
-   "y": 957.1,
-   "building": 68,
-   "base": {
-    "name": "Замок Кагиев",
-    "type": "castle",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь живёт Гай Кагий; в погребе собираются «Сыновья Легата».",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-verelveiler-1",
-   "mapId": "map-city-verelveiler",
-   "x": 1226.7,
-   "y": 677.7,
-   "building": 67,
-   "base": {
-    "name": "Меняльные ряды",
-    "type": "landmark",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Лавки Векслеров и дом Дитмара Ланга.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-verelveiler-2",
-   "mapId": "map-city-verelveiler",
-   "x": 1166.9,
-   "y": 990.8,
-   "building": 69,
-   "base": {
-    "name": "Храм Верельвейлер",
-    "type": "temple",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
    "id": "city-brasbah-0",
    "mapId": "map-city-brasbah",
    "x": 1298.4,
@@ -115426,63 +115236,6 @@
     "population": "",
     "ruler": "",
     "description": "Дети играют в «торг",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-shtainerrit-0",
-   "mapId": "map-city-shtainerrit",
-   "x": 748.9,
-   "y": 1023.4,
-   "building": 94,
-   "base": {
-    "name": "Ворота Торга",
-    "type": "landmark",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Отмар поставил их в 1009 г. выше городской стены.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-shtainerrit-1",
-   "mapId": "map-city-shtainerrit",
-   "x": 1051.8,
-   "y": 498.2,
-   "building": 95,
-   "base": {
-    "name": "Каменоломни Штайнов",
-    "type": "landmark",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "Ступени серых карьеров; в залоге у Каяя.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-shtainerrit-2",
-   "mapId": "map-city-shtainerrit",
-   "x": 1302.4,
-   "y": 1040,
-   "building": 96,
-   "base": {
-    "name": "Храм Штайнеррит",
-    "type": "temple",
-    "stateId": "fbb47726-c",
-    "population": "",
-    "ruler": "",
-    "description": "",
     "image": ""
    },
    "history": [],
@@ -115554,253 +115307,6 @@
    "building": 18,
    "base": {
     "name": "Храм Эрлаге",
-    "type": "temple",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-trevenburg-0",
-   "mapId": "map-city-trevenburg",
-   "x": 1332.1,
-   "y": 1359.6,
-   "building": 938,
-   "base": {
-    "name": "Замок Реденов",
-    "type": "castle",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Белая башня короля над Королевским мостом.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-trevenburg-1",
-   "mapId": "map-city-trevenburg",
-   "x": 1122,
-   "y": 1046.6,
-   "building": 942,
-   "base": {
-    "name": "Звёздный собор",
-    "type": "temple",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Купол открыт к небу: здесь ведут Звёздную книгу.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-trevenburg-2",
-   "mapId": "map-city-trevenburg",
-   "x": 788.5,
-   "y": 1070.8,
-   "building": 939,
-   "base": {
-    "name": "Дом Клятвы",
-    "type": "assembly",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Пять раз в год король клянётся здесь пятерым Мостовым.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-trevenburg-3",
-   "mapId": "map-city-trevenburg",
-   "x": 1061.1,
-   "y": 1306,
-   "building": 940,
-   "base": {
-    "name": "Мельница Мюльнеров",
-    "type": "landmark",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Мельница на быке Королевского моста.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-trevenburg-4",
-   "mapId": "map-city-trevenburg",
-   "x": 769.4,
-   "y": 1650,
-   "building": 941,
-   "base": {
-    "name": "Пропускная будка",
-    "type": "landmark",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Белые пропуска для нелюдей.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-trevenburg-5",
-   "mapId": "map-city-trevenburg",
-   "x": 817.5,
-   "y": 1372.8,
-   "building": 937,
-   "base": {
-    "name": "Ратуша Тревенбург",
-    "type": "assembly",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-trevenburg-6",
-   "mapId": "map-city-trevenburg",
-   "x": 1046.1,
-   "y": 1646,
-   "building": 943,
-   "base": {
-    "name": "Храм Тревенбург",
-    "type": "temple",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-oksenau-0",
-   "mapId": "map-city-oksenau",
-   "x": 855.5,
-   "y": 781.1,
-   "building": 143,
-   "base": {
-    "name": "Бычий брод",
-    "type": "landmark",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Мелкий брод и плотина.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-oksenau-1",
-   "mapId": "map-city-oksenau",
-   "x": 1202,
-   "y": 944.1,
-   "building": 144,
-   "base": {
-    "name": "Красильни",
-    "type": "landmark",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Синие ручьи от вайды.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-oksenau-2",
-   "mapId": "map-city-oksenau",
-   "x": 1128,
-   "y": 652.1,
-   "building": 145,
-   "base": {
-    "name": "Храм Оксенау",
-    "type": "temple",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-gryuningard-0",
-   "mapId": "map-city-gryuningard",
-   "x": 910.4,
-   "y": 610.4,
-   "building": 132,
-   "base": {
-    "name": "Палата белых пропусков",
-    "type": "assembly",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Наследница Мостовой инквизиции.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-gryuningard-1",
-   "mapId": "map-city-gryuningard",
-   "x": 606.5,
-   "y": 364.9,
-   "building": 133,
-   "base": {
-    "name": "Башня слепого магистра",
-    "type": "tower",
-    "stateId": "ab3ffb0e-3",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь живёт Ульрих Кляйн.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-gryuningard-2",
-   "mapId": "map-city-gryuningard",
-   "x": 464.2,
-   "y": 670.3,
-   "building": 134,
-   "base": {
-    "name": "Храм Грюнингард",
     "type": "temple",
     "stateId": "ab3ffb0e-3",
     "population": "",
@@ -115977,139 +115483,6 @@
     "population": "",
     "ruler": "",
     "description": "Кирххаузен — деревня в лесу: фахверковые дома, мельница и тропа к заставе.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-singor-0",
-   "mapId": "map-city-singor",
-   "x": 749.7,
-   "y": 1005.5,
-   "building": 742,
-   "base": {
-    "name": "Сонное Хранилище",
-    "type": "landmark",
-    "stateId": "66f5bac5-7",
-    "population": "",
-    "ruler": "",
-    "description": "Низкое здание с двумя замками: золотой запас Павильона.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-singor-1",
-   "mapId": "map-city-singor",
-   "x": 1274.9,
-   "y": 1759.7,
-   "building": 744,
-   "base": {
-    "name": "Дом Хранителя",
-    "type": "assembly",
-    "stateId": "66f5bac5-7",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь Натен Россо Сен объявляет Грёзы.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-singor-2",
-   "mapId": "map-city-singor",
-   "x": 1090.5,
-   "y": 1223.1,
-   "building": 745,
-   "base": {
-    "name": "Нотный двор",
-    "type": "landmark",
-    "stateId": "66f5bac5-7",
-    "population": "",
-    "ruler": "",
-    "description": "Школа музыки и склад посольских даров.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-singor-3",
-   "mapId": "map-city-singor",
-   "x": 1103.2,
-   "y": 888.1,
-   "building": 743,
-   "base": {
-    "name": "Казармы Патруля",
-    "type": "castle",
-    "stateId": "66f5bac5-7",
-    "population": "",
-    "ruler": "",
-    "description": "Конные дозоры Павильона.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-singor-4",
-   "mapId": "map-city-singor",
-   "x": 882.7,
-   "y": 1507,
-   "building": 747,
-   "base": {
-    "name": "Храм Света",
-    "type": "temple",
-    "stateId": "66f5bac5-7",
-    "population": "",
-    "ruler": "",
-    "description": "Семь свечей — семь окон.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-singor-5",
-   "mapId": "map-city-singor",
-   "x": 709.7,
-   "y": 1248.9,
-   "building": 746,
-   "base": {
-    "name": "Ратуша Сингор",
-    "type": "assembly",
-    "stateId": "66f5bac5-7",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-singor-6",
-   "mapId": "map-city-singor",
-   "x": 1402.6,
-   "y": 1308.6,
-   "building": 748,
-   "base": {
-    "name": "Храм Сингор",
-    "type": "temple",
-    "stateId": "66f5bac5-7",
-    "population": "",
-    "ruler": "",
-    "description": "",
     "image": ""
    },
    "history": [],
@@ -116307,253 +115680,6 @@
    "to": null
   },
   {
-   "id": "city-avallone-0",
-   "mapId": "map-city-avallone",
-   "x": 478.8,
-   "y": 885.9,
-   "building": 533,
-   "base": {
-    "name": "Палата Паёв",
-    "type": "assembly",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь лежит Лесная книга на сто паёв.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-avallone-1",
-   "mapId": "map-city-avallone",
-   "x": 1212.7,
-   "y": 944.6,
-   "building": 532,
-   "base": {
-    "name": "Дворец из шестисот стволов",
-    "type": "castle",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Самый высокий дом Таварвайта.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-avallone-2",
-   "mapId": "map-city-avallone",
-   "x": 743.7,
-   "y": 632.5,
-   "building": 536,
-   "base": {
-    "name": "Лесной храм",
-    "type": "temple",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Дом Света из тисовых брёвен.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-avallone-3",
-   "mapId": "map-city-avallone",
-   "x": 1617.6,
-   "y": 465.1,
-   "building": 534,
-   "base": {
-    "name": "Контора Каяя",
-    "type": "landmark",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Расписки на заложенные паи.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-avallone-4",
-   "mapId": "map-city-avallone",
-   "x": 1461.4,
-   "y": 831.2,
-   "building": 535,
-   "base": {
-    "name": "Стрельбище",
-    "type": "landmark",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Каждый день на рассвете.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-avallone-5",
-   "mapId": "map-city-avallone",
-   "x": 1251.7,
-   "y": 596.2,
-   "building": 531,
-   "base": {
-    "name": "Ратуша Аваллонэ",
-    "type": "assembly",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-avallone-6",
-   "mapId": "map-city-avallone",
-   "x": 744.6,
-   "y": 1157.6,
-   "building": 537,
-   "base": {
-    "name": "Храм Аваллонэ",
-    "type": "temple",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tirion-0",
-   "mapId": "map-city-tirion",
-   "x": 1101.7,
-   "y": 1128.6,
-   "building": 152,
-   "base": {
-    "name": "Дом старейшин",
-    "type": "assembly",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь читают выписку из Лесной книги.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-tirion-1",
-   "mapId": "map-city-tirion",
-   "x": 1312.1,
-   "y": 504.7,
-   "building": 153,
-   "base": {
-    "name": "Храм Тирион",
-    "type": "temple",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-valimar-0",
-   "mapId": "map-city-valimar",
-   "x": 970.8,
-   "y": 629.9,
-   "building": 138,
-   "base": {
-    "name": "Дом старейшин",
-    "type": "assembly",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь читают выписку из Лесной книги.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-valimar-1",
-   "mapId": "map-city-valimar",
-   "x": 1199.2,
-   "y": 502.1,
-   "building": 139,
-   "base": {
-    "name": "Храм Валимар",
-    "type": "temple",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-ilmarion-0",
-   "mapId": "map-city-ilmarion",
-   "x": 853.4,
-   "y": 1166.2,
-   "building": 107,
-   "base": {
-    "name": "Дом старейшин",
-    "type": "assembly",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь читают выписку из Лесной книги.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-ilmarion-1",
-   "mapId": "map-city-ilmarion",
-   "x": 814,
-   "y": 868.6,
-   "building": 108,
-   "base": {
-    "name": "Храм Ильмарион",
-    "type": "temple",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
    "id": "city-valveiler-0",
    "mapId": "map-city-valveiler",
    "x": 1579.5,
@@ -116566,82 +115692,6 @@
     "population": "",
     "ruler": "",
     "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-brukelrit-0",
-   "mapId": "map-city-brukelrit",
-   "x": 1220.5,
-   "y": 911.2,
-   "building": 203,
-   "base": {
-    "name": "Хлебный причал",
-    "type": "landmark",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Сюда идут баржи из Харнмарка.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-brukelrit-1",
-   "mapId": "map-city-brukelrit",
-   "x": 1029.8,
-   "y": 650.6,
-   "building": 204,
-   "base": {
-    "name": "Склады смолы",
-    "type": "landmark",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "Смола и дёготь на Каяя.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-brukelrit-2",
-   "mapId": "map-city-brukelrit",
-   "x": 934.8,
-   "y": 964.1,
-   "building": 206,
-   "base": {
-    "name": "Храм Брукельрит",
-    "type": "temple",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-brukelrit-3",
-   "mapId": "map-city-brukelrit",
-   "x": 1299.2,
-   "y": 629.6,
-   "building": 205,
-   "base": {
-    "name": "Гавань",
-    "type": "landmark",
-    "stateId": "f094039b-4",
-    "population": "",
-    "ruler": "",
-    "description": "порт Таварвайта: причалы из тиса, склады смолы и дёгтя, баржи на Харнмарк и Каяя.",
     "image": ""
    },
    "history": [],
@@ -116687,32 +115737,13 @@
    "to": null
   },
   {
-   "id": "city-morioka-0",
-   "mapId": "map-city-morioka",
-   "x": 1216.1,
-   "y": 772,
-   "building": 134,
+   "id": "city-vedelgard-0",
+   "mapId": "map-city-vedelgard",
+   "x": 1211.8,
+   "y": 363.5,
+   "building": 14,
    "base": {
-    "name": "Дом вождя",
-    "type": "assembly",
-    "stateId": "dbcdc36d-e",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь вождь племени слушает весть с Гряды.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-morioka-1",
-   "mapId": "map-city-morioka",
-   "x": 1502.5,
-   "y": 412.3,
-   "building": 135,
-   "base": {
-    "name": "Храм Мориока",
+    "name": "Храм Ведельгард",
     "type": "temple",
     "stateId": "dbcdc36d-e",
     "population": "",
@@ -116725,56 +115756,18 @@
    "to": null
   },
   {
-   "id": "city-nioto-0",
-   "mapId": "map-city-nioto",
-   "x": 1047.4,
-   "y": 706.1,
-   "building": 144,
+   "id": "city-tselvedel-0",
+   "mapId": "map-city-tselvedel",
+   "x": 1315.6,
+   "y": 980.7,
+   "building": 920,
    "base": {
-    "name": "Дом вождя",
-    "type": "assembly",
-    "stateId": "dbcdc36d-e",
-    "population": "",
-    "ruler": "",
-    "description": "Здесь вождь племени слушает весть с Гряды.",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-nioto-1",
-   "mapId": "map-city-nioto",
-   "x": 1228.8,
-   "y": 506.2,
-   "building": 145,
-   "base": {
-    "name": "Храм Ниото",
-    "type": "temple",
-    "stateId": "dbcdc36d-e",
-    "population": "",
-    "ruler": "",
-    "description": "",
-    "image": ""
-   },
-   "history": [],
-   "from": null,
-   "to": null
-  },
-  {
-   "id": "city-nioto-2",
-   "mapId": "map-city-nioto",
-   "x": 880.8,
-   "y": 435.9,
-   "building": 143,
-   "base": {
-    "name": "Рыночная площадь",
+    "name": "Семь ворот",
     "type": "landmark",
-    "stateId": "dbcdc36d-e",
+    "stateId": "fbb47726-c",
     "population": "",
     "ruler": "",
-    "description": "Здесь вождь Лиса Мацуо-но-Тоён и торг",
+    "description": "Имперская таможня с семью арками: здесь продают трон и считают взносы.",
     "image": ""
    },
    "history": [],
@@ -116782,18 +115775,18 @@
    "to": null
   },
   {
-   "id": "city-vokio-0",
-   "mapId": "map-city-vokio",
-   "x": 911.3,
-   "y": 1100.1,
-   "building": 75,
+   "id": "city-tselvedel-1",
+   "mapId": "map-city-tselvedel",
+   "x": 1271.3,
+   "y": 1279.6,
+   "building": 922,
    "base": {
-    "name": "Дом вождя",
+    "name": "Ценовая палата",
     "type": "assembly",
-    "stateId": "dbcdc36d-e",
+    "stateId": "fbb47726-c",
     "population": "",
     "ruler": "",
-    "description": "Здесь вождь племени слушает весть с Гряды.",
+    "description": "Меняльная контора Векслеров: залоги и Ценовая книга.",
     "image": ""
    },
    "history": [],
@@ -116801,15 +115794,148 @@
    "to": null
   },
   {
-   "id": "city-vokio-1",
-   "mapId": "map-city-vokio",
-   "x": 1231.2,
-   "y": 980,
-   "building": 76,
+   "id": "city-tselvedel-2",
+   "mapId": "map-city-tselvedel",
+   "x": 973.9,
+   "y": 1271,
+   "building": 925,
    "base": {
-    "name": "Храм Вокио",
+    "name": "Капелла Ворот",
     "type": "temple",
-    "stateId": "dbcdc36d-e",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "На стене — свинцовые бирки с ценой каждого императора.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tselvedel-3",
+   "mapId": "map-city-tselvedel",
+   "x": 847.3,
+   "y": 983.5,
+   "building": 921,
+   "base": {
+    "name": "Казармы Багряной гвардии",
+    "type": "castle",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "Полторы тысячи копий в багряных плащах.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tselvedel-4",
+   "mapId": "map-city-tselvedel",
+   "x": 1152,
+   "y": 749.6,
+   "building": 923,
+   "base": {
+    "name": "Контора Каяя",
+    "type": "landmark",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "Расписки трёх императоров.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tselvedel-5",
+   "mapId": "map-city-tselvedel",
+   "x": 1469.1,
+   "y": 778.7,
+   "building": 924,
+   "base": {
+    "name": "Ратуша Целведель",
+    "type": "assembly",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tselvedel-6",
+   "mapId": "map-city-tselvedel",
+   "x": 659.8,
+   "y": 1301.1,
+   "building": 926,
+   "base": {
+    "name": "Храм Целведель",
+    "type": "temple",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-verelveiler-0",
+   "mapId": "map-city-verelveiler",
+   "x": 1523,
+   "y": 1110.5,
+   "building": 65,
+   "base": {
+    "name": "Замок Кагиев",
+    "type": "castle",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь живёт Гай Кагий; в погребе собираются «Сыновья Легата».",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-verelveiler-1",
+   "mapId": "map-city-verelveiler",
+   "x": 1137.7,
+   "y": 782.2,
+   "building": 64,
+   "base": {
+    "name": "Меняльные ряды",
+    "type": "landmark",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "Лавки Векслеров и дом Дитмара Ланга.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-verelveiler-2",
+   "mapId": "map-city-verelveiler",
+   "x": 1067.5,
+   "y": 1150,
+   "building": 66,
+   "base": {
+    "name": "Храм Верельвейлер",
+    "type": "temple",
+    "stateId": "fbb47726-c",
     "population": "",
     "ruler": "",
     "description": "",
@@ -116822,9 +115948,9 @@
   {
    "id": "city-noibryuk-0",
    "mapId": "map-city-noibryuk",
-   "x": 1485.3,
-   "y": 1178.2,
-   "building": 543,
+   "x": 1589.4,
+   "y": 971.9,
+   "building": 487,
    "base": {
     "name": "Мост в девять пролётов",
     "type": "landmark",
@@ -116841,9 +115967,9 @@
   {
    "id": "city-noibryuk-1",
    "mapId": "map-city-noibryuk",
-   "x": 1048.4,
-   "y": 1284.8,
-   "building": 542,
+   "x": 981.9,
+   "y": 1081.4,
+   "building": 486,
    "base": {
     "name": "Колокол Паромного братства",
     "type": "assembly",
@@ -116860,9 +115986,9 @@
   {
    "id": "city-noibryuk-2",
    "mapId": "map-city-noibryuk",
-   "x": 802.7,
-   "y": 1217.9,
-   "building": 544,
+   "x": 993.3,
+   "y": 823.7,
+   "building": 488,
    "base": {
     "name": "Склады Ланц",
     "type": "landmark",
@@ -116879,9 +116005,9 @@
   {
    "id": "city-noibryuk-3",
    "mapId": "map-city-noibryuk",
-   "x": 777.6,
-   "y": 958.6,
-   "building": 541,
+   "x": 722.5,
+   "y": 851,
+   "building": 485,
    "base": {
     "name": "Ратуша Нойбрюк",
     "type": "assembly",
@@ -116898,9 +116024,9 @@
   {
    "id": "city-noibryuk-4",
    "mapId": "map-city-noibryuk",
-   "x": 1291.9,
-   "y": 958.2,
-   "building": 545,
+   "x": 1254.1,
+   "y": 862.2,
+   "building": 489,
    "base": {
     "name": "Храм Нойбрюк",
     "type": "temple",
@@ -116915,11 +116041,619 @@
    "to": null
   },
   {
+   "id": "city-trevenburg-0",
+   "mapId": "map-city-trevenburg",
+   "x": 1373.4,
+   "y": 1353.1,
+   "building": 850,
+   "base": {
+    "name": "Замок Реденов",
+    "type": "castle",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Белая башня короля над Королевским мостом.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-trevenburg-1",
+   "mapId": "map-city-trevenburg",
+   "x": 1151.2,
+   "y": 1005.4,
+   "building": 854,
+   "base": {
+    "name": "Звёздный собор",
+    "type": "temple",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Купол открыт к небу: здесь ведут Звёздную книгу.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-trevenburg-2",
+   "mapId": "map-city-trevenburg",
+   "x": 786.2,
+   "y": 1021.8,
+   "building": 851,
+   "base": {
+    "name": "Дом Клятвы",
+    "type": "assembly",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Пять раз в год король клянётся здесь пятерым Мостовым.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-trevenburg-3",
+   "mapId": "map-city-trevenburg",
+   "x": 1071.3,
+   "y": 1292.8,
+   "building": 852,
+   "base": {
+    "name": "Мельница Мюльнеров",
+    "type": "landmark",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Мельница на быке Королевского моста.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-trevenburg-4",
+   "mapId": "map-city-trevenburg",
+   "x": 776.1,
+   "y": 1639.5,
+   "building": 853,
+   "base": {
+    "name": "Пропускная будка",
+    "type": "landmark",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Белые пропуска для нелюдей.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-trevenburg-5",
+   "mapId": "map-city-trevenburg",
+   "x": 774.3,
+   "y": 1383.7,
+   "building": 849,
+   "base": {
+    "name": "Ратуша Тревенбург",
+    "type": "assembly",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-trevenburg-6",
+   "mapId": "map-city-trevenburg",
+   "x": 1046,
+   "y": 1681,
+   "building": 855,
+   "base": {
+    "name": "Храм Тревенбург",
+    "type": "temple",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-oksenau-0",
+   "mapId": "map-city-oksenau",
+   "x": 896.6,
+   "y": 833.4,
+   "building": 137,
+   "base": {
+    "name": "Бычий брод",
+    "type": "landmark",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Мелкий брод и плотина.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-oksenau-1",
+   "mapId": "map-city-oksenau",
+   "x": 1119.2,
+   "y": 982.9,
+   "building": 138,
+   "base": {
+    "name": "Красильни",
+    "type": "landmark",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Синие ручьи от вайды.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-oksenau-2",
+   "mapId": "map-city-oksenau",
+   "x": 1124.9,
+   "y": 724,
+   "building": 139,
+   "base": {
+    "name": "Храм Оксенау",
+    "type": "temple",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryuningard-0",
+   "mapId": "map-city-gryuningard",
+   "x": 882.8,
+   "y": 605.3,
+   "building": 126,
+   "base": {
+    "name": "Палата белых пропусков",
+    "type": "assembly",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Наследница Мостовой инквизиции.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryuningard-1",
+   "mapId": "map-city-gryuningard",
+   "x": 625.2,
+   "y": 367.1,
+   "building": 127,
+   "base": {
+    "name": "Башня слепого магистра",
+    "type": "tower",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь живёт Ульрих Кляйн.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-gryuningard-2",
+   "mapId": "map-city-gryuningard",
+   "x": 463.9,
+   "y": 669,
+   "building": 128,
+   "base": {
+    "name": "Храм Грюнингард",
+    "type": "temple",
+    "stateId": "ab3ffb0e-3",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-singor-0",
+   "mapId": "map-city-singor",
+   "x": 756.5,
+   "y": 934.3,
+   "building": 748,
+   "base": {
+    "name": "Сонное Хранилище",
+    "type": "landmark",
+    "stateId": "66f5bac5-7",
+    "population": "",
+    "ruler": "",
+    "description": "Низкое здание с двумя замками: золотой запас Павильона.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-singor-1",
+   "mapId": "map-city-singor",
+   "x": 572.6,
+   "y": 646.7,
+   "building": 750,
+   "base": {
+    "name": "Дом Хранителя",
+    "type": "assembly",
+    "stateId": "66f5bac5-7",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь Натен Россо Сен объявляет Грёзы.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-singor-2",
+   "mapId": "map-city-singor",
+   "x": 1291,
+   "y": 1184,
+   "building": 751,
+   "base": {
+    "name": "Нотный двор",
+    "type": "landmark",
+    "stateId": "66f5bac5-7",
+    "population": "",
+    "ruler": "",
+    "description": "Школа музыки и склад посольских даров.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-singor-3",
+   "mapId": "map-city-singor",
+   "x": 1064.5,
+   "y": 994,
+   "building": 749,
+   "base": {
+    "name": "Казармы Патруля",
+    "type": "castle",
+    "stateId": "66f5bac5-7",
+    "population": "",
+    "ruler": "",
+    "description": "Конные дозоры Павильона.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-singor-4",
+   "mapId": "map-city-singor",
+   "x": 1027,
+   "y": 1406,
+   "building": 753,
+   "base": {
+    "name": "Храм Света",
+    "type": "temple",
+    "stateId": "66f5bac5-7",
+    "population": "",
+    "ruler": "",
+    "description": "Семь свечей — семь окон.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-singor-5",
+   "mapId": "map-city-singor",
+   "x": 798.3,
+   "y": 1180.1,
+   "building": 752,
+   "base": {
+    "name": "Ратуша Сингор",
+    "type": "assembly",
+    "stateId": "66f5bac5-7",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-singor-6",
+   "mapId": "map-city-singor",
+   "x": 1435.1,
+   "y": 1473.6,
+   "building": 754,
+   "base": {
+    "name": "Храм Сингор",
+    "type": "temple",
+    "stateId": "66f5bac5-7",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirion-0",
+   "mapId": "map-city-tirion",
+   "x": 1139.3,
+   "y": 1088.9,
+   "building": 153,
+   "base": {
+    "name": "Дом старейшин",
+    "type": "assembly",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь читают выписку из Лесной книги.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-tirion-1",
+   "mapId": "map-city-tirion",
+   "x": 1354.9,
+   "y": 470.4,
+   "building": 154,
+   "base": {
+    "name": "Храм Тирион",
+    "type": "temple",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-valimar-0",
+   "mapId": "map-city-valimar",
+   "x": 1019.6,
+   "y": 685.8,
+   "building": 148,
+   "base": {
+    "name": "Дом старейшин",
+    "type": "assembly",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь читают выписку из Лесной книги.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-valimar-1",
+   "mapId": "map-city-valimar",
+   "x": 1244.7,
+   "y": 560,
+   "building": 149,
+   "base": {
+    "name": "Храм Валимар",
+    "type": "temple",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ilmarion-0",
+   "mapId": "map-city-ilmarion",
+   "x": 1101.9,
+   "y": 1078.7,
+   "building": 114,
+   "base": {
+    "name": "Дом старейшин",
+    "type": "assembly",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь читают выписку из Лесной книги.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-ilmarion-1",
+   "mapId": "map-city-ilmarion",
+   "x": 1050.5,
+   "y": 749.6,
+   "building": 115,
+   "base": {
+    "name": "Храм Ильмарион",
+    "type": "temple",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukelrit-0",
+   "mapId": "map-city-brukelrit",
+   "x": 1158,
+   "y": 948,
+   "building": 195,
+   "base": {
+    "name": "Хлебный причал",
+    "type": "landmark",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Сюда идут баржи из Харнмарка.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukelrit-1",
+   "mapId": "map-city-brukelrit",
+   "x": 986.7,
+   "y": 679.1,
+   "building": 196,
+   "base": {
+    "name": "Склады смолы",
+    "type": "landmark",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Смола и дёготь на Каяя.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukelrit-2",
+   "mapId": "map-city-brukelrit",
+   "x": 888.2,
+   "y": 1007.6,
+   "building": 198,
+   "base": {
+    "name": "Храм Брукельрит",
+    "type": "temple",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-brukelrit-3",
+   "mapId": "map-city-brukelrit",
+   "x": 1249.3,
+   "y": 669.5,
+   "building": 197,
+   "base": {
+    "name": "Гавань",
+    "type": "landmark",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "порт Таварвайта: причалы из тиса, склады смолы и дёгтя, баржи на Харнмарк и Каяя.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-morioka-0",
+   "mapId": "map-city-morioka",
+   "x": 1191.2,
+   "y": 791.4,
+   "building": 126,
+   "base": {
+    "name": "Дом вождя",
+    "type": "assembly",
+    "stateId": "dbcdc36d-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь вождь племени слушает весть с Гряды.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-morioka-1",
+   "mapId": "map-city-morioka",
+   "x": 1485.9,
+   "y": 419.8,
+   "building": 127,
+   "base": {
+    "name": "Храм Мориока",
+    "type": "temple",
+    "stateId": "dbcdc36d-e",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
    "id": "city-fein-0",
    "mapId": "map-city-fein",
-   "x": 1278.8,
-   "y": 587.6,
-   "building": 360,
+   "x": 1261.5,
+   "y": 524.7,
+   "building": 361,
    "base": {
     "name": "Гряда Великанов",
     "type": "landmark",
@@ -116936,9 +116670,9 @@
   {
    "id": "city-fein-1",
    "mapId": "map-city-fein",
-   "x": 1181.7,
-   "y": 842.4,
-   "building": 361,
+   "x": 1078.3,
+   "y": 714.7,
+   "building": 362,
    "base": {
     "name": "Дом государя",
     "type": "castle",
@@ -116955,9 +116689,9 @@
   {
    "id": "city-fein-2",
    "mapId": "map-city-fein",
-   "x": 743.8,
-   "y": 836.4,
-   "building": 362,
+   "x": 665.6,
+   "y": 739.8,
+   "building": 363,
    "base": {
     "name": "Зал четырёх старейшин",
     "type": "assembly",
@@ -116974,9 +116708,9 @@
   {
    "id": "city-fein-3",
    "mapId": "map-city-fein",
-   "x": 567.4,
-   "y": 559.7,
-   "building": 363,
+   "x": 1600.4,
+   "y": 561.6,
+   "building": 364,
    "base": {
     "name": "Дом Хранителя",
     "type": "landmark",
@@ -116993,9 +116727,9 @@
   {
    "id": "city-fein-4",
    "mapId": "map-city-fein",
-   "x": 1516.9,
-   "y": 713.2,
-   "building": 364,
+   "x": 499.5,
+   "y": 544.6,
+   "building": 365,
    "base": {
     "name": "Ратуша Фейн",
     "type": "assembly",
@@ -117012,9 +116746,9 @@
   {
    "id": "city-fein-5",
    "mapId": "map-city-fein",
-   "x": 894,
-   "y": 455,
-   "building": 365,
+   "x": 869.1,
+   "y": 362.1,
+   "building": 366,
    "base": {
     "name": "Храм Фейн",
     "type": "temple",
@@ -117029,15 +116763,262 @@
    "to": null
   },
   {
-   "id": "city-vedelgard-0",
-   "mapId": "map-city-vedelgard",
-   "x": 1211.8,
-   "y": 363.5,
-   "building": 14,
+   "id": "city-nioto-0",
+   "mapId": "map-city-nioto",
+   "x": 1015.8,
+   "y": 703.9,
+   "building": 140,
    "base": {
-    "name": "Храм Ведельгард",
+    "name": "Дом вождя",
+    "type": "assembly",
+    "stateId": "dbcdc36d-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь вождь племени слушает весть с Гряды.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-nioto-1",
+   "mapId": "map-city-nioto",
+   "x": 1239.2,
+   "y": 584.3,
+   "building": 141,
+   "base": {
+    "name": "Храм Ниото",
     "type": "temple",
     "stateId": "dbcdc36d-e",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-nioto-2",
+   "mapId": "map-city-nioto",
+   "x": 843.3,
+   "y": 504.7,
+   "building": 139,
+   "base": {
+    "name": "Рыночная площадь",
+    "type": "landmark",
+    "stateId": "dbcdc36d-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь вождь Лиса Мацуо-но-Тоён и торг",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vokio-0",
+   "mapId": "map-city-vokio",
+   "x": 969.3,
+   "y": 709.3,
+   "building": 72,
+   "base": {
+    "name": "Дом вождя",
+    "type": "assembly",
+    "stateId": "dbcdc36d-e",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь вождь племени слушает весть с Гряды.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-vokio-1",
+   "mapId": "map-city-vokio",
+   "x": 1232.7,
+   "y": 688.8,
+   "building": 73,
+   "base": {
+    "name": "Храм Вокио",
+    "type": "temple",
+    "stateId": "dbcdc36d-e",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainerrit-0",
+   "mapId": "map-city-shtainerrit",
+   "x": 834.1,
+   "y": 993.6,
+   "building": 82,
+   "base": {
+    "name": "Ворота Торга",
+    "type": "landmark",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "Отмар поставил их в 1009 г. выше городской стены.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainerrit-1",
+   "mapId": "map-city-shtainerrit",
+   "x": 904.3,
+   "y": 739.9,
+   "building": 83,
+   "base": {
+    "name": "Каменоломни Штайнов",
+    "type": "landmark",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "Ступени серых карьеров; в залоге у Каяя.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-shtainerrit-2",
+   "mapId": "map-city-shtainerrit",
+   "x": 1186.5,
+   "y": 894.4,
+   "building": 84,
+   "base": {
+    "name": "Храм Штайнеррит",
+    "type": "temple",
+    "stateId": "fbb47726-c",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-avallone-0",
+   "mapId": "map-city-avallone",
+   "x": 564.4,
+   "y": 1144.5,
+   "building": 510,
+   "base": {
+    "name": "Палата Паёв",
+    "type": "assembly",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Здесь лежит Лесная книга на сто паёв.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-avallone-1",
+   "mapId": "map-city-avallone",
+   "x": 1037.3,
+   "y": 877.4,
+   "building": 509,
+   "base": {
+    "name": "Дворец из шестисот стволов",
+    "type": "castle",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Самый высокий дом Таварвайта.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-avallone-2",
+   "mapId": "map-city-avallone",
+   "x": 644.6,
+   "y": 736.8,
+   "building": 512,
+   "base": {
+    "name": "Лесной храм",
+    "type": "temple",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Дом Света из тисовых брёвен.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-avallone-3",
+   "mapId": "map-city-avallone",
+   "x": 851.2,
+   "y": 1038.2,
+   "building": 511,
+   "base": {
+    "name": "Контора Каяя",
+    "type": "landmark",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "Расписки на заложенные паи.",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-avallone-4",
+   "mapId": "map-city-avallone",
+   "x": 1179.2,
+   "y": 589.2,
+   "building": 508,
+   "base": {
+    "name": "Ратуша Аваллонэ",
+    "type": "assembly",
+    "stateId": "f094039b-4",
+    "population": "",
+    "ruler": "",
+    "description": "",
+    "image": ""
+   },
+   "history": [],
+   "from": null,
+   "to": null
+  },
+  {
+   "id": "city-avallone-5",
+   "mapId": "map-city-avallone",
+   "x": 1595.9,
+   "y": 517.1,
+   "building": 513,
+   "base": {
+    "name": "Храм Аваллонэ",
+    "type": "temple",
+    "stateId": "f094039b-4",
     "population": "",
     "ruler": "",
     "description": "",
