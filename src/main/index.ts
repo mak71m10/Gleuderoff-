@@ -918,6 +918,54 @@ async function migrateWorld(dir: string): Promise<void> {
   if ((user.version ?? 1) < 53) migrateCountry('Таварвайт', ['lore-tw-', 'lore-fm-tT-', 'lore-fm-tN-'])
   // v54: Фейноко — Гряда Великанов, Фейн, Ниото, Мориока, Вокио; Гряда в 3D
   if ((user.version ?? 1) < 54) migrateCountry('Фейноко', ['lore-fn-', 'lore-fm-fM-', 'lore-fm-fO-'])
+  // Север Лоры (волна 1): страна целиком из стартового мира — состояние, записи лора и родословных, провинции, округа, планы, места, походы,
+  // строки дипломатии соседей, где упомянута страна
+  const migrateNorth = (name: string, pfx: string, fam: string, neighbors: string[]): void => {
+    const ds = (def.states ?? []).find((s: Json) => s.base.name === name)
+    const us = ds && user.states.find((s: Json) => s.id === ds.id)
+    if (us) { us.base = { ...us.base, ...structuredClone(ds.base) }; us.factions = structuredClone(ds.factions); us.history = structuredClone(ds.history ?? []) }
+    const re = new RegExp(`^lore-(${pfx}-|fm-${fam}|book-)`)
+    const fresh = (def.entries ?? []).filter((e: Json) => re.test(String(e.id)))
+    const ids = new Set(fresh.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !ids.has(e.id)), ...structuredClone(fresh)]
+    const ourMaps = new Set<string>()
+    const ourAreas = new Set<string>()
+    const defProvs = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProvs.get(p.id)
+      if (dp && ds && dp.owners?.at(-1)?.[1] === ds.id) {
+        p.name = dp.name; p.settlement = structuredClone(dp.settlement ?? null); p.description = dp.description
+        if (dp.areaId) ourAreas.add(dp.areaId)
+        if (dp.cityMapId) { p.cityMapId = dp.cityMapId; ourMaps.add(dp.cityMapId) }
+      }
+    }
+    const defAreas = new Map<string, Json>((def.adminRegions ?? []).map((a: Json) => [a.id, a]))
+    for (const a of user.adminRegions ?? []) { const da = defAreas.get(a.id); if (ourAreas.has(a.id) && da) a.name = da.name }
+    const cityMaps = (def.maps ?? []).filter((m: Json) => ourMaps.has(m.id) && !user.maps.some((u: Json) => u.id === m.id))
+    user.maps = [...user.maps, ...structuredClone(cityMaps)]
+    const isOurs = (x: Json) => String(x.id).startsWith(`lore-${pfx}-`) || String(x.id).startsWith(`lore-army-${pfx}-`) || ourMaps.has(x.mapId)
+    const placeIds = new Set((user.places ?? []).map((p: Json) => p.id))
+    user.places = [...(user.places ?? []), ...structuredClone((def.places ?? []).filter((p: Json) => isOurs(p) && !placeIds.has(p.id)))]
+    const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))
+    user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => isOurs(a) && !armyIds.has(a.id)))]
+    for (const n of neighbors) {
+      const d = (def.states ?? []).find((s: Json) => s.base.name === n), u = d && user.states.find((s: Json) => s.id === d.id)
+      if (!u) continue
+      const have = new Set(String(u.base.diplomacy ?? '').split('\n'))
+      const add = String(d.base.diplomacy ?? '').split('\n').filter((l: string) => l.includes(name) && !have.has(l))
+      if (add.length) u.base.diplomacy = [u.base.diplomacy, ...add].filter(Boolean).join('\n')
+    }
+  }
+  // v45: Эрэдамство Олекохт — Белая нить (девять сфер, узлы Ясного дня), Храм Нити; Талиурит → Антсла, Нээль → Элва
+  if ((user.version ?? 1) < 45) migrateNorth('Олекохт', 'ol', 'ol', ['Империя', 'Земли Севера'])
+  // v46: Уунааш — Ворота и дымы (дымы владетелей, День Ворот, дальние дымы); Брасенхольм → Авель, Хагинштейн → Айно, Линельгард → Лаяно, Дорнинталь → Филь
+  if ((user.version ?? 1) < 46) migrateNorth('Уунааш', 'uu', 'uu', ['Империя', 'Княжества Гарефорда', 'Олекохт', 'Креит'])
+  // v47: Объединённые Берега Гренинсворда — Стяг Саренто и чистая вода; Оберталь → Дрогенмау, Оствейлер → Этнор, Фрейхаузен → Артензи'Винар, Оберенведель → Онершайм, Вердорф → Саренто
+  if ((user.version ?? 1) < 47) migrateNorth('Объединённые Берега Гренинсворда', 'gs', 'gs', ['Фарвольская лига', 'Уунааш'])
+  // v48: Северная Башня — Великое испытание (двенадцать кафедр, Магистр по баллам); Башня, Нижняя библиотека, городки ордена
+  if ((user.version ?? 1) < 48) migrateNorth('Северная Башня', 'nt', 'nt', ['Земли Севера'])
+  // v49: Братство Бездны — Колодец и Лестница (наборы-ступени, Магистр по стажу); Дальберг, деревни острова, планы
+  if ((user.version ?? 1) < 49) migrateNorth('Братство Бездны', 'bz', 'bz', ['Земли Севера'])
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

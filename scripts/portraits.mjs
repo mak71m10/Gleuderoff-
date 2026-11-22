@@ -24,6 +24,11 @@ const CHURCH_STYLE = 'oil painting, renaissance papal court portrait, raphael an
 // Земли Севера: суровый северный портрет — мех, кольчуга, дерево длинного дома, огонь очага
 const NORTH_STYLE = 'oil painting, viking age nordic portrait, firelit longhouse interior, carved wooden pillars, dark background, visible brush strokes, detailed weathered face, half-length portrait'
 // Креит: суровый портрет при свете факелов и серебра — тёмное дерево длинного дома или штольня, мех, железо, серебряные кольца
+const BZ_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, rough black stone and rusty iron chain background lit by one torch from the side, blacks, rust and dull rose'
+const NT_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, dark stone arch background with a single candle, cool violet-grey light, silver and violet greys'
+const GREN_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, dark weathered ship planks and coiled rope background, cold sea-grey light, muted blue-green, grey and old gold'
+const UUNAASH_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, dark plain stone wall background hung with small old iron keys, cool grey-blue light, muted blues, greys and warm amber'
+const OLEKOHT_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, dark wooden panel background with one branch of crimson leaves at the edge, cold pale light from the left, deep reds, creams and dark brown'
 const HARNMARK_STYLE = 'oil painting, Germanic imperial principality portrait, half-timbered stone town and a white tower with a red pennant behind, overcast amber light, muted reds, creams and slate, painterly, half-length portrait'
 const FEINOKO_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), mountain island kingdom portrait, grey stone terraces and paper lanterns behind, misty blue dusk light, slate blue and grey tones, visible brush strokes, detailed face, half-length portrait'
 const TAVAR_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), forest elf kingdom portrait, a vast ancient yew tree with carved trunk behind, dappled green forest light, muted greens and browns, visible brush strokes, detailed face, half-length portrait'
@@ -43,7 +48,7 @@ const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge l
 const ELFBORN_STYLE = 'oil painting, high fantasy elven court portrait, pre-raphaelite style, soft silver-green light through willow leaves, pale stone arches behind, visible brush strokes, detailed face, half-length portrait'
 const SILVLAND_STYLE = 'oil painting, high fantasy forest portrait, deep green dappled light under giant ancient tree canopy, mossy roots and glowing fruit behind, visible brush strokes, detailed face, half-length portrait'
 const KREIT_STYLE ='oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
-const NEG = '(asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
+const NEG = '(beanie, knit hat, baseball cap, eyeglasses, hoodie, sweater, t-shirt, zipper, modern jacket:1.3), (cleavage, shirtless, bare chest:1.4), (photograph, dslr, bokeh:1.3), (asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
 
 // цвета домов -> слова для одежды
 const HOUSE_COLORS = {
@@ -68,6 +73,113 @@ const CUSTOM = {
   'kl-geeske': 'elderly woman in her late sixties, white hair under a linen cap, shrewd calm eyes, dark wool dress',
   'kl-sjoukje': 'composed woman of forty-four, blond hair braided, grey dress, quiet clever expression',
   'kl-piebe': 'serious boy of ten, straw hair, grey tunic, solemn look',
+  // Олекохт: элуины — бледные северяне, валлины — люди
+  // Север Лоры (волна 1): пять стран, у каждого своё описание
+  'ol-kaido': 'tall stooped ruler with a grey streak over the left eye, thin silver circlet with four red enamel petals, closed high-collared dark red fur-trimmed robe, tired attentive mood',
+  'ol-toomas': 'gaunt old ruler with a mountain-weathered face, white threads wound on his fingers, heavy dark red robe over a plain soldier coat, hard watchful mood',
+  'ol-ilmar': 'gentle middle-aged man with a soft smile, festive red sash over a white linen tunic with high collar, kind melancholy mood',
+  'ol-kadri': 'young woman archer, left temple shaved, light braid on the other side, short horn on a belt, grey wool tunic with long sleeves and a leather vest, high collar, resolute mood',
+  'ol-mart': 'broad cheerful man hunter, thin white thread tied around the right wrist, heavy fur cloak over wool, leather hound leash in hand, jovial mood',
+  'ol-sirje': 'small old priestess of Kairi, fingers tightly wrapped in white thread, plain black wool robe to the chin, calm unreadable mood',
+  'ol-august': 'stout older treasurer, black ore-stained fingernails, heavy wool coat, wooden abacus in the hands, shrewd quiet mood',
+  'ol-indrek': 'young man with a white priestly cord instead of a belt, dark wool tunic, miner lamp in the hand, solemn zealous mood',
+  'ol-tynu': 'thin clean-shaven priest with a white thread around one finger, grey wool robe, polite cold smile',
+  'ol-merle': 'woman priestess in a red fox fur collar, small iron ring through the lower lip, high-necked dark wool robe fully closed, sharp watchful mood',
+  'ol-helje': 'tall priestess in a white wool robe closed to the throat with a copper sphere-eye pendant, light veil-free hair pinned up, low calm gaze',
+  'ol-arvo': 'grizzled marshal missing two fingers of the left hand, lynx fur on the shoulders over a steel breastplate, loud stern mood',
+  'ol-pille': 'red-haired woman in a travelling wool cloak with high collar, a folded map in the belt, an iron lantern in hand, worried determined mood',
+  'ol-hannes': 'craftsman master in a leather apron over a linen shirt, thick glass shards held in tongs, clever tired mood',
+  'ol-liis': 'circus tightrope walker woman, white face paint with a black stripe across the eyes, fitted red and white acrobat jerkin with long sleeves and high neck, proud mood',
+  'ol-jaak': 'old circus clown, floury nose, patched motley coat with bells, kind wrinkled gentle mood',
+  'ol-rein': 'fire-eater in a dark leather jerkin closed at the neck, soot-streaked, flame tattoos on the neck, drum strap over the shoulder, defiant mood',
+  'ol-valter': 'human grey-haired man with frostbitten ears, sheepskin coat, sack of grain on the shoulder, stubborn weary mood',
+  'ol-vaimo': 'big red fox the size of a calf with an ever-burning lantern in its teeth, wise eyes, snowy birch forest',
+  'ol-lennin': 'old founder leading exiles, travel-worn long wool coat, a wooden walking staff, heavy sorrowful brow, resigned mood',
+  'ol-rinel': 'middle-aged stern leader in a plain dark red wool coat with a high collar, a simple iron torc, resolute mood',
+  'fm-olt-maare': 'middle-aged mountain shepherd woman turned queen, plain grey wool dress with high neck, braids pinned up, quiet gentle mood',
+  'fm-olt-ingrid': 'woman of about forty from a human family of grain traders, grey wool dress with a white collar, hands folded, steady kind mood',
+  'fm-olt-tiina': 'woman archer of about forty with a shaved left temple, short horn, wool tunic with a high collar and a leather vest, proud mood',
+  'fm-olt-eve': 'quiet woman of about forty, a small copper sphere-eye pendant at the throat, dark red wool dress with high collar, reserved anxious mood',
+  'fm-olt-ausl': 'six year old boy in a plain red wool tunic, round cheeks, solemn mood',
+  'fm-olt-liina': 'ten year old girl with red braids, a ribbon in the hair, simple wool dress with high collar, mischievous mood',
+  'fm-olt-merilin': 'woman of thirty with white painted nails, laughing eyes, hunting wool coat with fur collar, bold cheerful mood',
+  'fm-olt-toomas2': 'seven year old boy with a thin white thread tied at the wrist, small dark wool tunic, earnest mood',
+  'fm-oli-mart': 'old retired marshal with white hair, scarred chin, worn steel gorget over a wool coat, proud weary mood',
+  'fm-oli-hele': 'old woman in a plain wool dress and apron, hands stained with pine tar, kind firm mood',
+  'fm-oli-kaarel': 'sixteen year old novice soldier, light hair cut short, leather jerkin with high collar, nervous proud mood',
+  'fm-olk-peeter': 'old miner priest with dust in the grey beard, rough wool coat, a small lantern, secretive mood',
+  'fm-olk-hilja': 'woman of fifty with a mine shop apron over dark wool, a ring of keys at the belt, tired practical mood',
+  'uu-abram': 'old man with a long white beard to the waist, an old iron house key on a cord around the neck, dark blue fur-collared gown, kind tired mood',
+  'uu-samuel': 'old moneychanger with a short grey beard, worn travelling coat, a bunch of iron keys in the hand, determined mood',
+  'uu-david': 'sturdy bearded sailor, salt-stained blue wool coat, a coil of rope on the shoulder, confident smile',
+  'uu-natan': 'thin young man, dark curly hair, ink on the fingers, a ledger under the arm, clever anxious mood',
+  'uu-miriam': 'stern dry woman with ink-stained hands, dark grey wool dress to the chin, hair under a plain dark kerchief, a heavy book',
+  'uu-elias': 'broad cheerful man with a trimmed beard, silver scales pendant on a chain, plum-coloured wool gown with fur collar, sly warm smile',
+  'uu-rachel': 'young woman merchant with a dark braid, travelling cloak with high collar, a bolt of cloth under the arm, watchful mood',
+  'uu-josef': 'stooped weathered man in a dusty caftan, a sheaf of wheat on the belt, honest stubborn mood',
+  'uu-hana': 'red-haired woman with short-cropped hair, anchor tattoo on the hand, thick sea coat closed to the throat, grieving hard mood',
+  'uu-levi': 'loud blacksmith lord with singed eyebrows, leather apron over a grey wool coat, hammer on the belt',
+  'uu-konrad': 'grey-haired imperial knight with a broken nose, plain red surcoat with a white tower, proud mood',
+  'uu-greta': 'sturdy peasant woman in a blue apron over a linen dress, strong hands, sunburnt face, kerchief pushed back',
+  'uu-jakov': 'small bald man with forty small keys on the belt, dark guard coat, cautious mood',
+  'uu-lea': 'middle-aged moneychanger woman in a grey shawl holding an old iron key, stern kind mood',
+  'uu-ezra': 'old court official with a neat grey beard, violet gown, a coin scale and a quill, careful mood',
+  'fm-uuy-tamar': 'old woman of seventy, white hair under a plain linen coif, shawl, a small iron key on a cord, proud tired mood',
+  'fm-uuy-sara': 'old healer woman, grey hair in a bun, wool dress with herb pouches at the belt, gentle wise mood',
+  'fm-uuy-yudit': 'woman of seventy in a dark wool dress with a stiff collar, shrewd calm mood',
+  'fm-uuy-dina': 'woman of forty-five in black mourning wool dress to the chin, a small anchor brooch, grieving determined mood',
+  'fm-uuy-benjamin': 'young scribe in a dark wool coat, ink-stained cuffs, a quill behind the ear, careful mood',
+  'fm-uuy-ester': 'twenty-four year old woman scribe, dark braid, ink on the fingers, a stack of papers, serious mood',
+  'fm-uum-joel': 'old cobbler with thick forearms, leather apron over wool shirt, a shoe last in the hand, tired humble mood',
+  'fm-uum-naomi': 'woman of fifty-two in a plum wool dress and white collar, cloth merchant measuring tape on the neck, practical stern mood',
+  'fm-uum-matias': 'twenty-six year old round-faced clerk, a quill behind the ear, a ledger, plum wool coat, hopeful mood',
+  'gs-maria': 'woman shipwright with small scars on the hands, blue wool cloak with a white ship badge, dark blonde hair tied back, resolute mood',
+  'gs-gunnar': 'huge bald man admiral with a tar burn scar on the neck, heavy grey sea coat with brass buttons, commanding mood',
+  'gs-bjarne': 'broad-shouldered man with frostbitten fingers, iron-shod pole in hand, thick sheepskin coat, wind-reddened face',
+  'gs-severin': 'thin dry man in red velvet with signet rings on every finger, neat grey beard, calm unreadable eyes',
+  'gs-ilsa': 'plain woman in grey wool with a chain of small keys on the wrist, hair covered by a plain linen band, sharp attentive eyes',
+  'gs-halvard': 'grey-haired wiry archer with a green ribbon in his braid, yew longbow on the back, forest green wool coat',
+  'gs-teresa': 'plump sun-tanned woman in a golden wool dress with a wheat brooch, warm shrewd smile',
+  'gs-ulvar': 'old pilot with a salt-white beard, trident and dolphin tattoos on the hands, small bell on a cord around the neck, sea-worn coat',
+  'gs-ragna': 'young woman pilot with a long pole and a small bell, braided fair hair, sealskin jacket closed to the throat, brave eyes',
+  'gs-ingvild': 'tall woman treasurer in black wool with bone abacus beads on the belt, severe face',
+  'gs-piet': 'broad fisherman with faded blue eyes, oilskin coat, rope-burned hands',
+  'gs-oskar': 'old shipwright with an adze, sawdust in the grey beard, leather apron over a linen shirt',
+  'fm-gse-anna': 'old sail-maker woman in a dark wool dress, a sail needle and thread in the hands, tired kind mood',
+  'fm-gse-eirik': 'weathered young skipper, blue wool coat, a coil of rope on the shoulder, easy confident smile',
+  'fm-gse-oskar2': 'twelve year old boy apprentice, sawdust in light hair, small leather apron, a model ship in hand, eager mood',
+  'fm-gsd-sigrid': 'tall woman of forty-eight in dark grey wool dress and a ring of keys, calm weary mood',
+  'fm-gsd-tord': 'huge twenty-eight year old captain with a trimmed blond beard, mail coif down on the shoulders, grey sea coat, steady proud mood',
+  'fm-gst-arne': 'middle-aged pilot with a pole and a small bell, salt-stiff coat, brave quiet mood',
+  'nt-signi': 'woman mage with black hair in a tight braid, two iron seal bracelets on the wrists, dark violet wool robe to the chin, stern composed mood',
+  'nt-torbjorn': 'thin stooped astronomer with a singed eyebrow, ink-stained fingers, a rolled star chart, tired intense mood',
+  'nt-ulrik': 'burly bald man with a long beard to the waist, a big iron key on the neck, dark grey robe, calm calculating mood',
+  'nt-lisa': 'young woman scholar, ink on the fingers up to the elbows, a bundle of scrolls, simple dark wool dress, nervous clever mood',
+  'nt-olav': 'massive grey-haired old mason mage covered in stone dust, heavy grey cloak, strong hands',
+  'nt-helga': 'small quick woman with an iron mesh net over her hair, plain dark robe to the chin, sharp bright mood',
+  'nt-hjalmar': 'old mage with burn scars on both hands, singed grey beard, fire-red scarf over a wool robe',
+  'nt-gerd': 'plump rosy healer woman in a grey shawl with herb pouches, warm tired mood',
+  'nt-orm': 'broad red-haired commander with a rune-engraved sword, grey cloak with an iron ring clasp, rugged mood',
+  'nt-brandr': 'man with claw scars on the face, a tame raven on the shoulder, leather jerkin over wool',
+  'nt-inge': 'dry thin woman with a bone abacus on a chain, high-necked grey dress, sceptical mood',
+  'nt-rolf': 'heavy man in a fur-collared harbour master coat, weather-beaten face',
+  'fm-ntv-ragnhild': 'old lighthouse cook woman in a grey wool dress and apron, kind sceptical mood',
+  'fm-ntv-sunniva': 'woman of forty-eight in a dark wool dress to the chin, a small ledger in hand, guarded mood',
+  'fm-nta-bodil': 'old midwife with white hair under a linen coif, strong hands, rolled sleeves over a wool dress, calm wise mood',
+  'bz-ottmar': 'man with prematurely white hair, missing little finger on the left hand, plain dark grey robe to the chin, tired haunted mood, a dark stain on a handkerchief',
+  'bz-walter': 'thin man in grey sackcloth with wet-mica eyes, shaved head, a renegade monk, calm cold look',
+  'bz-matias': 'huge former sergeant with a torn ear, stern discipline face, grey coat with a rope belt',
+  'bz-gisela': 'tall sharp woman in a black wool coat closed to the throat, silver cheek-chain, severe pale face',
+  'bz-lukas': 'quiet man with a child-like face, a black leather book against the chest, dark robe, whispering mood',
+  'bz-ilsa': 'young red-haired woman messenger, ink on fingers, worn grey wool dress with high collar, eager mood',
+  'bz-johann': 'young smith with burns on the neck and black hands, leather apron, shy serious face',
+  'bz-edith': 'small ten year old girl with pale hair and big brave eyes, grey too-big wool robe',
+  'bz-hanna': 'heavy harbour woman in a fur-collared wool coat, weather-beaten, sad shrewd mood',
+  'bz-rainer': 'broad fisherman in a torn cloak with a boat hook on the shoulder, angry grief in his eyes',
+  'bz-abt': 'old priest in a grey cassock with a small light symbol, kind weary mood',
+  'fm-bzm-greta': 'woman of thirty-eight, salt-cracked hands, grey wool dress and apron, a strand of drying fish, silent grief',
+  'fm-bzm-per': 'eight year old boy in a patched wool tunic holding a small black pebble in the fist, anxious mood',
+  'fm-bzd-anselm': 'twenty-six year old brother of the Well with soot-darkened hands, rust-brown wool robe, shaved sides, distant mood',
   // Сильвленд: сильва — растительные черты, эльфы и люди — северноевропейские лица
   'sv-ilarion': 'tall stooped old elf looking about eighty, long grey hair, moss-green cloak, a staff of pale wood, wise sad eyes',
   'sv-elenve': 'golden-eyed sun elf woman looking about fifty, red-gold hair, sunset-colored dress, proud calm face',
@@ -731,9 +843,16 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон', 'Эльфборн', 'Сильвленд', 'Княжество Харнмарк', 'Фейноко', 'Таварвайт', 'Павильон Грёз', 'Королевство Редания', 'Империя Кагия'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон', 'Эльфборн', 'Сильвленд', 'Княжество Харнмарк', 'Фейноко', 'Таварвайт', 'Павильон Грёз', 'Королевство Редания', 'Империя Кагия', 'Олекохт', 'Уунааш', 'Объединённые Берега Гренинсворда', 'Северная Башня', 'Братство Бездны'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
+// запись мира с повторами: файл может быть занят dev-сервером или другим процессом
+function saveWorld() {
+  for (let t = 0; t < 30; t++) {
+    try { writeFileSync(WORLD, JSON.stringify(world, null, 1)); return } catch (e) { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000) }
+  }
+  throw new Error('не удалось записать world.json')
+}
 for (const e of chars) {
   const id = e.id.slice(5)
   const file = `${OUT}/${id}.webp`
@@ -761,7 +880,12 @@ for (const e of chars) {
   const pavil = e.base.tags.includes('Павильон Грёз')
   const redania = e.base.tags.includes('Королевство Редания')
   const kagia = e.base.tags.includes('Империя Кагия')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon || elfborn || silvland || harnmark
+  const olekoht = e.base.tags.includes('Олекохт')
+  const uunaash = e.base.tags.includes('Уунааш')
+  const gren = e.base.tags.includes('Объединённые Берега Гренинсворда')
+  const ntw = e.base.tags.includes('Северная Башня')
+  const bzd = e.base.tags.includes('Братство Бездны')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon || elfborn || silvland || harnmark || olekoht || uunaash || gren || ntw || bzd
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -780,7 +904,17 @@ for (const e of chars) {
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
   const halfElf = /Полуэльф/.test(race), elfR = /эльф/i.test(race) && !halfElf
   const sylvaR = /Сильва/.test(race)
-  const prompt = silvland
+  const prompt = bzd
+    ? `${BZ_STYLE}, portrait of a (${age} year old ${age < 17 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (northern european features, pale tired skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat, no cap:1.5), (fully clothed, long sleeves:1.2)`
+    : ntw
+    ? `${NT_STYLE}, portrait of a (${age} year old ${age < 17 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (northern european, nordic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat, no cap:1.5), (fully clothed, long sleeves:1.2)`
+    : gren
+    ? `${GREN_STYLE}, portrait of a (${age} year old ${age < 17 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (northern european, scandinavian features, pale weathered skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat, no cap:1.5), (fully clothed:1.2)`
+    : uunaash
+    ? `${UUNAASH_STYLE}, portrait of a (${age} year old ${age < 17 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, dark hair:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
+    : olekoht
+    ? `${OLEKOHT_STYLE}, portrait of ${/Илутс/.test(race) ? `(a large red fox spirit creature holding a glowing lantern in its mouth:1.5), mythical, no human` : /Элуин/.test(race) ? `a (${age} year old ${age < 17 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}, light-blessed eluin:1.35), (luminous pale silver-gold irises with a faint inner glow:1.45), (ash-white hair${age > 14 ? ' with a single silver streak' : ''}:1.2), (ageless smooth very pale skin with a few tiny golden dots like freckles of light on the cheekbones:1.15), (small silver sphere-eye amulet of the goddess Elu at the throat:1.1), serene clear gaze, northern european features` : /Ладэс/.test(race) ? `a (${age} year old ${age < 17 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}, old ladesh exile:1.35), (tired grey eyes, heavy sorrowful brow, dark ash hair:1.2), pale northern european features` : `a (${age} year old ${age < 17 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (northern european, pale skin, light hair:1.25)`}, ${CUSTOM[id] ?? subject}, (bareheaded, no hat, no cap, uncovered hair:1.5), (fully clothed, long sleeves, high collar:1.2)`
+    : silvland
     ? `${SILVLAND_STYLE}, portrait of ${sylvaR ? `a (sylva ${female ? 'woman' : 'man'}, living plant person:1.4), (green-tinted skin with bark texture on shoulders, leaves and berries growing in the hair, glowing amber eyes, a small carved root-shaped mark on the shoulder, plain coarse bast clothes, northern european facial features:1.3)` : elfR ? `an (elf ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, long pointed elf ears:1.3)` : halfElf ? `a (half-elf ${female ? 'woman' : 'man'}:1.35), (northern european human face, slightly pointed ears:1.25)` : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25)`}, ${CUSTOM[id] ?? subject}, (bareheaded:1.1)`
     : elfborn
     ? `${ELFBORN_STYLE}, portrait of ${elfR ? `an (elf ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, long pointed elf ears:1.3)` : halfElf ? `a (half-elf ${female ? 'woman' : 'man'}:1.35), (northern european human face, slightly pointed ears:1.25)` : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin:1.25)`}, ${CUSTOM[id] ?? subject}${id === 'el-serelin' ? '' : ', (bareheaded:1.1)'}`
@@ -837,9 +971,9 @@ for (const e of chars) {
   // республиканцев любит рисовать в раме — обрезаем края
   await (rp ? sharp(png).extract({ left: 24, top: 28, width: 400, height: 504 }).resize(456, 576, { kernel: 'lanczos3' }) : sharp(png).resize(512, 640, { kernel: 'lanczos3' })).webp({ quality: 86 }).toFile(file)
   e.base.image = `portraits/${id}.webp`
-  if (!process.env.NOWRITE) writeFileSync(WORLD, JSON.stringify(world, null, 1)) // сохраняем после каждого — можно прервать и продолжить
+  if (!process.env.NOWRITE) saveWorld() // сохраняем после каждого — можно прервать и продолжить
   console.log(`[${++done}/${chars.length}] ${e.base.name} — ${((Date.now() - t0) / 1000).toFixed(0)} с`)
 }
 stopSd()
-if (!process.env.NOWRITE) writeFileSync(WORLD, JSON.stringify(world, null, 1))
+if (!process.env.NOWRITE) saveWorld()
 console.log(`Готово: портретов ${chars.filter((e) => e.base.image).length} из ${chars.length}`)

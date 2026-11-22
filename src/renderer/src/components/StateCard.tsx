@@ -29,6 +29,11 @@ import { CartView } from './Cart'
 import { FordsView } from './Fords'
 import { WillowView } from './Willow'
 import { BansView } from './Bans'
+import { KnotsView } from './Knots'
+import { SmokeView } from './Smoke'
+import { IceView } from './Ice'
+import { ExamView } from './Exam'
+import { WellView } from './Well'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
@@ -107,7 +112,7 @@ function StateCardBody({ id }: { id: string }) {
   const dynastyEntry = world.entries.find((e) => e.id === f.dynastyId)
   const dynastyCouncil = dynastyEntry ? resolve(dynastyEntry, date).council : undefined
   // органы власти без парламента (Сабельная ставка, Совет Десяти графа): организации этой страны с пометкой «Государственный орган»
-  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.vault || e.base.heights || e.base.urn || e.base.fleet || e.base.lantern || e.base.razryad || e.base.threshold || e.base.wall || e.base.auction || e.base.ridge || e.base.pledge || e.base.reserve || e.base.star || e.base.cart || e.base.ford || e.base.willow || e.base.bans || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
+  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.vault || e.base.heights || e.base.urn || e.base.fleet || e.base.lantern || e.base.razryad || e.base.threshold || e.base.wall || e.base.auction || e.base.ridge || e.base.pledge || e.base.reserve || e.base.star || e.base.cart || e.base.ford || e.base.willow || e.base.bans || e.base.knots || e.base.smoke || e.base.ice || e.base.tower || e.base.descent || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
   const religions = world.entries.filter((e) => e.kind === 'religion').map((e) => ({ id: e.id, name: e.base.name }))
   const otherStates = world.states.filter((s) => s.id !== id).map((s) => ({ id: s.id, name: resolve(s, date).name }))
   const places = world.places.filter((p) => existsAt(p, date) && resolve(p, date).stateId === id)
@@ -464,6 +469,11 @@ function StateCardBody({ id }: { id: string }) {
                 {of.ford && <FordsView data={of.ford} onOpen={open} />}
                 {of.willow && <WillowView data={of.willow} onOpen={open} />}
                 {of.bans && <BansView data={of.bans} onOpen={open} />}
+                {of.knots && <KnotsView data={of.knots} onOpen={open} />}
+                {of.smoke && <SmokeView data={of.smoke} onOpen={open} />}
+                {of.ice && <IceView data={of.ice} onOpen={open} />}
+                {of.tower && <ExamView data={of.tower} onOpen={open} />}
+                {of.descent && <WellView data={of.descent} onOpen={open} />}
                 {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
               </section>
             )

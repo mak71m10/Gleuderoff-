@@ -33,6 +33,11 @@ import redaniaLore from './lore/redania.mjs'
 import pavilionLore from './lore/pavilion.mjs'
 import tavarvaitLore from './lore/tavarvait.mjs'
 import feinokoLore from './lore/feinoko.mjs'
+import olekohtLore from './lore/olekoht.mjs'
+import uunaashLore from './lore/uunaash.mjs'
+import greninswordLore from './lore/greninsword.mjs'
+import ntowerLore from './lore/ntower.mjs'
+import bezdnaLore from './lore/bezdna.mjs'
 import familiesLore from './lore/families.mjs'
 import geo from './lore/geo.mjs'
 
@@ -81,7 +86,12 @@ const E = (id, kind, name, f = {}) => {
       ...(f.pledge ? { pledge: f.pledge } : {}),
       ...(f.reserve ? { reserve: f.reserve } : {}),
       ...(f.star ? { star: f.star } : {}),
-      ...(f.bans ? { bans: f.bans } : {})
+      ...(f.bans ? { bans: f.bans } : {}),
+      ...(f.knots ? { knots: f.knots } : {}),
+      ...(f.smoke ? { smoke: f.smoke } : {}),
+      ...(f.ice ? { ice: f.ice } : {}),
+      ...(f.tower ? { tower: f.tower } : {}),
+      ...(f.descent ? { descent: f.descent } : {})
     },
     history: [],
     from: f.from ?? null,
@@ -213,6 +223,11 @@ redaniaLore({ E, Y, world })
 pavilionLore({ E, Y, world })
 tavarvaitLore({ E, Y, world })
 feinokoLore({ E, Y, world })
+olekohtLore({ E, Y, world })
+uunaashLore({ E, Y, world })
+greninswordLore({ E, Y, world })
+ntowerLore({ E, Y, world })
+bezdnaLore({ E, Y, world })
 familiesLore({ E, Y, entries })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })

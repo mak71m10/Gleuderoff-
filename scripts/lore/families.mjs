@@ -14,6 +14,11 @@ import * as RDF from './families/rd.mjs'
 import * as PVF from './families/pv.mjs'
 import * as TWF from './families/tw.mjs'
 import * as FNF from './families/fn.mjs'
+import * as OL from './families/ol.mjs'
+import * as UU from './families/uu.mjs'
+import * as GS from './families/gs.mjs'
+import * as NT from './families/nt.mjs'
+import * as BZ from './families/bz.mjs'
 import * as MISC from './families/misc.mjs'
 
 const HU = 'Человек (имперец)'
@@ -44,7 +49,7 @@ export function look(g, age, role, key) {
 export default function families({ E, Y, entries }) {
   const idOf = (ref) => (ref == null ? null : ref.startsWith('@') ? ref.slice(1) : `fm-${ref}`)
   const pass = []
-  for (const m of [TM, GF, CR, CH, LY, EL, SV, HM, KJ, RDF, PVF, TWF, FNF]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
+  for (const m of [TM, GF, CR, CH, LY, EL, SV, HM, KJ, RDF, PVF, TWF, FNF, OL, UU, GS, NT, BZ]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
   for (const m of MISC.MODULES) pass.push({ tag: m.tag, race: m.race ?? HU, specs: m.specs })
 
   let created = 0, patched = 0

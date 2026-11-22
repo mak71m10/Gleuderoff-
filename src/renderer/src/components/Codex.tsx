@@ -31,6 +31,11 @@ import { CartView } from './Cart'
 import { FordsView } from './Fords'
 import { WillowView } from './Willow'
 import { BansView } from './Bans'
+import { KnotsView } from './Knots'
+import { SmokeView } from './Smoke'
+import { IceView } from './Ice'
+import { ExamView } from './Exam'
+import { WellView } from './Well'
 import { StavkaView } from './Stavka'
 import { AdvisorsGrid } from './Advisors'
 import { renderBody } from './prose'
@@ -360,6 +365,11 @@ function EntryEditor({ id }: { id: string }) {
                 {f.ford && <FordsView data={f.ford} onOpen={goto} />}
                 {f.willow && <WillowView data={f.willow} onOpen={goto} />}
                 {f.bans && <BansView data={f.bans} onOpen={goto} />}
+                {f.knots && <KnotsView data={f.knots} onOpen={goto} />}
+                {f.smoke && <SmokeView data={f.smoke} onOpen={goto} />}
+                {f.ice && <IceView data={f.ice} onOpen={goto} />}
+                {f.tower && <ExamView data={f.tower} onOpen={goto} />}
+                {f.descent && <WellView data={f.descent} onOpen={goto} />}
           {f.advisors && f.advisors.length > 0 && <AdvisorsGrid advisors={f.advisors} onOpen={goto} />}
           {entry.kind === 'dynasty' && <DynastyTree dynastyId={id} onOpen={goto} />}
           {entry.kind === 'dynasty' && f.council && <SuccessionCouncilView council={f.council} onOpen={goto} rules={renderBody(f.council.rules, world, goto)} />}
