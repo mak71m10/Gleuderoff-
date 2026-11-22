@@ -97,6 +97,11 @@ const TABLES: Record<string, W> = {
   kogal: { imperials: 72, gladry: 18, nords: 3, roma: 3, dwarves: 1.5, gnomes: 1.5, 'wood-elves': 1 },
   // Протекторат Лирия: лирийцы и имперцы, немного нордов и пришлых; полудворфская кровь в рудничных домах
   lyria: { imperials: 50, gladry: 36, dwarves: 3, nords: 3, roma: 3, 'wood-elves': 2, gnomes: 1.5, goliaths: 1.5 },
+  kagia: { imperials: 88, roma: 3, nords: 2, dwarves: 2, 'wood-elves': 2, gnomes: 1, goliaths: 1, gladry: 1 },
+  redan: { imperials: 95, roma: 2, nords: 2, dwarves: 0.5, gnomes: 0.5 },
+  pavil: { imperials: 90, roma: 4, nords: 2, gladry: 2, 'wood-elves': 1, gnomes: 1 },
+  tavar: { 'wood-elves': 92, imperials: 5, gnomes: 1, dwarves: 1, roma: 1 },
+  momit: { momits: 94, imperials: 4, dwarves: 1, gnomes: 1 },
   // Королевство Темерия: беглецы Империи — имперцы, лесные гладры и нерегулярные пришельцы
   temer: { imperials: 84, gladry: 5, nords: 3, dwarves: 2, gnomes: 1.5, 'wood-elves': 1.5, roma: 1, dalorians: 1 },
   // Княжества Гарефорда: горные имперцы, немного дварфов, гномов, нордов и гладров

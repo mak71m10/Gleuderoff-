@@ -22,6 +22,11 @@ import { LanternView } from './Lantern'
 import { HostagesView } from './Hostages'
 import { ThresholdView } from './Threshold'
 import { WallView } from './Wall'
+import { AuctionView } from './Auction'
+import { RidgeView } from './Ridge'
+import { PledgeView } from './Pledge'
+import { ReserveView } from './Reserve'
+import { StarView } from './Star'
 import { CartView } from './Cart'
 import { FordsView } from './Fords'
 import { WillowView } from './Willow'
@@ -346,6 +351,11 @@ function EntryEditor({ id }: { id: string }) {
                 {f.hostages && <HostagesView data={f.hostages} onOpen={goto} />}
                 {f.threshold && <ThresholdView data={f.threshold} onOpen={goto} />}
                 {f.wall && <WallView data={f.wall} onOpen={goto} />}
+                {f.auction && <AuctionView data={f.auction} onOpen={goto} />}
+                {f.ridge && <RidgeView data={f.ridge} onOpen={goto} />}
+                {f.pledge && <PledgeView data={f.pledge} onOpen={goto} />}
+                {f.reserve && <ReserveView data={f.reserve} onOpen={goto} />}
+                {f.star && <StarView data={f.star} onOpen={goto} />}
                 {f.cart && <CartView data={f.cart} onOpen={goto} />}
                 {f.ford && <FordsView data={f.ford} onOpen={goto} />}
                 {f.willow && <WillowView data={f.willow} onOpen={goto} />}
