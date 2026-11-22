@@ -9,6 +9,8 @@ import * as LY from './families/ly.mjs'
 import * as EL from './families/el.mjs'
 import * as SV from './families/sv.mjs'
 import * as HM from './families/hm.mjs'
+import * as BT from './families/bt.mjs'
+import * as MN from './families/mn.mjs'
 import * as MISC from './families/misc.mjs'
 
 const HU = 'Человек (имперец)'
@@ -39,7 +41,7 @@ export function look(g, age, role, key) {
 export default function families({ E, Y, entries }) {
   const idOf = (ref) => (ref == null ? null : ref.startsWith('@') ? ref.slice(1) : `fm-${ref}`)
   const pass = []
-  for (const m of [TM, GF, CR, CH, LY, EL, SV, HM]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
+  for (const m of [TM, GF, CR, CH, LY, EL, SV, HM, BT, MN]) pass.push({ tag: m.TAG, race: m.RACE ?? HU, specs: m.SPECS })
   for (const m of MISC.MODULES) pass.push({ tag: m.tag, race: m.race ?? HU, specs: m.specs })
 
   let created = 0, patched = 0

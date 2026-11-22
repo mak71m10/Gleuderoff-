@@ -28,6 +28,13 @@ import kulagonLore from './lore/kulagon.mjs'
 import elfbornLore from './lore/elfborn.mjs'
 import silvlandLore from './lore/silvland.mjs'
 import harnmarkLore from './lore/harnmark.mjs'
+import boletariaLore from './lore/boletaria.mjs'
+import magnoliaLore from './lore/magnolia.mjs'
+import kreccakaLore from './lore/kreccaka.mjs'
+import reichLore from './lore/reich.mjs'
+import obliviumLore from './lore/oblivium.mjs'
+import kayaLore from './lore/kaya.mjs'
+import larocheLore from './lore/laroche.mjs'
 import familiesLore from './lore/families.mjs'
 import geo from './lore/geo.mjs'
 
@@ -67,6 +74,13 @@ const E = (id, kind, name, f = {}) => {
       ...(f.lantern ? { lantern: f.lantern } : {}),
       ...(f.hostages ? { hostages: f.hostages } : {}),
       ...(f.threshold ? { threshold: f.threshold } : {}),
+      ...(f.ash ? { ash: f.ash } : {}),
+      ...(f.chalice ? { chalice: f.chalice } : {}),
+      ...(f.belt ? { belt: f.belt } : {}),
+      ...(f.sentence ? { sentence: f.sentence } : {}),
+      ...(f.silence ? { silence: f.silence } : {}),
+      ...(f.ledger ? { ledger: f.ledger } : {}),
+      ...(f.keys ? { keys: f.keys } : {}),
       ...(f.wall ? { wall: f.wall } : {}),
       ...(f.cart ? { cart: f.cart } : {}),
       ...(f.ford ? { ford: f.ford } : {}),
@@ -174,7 +188,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 42
+world.version = 61
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })
@@ -198,6 +212,13 @@ kulagonLore({ E, Y, world })
 elfbornLore({ E, Y, world })
 silvlandLore({ E, Y, world })
 harnmarkLore({ E, Y, world })
+boletariaLore({ E, Y, world })
+magnoliaLore({ E, Y, world })
+kreccakaLore({ E, Y, world })
+reichLore({ E, Y, world })
+obliviumLore({ E, Y, world })
+kayaLore({ E, Y, world })
+larocheLore({ E, Y, world })
 familiesLore({ E, Y, entries })
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
 geo({ world })

@@ -842,6 +842,66 @@ async function migrateWorld(dir: string): Promise<void> {
     const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))
     user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => isOurs(a) && !armyIds.has(a.id)))]
   }
+  // v55–v61: страны юга центра Лоры (волна 3) — общий перенос страны из стартового мира по имени и префиксу id
+  const moveCountry = (name: string, pre: string): void => {
+    const ds = (def.states ?? []).find((s: Json) => s.base.name === name)
+    const us = ds && user.states.find((s: Json) => s.id === ds.id)
+    if (us) { us.base = { ...us.base, ...structuredClone(ds.base) }; us.factions = structuredClone(ds.factions); us.history = structuredClone(ds.history ?? []) }
+    const isNew = (e: Json) => String(e.id).startsWith(`lore-${pre}-`) || String(e.id).startsWith('lore-book-')
+    const fresh = (def.entries ?? []).filter(isNew)
+    const ids = new Set(fresh.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !ids.has(e.id)), ...structuredClone(fresh)]
+    const ourMaps = new Set<string>()
+    const defProvs = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    const areaNames = new Map<string, string>((def.adminRegions ?? []).map((a: Json) => [a.id, a.name]))
+    for (const p of user.provinces ?? []) {
+      const dp = defProvs.get(p.id)
+      if (dp && ds && dp.owners?.at(-1)?.[1] === ds.id) {
+        p.name = dp.name; p.settlement = structuredClone(dp.settlement ?? null); p.description = dp.description
+        if (dp.cityMapId) { p.cityMapId = dp.cityMapId; ourMaps.add(dp.cityMapId) }
+        const ua = (user.adminRegions ?? []).find((a: Json) => a.id === p.areaId)
+        if (ua && areaNames.has(ua.id)) ua.name = areaNames.get(ua.id)
+      }
+    }
+    const cityMaps = (def.maps ?? []).filter((m: Json) => ourMaps.has(m.id) && !user.maps.some((u: Json) => u.id === m.id))
+    user.maps = [...user.maps, ...structuredClone(cityMaps)]
+    const isOurs = (x: Json) => String(x.id).startsWith(`lore-${pre}-`) || String(x.id).startsWith(`lore-army-${pre}-`) || ourMaps.has(x.mapId)
+    const placeIds = new Set((user.places ?? []).map((p: Json) => p.id))
+    user.places = [...(user.places ?? []), ...structuredClone((def.places ?? []).filter((p: Json) => isOurs(p) && !placeIds.has(p.id)))]
+    const armyIds = new Set((user.armies ?? []).map((a: Json) => a.id))
+    user.armies = [...(user.armies ?? []), ...structuredClone((def.armies ?? []).filter((a: Json) => isOurs(a) && !armyIds.has(a.id)))]
+  }
+  if ((user.version ?? 1) < 55) {
+    // v55: Королевство Болетария — Свод Предков и Пепельный суд (Галерея Предков), города Бельфор, Балфиера, Бал-Фойен, стиль bolet
+    moveCountry('Королевство Болетария', 'bt')
+  }
+  if ((user.version ?? 1) < 56) {
+    // v56: Магнолия — восьмушки крови и Чаша Наллы, Эрисан, Альен, Гливин, Фастинат, стиль mgn и Шпиль Наллы
+    moveCountry('Магнолия', 'mn')
+  }
+  if ((user.version ?? 1) < 57) {
+    // v57: Династия Креццака — Пояс Старшей Матери, Терем Матерей в Фальергарде, стиль krec
+    moveCountry('Династия Креццака', 'kc')
+  }
+  if ((user.version ?? 1) < 58) {
+    // v58: Рейх — Срок рода и Пустой трон, Сигузмун, Фила, Сумаркат, Сумаркад, стиль reich
+    moveCountry('Рейх', 'rh')
+  }
+  if ((user.version ?? 1) < 59) {
+    // v59: Обливиум Каэлорум — Капитул молчащих (Орден Безмолвного Неба, Аргенту), Пиеция; записка «Ордена церковных земель»
+    moveCountry('Обливиум Каэлорум', 'obl')
+  }
+  if ((user.version ?? 1) < 60) {
+    // v60: Семья Каяя — Сто Долей и Ночь Карт, Империум и Большой банк; глава дома теперь Геральд (канон автора)
+    moveCountry('Семья Каяя', 'ky')
+    const kay = (def.entries ?? []).filter((e: Json) => e.id === 'lore-kaya' || e.id === 'lore-kaya-head')
+    const kids = new Set(kay.map((e: Json) => e.id))
+    user.entries = [...user.entries.filter((e: Json) => !kids.has(e.id)), ...structuredClone(kay)]
+  }
+  if ((user.version ?? 1) < 61) {
+    // v61: Ла Роше — Сёстры Лозы (Аматерасу) под двумя ключами, Тореццо и Дом Лозы
+    moveCountry('Ла Роше', 'lrs')
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

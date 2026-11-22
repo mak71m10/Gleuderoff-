@@ -19,6 +19,13 @@ import { FleetView } from './Fleet'
 import { LanternView } from './Lantern'
 import { HostagesView } from './Hostages'
 import { ThresholdView } from './Threshold'
+import { AshView } from './Ash'
+import { ChaliceView } from './Chalice'
+import { BeltView } from './Belt'
+import { SentenceView } from './Sentence'
+import { SilenceView } from './Silence'
+import { LedgerView } from './Ledger'
+import { KeysView } from './Keys'
 import { WallView } from './Wall'
 import { CartView } from './Cart'
 import { FordsView } from './Fords'
@@ -102,7 +109,7 @@ function StateCardBody({ id }: { id: string }) {
   const dynastyEntry = world.entries.find((e) => e.id === f.dynastyId)
   const dynastyCouncil = dynastyEntry ? resolve(dynastyEntry, date).council : undefined
   // органы власти без парламента (Сабельная ставка, Совет Десяти графа): организации этой страны с пометкой «Государственный орган»
-  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.vault || e.base.heights || e.base.urn || e.base.fleet || e.base.lantern || e.base.hostages || e.base.threshold || e.base.wall || e.base.cart || e.base.ford || e.base.willow || e.base.circle || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
+  const organs = world.entries.filter((e) => e.kind === 'organization' && existsAt(e, date) && e.base.tags.includes(f.name) && !legislatures.some((l) => l.entryId === e.id) && (e.base.stavka || e.base.ting || e.base.brood || e.base.vault || e.base.heights || e.base.urn || e.base.fleet || e.base.lantern || e.base.hostages || e.base.threshold || e.base.wall || e.base.cart || e.base.ford || e.base.willow || e.base.ash || e.base.chalice || e.base.belt || e.base.sentence || e.base.silence || e.base.ledger || e.base.keys || e.base.circle || e.base.advisors?.length || e.base.props?.type === 'Государственный орган'))
   const religions = world.entries.filter((e) => e.kind === 'religion').map((e) => ({ id: e.id, name: e.base.name }))
   const otherStates = world.states.filter((s) => s.id !== id).map((s) => ({ id: s.id, name: resolve(s, date).name }))
   const places = world.places.filter((p) => existsAt(p, date) && resolve(p, date).stateId === id)
@@ -354,6 +361,13 @@ function StateCardBody({ id }: { id: string }) {
                 {of.cart && <CartView data={of.cart} onOpen={open} />}
                 {of.ford && <FordsView data={of.ford} onOpen={open} />}
                 {of.willow && <WillowView data={of.willow} onOpen={open} />}
+                {of.ash && <AshView data={of.ash} onOpen={open} />}
+                {of.chalice && <ChaliceView data={of.chalice} onOpen={open} />}
+                {of.belt && <BeltView data={of.belt} onOpen={open} />}
+                {of.sentence && <SentenceView data={of.sentence} onOpen={open} />}
+                {of.silence && <SilenceView data={of.silence} onOpen={open} />}
+                {of.ledger && <LedgerView data={of.ledger} onOpen={open} />}
+                {of.keys && <KeysView data={of.keys} onOpen={open} />}
                 {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
               </section>
             )
@@ -448,6 +462,13 @@ function StateCardBody({ id }: { id: string }) {
                 {of.cart && <CartView data={of.cart} onOpen={open} />}
                 {of.ford && <FordsView data={of.ford} onOpen={open} />}
                 {of.willow && <WillowView data={of.willow} onOpen={open} />}
+                {of.ash && <AshView data={of.ash} onOpen={open} />}
+                {of.chalice && <ChaliceView data={of.chalice} onOpen={open} />}
+                {of.belt && <BeltView data={of.belt} onOpen={open} />}
+                {of.sentence && <SentenceView data={of.sentence} onOpen={open} />}
+                {of.silence && <SilenceView data={of.silence} onOpen={open} />}
+                {of.ledger && <LedgerView data={of.ledger} onOpen={open} />}
+                {of.keys && <KeysView data={of.keys} onOpen={open} />}
                 {of.circle && <CircleView data={of.circle} onOpen={open} />}
                 {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
               </section>

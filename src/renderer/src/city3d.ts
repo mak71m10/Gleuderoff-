@@ -75,6 +75,20 @@ export const STYLES: Record<string, Style> = {
   // Высокогорное Княжество: альпийские дома — белёный камень внизу, тёмное дерево наверху, широкие крыши из тёмного гонта;
   // kranz — то же на каменной платформе вокруг вершины (Венец), alpine — замки и городки людей ниже
   // Княжества Гарефорда: горный фахверк — белёная штукатурка, тёмный дуб, крутые сланцевые и красно-бурые крыши, медно-зелёные шпили
+  // Королевство Болетария: тёмный серый камень, очень крутые чёрные сланцевые крыши, стрельчатые фасады, оранжевые и синие ставни
+  // Магнолия: светлый пепельно-сиреневый камень, чёрно-лиловые крутые крыши, лиловые ставни, ночью окна светятся
+  // Династия Креццака: тёмные срубы, высокие шатровые крыши, красная и охристая роспись ставен
+  // Рейх: ободранный имперский камень, серые и бурые крыши, тёмные окна (света почти нет), выжженная трава
+  // Обливиум: белый известняк, сланцево-синие крыши, почти без света ночью
+  oblv: { plaster: ['#e4e2da', '#d8d6ce', '#eceae2', '#cfccc2', '#e0ded6'], roof: ['#2e3a52', '#283246', '#34405a', '#3a4458', '#2a344a'], timber: '#3a3a40', stone: '#b8b6ae', wall: '#c8c6be', shutter: ['#2e3a52', '#4a4a52'], pitch: 1.1, framed: false, floors: 1, grass: '#5e7a4a', grass2: '#6a8652', dirt: '#8a8270', pave: '#c0beb4', lit: 0.12, conifer: 0.7, tower: '#c8c8e8' },
+  // Каяя: белый мрамор и охра, золотисто-терракотовые крыши, богатые ставни
+  kaya: { plaster: ['#f2ece0', '#ece2cc', '#f6f0e4', '#e2d4b8', '#efe6d2'], roof: ['#b8763a', '#c8863e', '#a8662e', '#c9a45c', '#b06a34'], timber: '#5a4024', stone: '#d8d0c0', wall: '#e0d8c8', shutter: ['#1a1a1a', '#2a4a6a', '#6a2a1a'], pitch: 0.55, framed: false, floors: 2, grass: '#6e8a4a', grass2: '#7a9450', dirt: '#a89a78', pave: '#d8d2c4', lit: 0.6, conifer: 0.2, tower: '#c9a45c' },
+  // Ла Роше: пастельные розовые и охристые стены, терракотовая черепица, зелёные ставни
+  lrsv: { plaster: ['#e8c8b8', '#ecd8a8', '#f0e0c8', '#d8a890', '#e8d0b0'], roof: ['#b85a3a', '#c86a44', '#a84e32', '#c87a50', '#b86040'], timber: '#5a3a24', stone: '#c8b8a0', wall: '#d8c8b0', shutter: ['#3a6a4a', '#2a5a7a', '#6a8a3a'], pitch: 0.5, framed: false, floors: 1, grass: '#7a8a4a', grass2: '#869452', dirt: '#a8946a', pave: '#d0c4ac', lit: 0.5, conifer: 0.1, tower: '#b85a3a' },
+  reich: { plaster: ['#8a8278', '#7a736a', '#6e685f', '#948c80', '#5f5a52'], roof: ['#3a3430', '#4a3e34', '#2e2a28', '#5a4a3a', '#403a36'], timber: '#2a2018', stone: '#6a645c', wall: '#7a746a', shutter: ['#2a2420', '#3a2e24'], pitch: 1.2, framed: false, floors: 1, grass: '#6a6a48', grass2: '#74704c', dirt: '#7a6a52', pave: '#6e6658', lit: 0.12, conifer: 0.9, tower: '#3a3430' },
+  krec: { plaster: ['#7a5a3a', '#6a4c30', '#86643e', '#5e4228', '#735436'], roof: ['#4a3a2a', '#5a2a1e', '#3e3226', '#6a3a24', '#4a4030'], timber: '#3a2616', stone: '#7a7266', wall: '#6a5a46', shutter: ['#c8503a', '#d8a040', '#3a6a3a'], pitch: 1.6, framed: false, floors: 1, grass: '#557a3e', grass2: '#608648', dirt: '#7a6648', pave: '#8a7a60', lit: 0.4, conifer: 0.75, tower: '#5a2a1e' },
+  mgn: { plaster: ['#c8c0d0', '#bcb2c6', '#d4ccdc', '#b0a6ba', '#c4bccc'], roof: ['#2a1e38', '#34244a', '#221a2e', '#3a2a50', '#2e2240'], timber: '#2a2030', stone: '#8a8294', wall: '#9a92a6', shutter: ['#6a3a8a', '#3a2a5a', '#8a5aa8'], pitch: 1.5, framed: false, floors: 1, grass: '#5a7a4a', grass2: '#668652', dirt: '#8a7c6a', pave: '#a8a0b0', lit: 0.55, conifer: 0.4, tower: '#3a2a50' },
+  bolet: { plaster: ['#6e6a62', '#625e58', '#77726a', '#5a5650', '#6a665e'], roof: ['#2a2a30', '#232328', '#30303a', '#2e2a2c', '#26282e'], timber: '#1e1812', stone: '#5e5a54', wall: '#6e6a62', shutter: ['#c86a24', '#2a4a8a', '#3a2a22'], pitch: 1.75, framed: false, floors: 2, grass: '#56703e', grass2: '#607a44', dirt: '#7a6c54', pave: '#6a665e', lit: 0.4, conifer: 0.85, tower: '#2a2a30' },
   harn: { plaster: ['#efe6d2', '#e4d6bc', '#f2eadb', '#d9c9ae', '#e8dcc4'], roof: ['#7a2a26', '#6a2622', '#4a4650', '#5a2a22', '#8a3a2e'], timber: '#2a1c12', stone: '#8a867c', wall: '#a29c90', shutter: ['#c03538', '#2a4a7a', '#2f5a3a'], pitch: 1.1, framed: true, floors: 2, grass: '#6a8a48', grass2: '#789850', dirt: '#988666', pave: '#9c9688', lit: 0.45, conifer: 0.7, tower: '#c03538' },
   garef: { plaster: ['#f1ece0', '#e8dfcc', '#f4efe4', '#ddd3bf', '#ece4d2'], roof: ['#4a4650', '#3e3a44', '#7a3a2a', '#5a4a40', '#6a3226'], timber: '#2f2014', stone: '#8c8a82', wall: '#a6a298', shutter: ['#2f5a3a', '#7a2a22', '#c8a040'], pitch: 1.05, framed: true, floors: 1, grass: '#6a8c4a', grass2: '#76984f', dirt: '#9a8a68', pave: '#9e988a', lit: 0.45, conifer: 0.8, tower: '#4f8a74' },
   // Королевство Темерия: средневековый имперский фахверк — белёные стены на каменных низах, зелёные и тёмно-красные крыши
@@ -2407,7 +2421,7 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
   const vendors: { x: number; z: number; a: number }[] = []
   const AWN = S.style === 'styria' ? ['#2a2230', '#3a2c3a', '#40303a'] : S.style === 'viking' ? ['#6a5440', '#7a6650', '#5a4634', '#8a7a62'] : ['#b03a2e', '#d9b44a', '#3f6a8a', '#5d8a4a']
   // Гарефорд: Светочная башня всегда встаёт на самую большую площадь
-  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag' || S.style === 'elf' || S.style === 'silva' || S.style === 'harn') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
+  const garefSq = (S.style === 'garef' || S.style === 'temer' || S.style === 'lyria' || S.style === 'kogal' || S.style === 'kulag' || S.style === 'elf' || S.style === 'silva' || S.style === 'harn' || S.style === 'bolet' || S.style === 'mgn' || S.style === 'krec' || S.style === 'reich' || S.style === 'oblv' || S.style === 'kaya' || S.style === 'lrsv') && squares.length ? squares.reduce((bi, r, i) => (Math.abs(areaOf(r)) > Math.abs(areaOf(squares[bi])) ? i : bi), 0) : -1
   squares.forEach((r, si) => {
     const [cx, cz] = centerOf(r), area = Math.abs(areaOf(r)), y = heightAt(cx, cz), ch = chunkAt(cx, cz)
     if (area > 500 || si === garefSq) {
@@ -2543,6 +2557,150 @@ export function buildCity(plan: CityPlan, seedName: string, opts: { mobile: bool
         // скамьи приюта вокруг
         for (let k = 0; k < 6; k++) { const a = si + (k / 6) * 6.283, bx = cx + Math.cos(a) * 11, bz = cz + Math.sin(a) * 11; ch.solid.box(bx, y, bz, 3, 0.55, 0.8, st.timber, a + Math.PI / 2) }
         fillLine([[cx, cz], [cx + 0.1, cz]], 9, N + 2 + si)
+      } else if (si === garefSq && S.style === 'oblv') {
+        // Звёздная башня Обливиума: круглая белая башня-обсерватория с раскрытым куполом и серебряной звездой, у подножия — немая звонница
+        // (колокол без языка) и кольцо надгробий
+        ch.solid.cyl(cx, y, cz, 4.2, 1.0, 16, mixHex(st.stone, '#000', 0.1), 4.2)
+        ch.solid.cyl(cx, y + 1.0, cz, 3.4, 15, 16, st.plaster[0], 3.1)
+        for (const hy of [5, 10]) ch.solid.cyl(cx, y + 1 + hy, cz, 3.45, 0.3, 16, st.stone, 3.4)
+        ch.roof.cyl(cx, y + 16, cz, 3.3, 2.6, 16, st.roof[0], 1.2, false)
+        ch.solid.box(cx, y + 17.2, cz, 0.9, 1.6, 3.2, st.roof[0], si)
+        ch.solid.cyl(cx + 0.3, y + 18.6, cz, 0.12, 2.4, 6, '#c8c8e8')
+        ch.glow.box(cx + 0.3, y + 21.2, cz, 0.9, 0.9, 0.15, '#ffffff', si + Math.PI / 4)
+        for (let k = 0; k < 6; k++) { const a = si + k * 1.05; ch.glow.box(cx + Math.cos(a) * 3.15, y + 12.5, cz + Math.sin(a) * 3.15, 0.08, 0.9, 0.5, '#ffffff', a) }
+        const bx = cx + 7 * Math.cos(si), bz = cz + 7 * Math.sin(si)
+        for (const sd of [-1, 1]) ch.solid.box(bx + sd * 1.2 * Math.sin(si), y, bz - sd * 1.2 * Math.cos(si), 0.4, 4.4, 0.4, st.stone, si)
+        ch.solid.box(bx, y + 4.4, bz, 0.6, 0.4, 3.0, st.stone, si)
+        ch.solid.cyl(bx, y + 2.8, bz, 0.7, 1.4, 10, '#8a6a3a', 0.4)
+        const ring = opts.mobile ? 6 : 12
+        for (let k = 0; k < ring; k++) { const a = si + (k / ring) * 6.283 + 0.3, px = cx + Math.cos(a) * 10.5, pz = cz + Math.sin(a) * 10.5; ch.solid.box(px, y, pz, 0.9, 1.2, 0.25, mixHex(st.stone, '#fff', 0.2), a + Math.PI / 2) }
+        fillLine([[cx, cz], [cx + 0.1, cz]], 12, N + 2 + si)
+      } else if (si === garefSq && S.style === 'kaya') {
+        // Большой банк Каяя: широкий мраморный зал на ступенях, колоннада по фасаду, барабан с окнами и огромный золотой купол с фонарём
+        const w = 22, d = 16, h = 8
+        ch.solid.box(cx, y, cz, w + 4, 0.5, d + 4, mixHex(st.stone, '#fff', 0.15), si)
+        ch.solid.box(cx, y + 0.5, cz, w + 2, 0.5, d + 2, mixHex(st.stone, '#fff', 0.1), si)
+        ch.solid.box(cx, y + 1.0, cz, w, h, d, st.plaster[0], si)
+        ch.solid.box(cx, y + 1.0 + h, cz, w + 0.8, 0.8, d + 0.8, st.stone, si)
+        const nx = Math.cos(si), nz = Math.sin(si)
+        for (let k = -4; k <= 4; k++) ch.solid.cyl(cx + nx * (d / 2 + 1.2) - nz * k * 2.4, y + 1.0, cz + nz * (d / 2 + 1.2) + nx * k * 2.4, 0.45, h, 10, '#f6f0e4')
+        ch.solid.box(cx + nx * (d / 2 + 1.2), y + 1.0 + h, cz + nz * (d / 2 + 1.2), 2.2, 0.8, w + 0.6, st.stone, si + Math.PI / 2)
+        ch.solid.cyl(cx, y + 1.8 + h, cz, 6.0, 3.2, 20, st.plaster[1])
+        for (let k = 0; k < 10; k++) { const a = si + (k / 10) * 6.283; ch.glow.box(cx + Math.cos(a) * 6.02, y + 2.8 + h, cz + Math.sin(a) * 6.02, 0.06, 1.5, 0.9, '#ffffff', a + Math.PI / 2) }
+        ch.solid.cyl(cx, y + 5.0 + h, cz, 6.2, 5.8, 20, '#d8b050', 0.8)
+        ch.glow.cyl(cx, y + 10.6 + h, cz, 0.9, 1.4, 8, '#ffffff', 0.9)
+        ch.solid.cyl(cx, y + 12.0 + h, cz, 0.3, 1.2, 6, '#d8b050', 0.05)
+        fillLine([[cx - nz * w / 2, cz + nx * w / 2], [cx + nz * w / 2, cz - nx * w / 2]], d + 4, N + 2 + si)
+      } else if (si === garefSq && S.style === 'lrsv') {
+        // Дом Лозы Ла Роше: белая часовня Аматерасу с колоколенкой-аркой, виноградная пергола на столбах и два бронзовых ключа на постаментах
+        ch.solid.box(cx, y, cz, 6, 4.6, 9, '#f4efe4', si)
+        ch.roof.cyl(cx, y + 4.6, cz, 5.6, 1.6, 4, st.roof[0], 0, false, si + Math.PI / 4)
+        const nx = Math.cos(si), nz = Math.sin(si)
+        const bx = cx - nz * 4.8, bz = cz + nx * 4.8
+        for (const sd of [-1, 1]) ch.solid.box(bx + nx * sd * 1.2, y + 4.6, bz + nz * sd * 1.2, 0.5, 3.2, 0.5, '#f4efe4', si)
+        ch.solid.box(bx, y + 7.8, bz, 3.0, 0.5, 0.8, '#f4efe4', si)
+        ch.solid.cyl(bx, y + 6.4, bz, 0.5, 1.0, 8, '#8a6a3a', 0.3)
+        ch.glow.box(cx + nx * 3.02, y + 1.2, cz + nz * 3.02, 0.06, 2.2, 1.4, '#ffffff', si)
+        const pg = opts.mobile ? 3 : 5
+        for (let k = 0; k < pg; k++) {
+          const off = (k - (pg - 1) / 2) * 2.6, px = cx + nx * 7, pz = cz + nz * 7
+          for (const sd of [-1, 1]) ch.solid.box(px + nx * sd * 1.6 - nz * off, y, pz + nz * sd * 1.6 + nx * off, 0.25, 2.8, 0.25, st.timber, si)
+          ch.solid.box(px - nz * off, y + 2.8, pz + nx * off, 3.6, 0.35, 2.4, '#5a8a3a', si)
+          ch.solid.box(px - nz * off + nx * 1.4, y + 2.3, pz + nx * off + nz * 1.4, 0.4, 0.6, 0.4, '#6a2a5a', si)
+        }
+        for (const sd of [-1, 1]) {
+          const kx = cx - nz * sd * 6.5 + nx * 3, kz = cz + nx * sd * 6.5 + nz * 3
+          ch.solid.box(kx, y, kz, 1.2, 1.2, 1.2, mixHex(st.stone, '#000', 0.1), si)
+          ch.solid.cyl(kx, y + 1.2, kz, 0.15, 2.2, 6, sd < 0 ? '#c8503a' : '#c9a45c')
+          ch.solid.cyl(kx, y + 3.8, kz, 0.6, 0.25, 10, sd < 0 ? '#c8503a' : '#c9a45c', 0.6)
+        }
+        fillLine([[cx, cz], [cx + nx * 7, cz + nz * 7]], 10, N + 2 + si)
+      } else if (si === garefSq && S.style === 'reich') {
+        // Пустой трон Рейха: каменный трон коменданта на ступенчатом помосте под открытым небом, вокруг — общий котёл на треноге,
+        // кольцо кольев с черепами и шкурами и обломки сожжённой комендатуры; на сиденье — добыча
+        ch.solid.box(cx, y, cz, 9, 0.6, 9, mixHex(st.stone, '#000', 0.2), si)
+        ch.solid.box(cx, y + 0.6, cz, 6.5, 0.6, 6.5, mixHex(st.stone, '#000', 0.1), si)
+        ch.solid.box(cx, y + 1.2, cz, 3.2, 1.2, 2.6, st.stone, si)
+        ch.solid.box(cx - 1.2 * Math.sin(si), y + 2.4, cz + 1.2 * Math.cos(si), 3.2, 4.2, 0.7, st.stone, si)
+        for (const sd of [-1, 1]) ch.solid.box(cx + sd * 1.5 * Math.cos(si), y + 2.4, cz + sd * 1.5 * Math.sin(si), 0.5, 1.4, 2.6, st.stone, si)
+        ch.solid.box(cx, y + 2.4, cz, 1.2, 0.5, 0.9, '#6a3a24', si)
+        const pot = [cx + 6 * Math.cos(si + 1.2), cz + 6 * Math.sin(si + 1.2)]
+        ch.solid.cyl(pot[0], y + 0.4, pot[1], 1.5, 1.3, 10, '#2a2420', 1.2)
+        ch.glow.cyl(pot[0], y, pot[1], 0.9, 0.4, 6, '#ffffff', 0.2)
+        for (let k = 0; k < 3; k++) { const a = si + k * 2.09; ch.solid.box(pot[0] + Math.cos(a) * 1.4, y, pot[1] + Math.sin(a) * 1.4, 0.15, 2.8, 0.15, '#2a2018', a) }
+        const ring = opts.mobile ? 6 : 12
+        for (let k = 0; k < ring; k++) {
+          const a = si + (k / ring) * 6.283, px = cx + Math.cos(a) * 10, pz = cz + Math.sin(a) * 10
+          ch.solid.cyl(px, y, pz, 0.14, 3.2, 5, '#3a2a1e', 0.08)
+          ch.solid.box(px, y + 3.2, pz, 0.5, 0.45, 0.5, '#d8ccb0', a)
+          if (k % 3 === 0) ch.solid.box(px + 0.3, y + 1.6, pz, 0.05, 1.2, 0.9, '#7a5a3a', a)
+        }
+        for (let k = 0; k < 4; k++) { const a = si + 0.6 + k * 0.4; ch.solid.box(cx - Math.cos(a) * 7, y, cz - Math.sin(a) * 7, 2.2, 0.8 + (k % 2) * 1.4, 0.7, mixHex(st.stone, '#000', 0.35), a) }
+        fillLine([[cx, cz], [cx + 0.1, cz]], 12, N + 2 + si)
+      } else if (si === garefSq && S.style === 'krec') {
+        // Терем Матерей Креццаки: пять деревянных ярусов, каждый уже предыдущего, с галереями на столбах и красной лентой-поясом;
+        // наверху — шатёр с охристой маковкой; светятся окна верхнего яруса (покрывало Старшей Матери)
+        const lv = 5
+        for (let k = 0; k < lv; k++) {
+          const w = 11 - k * 1.7, h = 3.4, by = y + k * h
+          ch.solid.box(cx, by, cz, w, h - 0.3, w, k % 2 ? st.plaster[1] : st.plaster[0], si)
+          ch.solid.box(cx, by + h - 0.4, cz, w + 1.6, 0.25, w + 1.6, st.timber, si)
+          for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) ch.solid.box(cx + dx * (w / 2 + 0.6), by, cz + dz * (w / 2 + 0.6), 0.22, h - 0.4, 0.22, st.timber, si)
+          ch.solid.box(cx, by + h - 1.2, cz, w + 0.06, 0.35, w + 0.06, '#c8302a', si)
+          if (k === lv - 1 || !opts.mobile) ch.glow.box(cx + w / 2 + 0.03, by + 1.2, cz, 0.06, 1.0, 1.4, '#ffffff', si)
+        }
+        const topY = y + lv * 3.4
+        ch.roof.cyl(cx, topY, cz, 2.6, 5.2, 4, st.roof[1], 0, false, si + Math.PI / 4)
+        ch.solid.cyl(cx, topY + 5.0, cz, 0.5, 0.9, 8, '#d8a040', 0.1)
+        fillLine([[cx, cz], [cx + 0.1, cz]], 10, N + 2 + si)
+      } else if (si === garefSq && S.style === 'mgn') {
+        // Шпиль Наллы Магнолии: чёрный витой шпиль из поворачивающихся ярусов, у подножия обсидиановая чаша на ступенях, наверху лиловый огонь;
+        // вокруг — кольцо белых магнолий (стволы и светлые кроны)
+        ch.solid.cyl(cx, y, cz, 6.2, 0.6, 12, mixHex(st.stone, '#fff', 0.2), 6.2, true, si)
+        ch.solid.cyl(cx, y + 0.6, cz, 5.0, 0.6, 12, mixHex(st.stone, '#fff', 0.1), 5.0, true, si)
+        const tiers = 9
+        for (let k = 0; k < tiers; k++) {
+          const r0 = 2.6 * (1 - k / (tiers + 1)), h = 2.6
+          ch.solid.cyl(cx, y + 1.2 + k * h, cz, r0, h, 4, '#1a1420', r0 * 0.82, true, si + k * 0.35)
+        }
+        const topY = y + 1.2 + tiers * 2.6
+        ch.solid.cyl(cx, topY, cz, 0.5, 3.4, 6, '#1a1420', 0.05)
+        ch.glow.cyl(cx, topY + 0.6, cz, 0.9, 1.4, 8, '#ffffff', 0.2)
+        ch.solid.cyl(cx + 3.6 * Math.cos(si), y + 1.2, cz + 3.6 * Math.sin(si), 1.1, 0.9, 10, '#120e18', 1.4)
+        ch.glow.cyl(cx + 3.6 * Math.cos(si), y + 2.05, cz + 3.6 * Math.sin(si), 1.25, 0.06, 10, '#ffffff', 1.25)
+        const ring = opts.mobile ? 4 : 8
+        for (let k = 0; k < ring; k++) {
+          const a = si + (k / ring) * 6.283, tx = cx + Math.cos(a) * 9.5, tz = cz + Math.sin(a) * 9.5
+          ch.solid.cyl(tx, y, tz, 0.25, 2.4, 5, '#4a3a30')
+          ch.solid.cyl(tx, y + 2.2, tz, 1.5, 1.6, 7, k % 2 ? '#f0e4ee' : '#e0b8d8', 0.6)
+        }
+        fillLine([[cx, cz], [cx + 0.1, cz]], 12, N + 2 + si)
+      } else if (si === garefSq && S.style === 'bolet') {
+        // Пламенник Болетарии: восьмигранная башня тёмного камня с контрфорсами, наверху открытая бронзовая чаша с огнём Дагота;
+        // вокруг — четыре малые жаровни на столбах (Час Очага), у подножия — плиты с именами королей
+        const th = 27
+        ch.solid.cyl(cx, y, cz, 5.6, 1.4, 8, mixHex(st.stone, '#000', 0.15), 5.6, true, si)
+        ch.solid.cyl(cx, y + 1.2, cz, 3.8, th - 1.2, 8, st.stone, 3.0, true, si)
+        for (let k = 0; k < 4; k++) {
+          const a = si + k * Math.PI / 2 + Math.PI / 8, ox = Math.cos(a), oz = Math.sin(a)
+          ch.solid.box(cx + ox * 3.2, y + 1.2, cz + oz * 3.2, 1.1, th * 0.55, 1.1, mixHex(st.stone, '#000', 0.08), a)
+          ch.solid.box(cx + ox * 3.0, y + 1.2 + th * 0.55, cz + oz * 3.0, 0.8, 2.2, 0.8, mixHex(st.stone, '#000', 0.08), a)
+          ch.glow.box(cx + ox * 2.62, y + th * 0.62, cz + oz * 2.62, 0.08, 2.4, 0.7, '#ffffff', a)
+        }
+        for (const hy of [8, 15, 21]) ch.solid.cyl(cx, y + hy, cz, 2.95, 0.35, 8, mixHex(st.stone, '#fff', 0.12), 2.95, true, si)
+        ch.solid.cyl(cx, y + th, cz, 3.4, 0.5, 8, mixHex(st.stone, '#fff', 0.1), 3.4, true, si)
+        ch.solid.cyl(cx, y + th + 0.5, cz, 2.0, 1.8, 12, '#8a5a24', 4.0)
+        ch.glow.cyl(cx, y + th + 1.8, cz, 3.2, 2.6, 10, '#ffffff', 0.6)
+        ch.glow.cyl(cx, y + th + 4.2, cz, 1.4, 2.8, 8, '#ffffff', 0)
+        const ring = opts.mobile ? 2 : 4
+        for (let k = 0; k < ring; k++) {
+          const a = si + (k / ring) * 6.283 + 0.4, bx = cx + Math.cos(a) * 9, bz = cz + Math.sin(a) * 9
+          ch.solid.cyl(bx, y, bz, 0.22, 3.2, 6, '#2a2420')
+          ch.solid.cyl(bx, y + 3.2, bz, 0.35, 0.4, 8, '#8a5a24', 0.8)
+          ch.glow.cyl(bx, y + 3.6, bz, 0.5, 0.6, 6, '#ffffff', 0)
+        }
+        for (let k = 0; k < 8; k++) { const a = si + (k / 8) * 6.283, px = cx + Math.cos(a) * 6.2, pz = cz + Math.sin(a) * 6.2; ch.solid.box(px, y, pz, 1.6, 0.35, 0.9, mixHex(st.stone, '#fff', 0.2), a + Math.PI / 2) }
+        fillLine([[cx, cz], [cx + 0.1, cz]], 12, N + 2 + si)
       } else if (si === garefSq && S.style === 'harn') {
         // Дом Колыбелей Орельберга: длинный зал и пять башен под щипцами цветов Пяти Домов; в красной башне Харнов горит свет
         const cols = ['#2a4a7a', '#2f5a3a', '#5a3a2a', '#1f5f6e', '#4a4a52']
