@@ -21,6 +21,13 @@ import { FleetView } from './Fleet'
 import { LanternView } from './Lantern'
 import { RazryadView } from './Razryad'
 import { ThresholdView } from './Threshold'
+import { AshView } from './Ash'
+import { ChaliceView } from './Chalice'
+import { BeltView } from './Belt'
+import { SentenceView } from './Sentence'
+import { SilenceView } from './Silence'
+import { LedgerView } from './Ledger'
+import { KeysView } from './Keys'
 import { WallView } from './Wall'
 import { AuctionView } from './Auction'
 import { RidgeView } from './Ridge'
@@ -355,6 +362,13 @@ function EntryEditor({ id }: { id: string }) {
                 {f.lantern && <LanternView data={f.lantern} onOpen={goto} />}
                 {f.razryad && <RazryadView data={f.razryad} onOpen={goto} />}
                 {f.threshold && <ThresholdView data={f.threshold} onOpen={goto} />}
+                {f.ash && <AshView data={f.ash} onOpen={goto} />}
+                {f.chalice && <ChaliceView data={f.chalice} onOpen={goto} />}
+                {f.belt && <BeltView data={f.belt} onOpen={goto} />}
+                {f.sentence && <SentenceView data={f.sentence} onOpen={goto} />}
+                {f.silence && <SilenceView data={f.silence} onOpen={goto} />}
+                {f.ledger && <LedgerView data={f.ledger} onOpen={goto} />}
+                {f.keys && <KeysView data={f.keys} onOpen={goto} />}
                 {f.wall && <WallView data={f.wall} onOpen={goto} />}
                 {f.auction && <AuctionView data={f.auction} onOpen={goto} />}
                 {f.ridge && <RidgeView data={f.ridge} onOpen={goto} />}

@@ -130,6 +130,15 @@ export const EMBLEMS: Record<string, { label: string; draw: (fg: string, bg: str
     label: 'Орёл',
     draw: (fg) => <path fill={fg} d="M50 18l6 6-2 6 30-14-8 20 14-2-18 16H58l6 26-14-8-14 8 6-26H28L10 34l14 2-8-20 30 14-2-6z" />
   },
+  griffin: {
+    label: 'Грифон',
+    draw: (fg) => (
+      <g fill={fg}>
+        <path d="M30 22l10-8 6 4 4 8-2 8 10-4 14-14 4 2-6 14 12-6 2 4-14 12 10 2-2 4-14 2 4 8-4 6 6 16-6 2-8-14-6 4v12h-6V70l-8 12-6-2 8-16-4-10-8 4-2-6 6-6-2-10-6-2 6-4z" />
+        <path d="M30 22l-8 2 6 4z" />
+      </g>
+    )
+  },
   wolf: { label: 'Волк', draw: (fg) => <path fill={fg} d="M24 12l14 18h24l14-18 4 34-12 16-8 22-10 6-10-6-8-22-12-16z" /> },
   scales: {
     label: 'Весы',

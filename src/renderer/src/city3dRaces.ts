@@ -110,6 +110,13 @@ const TABLES: Record<string, W> = {
   gren: { nords: 70, imperials: 24, gladry: 3, dwarves: 1.5, gnomes: 1.5 },
   uuna: { imperials: 92, gladry: 3, nords: 2, dwarves: 1.5, gnomes: 1.5 },
   olek: { eluins: 78, imperials: 16, nords: 4, gladry: 2 },
+  oblv: { imperials: 96, gladry: 2, eluins: 2 },
+  kaya: { imperials: 70, gladry: 10, eleons: 6, nords: 4, dalorians: 4, eluins: 6 },
+  lrsv: { imperials: 85, gladry: 6, eleons: 4, eluins: 5 },
+  reich: { gladry: 40, nords: 30, imperials: 30 },
+  krec: { imperials: 92, 'high-elves': 1, gladry: 3, nords: 2, eluins: 2 },
+  mgn: { imperials: 90, 'high-elves': 4, 'wood-elves': 2, gladry: 2, eluins: 2 },
+  bolet: { imperials: 97, nords: 1, gladry: 1, dalorians: 1 },
   harn: { imperials: 90, dwarves: 2, gnomes: 2, nords: 3, gladry: 2, dalorians: 1 },
   garef: { imperials: 86, dwarves: 3, gnomes: 2, nords: 3, gladry: 3, dalorians: 1 },
   // Крайдонианская Лига: элеоны, люди и немного эльфов и прочих — порт, где бывают все

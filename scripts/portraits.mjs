@@ -29,6 +29,13 @@ const NT_STYLE = 'oil painting on canvas, old master style, 15th century norther
 const GREN_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, dark weathered ship planks and coiled rope background, cold sea-grey light, muted blue-green, grey and old gold'
 const UUNAASH_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, dark plain stone wall background hung with small old iron keys, cool grey-blue light, muted blues, greys and warm amber'
 const OLEKOHT_STYLE = 'oil painting on canvas, old master style, 15th century northern european portrait, chiaroscuro, visible brush strokes, craquelure, (medieval linen and wool clothing:1.2), half-length portrait, dark wooden panel background with one branch of crimson leaves at the edge, cold pale light from the left, deep reds, creams and dark brown'
+const SOUTHCHURCH_STYLE = 'oil painting, quiet monastic portrait, white limestone cloister with a silver star and candles behind, soft blue twilight, muted whites, slate blues and silver, painterly, half-length portrait, detailed face, visible brush strokes'
+const KAYA_STYLE = 'oil painting, renaissance banker portrait, marble hall with golden dome, ledgers and coins on a green card table behind, warm golden light, gold, black and ivory, painterly, half-length portrait, detailed face, visible brush strokes'
+const LAROCHE_STYLE = 'oil painting, sunny mediterranean portrait, terracotta roofs, vineyards and a blue harbour behind, warm afternoon light, ochre, wine red and sea blue, painterly, half-length portrait, detailed face, visible brush strokes'
+const REICH_STYLE = 'oil painting, grim dark fantasy portrait, ruined stone prison courtyard with chains and an empty stone throne behind, cold grey daylight, ash, rust and bone tones, painterly, half-length portrait, detailed face, visible brush strokes'
+const KRECCAKA_STYLE = 'oil painting, rustic forest folk portrait, dark log house interior with a beehive, honeycomb and a red woven belt hanging on the wall, warm candle and hearth light, ochre, red and dark wood tones, painterly, half-length portrait, detailed face, visible brush strokes'
+const MAGNOLIA_STYLE = 'oil painting, dark elegant fantasy court portrait, pale stone hall with violet glowing round moon window and white magnolia blossoms behind, cold moonlight and violet glow, muted lilac, black and silver, painterly, half-length portrait, detailed face, visible brush strokes'
+const BOLETARIA_STYLE = 'oil painting, dark gothic medieval kingdom portrait, grey stone hall with a burning bronze brazier and an orange and blue banner behind, firelight from below, deep shadows, muted greys, ember orange and deep blue, painterly, half-length portrait, detailed face, visible brush strokes'
 const HARNMARK_STYLE = 'oil painting, Germanic imperial principality portrait, half-timbered stone town and a white tower with a red pennant behind, overcast amber light, muted reds, creams and slate, painterly, half-length portrait'
 const FEINOKO_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), mountain island kingdom portrait, grey stone terraces and paper lanterns behind, misty blue dusk light, slate blue and grey tones, visible brush strokes, detailed face, half-length portrait'
 const TAVAR_STYLE = 'oil painting on canvas, old master, (medieval clothing:1.2), forest elf kingdom portrait, a vast ancient yew tree with carved trunk behind, dappled green forest light, muted greens and browns, visible brush strokes, detailed face, half-length portrait'
@@ -48,7 +55,7 @@ const FARVOL_STYLE = 'oil painting, fantasy mountain hall portrait, warm forge l
 const ELFBORN_STYLE = 'oil painting, high fantasy elven court portrait, pre-raphaelite style, soft silver-green light through willow leaves, pale stone arches behind, visible brush strokes, detailed face, half-length portrait'
 const SILVLAND_STYLE = 'oil painting, high fantasy forest portrait, deep green dappled light under giant ancient tree canopy, mossy roots and glowing fruit behind, visible brush strokes, detailed face, half-length portrait'
 const KREIT_STYLE ='oil painting, viking age norwegian portrait, dark smoky longhouse lit by torches, glints of raw silver, carved dragon posts, dark background, visible brush strokes, detailed weathered face, half-length portrait'
-const NEG = '(beanie, knit hat, baseball cap, eyeglasses, hoodie, sweater, t-shirt, zipper, modern jacket:1.3), (cleavage, shirtless, bare chest:1.4), (photograph, dslr, bokeh:1.3), (asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude'
+const NEG = '(beanie, knit hat, baseball cap, eyeglasses, hoodie, sweater, t-shirt, zipper, modern jacket:1.3), (cleavage, shirtless, bare chest:1.4), (photograph, dslr, bokeh:1.3), (asian:1.5), (east asian, chinese, japanese, korean, mongolian:1.4), epicanthic fold, monolid eyes, narrow eyes, photo, photorealistic, 3d render, modern clothing, text, watermark, signature, frame border, blurry, lowres, deformed, extra fingers, extra limbs, cartoon, anime, nsfw, nude, (beanie, knit hat, eyeglasses, hoodie, sweater, modern suit, necktie:1.3), (photograph, dslr, bokeh:1.3)'
 
 // цвета домов -> слова для одежды
 const HOUSE_COLORS = {
@@ -62,6 +69,70 @@ const houseOf = new Map(HOUSES.map((h) => [`lore-${h.id}`, h.id]))
 // особые описания ключевых персонажей
 const CUSTOM = {
   'hm-baltasar': 'thin stooped clerk about forty, short dark beard, short dark hair, (no hat:1.4), red-rimmed tired eyes, ink-stained fingers, plain dark wool doublet with a white linen collar, a small scraping knife on the belt, holding a quill',
+  'obl-abbot': 'very old frail monk lying on a pillow, white hair, finger on the lips, copper star on the chest, dark blue habit',
+  'obl-severa': 'old nun reading lips intently, white wimple, dark blue habit, silver ink on fingers',
+  'obl-tacitus': 'old monk astronomer, brass spyglass on a chain, dark blue habit, finger on the lips',
+  'obl-ostiar': 'broad monk gatekeeper with a broken nose, dark blue habit, iron keys, speaking',
+  'obl-felix': 'monk treasurer, ledger and quill, dark blue habit, gold coin in hand',
+  'ky-bartolomeo': 'cunning renaissance banker of fifty with a sly smile, dark velvet doublet with a fur collar and a gold chain, a plain black cap-less head with grey-streaked hair, a fan of painted playing cards in his hand, a heavy gold ring, calculating eyes',
+  'ky-margarita': 'old noble widow, black gown, lace collar, abacus, clever eyes',
+  'ky-lukas': 'nervous merchant, losing playing cards in hand, worn velvet coat',
+  'ky-aurelian': 'smiling polite banker, black velvet doublet, gold chain, ledger',
+  'ky-isabella': 'young woman banker, dark hair, (fingerless black gloves:1.3), playing cards, sharp smile',
+  'ky-matthias': 'bald old man, ring without a stone, shabby rich clothes, worried eyes',
+  'ky-hedwig': 'young noblewoman, salt-white gown with silver, playing card in hand, defiant look',
+  'ky-vitus': 'dry thin man, big iron key on a neck chain, black clothes',
+  'lrs-chiara': 'tanned abbess, (straw hat over a white veil:1.3), wine-red habit, cup of wine, laughing eyes',
+  'lrs-octavius': 'stern archbishop, red and gold vestments, mitre in hand, cold eyes',
+  'lrs-bianca': 'young merchant woman, dark curls, golden ship brooch, quill, lively smile',
+  'lrs-dario': 'one-armed sea captain, earring, weathered face, salt-white beard stubble',
+  'rh-far': 'huge crouching warlord, grey fur cloak, bone knife, (forehead brand DCC:1.2), hunting trophies',
+  'rh-kar': 'silent scarred man, (forehead brand CM:1.2), grey hide armour, patient cruel eyes',
+  'rh-asha': 'lean huntress, yew bow, grey cloak, leaves in the clothes, fierce eyes',
+  'rh-mohh': 'blind old priest, gold thread sewn into the forehead brand, ragged robe, holding a scratched portrait of an emperor',
+  'rh-nim': 'young miner, pickaxe, scarred forearms, dust on the face',
+  'rh-tisa': 'young woman, (forehead brand crossed out with a scar:1.3), travel cloak, bundle of torn book pages',
+  'rh-uta': 'grey-haired woman scribe in a tight bun, iron spectacles, black dress, huge iron-bound ledger',
+  'kc-jadwiga': 'very old woman, deeply wrinkled, white hair under a linen veil, red wool shawl, (ninety seven years old:1.3)',
+  'kc-laes': 'ageless half-elf woman looking forty, long dark hair braided with red thread, forest-green dress, calm knowing eyes',
+  'kc-zofia': 'very old thin woman, upright posture, knitting needles in her hands, grey braid, sharp eyes',
+  'kc-mieszko': 'broad red-haired prince with a red beard, (red woollen belt with knots around the waist:1.3), fur-trimmed coat, bow on the shoulder',
+  'kc-jarosz': 'blind very old man, milky eyes, long white beard, chewing resin, sheepskin coat',
+  'kc-tadek': 'young man, wool cap pulled low over the ears, fair hair, bow and quiver',
+  'mn-arnam': 'ancient regal elf king, very long silver hair to the waist, thin silver circlet, black and violet high-collared robe, cold violet eyes',
+  'mn-ilsae': 'elf queen, silver net over silver hair, white magnolia flower on a high black collar, serene face',
+  'mn-kaeron': 'young-looking elf prince, violet fire flickering over his fingers, black lacquered armour, long silver hair tied back',
+  'mn-inne': 'elf priestess, (left half of the head shaved:1.3), long silver hair on the right side, black robe, obsidian chalice pendant',
+  'mn-morvena': 'old elf high priestess, (one eye milky blind, the other amber:1.3), black hooded robe, holding an obsidian chalice',
+  'mn-seivar': 'bald elf weapon master, scarred forearms, black lacquered armour, curved short sword with violet ribbon',
+  'mn-tairen': 'elf noble, seven black dots on the cheekbone and an empty space, dark blue high collar, calculating look',
+  'mn-aerin': 'elf gardener nobleman, plain grey clothes, pruning shears, tired proud eyes, magnolia branch',
+  'mn-virra': '(dark elf woman, charcoal black skin, white glowing eyes:1.4), white hair, black leather and bone jewelry',
+  'mn-eloen': '(light elf woman, golden hair under a grey kerchief, pale warm skin:1.3), servant dress, sad gentle eyes',
+  'bt-lothric3': 'young king, shoulder-length fair hair, a fresh burn scar on the left palm held up, plain gold circlet, dark grey surcoat with an orange and blue griffin, earnest restless eyes',
+  'bt-lothric2': 'old king, white hair and white short beard, heavy fur-lined black robe, red flame badge on white, tired gentle eyes',
+  'bt-adalheid': 'middle-aged queen mother, dark hair pinned up under a white veil, dark blue gown, a small ledger in her hands, shrewd calm eyes',
+  'bt-irma': 'young woman, red hair in a long braid, riding coat of orange and blue, leather gloves, bold smile',
+  'bt-godfrid': 'old prince, long grey beard down to the belt, black robe, a large iron key on the belt, stern pious look',
+  'bt-ortwin': 'old grand inquisitor, (golden half-mask covering the upper face:1.3), black hooded robe, thin lips, red flame emblem on the chest',
+  'bt-clemens': 'young inquisitor scholar, short dark hair, round spectacles, black robe, golden half-mask pushed up on the forehead, a thick book',
+  'bt-sibylla': '(forty-five year old woman with lines on the face:1.3), woman inquisitor, (very short cropped grey hair like a man:1.4), black robe, golden half-mask in her hand, hard eyes',
+  'bt-ulrich': 'middle-aged inquisitor, scar through the eyebrow, black robe over mail, golden half-mask hanging at the belt',
+  'bt-anselm': 'grim inquisitor, black cassock over plate armour, golden half-mask at the belt, shaved head',
+  'bt-benno': 'fat cheerful inquisitor, black robe, gold signet ring on the little finger, golden half-mask on the table',
+  'bt-gauderich': 'very old inquisitor, bald, hand cupped to his ear, black robe, golden half-mask hanging on the chest',
+  'bt-hedda': '(sixty year old wrinkled woman:1.4), old noblewoman, grey hair pinned up, (black soot-stained gloves:1.3), dark brown gown with gold trim, a lump of charcoal on a chain',
+  'bt-egbert': 'tall silent young man, singed eyebrows, soot on the cheek, dark wool coat with a gold and black badge',
+  'bt-gunther': 'grizzled knight grand master, (full heavy plate armour:1.3), white griffin on orange and blue tabard over the plate, short grey beard',
+  'bt-martin': 'lean merchant, sharp face, blue doublet with golden scales badge, quill behind the ear',
+  'bt-konrad': 'border margrave, wolf fur over the shoulders, green and grey surcoat, short brown beard, crossbow',
+  'bt-joachim': 'old fire priest, pockmarked face, hands stained with pitch, orange vestments, holding a bronze oil lamp',
+  'bt-marta': 'woman chronicler, dusty dark dress, ink-stained fingers, scrolls under the arm, tired kind eyes',
+  'bt-hanna': 'young heretic preacher, dark hair with a grey streak, plain grey wool dress, weaving shuttle in her hand',
+  'bt-tobias': 'republican envoy, neat brown hair, grey cloak over a blue republican coat with a small badge, polite smile',
+  'bt-baldwin1': 'legendary first king, long dark beard, (old dented armour under a red flame on white surcoat:1.2), torch in hand, haunted eyes',
+  'bt-irmelinda': 'stern medieval queen, pale, hair hidden under a white wimple, black gown, a large iron key, closed lips',
+  'bt-edwin3': 'medieval king, auburn beard, crown, red flame on white surcoat, grim face, a sealed scroll',
   'fm-lA-eg': 'sturdy woman in her fifties, long dark brown hair tied back, full head of hair, plain brown wool dress, a simple pendant, tired practical eyes',
   'fm-lF-old': 'dignified landowner-judge in his sixties, short white hair, grey beard, dark toga, a scroll in hand, plain stone wall behind, no frame',
   'fm-lF-w': 'practical widow in her fifties, brown hair streaked with grey tied in a bun, olive dress, vineyard basket, calm tired eyes',
@@ -744,6 +815,59 @@ const CUSTOM = {
   'rp-agnes-erlach': 'cold precise young woman treasurer around thirty, dark hair, black dress with a white ruff collar, ledger and keys',
   'rp-wilma-tirnau': 'serious woman in her late thirties, publisher of a memorial journal, dark green dress, holding a book of names'
 }
+// ---------- Юг, волна 3: описания по биографиям (22.11.2026) ----------
+// Возраст — на момент правления (AGE), эпоха — по одежде: до 300 — железный век, меха и гривна; 300–650 — ранний камень и кольчуга;
+// 650–900 — позднее средневековье, бархат; после 900 — ренессанс, дублет с жабо.
+const AGE = {
+  'bt-k-godfrid1': 52, 'bt-k-baldwin2': 44, 'bt-k-arnulf1': 38, 'bt-k-mechtild1': 47, 'bt-k-arnulf2': 58, 'bt-k-childerich': 41, 'bt-k-bertram1': 33, 'bt-k-alarich1': 55,
+  'bt-k-alarich2': 36, 'bt-k-alarich3': 29, 'bt-k-edgar': 50, 'bt-k-godfrid2': 62, 'bt-k-oswin1': 26, 'bt-k-oswin2': 35, 'bt-k-bertram2': 48, 'bt-k-mechtild2': 63,
+  'bt-k-raimund1': 34, 'bt-k-raimund2': 24, 'bt-k-arnulf3': 57, 'bt-k-hildegard': 40, 'bt-k-edwin1': 30, 'bt-k-edwin2': 46, 'bt-k-oswin3': 51, 'bt-k-baldwin3': 66, 'bt-k-lothric1': 37,
+  'mn-kaelt': 58, 'mn-niara': 49, 'kc-boleslaw': 61, 'kc-waclaw': 44, 'kc-agnieszka': 92
+}
+const CUSTOM_YUG = {
+  // — короли Болетарии: у каждого своя примета, возраст и предмет —
+  'bt-k-godfrid1': 'early iron-age king, broad weathered face, thick red-grey beard braided in two plaits, bear fur cloak, a heavy bronze torc and a plain iron circlet, holding a rolled birch-bark forest census, steady surveying eyes',
+  'bt-k-baldwin2': 'king with a long narrow face, clean shaven, hooked nose, dark hair in a bowl cut, plain white linen tunic under a red wool cloak, a small clay lamp in his hands, serene devout expression, thin gold circlet',
+  'bt-k-arnulf1': 'stern king, square jaw, short black beard, iron lamellar vest under a black cloak, an iron crown with three points, three small wooden tokens in his palm, hard measuring gaze',
+  'bt-k-mechtild1': 'first queen, strong-boned face, long fair hair in a crown braid, deep red wool gown with a wide gold belt, a gold diadem with a flame, a wax tablet in her hand, calm authority',
+  'bt-k-arnulf2': 'ailing king, sunken cheeks, thin grey hair, long white mustache without beard, heavy furs, a plain iron circlet slightly crooked, a hollow sadness in the eyes',
+  'bt-k-childerich': 'gaunt king, wild staring pale eyes, tangled black hair and unkempt black beard, a crooked iron crown, black robe with candle wax stains, holding a thick burning candle, feverish fanatic expression',
+  'bt-k-bertram1': 'solid king, round friendly face, short brown beard, ring mail under a green and red tunic, a silver circlet, a rolled charter in hand, cautious wary eyes',
+  'bt-k-alarich1': 'builder king, bald head, grey trimmed beard, sunburnt skin, a mason apron over a blue tunic, a gold circlet, a bridge architect compass in his hand, pragmatic look',
+  'bt-k-alarich2': 'hard king, lean face, sharp black goatee, black chainmail coif pushed back, dark red surcoat, a plain gold crown, a wooden boundary stake in his fist, cold unyielding eyes',
+  'bt-k-alarich3': 'young king, clean shaven, long auburn hair, flame badge on a white surcoat, a golden crown with flame points, a burning torch in hand, fierce zealous look',
+  'bt-k-edgar': 'prosperous king, plump cheeks, short curly grey beard, fine wool brocade coat, gold chain, a folded bolt of fine cloth under his arm, merchant-like cunning smile, a low gold crown',
+  'bt-k-godfrid2': 'warlike king, scarred face, grey beard cut short, steel breastplate over a red tunic, an old iron crown, a sword half drawn, proud brutal expression',
+  'bt-k-oswin1': 'young timid king, thin pale face, no beard, fair hair, heavy fur collar, a small gold crown too big for him, hands folded around an iron key, closed guarded expression',
+  'bt-k-oswin2': 'devout king, long brown hair, light brown beard trimmed round, dark red velvet robe with a gold flame, a gold crown, a stone cathedral model in his hands, pious tired eyes',
+  'bt-k-bertram2': 'earnest king, high forehead, receding brown hair, close grey beard, plain blue robe with a fur collar, a gold circlet, a petition scroll in hand, hopeful and defeated eyes',
+  'bt-k-mechtild2': 'old queen, lined face, white hair under a lace widow veil and a gold crown, black gown with silver embroidery, a tournament lance pennon in her hand, kind but firm eyes',
+  'bt-k-raimund1': 'warrior king, dark hair tied back, thick black beard, a scar through the left eyebrow, steel pauldrons, a red and gold surcoat, a gold crown over a mail hood, a map of the northern march in hand, grim resolve',
+  'bt-k-raimund2': 'very young king with a smooth boyish face and a thin blond mustache, burgundy velvet doublet with a small flame brooch, a jeweled gold crown, tithe rolls in hand, uncertain proud look',
+  'bt-k-arnulf3': 'suspicious king, deep eye bags, sparse grey hair, sharp narrow face and a thin white beard, black velvet robe with a red collar, a gold crown, a sealed scroll, narrow watchful eyes',
+  'bt-k-hildegard': 'decisive queen, severe handsome face, dark hair under a gold diadem, a deep blue gown with a stiff high collar, holding a burning page over a candle, resolved eyes',
+  'bt-k-edwin1': 'knightly king, strong chin, short blond beard, chain mail with a white surcoat and a red flame, a gold crown, a sword with a frayed ribbon thread tied to the hilt, proud pensive look',
+  'bt-k-edwin2': 'amiable king, wide face, neatly combed brown beard with grey, a green velvet coat with fur trim, a gold crown, a sheaf of wheat in hand, relaxed warm smile',
+  'bt-k-oswin3': 'quiet king, long thin face, grey hair to the shoulders, long beard, simple dark grey robe, a thin gold crown, a pine branch in his hand, peaceful absent eyes',
+  'bt-k-baldwin3': 'old courtly king, ruddy face, white pointed beard, ruff collar, black velvet doublet with a red slashed sleeve, a jeweled crown, an imperial letter with a seal, wise diplomatic eyes',
+  'bt-k-lothric1': 'renaissance king, oval face, neat dark pointed beard and waxed mustache, a black doublet embroidered with orange and blue griffins, a gold crown, a newly minted gold coin with a griffin in his fingers, ambitious confident look',
+  // — Магнолия —
+  'mn-kaelt': 'twilight elf prince of the western shore, ashen lilac skin, long silver-white hair in a high knot, silver rings on the pointed ears, a black dot tattoo on the cheekbone, a dark violet robe and a small silver circlet, a roll of the Union treaty in hand, proud wise eyes',
+  'mn-niara': 'twilight elf princess of the eastern shore, ashen lilac skin, black hair in long braids with silver beads, silver rings on the pointed ears, black dot tattoos on the cheekbone, a deep grey and silver gown, a silver diadem with a moonstone, calm shrewd eyes',
+  'mn-anselm': 'tough half-elf overseer, slightly pointed ears, faint lilac tint on a scarred face, short dark hair, a leather overseer coat, a whistle and a heavy ring of keys, a small black dot tattoo on the cheekbone, angry scrutinizing eyes',
+  'mn-greta': 'stern woman, pale freckled face, light brown hair under a grey linen coif, a plain grey gown with a small brass bell on a cord, an hourglass in her hand, tired resolute eyes',
+  'mn-martin': 'smooth dutch-looking republican envoy, clean shaven, dark brown hair, a black doublet with a white ruff collar and a silver chain, a bundle of trade contracts, polite wary smile',
+  'mn-den': 'thin half-elf kitchen boy, slightly pointed ears, faint lilac tint on the pale skin, messy dark hair, a flour-stained apron, a wooden spoon, shy curious eyes',
+  // — Креццака —
+  'kc-dorota': 'stout slavic mother, round wrinkled face, white hair under a heavy embroidered kerchief, a dark red wool gown with a belt of amber beads, an old distaff in her hands, firm protective eyes',
+  'kc-hanka': 'sharp-faced trader mother, long nose, grey braids pinned under a brown scarf, a patched blue gown with a purse and small brass scales at the belt, a clay jar of honey, bargaining smile',
+  'kc-staszek': 'bearded forest warden, ruddy weathered face, thick light brown beard, a sheepskin vest, a woodcutter axe over the shoulder, a sprig of oak leaves at the belt, patient eyes',
+  'kc-malgorzata': 'young woman with a long white veil covering the lower half of her face, pale face with wide serious grey eyes, a pale linen gown with red embroidery, a small bronze bell in her hands, mysterious quiet look',
+  'kc-boleslaw': 'prince known as the Beekeeper, broad kindly face, long white mustache, a beekeeper veil pushed back on the shoulders, a brown felt coat with a gold belt and a plain gold circlet, a honeycomb frame in his hands, gentle weary eyes',
+  'kc-waclaw': 'prince known as the Forester, lean face with a short brown beard, a green hunting coat with fur trim, a small gold circlet, a hunting horn at the belt, stern thoughtful look',
+  'kc-agnieszka': 'very old Eldest Mother, deeply wrinkled face, pure white hair under a red embroidered headcloth, a heavy wide belt of silver plates over a dark gown, a carved staff, sharp dignified eyes'
+}
+Object.assign(CUSTOM, CUSTOM_YUG)
 // без короны: незнатные и монахи (корону подсказывает герб рода на знамени)
 const NO_CROWN = new Set(['ag-argus-1', 'ag-joachim'])
 const word = (e) => {
@@ -843,7 +967,7 @@ const IDS = new Set(process.argv.slice(2).map((x) => (x.startsWith('lore-') ? x 
 const chars = world.entries.filter(
   (e) =>
     e.kind === 'character' &&
-    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон', 'Эльфборн', 'Сильвленд', 'Княжество Харнмарк', 'Фейноко', 'Таварвайт', 'Павильон Грёз', 'Королевство Редания', 'Империя Кагия', 'Олекохт', 'Уунааш', 'Объединённые Берега Гренинсворда', 'Северная Башня', 'Братство Бездны'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
+    (IDS.size ? IDS.has(e.id) : e.base.tags.some((t) => ['Монстарги', 'Дагерфорд', 'Великие дома', 'армия', 'Корона Аргус', 'Республика', 'южные республики', 'Святая церковь', 'Графство Штирия', 'Графство Мангениум', 'Имперские Изгнанники', 'Земли Севера', 'Креит', 'Фарвольская лига', 'Высокогорное Княжество', 'Республика Чеафарал', 'Крайдонианская Лига', 'Княжества Гарефорда', 'Королевство Темерия', 'Протекторат Лирия', 'Когалым', 'Кулагон', 'Эльфборн', 'Сильвленд', 'Княжество Харнмарк', 'Фейноко', 'Таварвайт', 'Павильон Грёз', 'Королевство Редания', 'Империя Кагия', 'Олекохт', 'Уунааш', 'Объединённые Берега Гренинсворда', 'Северная Башня', 'Братство Бездны', 'Королевство Болетария', 'Магнолия', 'Династия Креццака', 'Рейх', 'Обливиум Каэлорум', 'Семья Каяя', 'Ла Роше'].includes(t)) || ['lore-kaya-head', 'lore-korvin-argus', 'lore-jakasta', 'lore-anselm-fern'].includes(e.id))
 )
 let done = 0
 // запись мира с повторами: файл может быть занят dev-сервером или другим процессом
@@ -885,7 +1009,14 @@ for (const e of chars) {
   const gren = e.base.tags.includes('Объединённые Берега Гренинсворда')
   const ntw = e.base.tags.includes('Северная Башня')
   const bzd = e.base.tags.includes('Братство Бездны')
-  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon || elfborn || silvland || harnmark || olekoht || uunaash || gren || ntw || bzd
+  const boletaria = e.base.tags.includes('Королевство Болетария')
+  const magnolia = e.base.tags.includes('Магнолия')
+  const kreccaka = e.base.tags.includes('Династия Креццака')
+  const reich = e.base.tags.includes('Рейх')
+  const oblv = e.base.tags.includes('Обливиум Каэлорум')
+  const kayaT = e.base.tags.includes('Семья Каяя') && e.id !== 'lore-kaya-head'
+  const lrs = e.base.tags.includes('Ла Роше')
+  const rp = e.base.tags.includes('Республика') || southern || holy || sty || man || exile || north || kreit || farvol || highland || cheaf || crydon || gareford || temeria || lyria || kogalym || kulagon || elfborn || silvland || harnmark || olekoht || uunaash || gren || ntw || bzd || boletaria || magnolia || kreccaka || reich || oblv || kayaT || lrs
   if (existsSync(file) && !IDS.size) {
     e.base.image = `portraits/${id}.webp`
     continue
@@ -898,7 +1029,7 @@ for (const e of chars) {
   const flag = NO_CROWN.has(id) ? bannerFor(e).replace(/ with .*$/, '') : bannerFor(e)
   const banner = flag ? `(${flag} hanging on the wall behind:${rp ? 1.1 : 1.35}), ` : ''
   // Республика: короче описание и явный возраст числом — с LCM длинный запрос сводит всех к одному молодому лицу
-  const age = Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
+  const age = AGE[id] ?? Math.max(1, Math.min(yearOf(e.to) ?? 1010, 1010) - (yearOf(e.from) ?? 965))
   const stHouse = sty && e.base.links?.dynasty === 'lore-house-styria'
   const female = e.base.props?.gender === 'Женский'
   const gnomeR = /Гном/.test(race), dwarfR = /Дварф/.test(race)
@@ -928,6 +1059,16 @@ for (const e of chars) {
     ? `${TAVAR_STYLE}, portrait of ${/эльф/i.test(race) ? `an (elf ${female ? 'woman' : 'man'}:1.35), (wood elf of a forest folk, northern european features, pale skin, tall slender, long pointed elf ears:1.35)` : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european human, germanic features, pale skin:1.25)`}, ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : feinoko
     ? `${FEINOKO_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european features, pale skin, black hair:1.25), ${/Момит/.test(race) ? '(high black topknot tied with a blue cord:1.25), (small white bone pendant on a thin cord around the neck:1.2), ' : ''}${CUSTOM[id] ?? subject}, (no hat:1.3)`
+    : oblv || kayaT || lrs
+    ? `${oblv ? SOUTHCHURCH_STYLE : kayaT ? KAYA_STYLE : LAROCHE_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (${lrs ? 'southern european, italian features, olive skin' : 'northern european, germanic features, pale skin'}:1.25), ${CUSTOM[id] ?? subject}, (bareheaded:1.2)`
+    : reich
+    ? `${REICH_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), ${/зирог/.test(race) ? '(rejg-zirog, gaunt hairless humanoid, ash-grey skin, all-black eyes, a branded roman numeral scar on the forehead, sharp cheekbones, northern european bone structure:1.4), ' : '(northern european, germanic features, pale skin:1.25), '}${CUSTOM[id] ?? subject}, (bareheaded:1.2)`
+    : kreccaka
+    ? `${KRECCAKA_STYLE}, portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), ${/Полуэльф/.test(race) ? '(half-elf, slightly pointed ears, ageless smooth face, faint lilac tint to pale skin:1.3), ' : '(northern european, slavic features, pale skin:1.25), '}${CUSTOM[id] ?? subject}, (bareheaded:1.2)`
+    : magnolia
+    ? `${MAGNOLIA_STYLE}, portrait of ${/Сумеречный/.test(race) ? `a (twilight elf ${female ? 'woman' : 'man'}:1.4), (ashen lilac-grey skin, long pointed elf ears with silver rings, small black dot tattoos on the cheekbone, northern european elven face:1.35), ` : /Полуэльф/.test(race) ? `a (half-elf ${female ? 'woman' : 'man'}:1.35), (slightly pointed ears, faint lilac tint to pale skin, dot tattoos on the cheekbone:1.2), ` : /Тёмный|Светлый/.test(race) ? '' : `a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), `}${CUSTOM[id] ?? subject}, (bareheaded:1.2)`
+    : boletaria
+    ? `${BOLETARIA_STYLE}, portrait of a (${age} year old ${age < 14 ? (female ? 'girl' : 'boy') : female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}${/^bt-k-/.test(id) ? "" : ", (bareheaded, no hat:1.3)"}`
     : harnmark
     ? `${HARNMARK_STYLE}, portrait of a (${age} year old ${female ? 'woman' : 'man'}:1.35), (northern european, germanic features, pale skin:1.25), ${CUSTOM[id] ?? subject}, (bareheaded, no hat:1.3)`
     : kulagon
