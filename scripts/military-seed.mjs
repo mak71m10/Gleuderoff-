@@ -323,8 +323,8 @@ for (const st of W.states) {
   const stab = typeof b.stability === 'number' ? b.stability : 60
   const rate = Math.round(Math.max(0.01, Math.min(0.35, g0.rate + (GRAFT_STATE[name] ? 0 : (60 - stab) / 500 + (men > 20000 ? 0.03 : 0)))) * 100) / 100
   const graft = { ...g0, rate }
-  b.military = { ladder, law, templates, companies, formations, roots, graft, ...(b.military?.measures ? { measures: b.military.measures } : {}) }
+  b.military = { ladder, law, templates, companies, formations, roots, graft, ...(b.military?.measures ? { measures: b.military.measures } : {}), ...(b.military?.navy ? { navy: b.military.navy } : {}) }
 }
-W.version = Math.max(W.version ?? 0, 65)
+W.version = Math.max(W.version ?? 0, 66)
 writeFileSync(WF + '.tmp', JSON.stringify(W, null, 1)); renameSync(WF + '.tmp', WF)
 console.log(`войска: рот ${totalCompanies}, людей ${totalMen.toLocaleString('ru-RU')}`)

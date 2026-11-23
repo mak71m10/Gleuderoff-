@@ -2930,3 +2930,43 @@ button.pw-chip:hover { background: var(--panel-2); }
 .mil-order-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
 .mil-order-head b { font-family: var(--serif); font-weight: normal; font-size: 15px; }
 .mil-order-head em { margin-left: auto; font-style: normal; font-size: 12px; color: var(--muted); }
+
+/* ---- флот (Navy.tsx) ---- */
+.nv { display: flex; flex-direction: column; gap: 12px; }
+.nv-fleet { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, rgba(40, 74, 122, .14), var(--bg-2) 60%); }
+.nv-fleet-head { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.nv-fleet-head h3 { margin: 0; font-family: var(--serif); font-weight: normal; font-size: 19px; color: var(--gold-2); }
+.nv-sqs { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 10px; }
+.nv-sq { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); }
+.nv-sq.merchant { border-style: dashed; opacity: .9; }
+.nv-sq-pic { position: relative; display: flex; align-items: flex-start; justify-content: center; padding-top: 6px; }
+.nv-ship { filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.nv-count { position: absolute; right: 2px; bottom: 0; font-family: var(--serif); font-size: 18px; color: var(--gold-2); text-shadow: 0 0 4px #000; }
+.nv-sq-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.nv-sq-name { font-family: var(--serif); font-size: 16px; }
+.nv-bars { display: flex; flex-direction: column; gap: 2px; margin: 4px 0; }
+.nv-bar { display: grid; grid-template-columns: 96px 1fr 24px; gap: 6px; align-items: center; font-size: 12px; }
+.nv-bar div { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+.nv-bar i { display: block; height: 100%; background: linear-gradient(90deg, #284a7a, #6aa0d8); }
+.nv-bar b { text-align: right; font-weight: 600; }
+.nv-sq-facts { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--text-2); }
+.navy-anchor { position: relative; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: #16263c; border: 2px solid var(--c); color: #e8d9a8; font-size: 13px; line-height: 18px; text-align: center; box-shadow: 0 0 5px rgba(0,0,0,.8); }
+.navy-anchor b { position: absolute; left: 22px; top: 2px; font-size: 11px; font-weight: 700; color: #f6ecd2; text-shadow: 0 0 3px #000; white-space: nowrap; }
+@media (max-width: 760px) { .nv-sqs { grid-template-columns: 1fr; } }
+.nv-sq-pic { align-self: start; height: 72px; }
+.nv-sq .mil-edit select, .nv-sq .mil-edit input { max-width: 140px; }
+
+/* ---- калькулятор похода (March.tsx) ---- */
+.mr { display: flex; flex-direction: column; gap: 12px; }
+.mr-search { position: relative; max-width: 520px; }
+.mr-search .dec-text { width: 100%; box-sizing: border-box; }
+.mr-options { position: absolute; z-index: 5; left: 0; right: 0; top: 100%; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--gold-dim); border-radius: 6px; overflow: hidden; }
+.mr-options button { text-align: left; padding: 6px 10px; background: none; border: 0; border-bottom: 1px solid var(--line); color: var(--text); cursor: pointer; font-size: 13px; }
+.mr-options button:hover { background: var(--bg-2); }
+.mr-steps { display: flex; flex-direction: column; gap: 2px; max-height: 50vh; overflow: auto; }
+.mr-step { display: grid; grid-template-columns: 28px 1fr auto; grid-template-areas: "n name km" "n how how"; gap: 0 8px; font-size: 13px; padding: 4px 6px; border-left: 3px solid var(--gold-dim); background: var(--bg-2); border-radius: 4px; }
+.mr-step span { grid-area: n; color: var(--muted); align-self: center; text-align: right; }
+.mr-step b { grid-area: name; font-weight: 600; }
+.mr-step i { grid-area: how; font-style: normal; color: var(--muted); font-size: 12px; }
+.mr-step em { grid-area: km; font-style: normal; color: var(--text-2); font-size: 12px; }
+.mr-step.foreign { border-left-color: #b0503a; }

@@ -437,6 +437,8 @@ export interface Province {
   terrain: number
   areaId: string
   neighbors: number[]
+  /** связь с соседом: дорога p/d/t (тракт, грунтовка, тропа) или река без моста r1–r3 (scripts/province-links.mjs) */
+  links?: Record<number, string>
   coastal?: boolean
   /** Поселение-столица провинции (объёмная модель на карте) */
   settlement?: { type: 'village' | 'fishing' | 'town' | 'city' | 'capital' | 'castle' | 'port' | 'temple' | 'ruins' | 'tower'; x: number; y: number } | null

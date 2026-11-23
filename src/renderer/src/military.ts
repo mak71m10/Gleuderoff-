@@ -383,6 +383,8 @@ export interface StateMilitary {
   measures?: Measure[]
   /** приказы во времени: перевооружение, учения (orders.ts) */
   orders?: Order[]
+  /** флот: эскадры и флоты (fleet.ts) */
+  navy?: import('./fleet').StateNavy
 }
 /** приказ: перевооружение устава (old — прежняя версия) или учения рот соединения */
 export interface Order { id: string; kind: 'rearm' | 'train'; from: number; days: number; cost: number; template?: string; old?: Pick<CompanyTemplate, 'arm' | 'parts' | 'kit' | 'name'>; target?: string; companies?: string[]; xp?: number; note?: string }

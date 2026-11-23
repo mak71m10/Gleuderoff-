@@ -766,6 +766,24 @@ export function MapView() {
     return () => clearTimeout(glide)
   }, [world.armies, date, layers.armies, mapDef.id])
 
+  // --- путь похода из калькулятора (store.routePreview): линия по областям, начало и конец ---
+  const routePreview = useStore((s) => s.routePreview)
+  const setRoutePreview = useStore((s) => s.setRoutePreview)
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !routePreview || !mapDef.provinceMap) return
+    if (!map.getPane('armies')) map.createPane('armies').style.zIndex = '640'
+    const ll = routePreview.points.map(([x, y]) => [-y, x] as L.LatLngExpression)
+    const layer = L.layerGroup([], { pane: 'armies' }).addTo(map)
+    L.polyline(ll, { pane: 'armies', color: '#120d08', weight: 8, opacity: 0.5, interactive: false }).addTo(layer)
+    L.polyline(ll, { pane: 'armies', color: routePreview.color, weight: 4, opacity: 0.95, dashArray: '10 6', interactive: false }).addTo(layer)
+    const end = routePreview.points.at(-1)!
+    L.marker([-end[1], end[0]], { pane: 'armies', interactive: false, icon: L.divIcon({ className: 'army-wrap', iconSize: [0, 0], html: `<div class="army army-base" style="--c:${routePreview.color}"><div class="army-banner"></div><div class="army-name">${escapeHtml(routePreview.label)}</div></div>` }) }).addTo(layer)
+    map.fitBounds(L.latLngBounds(ll), { padding: [60, 60] })
+    return () => { layer.remove() }
+  }, [routePreview, mapDef.id, mapDef.provinceMap])
+  useEffect(() => () => setRoutePreview(null), [setRoutePreview])
+
   // --- места базирования войск выбранной страны (военная система, base.military): знамя на области базы ---
   const baseLayer = useRef<L.LayerGroup | null>(null)
   const selStateId = selection?.type === 'state' ? selection.id : null
@@ -796,6 +814,15 @@ export function MapView() {
       if (!p) continue
       const parent = mil.formations.find((x) => x.children.includes(f.id))
       L.marker([-p.y, p.x], { pane: 'armies', title: `${p.name}: гарнизон — ${f.name}${parent ? `, ${parent.name}` : ''} (${men(f.id).toLocaleString('ru-RU')})`, icon: L.divIcon({ className: 'army-wrap army-base-wrap', iconSize: [0, 0], html: `<div class="army-post" style="--c:${color}"></div>` }) }).addTo(layer)
+    }
+    // флот: якорь в каждом порту, где стоят эскадры
+    const ports = new Map<number, { name: string; count: number }[]>()
+    for (const s of mil.navy?.squadrons ?? []) if (s.base != null && s.count > 0) (ports.get(s.base) ?? ports.set(s.base, []).get(s.base)!).push({ name: s.name, count: s.count })
+    for (const [pid, list] of ports) {
+      const p = provById.get(pid)
+      if (!p) continue
+      const n = list.reduce((s, x) => s + x.count, 0)
+      L.marker([-p.y, p.x], { pane: 'armies', title: `${p.name}: ${list.map((x) => `${x.name} (${x.count})`).join(', ')}`, icon: L.divIcon({ className: 'army-wrap army-base-wrap', iconSize: [0, 0], html: `<div class="navy-anchor" style="--c:${color}">⚓<b>${n}</b></div>` }) }).addTo(layer)
     }
     for (const [pid, list] of byProv) {
       const p = provById.get(pid)

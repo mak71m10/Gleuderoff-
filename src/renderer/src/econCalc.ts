@@ -12,6 +12,7 @@ import { GOOD, GOODS, type Good, type Role } from './economy'
 import { ownerAt } from './provinces'
 import { armyLedger, type Ledger } from './armyLedger'
 import { taxesAt } from './decisions'
+import { squadronStats } from './fleet'
 import { toParts } from './calendar'
 import type { AdminRegion, Entry, Province, WorldData, WorldDate, WorldState } from './types'
 
@@ -293,7 +294,13 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   const soldiers = Math.round((mil ? milMen : armySize(st.base.army)) * Math.min(2, cond.army))
   const ships = shipCount(st.base.navy)
   if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: ledger ? ledger.total : Math.round(soldiers * 0.045 * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${ledger ? `, ${mil!.companies.length} рот; на жалованье ${ledger.standing.toLocaleString('ru-RU')}, остальные — ${ledger.level === 'мир' ? 'по домам' : ledger.level}` : ''}` })
-  if (ships) expense.push({ name: 'Флот', amount: Math.round(ships * 4), note: `≈ ${ships} кораблей` })
+  // флот: эскадры страны (fleet.ts); торговые суда по найму в мирное время почти даром; утечки — как у войска
+  const navy = mil?.navy
+  if (navy?.squadrons.length) {
+    const war = navy.squadrons.filter((s) => !s.merchant), n = navy.squadrons.reduce((s, q) => s + q.count, 0)
+    const cost = navy.squadrons.reduce((s, q) => s + squadronStats(q).cost, 0) * (1 + (ledger?.leak.rate ?? 0) * 0.8)
+    expense.push({ name: 'Флот', amount: Math.round(cost), note: `${n} кораблей в ${navy.squadrons.length} эскадрах${war.length < navy.squadrons.length ? ', с торговыми по найму' : ''}` })
+  } else if (ships) expense.push({ name: 'Флот', amount: Math.round(ships * 4), note: `≈ ${ships} кораблей` })
   if (nb) expense.push({ name: 'Постройки и мануфактуры', amount: nb * 6, note: `${nb} построек` })
   for (const d of e.debts) expense.push({ name: `Проценты: ${d.to}`, amount: Math.round(d.sum * d.rate), note: `долговая печать на ${Math.round(d.sum).toLocaleString('ru-RU')} мар., срок ${d.due} г.` })
 

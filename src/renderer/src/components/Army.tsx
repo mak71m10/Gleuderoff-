@@ -5,6 +5,8 @@ import { armyLedger, MEASURES, measureOn, type Ledger } from '../armyLedger'
 import { formatDate } from '../calendar'
 import { actTitle, levelAt } from '../decisions'
 import { DecisionsView, useProposeDecision } from './Decisions'
+import { NavyView } from './Navy'
+import { MarchView } from './March'
 import { companiesUnder, companyAt, orderActive, orderEnd, rearmCost, rearmDays, trainCost } from '../orders'
 import { GOOD, fmtMarks, fmtPeople, type Good } from '../economy'
 import {
@@ -26,17 +28,19 @@ const modsText = (m: Mods): string => Object.entries(m).filter(([, v]) => v).map
 /** Вкладка «Армия»: сводка и призыв, дерево войск со схемой построения и карточками рот, конструктор уставов */
 export function ArmyView({ st }: { st: WorldState }) {
   const m = st.base.military
-  const [tab, setTab] = useState<'sum' | 'tree' | 'money' | 'decide' | 'orders' | 'designer'>('sum')
+  const [tab, setTab] = useState<'sum' | 'tree' | 'navy' | 'march' | 'money' | 'decide' | 'orders' | 'designer'>('sum')
   if (!m) return <p className="ew-muted">У страны пока нет войска.</p>
   return (
     <div className="mil">
       <div className="mil-tabs">
-        {([['sum', 'Сводка'], ['tree', 'Войска'], ['money', 'Казна войска'], ['decide', 'Решения власти'], ['orders', 'Приказы'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
+        {([['sum', 'Сводка'], ['tree', 'Войска'], ['navy', 'Флот'], ['march', 'Поход'], ['money', 'Казна войска'], ['decide', 'Решения власти'], ['orders', 'Приказы'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
           <button key={k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>{n}</button>
         ))}
       </div>
       {tab === 'sum' && <Summary st={st} m={m} onOpen={() => setTab('tree')} />}
       {tab === 'tree' && <Tree st={st} m={m} />}
+      {tab === 'navy' && <NavyView st={st} m={m} />}
+      {tab === 'march' && <MarchView st={st} m={m} />}
       {tab === 'money' && <Treasury st={st} m={m} onDecide={() => setTab('decide')} />}
       {tab === 'decide' && <DecisionsView st={st} />}
       {tab === 'orders' && <Orders st={st} m={m} />}

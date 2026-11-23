@@ -1082,6 +1082,14 @@ async function migrateWorld(dir: string): Promise<void> {
       st.base.military = { ...structuredClone(d.base.military), ...(keep.measures ? { measures: keep.measures } : {}), ...(keep.orders ? { orders: keep.orders } : {}) }
     }
   }
+  if ((user.version ?? 1) < 66) {
+    // v66: флот ВПИ — эскадры и флоты приморских стран (fleet.ts); только где своего флота ещё нет
+    const ds = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
+    for (const st of user.states ?? []) { const d = ds.get(st.id); if (d?.base?.military?.navy && st.base.military && !st.base.military.navy) st.base.military.navy = structuredClone(d.base.military.navy) }
+    // связи соседних провинций для калькулятора походов: дороги и реки на границах
+    const dp = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
+    for (const p of user.provinces ?? []) { const d = dp.get(p.id); if (d?.links) p.links = structuredClone(d.links) }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

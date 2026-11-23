@@ -54,6 +54,9 @@ interface Store {
   editMode: EditMode
   /** Режим правки вершин выбранного участка */
   vertexEdit: boolean
+  /** путь похода на карте (калькулятор похода) */
+  routePreview: { points: [number, number][]; color: string; label: string } | null
+  setRoutePreview: (r: { points: [number, number][]; color: string; label: string } | null) => void
   /** Режим мастера: показывать тайное знание */
   masterMode: boolean
   mapMode: MapMode
@@ -138,6 +141,8 @@ export const useStore = create<Store>((set, get) => {
     layers: loadLayers(),
     editMode: 'base',
     vertexEdit: false,
+    routePreview: null,
+    setRoutePreview: (routePreview) => set({ routePreview }),
     mapMode: 'political',
     // приложение — для мастера (с 23.11.2026): режим игрока убран, версия игрока будет отдельной
     masterMode: true,
