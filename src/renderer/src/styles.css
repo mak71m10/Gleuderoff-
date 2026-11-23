@@ -2920,3 +2920,13 @@ button.pw-chip:hover { background: var(--panel-2); }
 .sc-decide { margin: 8px 0 12px; }
 .sc-decide > summary { cursor: pointer; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-dim); background: var(--panel); font-family: var(--serif); color: var(--gold-2); }
 .sc-decide[open] > summary { margin-bottom: 10px; }
+
+/* ---- приказы во времени (Army.tsx → Orders, Training) ---- */
+.mil-state { margin: 0; padding: 6px 10px; border-radius: 6px; background: rgba(200, 160, 64, .1); border-left: 3px solid var(--gold); font-size: 13px; }
+.mil-train { display: flex; flex-direction: column; gap: 6px; }
+.mil-orders { display: flex; flex-direction: column; gap: 8px; }
+.mil-order { display: flex; flex-direction: column; gap: 5px; padding: 8px 10px; border-radius: 6px; background: var(--bg-2); border-left: 3px solid var(--gold); font-size: 13px; }
+.mil-order.done { border-left-color: #5a9a50; opacity: .8; }
+.mil-order-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.mil-order-head b { font-family: var(--serif); font-weight: normal; font-size: 15px; }
+.mil-order-head em { margin-left: auto; font-style: normal; font-size: 12px; color: var(--muted); }

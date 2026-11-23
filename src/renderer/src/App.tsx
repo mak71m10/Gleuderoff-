@@ -28,7 +28,6 @@ export default function App() {
   const canUndo = useStore((s) => s.past.length > 0)
   const canRedo = useStore((s) => s.future.length > 0)
   const masterMode = useStore((s) => s.masterMode)
-  const setMasterMode = useStore((s) => s.setMasterMode)
   // на телефоне меню выезжает сбоку по кнопке
   const [navOpen, setNavOpen] = useState(false)
 
@@ -38,7 +37,7 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
-      if ((e.target as HTMLElement).closest('input, textarea')) return
+      if ((e.target as HTMLElement).closest?.('input, textarea')) return
       if (e.ctrlKey && e.code === 'KeyZ') {
         e.preventDefault()
         e.shiftKey ? redo() : undo()
@@ -84,10 +83,6 @@ export default function App() {
           ))}
         </div>
         <div className="nav-bottom">
-          <button className={`master-toggle ${masterMode ? 'on' : ''}`} onClick={() => setMasterMode(!masterMode)} title="В режиме игрока тайное знание мастера скрыто">
-            <Icon name="eye" size={16} />
-            {masterMode ? 'Режим мастера' : 'Режим игрока'}
-          </button>
           <div className="undo-row">
             <button onClick={undo} disabled={!canUndo} title="Отменить (Ctrl+Z)">
               <Icon name="undo" size={16} />

@@ -139,13 +139,8 @@ export const useStore = create<Store>((set, get) => {
     editMode: 'base',
     vertexEdit: false,
     mapMode: 'political',
-    masterMode: (() => {
-      try {
-        return localStorage.getItem('gleuderoff.master') !== '0'
-      } catch {
-        return true
-      }
-    })(),
+    // приложение — для мастера (с 23.11.2026): режим игрока убран, версия игрока будет отдельной
+    masterMode: true,
     saveState: 'saved',
     past: [],
     future: [],
@@ -213,13 +208,8 @@ export const useStore = create<Store>((set, get) => {
     setEditMode: (editMode) => set({ editMode }),
     setVertexEdit: (vertexEdit) => set({ vertexEdit }),
     setMapMode: (mapMode) => set({ mapMode }),
-    setMasterMode: (masterMode) => {
-      try {
-        localStorage.setItem('gleuderoff.master', masterMode ? '1' : '0')
-      } catch {
-        /* без сохранения */
-      }
-      set({ masterMode })
+    setMasterMode: () => {
+      set({ masterMode: true })
     }
   }
 })

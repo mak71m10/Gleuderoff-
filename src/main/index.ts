@@ -1071,6 +1071,17 @@ async function migrateWorld(dir: string): Promise<void> {
     const ds = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
     for (const st of user.states ?? []) { const d = ds.get(st.id); if (d?.base?.military && !st.base.military) st.base.military = structuredClone(d.base.military) }
   }
+  if ((user.version ?? 1) < 65) {
+    // v65: войско ВПИ пересобрано — базы и гарнизоны, корпуса по сторонам света, утечки по лору, свои рода войск всех стран Лоры;
+    // меры и приказы мастера сохраняются
+    const ds = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
+    for (const st of user.states ?? []) {
+      const d = ds.get(st.id)
+      if (!d?.base?.military) continue
+      const keep = { measures: st.base.military?.measures, orders: st.base.military?.orders }
+      st.base.military = { ...structuredClone(d.base.military), ...(keep.measures ? { measures: keep.measures } : {}), ...(keep.orders ? { orders: keep.orders } : {}) }
+    }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

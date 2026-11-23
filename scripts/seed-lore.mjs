@@ -208,7 +208,7 @@ races({ E, Y })
 const reigns = monstargs({ E, Y, entries })
 
 world.entries = [...world.entries.filter((e) => !e.id.startsWith('lore-')), ...entries]
-world.version = 64
+world.version = 65
 states({ world, Y, reigns })
 empireLore({ E, Y, world })
 argusLore({ E, Y, world })

@@ -5,6 +5,7 @@ import { armyLedger, MEASURES, measureOn, type Ledger } from '../armyLedger'
 import { formatDate } from '../calendar'
 import { actTitle, levelAt } from '../decisions'
 import { DecisionsView, useProposeDecision } from './Decisions'
+import { companiesUnder, companyAt, orderActive, orderEnd, rearmCost, rearmDays, trainCost } from '../orders'
 import { GOOD, fmtMarks, fmtPeople, type Good } from '../economy'
 import {
   ARM, ARMS, KIT, KITS, PARTS, PART, QUALITY, REGION_KINDS, SLOTS, STATS, TRAIT, TRAITS, companyPower, companyStats,
@@ -25,12 +26,12 @@ const modsText = (m: Mods): string => Object.entries(m).filter(([, v]) => v).map
 /** Вкладка «Армия»: сводка и призыв, дерево войск со схемой построения и карточками рот, конструктор уставов */
 export function ArmyView({ st }: { st: WorldState }) {
   const m = st.base.military
-  const [tab, setTab] = useState<'sum' | 'tree' | 'money' | 'decide' | 'designer'>('sum')
+  const [tab, setTab] = useState<'sum' | 'tree' | 'money' | 'decide' | 'orders' | 'designer'>('sum')
   if (!m) return <p className="ew-muted">У страны пока нет войска.</p>
   return (
     <div className="mil">
       <div className="mil-tabs">
-        {([['sum', 'Сводка'], ['tree', 'Войска'], ['money', 'Казна войска'], ['decide', 'Решения власти'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
+        {([['sum', 'Сводка'], ['tree', 'Войска'], ['money', 'Казна войска'], ['decide', 'Решения власти'], ['orders', 'Приказы'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
           <button key={k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>{n}</button>
         ))}
       </div>
@@ -38,7 +39,8 @@ export function ArmyView({ st }: { st: WorldState }) {
       {tab === 'tree' && <Tree st={st} m={m} />}
       {tab === 'money' && <Treasury st={st} m={m} onDecide={() => setTab('decide')} />}
       {tab === 'decide' && <DecisionsView st={st} />}
-      {tab === 'designer' && <Designer st={st} m={m} />}
+      {tab === 'orders' && <Orders st={st} m={m} />}
+      {tab === 'designer' && <Designer st={st} m={m} onOrders={() => setTab('orders')} />}
     </div>
   )
 }
@@ -61,7 +63,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
     const goods: Partial<Record<Good, number>> = {}, byArm: Record<string, number> = {}, byRace: Record<string, number> = {}, byQ: Record<string, number> = {}
     const best: { c: Company; p: number }[] = []
     for (const c of m.companies) {
-      const t = tpl.get(c.t), r = companyStats(c, t), p = companyPower(r.stats, c.men)
+      const r = companyAt(m, c, date), t = r.tpl ?? tpl.get(c.t), p = companyPower(r.stats, c.men)
       men += c.men; power += p; cost += r.cost
       for (const [g, v] of Object.entries(r.goods) as [Good, number][]) goods[g] = (goods[g] ?? 0) + v
       const arm = t?.arm ?? 'line'
@@ -70,7 +72,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
     }
     best.sort((a, b) => b.p - a.p)
     return { men, power, cost, goods, byArm, byRace, byQ, best: best.slice(0, 6) }
-  }, [m, tpl])
+  }, [m, tpl, date])
   const rep = useMemo(() => stateReport(world, st, date), [world, st, date])
   const law = m.law
   const level = levelAt(st, date)
@@ -262,6 +264,32 @@ function FormationCard({ st, m, f, men, onPick }: { st: WorldState; m: StateMili
         ))}
       </div>
       {f.companies?.length ? <p className="ew-muted small">Нажмите роту дважды — откроется её карточка.</p> : null}
+      <Training st={st} m={m} f={f} />
+    </div>
+  )
+}
+
+/** учения соединения: 20, 35 или 50 дней; опыт растёт, когда закончатся */
+function Training({ st, m, f }: { st: WorldState; m: StateMilitary; f: Formation }) {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
+  const master = useStore((s) => s.masterMode)
+  const edit = useEditMilitary(st)
+  const ids = useMemo(() => companiesUnder(m, f), [m, f])
+  const now = (m.orders ?? []).find((o) => o.kind === 'train' && o.target === f.id && orderActive(o, date))
+  const PLANS = [{ days: 20, xp: 4, name: 'Строевые учения' }, { days: 35, xp: 7, name: 'Полевые учения' }, { days: 50, xp: 10, name: 'Большие манёвры' }]
+  const start = (days: number, xp: number, name: string): void =>
+    edit((mm) => { mm.orders = [...(mm.orders ?? []), { id: `o${Date.now().toString(36)}`, kind: 'train', from: date, days, xp, cost: trainCost(mm, ids, days), target: f.id, companies: ids, note: `${name} — ${f.name}` }] })
+  return (
+    <div className="mil-train">
+      <h4 className="ed-h4">Учения</h4>
+      {now ? (
+        <p className="mil-state">🎯 {now.note}: до {formatDate(world.calendar, orderEnd(now))}, опыт +{now.xp} у {ids.length} рот.</p>
+      ) : master ? (
+        <div className="dec-actions">
+          {PLANS.map((p) => <button key={p.days} className="mil-go" onClick={() => start(p.days, p.xp, p.name)}>{p.name}: {p.days} дн., опыт +{p.xp}, ≈ {fmtMarks(trainCost(m, ids, p.days))}</button>)}
+        </div>
+      ) : <p className="ew-muted">Учений нет.</p>}
     </div>
   )
 }
@@ -285,10 +313,12 @@ function StatBars({ stats, base }: { stats: Required<Mods>; base?: Required<Mods
 
 function CompanyCard({ st, m, c }: { st: WorldState; m: StateMilitary; c: Company }) {
   const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
   const master = useStore((s) => s.masterMode)
   const edit = useEditMilitary(st)
-  const t = m.templates.find((x) => x.id === c.t)
-  const r = companyStats(c, t)
+  // рота на дату: устав с перевооружениями, опыт после учений
+  const r = companyAt(m, c, date)
+  const t = r.tpl ?? m.templates.find((x) => x.id === c.t)
   const arm = ARM[t?.arm ?? 'line']
   const area = world.adminRegions?.find((a) => a.id === c.area)
   const set = (fn: (cc: Company) => void): void => edit((mm) => { const cc = mm.companies.find((x) => x.id === c.id); if (cc) fn(cc) })
@@ -302,12 +332,14 @@ function CompanyCard({ st, m, c }: { st: WorldState; m: StateMilitary; c: Compan
         </div>
       </div>
       {t?.note && <p className="mil-lore">{t.note}</p>}
+      {r.rearm && <p className="mil-state">⚒ В переучке до {formatDate(world.calendar, orderEnd(r.rearm))}: дисциплина −3, дух и стойкость −1.</p>}
+      {r.train && <p className="mil-state">🎯 На учениях до {formatDate(world.calendar, orderEnd(r.train))}: опыт +{r.train.xp} после окончания.</p>}
       <div className="mil-card-grid">
         <div>
           <StatBars stats={r.stats} />
           <div className="mil-cost">Сила <b>{companyPower(r.stats, c.men)}</b> · содержание <b>{fmtMarks(r.cost)}</b> за ход · {Object.entries(r.goods).filter(([, v]) => v! > 0.05).map(([g, v]) => `${GOOD[g as Good].icon} ${v}`).join(' ')}</div>
           <h4 className="ed-h4">Командир</h4>
-          <p>{c.cmd.name} — {c.cmd.trait}. Опыт роты: {c.xp}.</p>
+          <p>{c.cmd.name} — {c.cmd.trait}. Опыт роты: {r.xp}{r.xp !== c.xp ? ` (с учениями; было ${c.xp})` : ''}.</p>
         </div>
         <div>
           <h4 className="ed-h4">Из чего сложилась</h4>
@@ -339,7 +371,9 @@ function CompanyCard({ st, m, c }: { st: WorldState; m: StateMilitary; c: Compan
 }
 
 // ---------------- конструктор уставов ----------------
-function Designer({ st, m }: { st: WorldState; m: StateMilitary }) {
+function Designer({ st, m, onOrders }: { st: WorldState; m: StateMilitary; onOrders: () => void }) {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
   const master = useStore((s) => s.masterMode)
   const edit = useEditMilitary(st)
   const [id, setId] = useState(m.templates[0]?.id ?? '')
@@ -355,6 +389,19 @@ function Designer({ st, m }: { st: WorldState; m: StateMilitary }) {
   const save = (): void => { edit((mm) => { const i = mm.templates.findIndex((x) => x.id === draft.id); if (i >= 0) mm.templates[i] = structuredClone(draft); else mm.templates.push(structuredClone(draft)) }) }
   const copy = (): void => { const n = { ...structuredClone(draft), id: `${draft.id}-${Date.now().toString(36)}`, name: `${draft.name} (новый)`, unique: false }; edit((mm) => { mm.templates.push(n) }); setId(n.id); setDraft(n) }
   const users = m.companies.filter((c) => c.t === draft.id).length
+  const changed = !!saved && JSON.stringify({ a: saved.arm, p: saved.parts, k: saved.kit }) !== JSON.stringify({ a: draft.arm, p: draft.parts, k: draft.kit })
+  const days = saved && changed ? rearmDays(saved, draft) : 0
+  const price = saved && changed ? rearmCost(saved, draft, users) : 0
+  // перевооружение: устав меняется с даты шкалы, роты в переучке на срок; прежняя версия хранится в приказе
+  const rearm = (): void => {
+    if (!saved) return
+    edit((mm) => {
+      const i = mm.templates.findIndex((x) => x.id === draft.id)
+      mm.orders = [...(mm.orders ?? []), { id: `o${Date.now().toString(36)}`, kind: 'rearm', from: date, days, cost: price, template: draft.id, old: { arm: saved.arm, parts: structuredClone(saved.parts), kit: [...saved.kit], name: saved.name }, note: `${draft.name} (${users} рот)` }]
+      mm.templates[i] = structuredClone(draft)
+    })
+    onOrders()
+  }
 
   return (
     <div className="mil-designer">
@@ -411,10 +458,15 @@ function Designer({ st, m }: { st: WorldState; m: StateMilitary }) {
         <div className="chip-list">{Object.entries(now.goods).filter(([, v]) => v! > 0.05).map(([g, v]) => <span key={g} className="chip">{GOOD[g as Good].icon} {v}</span>)}</div>
         {master && (
           <div className="mil-edit-row">
-            <button className="eco-open" onClick={save}>Сохранить устав{users ? ` (изменит ${users} рот)` : ''}</button>
+            {changed && users > 0 ? (
+              <button className="eco-open" onClick={rearm}>Перевооружить {users} рот: {days} дн., ≈ {fmtMarks(price)}</button>
+            ) : (
+              <button className="eco-open" onClick={save}>Сохранить устав</button>
+            )}
             <button className="eco-open" onClick={copy}>Новый устав из этого</button>
           </div>
         )}
+        {changed && users > 0 && <p className="ew-muted small">Роты по уставу перейдут на новый с {formatDate(world.calendar, date)} и будут в переучке до {formatDate(world.calendar, date + days)}: пока слабее (дисциплина −3). {master && <button className="link-btn" onClick={save}>Исправить устав без переучки</button>}</p>}
         <p className="ew-muted small">Каждая рота по уставу ещё получает своё: народ, край набора, качество снаряжения, черты и опыт.</p>
       </div>
     </div>
@@ -560,6 +612,47 @@ function Treasury({ st, m, onDecide }: { st: WorldState; m: StateMilitary; onDec
           })}
         </div>
       </section>
+    </div>
+  )
+}
+
+// ---------------- приказы во времени ----------------
+function Orders({ st, m }: { st: WorldState; m: StateMilitary }) {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
+  const master = useStore((s) => s.masterMode)
+  const edit = useEditMilitary(st)
+  const list = [...(m.orders ?? [])].sort((a, b) => b.from - a.from)
+  // отмена: учения просто убираются; перевооружение — устав возвращается к прежней версии
+  const cancel = (id: string): void => edit((mm) => {
+    const o = mm.orders?.find((x) => x.id === id)
+    if (!o) return
+    if (o.kind === 'rearm' && o.old) { const t = mm.templates.find((x) => x.id === o.template); if (t) Object.assign(t, structuredClone(o.old)) }
+    mm.orders = mm.orders!.filter((x) => x.id !== id)
+  })
+  if (!list.length) return <p className="ew-muted">Приказов нет. Перевооружение начинается из конструктора уставов, учения — в карточке соединения на вкладке «Войска».</p>
+  return (
+    <div className="mil-orders">
+      {list.map((o) => {
+        const done = orderEnd(o) <= date, waiting = date < o.from
+        const pct = waiting ? 0 : done ? 100 : Math.round((100 * (date - o.from)) / o.days)
+        return (
+          <div key={o.id} className={`mil-order${done ? ' done' : ''}`}>
+            <div className="mil-order-head">
+              <span>{o.kind === 'rearm' ? '⚒' : '🎯'}</span>
+              <b>{o.kind === 'rearm' ? 'Перевооружение' : 'Учения'}: {o.note}</b>
+              <em>{waiting ? 'ещё не начато' : done ? 'завершено' : `идёт, ${pct} %`}</em>
+            </div>
+            <div className="dec-fc-bar"><i style={{ width: `${pct}%` }} /></div>
+            <div className="ew-muted">
+              {formatDate(world.calendar, o.from)} — {formatDate(world.calendar, orderEnd(o))} · {o.days} дн. · {fmtMarks(o.cost)}
+              {o.kind === 'rearm' && o.old ? ` · прежний устав: ${o.old.name} (${ARM[o.old.arm]?.name ?? ''})` : ''}
+              {o.kind === 'train' ? ` · опыт +${o.xp} у ${o.companies?.length ?? 0} рот` : ''}
+            </div>
+            {master && <div className="dec-actions"><button className="link-btn" onClick={() => cancel(o.id)}>{o.kind === 'rearm' ? 'Отменить и вернуть прежний устав' : 'Отменить учения'}</button></div>}
+          </div>
+        )
+      })}
     </div>
   )
 }

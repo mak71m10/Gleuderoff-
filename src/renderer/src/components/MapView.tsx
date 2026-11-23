@@ -462,7 +462,7 @@ export function MapView() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
-      if ((e.target as HTMLElement).closest('input, textarea, select')) return
+      if ((e.target as HTMLElement).closest?.('input, textarea, select')) return
       const s = useStore.getState()
       if (s.tool.kind === 'draw') {
         if (e.key === 'Enter') finishDraw()

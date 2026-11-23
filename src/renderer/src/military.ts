@@ -381,7 +381,11 @@ export interface StateMilitary {
   graft?: Graft
   /** меры по бюджету войска (военные поселения, постой, ревизия…) — действуют с даты */
   measures?: Measure[]
+  /** приказы во времени: перевооружение, учения (orders.ts) */
+  orders?: Order[]
 }
+/** приказ: перевооружение устава (old — прежняя версия) или учения рот соединения */
+export interface Order { id: string; kind: 'rearm' | 'train'; from: number; days: number; cost: number; template?: string; old?: Pick<CompanyTemplate, 'arm' | 'parts' | 'kit' | 'name'>; target?: string; companies?: string[]; xp?: number; note?: string }
 export interface Graft { rate: number; who: string; through: string; note?: string }
 export type MeasureKind = 'settle' | 'billet' | 'scutage' | 'provincial' | 'audit' | 'staffcut'
 export interface Measure { id: string; kind: MeasureKind; from: number; to?: number; scope?: string[]; note?: string }

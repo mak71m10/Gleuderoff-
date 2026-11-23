@@ -1,8 +1,9 @@
 // Казна войска: ведомость расходов армии по статьям, утечки (видит мастер), меры по бюджету.
 // Считается в econCalc.ts для строки «Армия» и показывается во вкладке «Армия» → «Казна войска».
-import { ARM, companyStats, type CostSplit, type Formation, type Graft, type Measure, type MeasureKind, type StateMilitary } from './military'
+import { ARM, type CostSplit, type Formation, type Graft, type Measure, type MeasureKind, type StateMilitary } from './military'
 import type { Role } from './economy'
 import { decisionMeasures, levelAt } from './decisions'
+import { DAY_MONTH, companyAt, orderActive } from './orders'
 import type { Province, WorldData, WorldDate, WorldState } from './types'
 
 const YEAR = 500
@@ -82,8 +83,9 @@ export function armyLedger(world: WorldData, st: WorldState, mil: StateMilitary,
   const per = new Map<string, CostSplit>()
   let noble = 0
   for (const c of mil.companies) {
-    const t = tpl.get(c.t)
-    const r = companyStats(c, t)
+    // рота на дату: устав с учётом перевооружений, опыт после учений
+    const r = companyAt(mil, c, date)
+    const t = r.tpl ?? tpl.get(c.t)
     men += c.men
     const s = { ...r.split }
     if (settled.has(c.id)) s.pay *= 0.4
@@ -146,6 +148,9 @@ export function armyLedger(world: WorldData, st: WorldState, mil: StateMilitary,
     { key: 'train', name: 'Обоз и подвоз', amount: sum.train, note: 'дальше от столицы — дороже' },
     { key: 'vets', name: 'Ветераны и вдовы', amount: vets }
   ]
+  // приказы: разовая цена перевооружения и учений раскладывается на месяцы срока
+  const act = (mil.orders ?? []).filter((o) => orderActive(o, date))
+  if (act.length) lines.push({ key: 'orders', name: 'Перевооружение и учения', amount: act.reduce((s, o) => s + o.cost / Math.max(1, Math.ceil(o.days / DAY_MONTH)), 0), note: act.map((o) => o.kind === 'rearm' ? `перевооружение: ${o.note ?? ''}` : `учения: ${o.note ?? ''}`).join('; ') })
   const au = audits.find((m) => date < m.from + YEAR)
   let total = lines.reduce((s, l) => s + l.amount, 0)
   if (au) { const c = total * 0.04; lines.push({ key: 'audit', name: 'Ревизоры', amount: c, note: 'первый год ревизии' }); total += c }

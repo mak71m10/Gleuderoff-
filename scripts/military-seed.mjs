@@ -160,6 +160,31 @@ for (const st of W.states) {
   let gi = 0
   for (let men = loreMen; men < target - 300 && gi < 40; gi++) { const m = Math.max(300, Math.min(size, target - men)); const r = regiment(genericName(gi), m, gi % 5 === 4 ? 'levy' : 'line'); r.parent = mainUmbrella?.id ?? null; regiments.push(r); men += m }
 
+  // каждый свой род войск страны набран хотя бы в одну роту: заменяем роту подходящего полка (гвардия — первой)
+  const usedT = new Set(companies.map((c) => c.t))
+  const byRegiment = regiments.slice().sort((x, y) => (y.kind === 'guard') - (x.kind === 'guard'))
+  for (const t of templates.filter((x) => x.unique && !usedT.has(x.id))) {
+    const role = ROLE_OF[t.arm] ?? 'line'
+    let target = null
+    for (const r of byRegiment) {
+      for (const bid of r.children) {
+        const bf = formations.find((f) => f.id === bid)
+        const c = bf?.companies?.map((id) => companies.find((x) => x.id === id)).find((x) => x && !tById.get(x.t)?.unique && (ROLE_OF[tById.get(x.t)?.arm] ?? 'line') === role)
+          ?? bf?.companies?.map((id) => companies.find((x) => x.id === id)).find((x) => x && !tById.get(x.t)?.unique)
+          ?? bf?.companies?.map((id) => companies.find((x) => x.id === id)).find((x) => x && companies.filter((y) => y.t === x.t).length > 1)
+        if (c) { target = c; break }
+      }
+      if (target) break
+    }
+    if (!target) continue
+    const men = Math.round((ARM_MEN[t.arm] ?? 120) * (0.8 + rnd() * 0.5))
+    totalMen += men - target.men
+    target.t = t.id; target.men = men
+    if (TEMPLATE_RACE[t.id]) target.race = TEMPLATE_RACE[t.id]
+    if (rnd() < 0.5) target.traits = [...new Set([...target.traits, pick(['fearless', 'stone', 'vets', 'oath'])])]
+    usedT.add(t.id)
+  }
+
   // ---- места базирования: гвардия у столицы, строевые — в городах и крепостях у границ, ополчение — в глубине ----
   const RANK = { capital: 6, city: 5, castle: 4, port: 4, town: 3, temple: 2, tower: 2, fishing: 1, village: 1 }
   const own = new Set(provs.map((p) => p.id))
@@ -271,6 +296,6 @@ for (const st of W.states) {
   const graft = { ...g0, rate }
   b.military = { ladder, law, templates, companies, formations, roots, graft, ...(b.military?.measures ? { measures: b.military.measures } : {}) }
 }
-W.version = Math.max(W.version ?? 0, 64)
+W.version = Math.max(W.version ?? 0, 65)
 writeFileSync(WF + '.tmp', JSON.stringify(W, null, 1)); renameSync(WF + '.tmp', WF)
 console.log(`войска: рот ${totalCompanies}, людей ${totalMen.toLocaleString('ru-RU')}`)

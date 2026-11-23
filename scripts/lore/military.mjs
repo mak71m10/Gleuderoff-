@@ -280,6 +280,115 @@ export const UNIQUE = {
   ]
 }
 
+// ---------- свои рода войск остальных стран Лоры (23.11.2026) — по лору их власти и войск ----------
+const UNIQUE_LORA = {
+  'Имперские Изгнанники': [
+    U('xoath', 'Ветераны Последней клятвы', 'line', { weapon: 'gladius', armor: 'lorica', shield: 'scutum', training: 'veteran', formation: 'testudo', banner: 'legend', train: 'full' }, ['drums', 'trophies'], 'X легион, присягнувший Пустому трону'),
+    U('icegarde', 'Ледяная гвардия', 'heavycav', { weapon: 'sabre', armor: 'lamellar', shield: 'round', mount: 'warhorse', training: 'guard', formation: 'charge', banner: 'eagle', train: 'normal' }, ['skis'], 'конница ставки, зимует в седле')
+  ],
+  'Уунааш': [
+    U('keybearers', 'Ключники', 'line', { weapon: 'mace', armor: 'brigandine', shield: 'round', training: 'guard', formation: 'close', banner: 'house', train: 'normal' }, ['hounds'], 'стража Ворот и Книги Дымов'),
+    U('smokelevy', 'Дворовые дымы', 'light', { weapon: 'spear', armor: 'gambeson', shield: 'wicker', training: 'levy', formation: 'loose', banner: 'company', train: 'light' }, [], 'ополчение приписанных дворов — в День Ворот может уйти')
+  ],
+  'Княжества Гарефорда': [
+    U('flamekeepers', 'Хранители Пламени', 'templars', { weapon: 'mace', armor: 'mail', shield: 'kite', training: 'trained', formation: 'shieldwall', banner: 'holy', train: 'normal' }, ['priest', 'vow'], 'стража Светоча'),
+    U('ringxbows', 'Кольцевые арбалетчики', 'xbow', { weapon: 'heavyxbow', armor: 'brigandine', shield: 'pavise', training: 'trained', formation: 'volley', banner: 'company', train: 'normal' }, [], 'по роте от каждого из десяти княжеств')
+  ],
+  'Объединённые Берега Гренинсворда': [
+    U('sarentoboarders', 'Абордажники Саренто', 'marines', { weapon: 'sword', armor: 'brigandine', shield: 'buckler', training: 'trained', formation: 'boarding', banner: 'company', train: 'river' }, ['boats', 'nets'], 'команды Общего флота'),
+    U('harbourxbows', 'Арбалетчики гаваней', 'xbow', { weapon: 'xbow', armor: 'gambeson', shield: 'pavise', training: 'trained', formation: 'volley', banner: 'house', train: 'normal' }, [], 'стража пяти полисов на стенах гаваней')
+  ],
+  'Графство Штирия': [
+    U('nightrotes', 'Вольные роты Ночного рынка', 'light', { weapon: 'sword', armor: 'brigandine', shield: 'buckler', training: 'veteran', formation: 'ambush', banner: 'company', train: 'light' }, ['chains'], 'служат графу днём и рынку ночью'),
+    U('mutes', 'Немые', 'scouts', { armor: 'gambeson', training: 'veteran', formation: 'ambush', banner: 'nobanner', train: 'light' }, ['nets', 'maps'], 'люди Немой палаты')
+  ],
+  'Республика Чеафарал': [
+    U('freebanners', 'Вольные хоругви', 'line', { weapon: 'daneaxe', armor: 'mail', shield: 'round', training: 'veteran', formation: 'shieldwall', banner: 'house', train: 'normal' }, ['horns'], 'пять мест в Совете Двадцати'),
+    U('saltbows', 'Соляные лучники', 'archers', { weapon: 'longbow', armor: 'gambeson', training: 'trained', formation: 'volley', banner: 'company', train: 'normal' }, [], 'нанимает Соляная гильдия')
+  ],
+  'Кулагон': [
+    U('ringwardens', 'Стража Колец', 'line', { weapon: 'spear', armor: 'mail', shield: 'kite', training: 'guard', formation: 'close', banner: 'house', train: 'normal' }, ['hounds'], 'двое на каждого наследника-заложника'),
+    U('fordmen', 'Перевозчики бродов', 'light', { weapon: 'javelin', armor: 'gambeson', shield: 'wicker', training: 'trained', formation: 'skirmish', banner: 'company', train: 'river' }, ['boats'], 'Братство Перевозчиков')
+  ],
+  'Графство Мангениум': [
+    U('countguard', 'Графская стража', 'line', { weapon: 'halberd', armor: 'brigandine', shield: 'noshield', training: 'trained', formation: 'square', banner: 'house', train: 'normal' }, ['drums'], 'по старому кодексу'),
+    U('secondchancery', 'Люди Второй канцелярии', 'scouts', { armor: 'gambeson', training: 'veteran', formation: 'ambush', banner: 'nobanner', train: 'light' }, ['maps'], 'тайная служба графа')
+  ],
+  'Протекторат Лирия': [
+    U('namedcohort', 'Когорта Имён', 'line', { weapon: 'gladius', armor: 'lorica', shield: 'scutum', training: 'veteran', formation: 'manipular', banner: 'legend', train: 'normal' }, ['trophies'], 'каждый воин — Имя со Стены'),
+    U('hundredsbows', 'Лучники Сотен', 'archers', { weapon: 'longbow', armor: 'gambeson', training: 'trained', formation: 'volley', banner: 'house', train: 'normal' }, [], 'по десятку от каждой Сотни')
+  ],
+  'Павильон Грёз': [
+    U('dreampatrol', 'Патруль границ Грёз', 'lightcav', { weapon: 'sabre', armor: 'mail', mount: 'riding', training: 'trained', formation: 'skirmish', banner: 'company', train: 'light' }, [], 'платят слитками Хранилища'),
+    U('vaultwardens', 'Стражи Хранилища', 'line', { weapon: 'glaive', armor: 'halfplate', shield: 'noshield', training: 'guard', formation: 'close', banner: 'house', train: 'normal' }, [], 'у замка с двумя ключами')
+  ],
+  'Королевство Темерия': [
+    U('thresholdhird', 'Дружина Порога', 'line', { weapon: 'axe', armor: 'mail', shield: 'round', training: 'trained', formation: 'shieldwall', banner: 'house', train: 'normal' }, ['tents'], 'кормится у дверей Очагов'),
+    U('opendoor', 'Странники Открытой Двери', 'light', { weapon: 'spear', armor: 'gambeson', shield: 'round', training: 'trained', formation: 'loose', banner: 'holy', train: 'light' }, ['priest'], 'орден, дающий кров')
+  ],
+  'Династия Креццака': [
+    U('beebows', 'Бортники-лучники', 'archers', { weapon: 'longbow', armor: 'hide', training: 'trained', formation: 'ambush', banner: 'house', train: 'forager' }, ['oil'], 'стреляют из дупел и с бортей'),
+    U('mothersguard', 'Стража Матерей', 'line', { weapon: 'spear', armor: 'mail', shield: 'round', training: 'guard', formation: 'shieldwall', banner: 'house', train: 'normal' }, [], 'клянутся Поясу Старшей Матери')
+  ],
+  'Княжество Харнмарк': [
+    U('razryadhorse', 'Полки по разряду', 'heavycav', { weapon: 'lance', armor: 'mail', shield: 'kite', mount: 'warhorse', training: 'veteran', formation: 'charge', banner: 'house', train: 'normal' }, [], 'место в строю — по службе дедов'),
+    U('housemilitia', 'Ополчение Домов', 'line', { weapon: 'spear', armor: 'gambeson', shield: 'round', training: 'levy', formation: 'close', banner: 'house', train: 'normal' }, [], 'обиженный Дом не выходит')
+  ],
+  'Обливиум Каэлорум': [
+    U('silentguard', 'Молчащие стражи', 'templars', { weapon: 'mace', armor: 'mail', shield: 'kite', training: 'trained', formation: 'shieldwall', banner: 'holy', train: 'normal' }, ['vow'], 'обет молчания и в бою'),
+    U('silentbows', 'Безмолвные лучники', 'archers', { weapon: 'longbow', armor: 'gambeson', training: 'trained', formation: 'volley', banner: 'holy', train: 'normal' }, [], 'стреляют по знаку, без команды голосом')
+  ],
+  'Архиепархия Луправена': [
+    U('luprbrothers', 'Орденские братья Луправены', 'templars', { weapon: 'sword', armor: 'mail', shield: 'kite', training: 'trained', formation: 'shieldwall', banner: 'holy', train: 'normal' }, ['priest'], 'командор ордена в святом совете'),
+    U('luprpilgrims', 'Паломническая стража', 'light', { weapon: 'spear', armor: 'gambeson', shield: 'round', training: 'trained', formation: 'loose', banner: 'holy', train: 'light' }, [], 'охраняет дороги паломников')
+  ],
+  'Архиепархия Ошоморида': [
+    U('oshoknights', 'Рыцари Ошоморидского креста', 'heavycav', { weapon: 'lance', armor: 'mail', shield: 'kite', mount: 'warhorse', training: 'trained', formation: 'charge', banner: 'holy', train: 'normal' }, [], 'малое орденское рыцарство'),
+    U('oshoguard', 'Соборная стража Ошомориды', 'templars', { weapon: 'mace', armor: 'mail', shield: 'kite', training: 'trained', formation: 'close', banner: 'holy', train: 'normal' }, ['priest'])
+  ],
+  'Архиепископия Окрупия': [
+    U('okrupspears', 'Окрупийские копейщики веры', 'line', { weapon: 'pike', armor: 'gambeson', shield: 'noshield', training: 'trained', formation: 'phalanx', banner: 'holy', train: 'normal' }, ['priest'], 'набор с церковных деревень'),
+    U('okruptemplars', 'Братья соборного ключа', 'templars', { weapon: 'sword', armor: 'mail', shield: 'kite', training: 'trained', formation: 'shieldwall', banner: 'holy', train: 'normal' }, ['vow'])
+  ],
+  'Архиепархия Бувезеона': [
+    U('buvkeyknights', 'Рыцари Ключа Бувезеоны', 'heavycav', { weapon: 'warlance', armor: 'mail', shield: 'kite', mount: 'warhorse', training: 'veteran', formation: 'charge', banner: 'holy', train: 'normal' }, [], 'держат ключ над Ла Роше'),
+    U('buvtemplars', 'Стража святого совета', 'templars', { weapon: 'mace', armor: 'mail', shield: 'kite', training: 'trained', formation: 'shieldwall', banner: 'holy', train: 'normal' }, ['priest'])
+  ],
+  'Тоскана': [
+    U('falconieri', 'Кондоттьеры Фальконьери', 'heavycav', { weapon: 'warlance', armor: 'plate', shield: 'kite', mount: 'destrier', training: 'veteran', formation: 'charge', banner: 'house', train: 'full' }, ['wine'], 'платят векселями банковского совета'),
+    U('akelataxbow', 'Арбалетчики Акелаты', 'xbow', { weapon: 'heavyxbow', armor: 'brigandine', shield: 'pavise', training: 'trained', formation: 'volley', banner: 'company', train: 'normal' }, [], 'конторщики и ткачи на стенах')
+  ],
+  'Кальтранская Республика': [
+    U('clanrotes', 'Вольные роты кланов', 'marines', { weapon: 'axe', armor: 'brigandine', shield: 'buckler', training: 'veteran', formation: 'boarding', banner: 'house', train: 'river' }, ['boats'], 'нанимаются с согласия Совета кланов'),
+    U('fishermen', 'Рыбацкое ополчение', 'light', { weapon: 'javelin', armor: 'gambeson', shield: 'wicker', training: 'levy', formation: 'skirmish', banner: 'company', train: 'light' }, ['nets'], 'каждый грамотен — закон о букваре')
+  ],
+  'Ла Роше': [
+    U('vineguard', 'Стража Лозы', 'line', { weapon: 'spear', armor: 'gambeson', shield: 'kite', training: 'trained', formation: 'shieldwall', banner: 'holy', train: 'normal' }, ['priest'], 'мягкий устав сестёр'),
+    U('coastsisters', 'Береговые сёстры', 'light', { weapon: 'javelin', armor: 'gambeson', shield: 'wicker', training: 'levy', formation: 'skirmish', banner: 'holy', train: 'light' }, ['boats'])
+  ],
+  'Вуфинская Республика': [
+    U('consulmarines', 'Морская пехота консулов', 'marines', { weapon: 'sword', armor: 'brigandine', shield: 'buckler', training: 'trained', formation: 'boarding', banner: 'company', train: 'river' }, ['boats'], 'Совет консулов гаваней'),
+    U('orsolinolances', 'Копья Орсолино', 'heavycav', { weapon: 'lance', armor: 'mail', shield: 'kite', mount: 'warhorse', training: 'trained', formation: 'charge', banner: 'house', train: 'normal' }, [], 'конница бессменного канцлера')
+  ],
+  'Республика Шеша': [
+    U('swordsenate', 'Полки Сената Меча', 'line', { weapon: 'pike', armor: 'halfplate', shield: 'noshield', training: 'veteran', formation: 'square', banner: 'legend', train: 'full' }, ['drums'], 'офицеры-помещики голосуют в Сенате'),
+    U('debtors', 'Отработчики долгов', 'light', { weapon: 'spear', armor: 'gambeson', shield: 'wicker', training: 'levy', formation: 'loose', banner: 'company', train: 'light' }, ['chains'], 'должник «отрабатывает» в кондотте')
+  ],
+  'Братство Бездны': [
+    U('drybrothers', 'Сухие братья Колодца', 'line', { weapon: 'mace', armor: 'hide', shield: 'round', training: 'trained', formation: 'close', banner: 'holy', train: 'normal' }, ['vow'], 'отказались от имущества'),
+    U('descenders', 'Спускающиеся', 'scouts', { armor: 'hide', training: 'veteran', formation: 'ambush', banner: 'nobanner', train: 'light' }, ['ladders'], 'прошедшие Спуск')
+  ],
+  // вторые рода войск тем, у кого был один
+  'Королевство Редания': [U('ferryxbow', 'Паромные арбалетчики', 'xbow', { weapon: 'xbow', armor: 'gambeson', shield: 'pavise', training: 'trained', formation: 'volley', banner: 'house', train: 'river' }, ['boats'], 'Паромное братство на пяти переправах')],
+  'Королевство Болетария': [U('griffinknights', 'Рыцари Ордена Грифона', 'heavycav', { weapon: 'warlance', armor: 'plate', shield: 'kite', mount: 'destrier', training: 'veteran', formation: 'charge', banner: 'holy', train: 'full' }, ['blessing'], 'орден под Святой Инквизицией Дагота')],
+  'Рейх': [U('dayhunt', 'Дневная охота', 'archers', { weapon: 'shortbow', armor: 'hide', training: 'trained', formation: 'skirmish', banner: 'nobanner', train: 'forager' }, ['hounds'], 'охота каждый день — и война тоже')],
+  'Олекохт': [U('kaiteda', 'Отряды Кайтеды', 'light', { weapon: 'spear', armor: 'elfmail', shield: 'round', training: 'trained', formation: 'skirmish', banner: 'house', train: 'light' }, [], 'повинность три зимы')],
+  'Фейноко': [U('ridgeguard', 'Горная стража Гряды', 'line', { weapon: 'club', armor: 'hide', shield: 'round', training: 'trained', formation: 'shieldwall', banner: 'house', train: 'normal' }, ['horns'], 'стерегут девять камней')],
+  'Таварвайт': [U('forestspears', 'Копейщики Лесного двора', 'line', { weapon: 'spear', armor: 'gambeson', shield: 'round', training: 'trained', formation: 'close', banner: 'house', train: 'normal' }, [], 'жалованье скрепляет кредитор')],
+  'Когалым': [U('cartbows', 'Лучники Воза', 'archers', { weapon: 'shortbow', armor: 'gambeson', training: 'levy', formation: 'volley', banner: 'company', train: 'wagons' }, [], 'Право Копья: любой вправе взять оружие')]
+}
+for (const [k, list] of Object.entries(UNIQUE_LORA)) UNIQUE[k] = [...(UNIQUE[k] ?? []), ...list]
+
 // ---------- имена командиров ----------
 export const NAMES = {
   imperial: [['Ансельм', 'Бертольд', 'Конрад', 'Дитрих', 'Эберхард', 'Готфрид', 'Хайнрих', 'Людвиг', 'Отто', 'Рупрехт', 'Зигмунд', 'Вильгельм', 'Альбрехт', 'Ульрих', 'Маркус', 'Лотар', 'Гериберт', 'Фалько'], ['Штайн', 'Вальдек', 'Фернау', 'Кельбург', 'Остерхольц', 'Брандт', 'Хаген', 'Лихтенау', 'Мюллер', 'Шварц', 'Райнер', 'фон Тальберг', 'Аурих', 'Грауэр', 'Зоммер', 'Вебер']],
