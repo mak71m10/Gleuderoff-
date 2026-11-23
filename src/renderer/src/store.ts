@@ -3,7 +3,7 @@ import { produce, type Draft } from 'immer'
 import { nanoid } from 'nanoid'
 import type { EntryKind, PlaceType, Temporal, WorldData, WorldDate } from './types'
 
-export type View = 'map' | 'states' | EntryKind | 'timeline' | 'settings'
+export type View = 'map' | 'states' | 'battle' | 'market' | EntryKind | 'timeline' | 'settings'
 
 export type Selection =
   | { type: 'state'; id: string }

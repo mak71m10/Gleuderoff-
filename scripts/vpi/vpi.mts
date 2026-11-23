@@ -5,11 +5,14 @@ import { readFileSync, writeFileSync, renameSync, copyFileSync, existsSync, mkdi
 import { join, dirname } from 'path'
 import { homedir } from 'os'
 import { execSync } from 'child_process'
-import { worldReports, provincesOf } from '../../src/renderer/src/econCalc'
+import { worldReports, provincesOf, marketAt } from '../../src/renderer/src/econCalc'
 import { forecast, decideProfile, TOPICS, actTitle, levelAt, taxesAt, type Decision, type Topic, type Act } from '../../src/renderer/src/decisions'
 import { MEASURES, armyLedger } from '../../src/renderer/src/armyLedger'
 import { companiesUnder, rearmCost, rearmDays, trainCost, orderEnd } from '../../src/renderer/src/orders'
 import { planMarch } from '../../src/renderer/src/marches'
+import { ownerAt } from '../../src/renderer/src/provinces'
+import { REL, REL_BASE, TREATIES, bordersOf, relationsOf, relationAt, type RelKind, type Relation } from '../../src/renderer/src/diplomacy'
+import { fight, sideForce, KINDS, PLAN, TERRAINS, type BattleInput, type SideInput } from '../../src/renderer/src/battle'
 import { SHIP, squadronStats } from '../../src/renderer/src/fleet'
 import { ARM, PART, PARTS, SLOTS, KIT, companyStats, type CompanyTemplate, type Formation, type MeasureKind, type StateMilitary } from '../../src/renderer/src/military'
 import { formatDate, fromParts, toParts } from '../../src/renderer/src/calendar'
@@ -28,7 +31,7 @@ function docs(): string {
 const WORLD = flag('--world') ?? (has('--dev') ? 'resources/default-world/world.json' : join(docs(), 'Gleuderoff', 'worlds', 'gleuderoff', 'world.json'))
 if (!existsSync(WORLD)) { console.error(`Нет мира: ${WORLD}`); process.exit(1) }
 const W: WorldData & Json = JSON.parse(readFileSync(WORLD, 'utf8'))
-const NEED = 66
+const NEED = 67
 if ((W.version ?? 0) < NEED) { console.error(`Мир версии ${W.version}: откройте приложение 0.46 или новее — оно обновит мир до ${NEED}, потом повторите.`); process.exit(1) }
 const save = (): void => {
   const dir = dirname(WORLD), bk = join(dir, 'backups')
@@ -94,9 +97,27 @@ function dossier(st: WorldState): string {
   if (dec.length) out.push('', '## Решения', ...dec.map((d) => `- ${d.title} — ${d.status} (${d.body}, решится ${fd(d.due)})`))
   const log = ((W.vpiLog ?? []) as Json[]).filter((x) => x.state === b.name).slice(-6)
   if (log.length) out.push('', '## Последние вердикты', ...log.map((x) => `- ${fd(x.date)}: ${x.title} — ${x.verdict.slice(0, 200)}`))
-  if (rep) out.push('', `Соседи: ${rep.neighbors.map((id) => W.states.find((s) => s.id === id)?.base.name).filter(Boolean).join(', ')}`)
+  const rels = relationsOf(W, st, DATE, rep ?? null, bordersOf(W, st.id, DATE))
+  if (rels.length) out.push('', '## Дипломатия', ...rels.map((r) => `- ${r.other.base.name}: ${REL[r.rec.kind].name}, оценка ${r.score > 0 ? '+' : ''}${r.score}${r.rec.treaties.length ? `; договоры: ${r.rec.treaties.map((x) => TREATIES[x] ?? x).join(', ')}` : ''}${r.border ? `; граница ${r.border} обл.` : ''}`))
   return out.join('\n')
 }
+
+// ---------- сражение ----------
+function battleOf(a: Json) {
+  const sa = findState(a.a), sb = findState(a.b)
+  const ma = sa.base.military!, mb = sb.base.military!
+  const kind = a.kind ?? 'field'
+  const pick = (m: StateMilitary, list: string[] = []): string[] => kind === 'naval' ? list.map((q) => m.navy?.squadrons.find((s) => s.id === q || s.name === q)?.id).filter(Boolean) as string[] : list.map((q) => fByName(m, q)?.id).filter(Boolean) as string[]
+  const side = (st: WorldState, m: StateMilitary, list: string[], plan: string, rp: Json[], home: boolean): SideInput => ({ stateId: st.id, name: st.base.name, formations: kind === 'naval' ? [] : pick(m, list), squadrons: kind === 'naval' ? pick(m, list) : [], plan: plan ?? 'line', rp: rp ?? [], home })
+  const pid = a.place ? provByName(a.place) : undefined
+  const pr = pid != null ? (W.provinces ?? []).find((x) => x.id === pid) : undefined
+  const inp: BattleInput = { kind, terrain: a.terrain ?? pr?.terrain ?? 1, weather: a.weather ?? 'ясно', fort: a.fort ?? (kind === 'siege' ? 2 : 0), river: a.river ?? (kind === 'crossing' ? 2 : 0), seed: a.seed ?? Math.floor(Math.random() * 1e9), date: DATE, place: a.place,
+    a: side(sa, ma, a.aUnits, a.aPlan, a.aRp, pr ? ownerAt(pr, DATE) === sa.id : false), b: side(sb, mb, a.bUnits, a.bPlan, a.bRp, pr ? ownerAt(pr, DATE) === sb.id : a.bHome !== false) }
+  const fa = sideForce(ma, ma.navy, inp.a, DATE), fb = sideForce(mb, mb.navy, inp.b, DATE)
+  return { inp, fa, fb, r: fight(inp, fa, fb), sa, sb, pr }
+}
+const battleText = (x: ReturnType<typeof battleOf>): string => [`${KINDS[x.inp.kind].name}${x.pr ? ` — ${x.pr.name} (${TERRAINS[x.inp.terrain]?.name})` : ''}: ${x.inp.a.name} (${x.fa.men}${x.fa.ships ? `, ${x.fa.ships} кор.` : ''}; ${PLAN[x.inp.a.plan]?.name}) против ${x.inp.b.name} (${x.fb.men}${x.fb.ships ? `, ${x.fb.ships} кор.` : ''}; ${PLAN[x.inp.b.plan]?.name}) → ${x.r.word}`,
+  ...x.r.phases.map((p) => `  ${p.name}: ${p.text}`), `  Потери: ${x.inp.a.name} — ${x.r.a.lost}${x.r.a.shipsLost ? ` и ${x.r.a.shipsLost} кораблей` : ''}; ${x.inp.b.name} — ${x.r.b.lost}${x.r.b.shipsLost ? ` и ${x.r.b.shipsLost} кораблей` : ''}. ${x.r.notes.join(' ')}`].join('\n')
 
 // ---------- внесение вердикта ----------
 const fByName = (m: StateMilitary, q: string): Formation | undefined => m.formations.find((f) => f.id === q) ?? m.formations.find((f) => f.name === q) ?? m.formations.find((f) => f.name.toLowerCase().includes(q.toLowerCase()))
@@ -213,6 +234,43 @@ function applyAction(a: Json, notes: string[]): void {
     }
     case 'law': b.laws = `${b.laws ?? ''}\n${a.text}`.trim(); notes.push(`${b.name}: закон — ${a.text.slice(0, 80)}`); break
     case 'note': notes.push(`${b.name}: ${a.text}`); break
+    case 'trade': { // { good, qty (+купить / −продать), kind: 'deal'|'contract', months?, note? } — по рыночной цене на дату, комиссия Каяи
+      const mk = marketAt(W, DATE)
+      const price = mk.price[a.good as keyof typeof mk.price]
+      const kind = a.kind ?? 'deal'
+      const sum = Math.round(Math.abs(a.qty) * price * (a.qty > 0 ? 1.04 : 0.96))
+      if (kind === 'deal') { b.econ.treasury += a.qty > 0 ? -sum : sum; if (a.qty > 0 && b.econ.treasury < 0) throw new Error(`не хватает казны: нужно ${sum}`) }
+      ;((W.market ??= { shocks: [] }).trades ??= []).push({ id: id('t'), stateId: st.id, good: a.good, qty: a.qty, price, date: DATE, kind, months: a.months, note: a.note })
+      notes.push(`${b.name}: ${kind === 'contract' ? `договор на ${a.months ?? 1} мес.: ` : ''}${a.qty > 0 ? 'купила' : 'продала'} ${Math.abs(a.qty)} «${a.good}» по ${price} — ${sum} мар.${kind === 'contract' ? ' в месяц' : ''}`); break
+    }
+    case 'market': { // { good, mult, days, note } — потрясение рынка с текущей даты
+      ((W.market ??= { shocks: [] }).shocks as Json[]).push({ id: id('sh'), good: a.good, mult: a.mult, from: DATE, to: DATE + (a.days ?? 200), note: a.note ?? '' })
+      notes.push(`рынок: ${a.good} ×${a.mult} на ${a.days ?? 200} дн. — ${a.note ?? ''}`); break
+    }
+    case 'relation': { // { other, kind?, base?, add?: [договоры], remove?: [договоры], note? } — с текущей даты игры
+      const o = findState(a.other)
+      const rs = ((W.relations ??= []) as Relation[])
+      const old = relationAt(W, st.id, o.id, DATE)
+      if (old) old.to = DATE
+      const n: Relation = { ...(old ? structuredClone(old) : { a: st.id, b: o.id, kind: 'neutral' as RelKind, base: 0, treaties: [], note: '' }), id: id('r'), from: DATE, source: 'master' } as Relation
+      delete (n as Partial<Relation>).to
+      if (a.kind) { n.kind = a.kind; if (a.base == null) n.base = REL_BASE[a.kind as RelKind] }
+      if (a.base != null) n.base = a.base
+      n.treaties = [...new Set([...(n.treaties ?? []).filter((x) => !(a.remove ?? []).includes(x)), ...(a.add ?? [])])]
+      if (a.note) n.note = `${n.note ? n.note + '\n' : ''}${fd(DATE)}: ${a.note}`
+      rs.push(n)
+      notes.push(`${b.name} — ${o.base.name}: ${REL[n.kind].name}, оценка ${n.base}${a.add?.length ? `, договор: ${a.add.map((x: string) => TREATIES[x] ?? x).join(', ')}` : ''}`); break
+    }
+    case 'battle': { // сражение: { b: противник, kind, aUnits, bUnits, aPlan, bPlan, place, aRp, bRp, seed } — потери в роты, битва на карте
+      const x = battleOf({ ...a, a: a.state })
+      for (const [st, sr, won, inpSide] of [[x.sa, x.r.a, x.r.winner === 'a', x.inp.a], [x.sb, x.r.b, x.r.winner === 'b', x.inp.b]] as const) {
+        const mil = st.base.military!
+        for (const c of mil.companies) { const loss = sr.byUnit.get(c.id); if (loss) { c.men = Math.max(5, c.men - loss); c.xp += won ? 3 : 1 } }
+        if (mil.navy && sr.shipsLost) { let left = sr.shipsLost; for (const q of mil.navy.squadrons) { if (!inpSide.squadrons.includes(q.id) || left <= 0) continue; const k = Math.min(q.count, left); q.count -= k; left -= k } }
+      }
+      if (x.pr) (W.places ??= []).push({ id: id('battle-'), mapId: W.maps.find((z) => z.kind === 'world')?.id ?? 'world', x: x.pr.x, y: x.pr.y, base: { name: `Битва — ${x.pr.name}`, type: 'battle', stateId: '', population: '', ruler: '', image: '', description: battleText(x).replace(/\n/g, '\n\n') }, history: [], from: DATE, to: DATE + 1000 } as Json)
+      notes.push(battleText(x)); break
+    }
     default: throw new Error(`неизвестное действие ${a.type}`)
   }
 }
@@ -231,6 +289,9 @@ if (cmd === 'досье' || cmd === 'dossier') {
   const ids = companiesUnder(m, f), men = ids.reduce((s, x) => s + (m.companies.find((c) => c.id === x)?.men ?? 0), 0)
   const p = planMarch(W, st.id, m, ids, f.base!, to, DATE, men, 0)
   console.log(p.ok ? `${f.name} → ${positional[3]}: ${p.days} дн., ${p.km} км, прибытие ${fd(p.arrive)}, хлеба ${p.grain} т, потери ≈ ${p.losses}; ${p.season}: ${p.seasonNote}; через ${p.foreign.join(', ') || 'свои земли'}` : `нельзя: ${p.reason}`)
+} else if (cmd === 'бой' || cmd === 'battle') {
+  // бой <страна A> <страна B> '<JSON: kind, aUnits, bUnits, aPlan, bPlan, place, weather, fort, river, aRp, bRp, seed>' — расчёт без внесения
+  console.log(battleText(battleOf({ a: positional[1], b: positional[2], ...JSON.parse(positional[3] ?? '{}') })))
 } else if (cmd === 'оценка' || cmd === 'estimate') {
   // перевооружение без внесения: срок, цена, характеристики было → стало
   const st = findState(positional[1]); const m = st.base.military!
@@ -262,5 +323,5 @@ if (cmd === 'досье' || cmd === 'dossier') {
 } else if (cmd === 'дата' || cmd === 'date') {
   if (positional[1]) { (W.vpi ??= {}).date = parseDate(positional[1]); save(); console.log(`Дата игры: ${fd(W.vpi.date)}`) } else console.log(`Дата игры: ${fd(DATE)}`)
 } else {
-  console.log('Команды: досье <страна> | оценка <страна> <устав> \'{"armor":"mail"}\' | прогноз <страна> <тема> <act JSON> | поход <страна> <соединение> <цель> | внести <вердикт.json> [--проба] | сводка [--since 1010.1.1] | дата [1010.2.1]\nФлаги: --world <путь> | --dev | --date 1010.1.1')
+  console.log('Команды: досье <страна> | бой <A> <B> \'{"aUnits":[…],"bUnits":[…],"place":"…"}\' | оценка <страна> <устав> \'{"armor":"mail"}\' | прогноз <страна> <тема> <act JSON> | поход <страна> <соединение> <цель> | внести <вердикт.json> [--проба] | сводка [--since 1010.1.1] | дата [1010.2.1]\nФлаги: --world <путь> | --dev | --date 1010.1.1')
 }

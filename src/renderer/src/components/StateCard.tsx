@@ -50,6 +50,7 @@ import { EconomyView } from './Economy'
 import { ArmyView } from './Army'
 import { DecisionsView } from './Decisions'
 import { VpiLogView } from './VpiLog'
+import { DiplomacyView } from './Diplomacy'
 import { fmtMarks } from '../economy'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
 
@@ -522,7 +523,9 @@ function StateCardBody({ id }: { id: string }) {
           </div>
         )}
 
+        {tab === 'diplomacy' && <DiplomacyView st={st} />}
         {tab === 'diplomacy' && (
+          <details className="sc-decide"><summary>📜 Лор дипломатии и сюзерен</summary>
           <div className="sc-cols">
             <div className="sc-side">
               <RefField label="Сюзерен" value={f.overlordId} items={otherStates} emptyLabel="— независимо —" onChange={(overlordId) => set({ overlordId })} />
@@ -536,6 +539,7 @@ function StateCardBody({ id }: { id: string }) {
               <TextField label="Союзы, войны, договоры, отношения" multiline rows={14} value={f.diplomacy} onChange={(diplomacy) => set({ diplomacy })} className={mark('diplomacy')} />
             </div>
           </div>
+          </details>
         )}
 
         {tab === 'overview' && (

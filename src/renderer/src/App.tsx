@@ -7,6 +7,8 @@ import { MapToolbar, LayersPanel, MapModeBar } from './components/MapControls'
 import { Inspector } from './components/Inspector'
 import { Timeline } from './components/Timeline'
 import { StateCard } from './components/StateCard'
+import { BattleView } from './components/Battle'
+import { MarketView } from './components/Market'
 import { CodexView, StatesView } from './components/Codex'
 import { SettingsView } from './components/Settings'
 import { Icon, type IconName } from './components/Icon'
@@ -14,6 +16,8 @@ import { Icon, type IconName } from './components/Icon'
 const NAV: { view: View; label: string; icon: IconName }[] = [
   { view: 'map', label: 'Карта', icon: 'map' },
   { view: 'states', label: 'Государства', icon: 'crown' },
+  { view: 'battle', label: 'Сражение', icon: 'sword' },
+  { view: 'market', label: 'Рынок', icon: 'balance' },
   ...KIND_ORDER.map((k) => ({ view: k as View, label: KINDS[k].plural, icon: KINDS[k].icon }))
 ]
 
@@ -118,6 +122,8 @@ export default function App() {
             </>
           )}
           {view === 'states' && <StatesView />}
+          {view === 'battle' && <BattleView />}
+          {view === 'market' && <MarketView />}
           {view === 'settings' && <SettingsView />}
           {view in KINDS && <CodexView key={view} kind={view as keyof typeof KINDS} />}
         </div>

@@ -1090,6 +1090,10 @@ async function migrateWorld(dir: string): Promise<void> {
     const dp = new Map<number, Json>((def.provinces ?? []).map((p: Json) => [p.id, p]))
     for (const p of user.provinces ?? []) { const d = dp.get(p.id); if (d?.links) p.links = structuredClone(d.links) }
   }
+  if ((user.version ?? 1) < 67) {
+    // v67: дипломатия ВПИ — отношения пар стран из лора, вассалитета и границ (diplomacy.ts); если своих ещё нет
+    if (!user.relations?.length && def.relations) user.relations = structuredClone(def.relations)
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

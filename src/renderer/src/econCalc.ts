@@ -13,6 +13,7 @@ import { ownerAt } from './provinces'
 import { armyLedger, type Ledger } from './armyLedger'
 import { taxesAt } from './decisions'
 import { squadronStats } from './fleet'
+import { computeMarket, contractsOf, type MarketReport } from './market'
 import { toParts } from './calendar'
 import type { AdminRegion, Entry, Province, WorldData, WorldDate, WorldState } from './types'
 
@@ -180,6 +181,9 @@ function ownerIndex(owned: Map<string, Province[]>): Map<number, string> {
 // кэш отчётов на дату: все страны мира считаются вместе (нужно для торговли)
 let cacheWorld: WorldData | null = null
 const cache = new Map<number, Map<string, EconReport>>()
+const marketOf = new WeakMap<Map<string, EconReport>, MarketReport>()
+/** рынок на дату (цены, спрос и предложение, кто продаёт и покупает) */
+export function marketAt(world: WorldData, date: WorldDate): MarketReport { return marketOf.get(worldReports(world, date))! }
 
 /** отчёт по стране на дату (по умолчанию — 1010 г., Ячори) */
 export function stateReport(world: WorldData, st: WorldState, date?: WorldDate): EconReport | null {
@@ -206,7 +210,10 @@ export function worldReports(world: WorldData, date: WorldDate): Map<string, Eco
     if (!st.base.econ || !provs?.length) continue
     reports.set(st.id, one(world, st, provs, owned, areaById, areaPop, year, month, S, date))
   }
-  trade(world, reports, owned)
+  // живой рынок на дату: цены из спроса и предложения мира, войн и потрясений; торговля считается по ним
+  const market = computeMarket(world, date, reports)
+  marketOf.set(reports, market)
+  trade(world, reports, owned, market.price)
   cache.set(date, reports)
   if (cache.size > 12) cache.delete(cache.keys().next().value!)
   return reports
@@ -255,7 +262,9 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   const produced = (Object.entries(FOOD) as [Good, number][]).reduce((s, [g, kk]) => s + (production[g] ?? 0) * kk, 0)
   const yearAvg = grainYear + ((production.fish ?? 0) / Math.max(0.01, S.fish)) * 0.9 + ((production.cattle ?? 0) / Math.max(0.01, S.cattle)) * 1.6
   const kinds = (Object.keys(FOOD) as Good[]).map((g) => ({ good: g, amount: Math.round((production[g] ?? 0) * (FOOD[g] ?? 1)) })).filter((x) => x.amount > 0)
-  const stockNow = stock * S.stock * Math.min(1.3, Math.max(0.3, yearAvg / Math.max(1, need)))
+  // купленная на рынке еда ложится в амбары (за последний год; рыба и скот — по пищевой ценности)
+  const bought = (world.market?.trades ?? []).filter((x) => x.stateId === st.id && x.kind === 'deal' && x.date <= date && date - x.date < 500 && FOOD[x.good]).reduce((s, x) => s + x.qty * (FOOD[x.good] ?? 1), 0)
+  const stockNow = Math.max(0, bought + stock * S.stock * Math.min(1.3, Math.max(0.3, yearAvg / Math.max(1, need))))
   const deficit = need - produced
   const months = deficit > 0 ? stockNow / deficit : Infinity
 
@@ -302,6 +311,8 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
     expense.push({ name: 'Флот', amount: Math.round(cost), note: `${n} кораблей в ${navy.squadrons.length} эскадрах${war.length < navy.squadrons.length ? ', с торговыми по найму' : ''}` })
   } else if (ships) expense.push({ name: 'Флот', amount: Math.round(ships * 4), note: `≈ ${ships} кораблей` })
   if (nb) expense.push({ name: 'Постройки и мануфактуры', amount: nb * 6, note: `${nb} построек` })
+  // договоры поставки на рынке Каяи (покупка — расход, продажа — доход)
+  for (const c of contractsOf(world, st.id, date)) (c.income ? income : expense).push({ name: c.name, amount: c.amount, note: c.note })
   for (const d of e.debts) expense.push({ name: `Проценты: ${d.to}`, amount: Math.round(d.sum * d.rate), note: `долговая печать на ${Math.round(d.sum).toLocaleString('ru-RU')} мар., срок ${d.due} г.` })
 
   // соседи по суше на дату — для торговли
@@ -319,7 +330,7 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
 }
 
 // ---------- торговля: излишки уходят соседям, морем и на рынок Каяи ----------
-function trade(world: WorldData, reports: Map<string, EconReport>, owned: Map<string, Province[]>) {
+function trade(world: WorldData, reports: Map<string, EconReport>, owned: Map<string, Province[]>, P: Record<Good, number>) {
   const FOODS = new Set<Good>(['grain', 'fish', 'cattle'])
   const surplus = new Map<string, Partial<Record<Good, number>>>(), deficit = new Map<string, Partial<Record<Good, number>>>()
   for (const [id, r] of reports) {
@@ -349,18 +360,18 @@ function trade(world: WorldData, reports: Map<string, EconReport>, owned: Map<st
       const ex: { good: Good; amount: number }[] = [], im: { good: Good; amount: number }[] = []
       for (const [g, v] of Object.entries(surplus.get(id)!) as [Good, number][]) { const need = deficit.get(o)![g]; if (need) ex.push({ good: g, amount: Math.min(v, need) * w }) }
       for (const [g, v] of Object.entries(deficit.get(id)!) as [Good, number][]) { const has = surplus.get(o)![g]; if (has) im.push({ good: g, amount: Math.min(v, has) * w }) }
-      const value = [...ex, ...im].reduce((s, x) => s + x.amount * GOOD[x.good].price, 0)
+      const value = [...ex, ...im].reduce((s, x) => s + x.amount * P[x.good], 0)
       if (value < 5) continue
       const so = stById.get(o)!
-      const top4 = (a: { good: Good; amount: number }[]) => a.filter((x) => x.amount > 0.5).sort((x, y) => y.amount * GOOD[y.good].price - x.amount * GOOD[x.good].price).slice(0, 4)
+      const top4 = (a: { good: Good; amount: number }[]) => a.filter((x) => x.amount > 0.5).sort((x, y) => y.amount * P[y.good] - x.amount * P[x.good]).slice(0, 4)
       partners.push({ id: o, name: so.base.name, color: so.base.color, exports: top4(ex), imports: top4(im), value, by })
     }
     partners.sort((a, b) => b.value - a.value)
     const top = partners.slice(0, 6)
     // остаток излишков — на рынок Каяи (через конторы, с комиссией)
     const sur = Object.entries(surplus.get(id)!) as [Good, number][]
-    const rest = sur.reduce((s, [g, v]) => s + v * GOOD[g].price * 0.2, 0)
-    if (kaya && id !== kaya.id && rest > 20) top.push({ id: kaya.id, name: 'Рынок Каяи', color: kaya.base.color, exports: sur.sort((a, b) => b[1] * GOOD[b[0]].price - a[1] * GOOD[a[0]].price).slice(0, 4).map(([g, v]) => ({ good: g, amount: v * 0.2 })), imports: [], value: rest, by: 'рынок Каяи' })
+    const rest = sur.reduce((s, [g, v]) => s + v * P[g] * 0.2, 0)
+    if (kaya && id !== kaya.id && rest > 20) top.push({ id: kaya.id, name: 'Рынок Каяи', color: kaya.base.color, exports: sur.sort((a, b) => b[1] * P[b[0]] - a[1] * P[a[0]]).slice(0, 4).map(([g, v]) => ({ good: g, amount: v * 0.2 })), imports: [], value: rest, by: 'рынок Каяи' })
     r.trade = top
     const turnover = top.reduce((s, p) => s + p.value, 0)
     const money = st.base.tech?.levels.money ?? 1

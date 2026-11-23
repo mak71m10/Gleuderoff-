@@ -55,6 +55,10 @@ tools: Bash, Read, Write, Glob, Grep
 - `{"type":"recruit","formation":"<соединение>","template":"<устав>","companies":4}` — набор новых рот (разовая цена из казны).
 - `{"type":"disband","formation":"<соединение>"}` — распустить.
 - `{"type":"navy","squadron":"<эскадра>","count":20}` или новая эскадра `{"type":"navy","squadron":"Новая","fleet":"<флот>","ship":"cog","count":6}`.
+- `{"type":"battle","b":"<противник>","kind":"field|siege|ambush|crossing|naval","aUnits":["<соединения или эскадры>"],"bUnits":[…],"aPlan":"<замысел>","bPlan":"…","place":"<область>"}` — сражение (только если мастер велел решить бой расчётом; обычно бой решает мастер в калькуляторе «Сражение»). Прикинуть заранее: `node scripts/vpi.mjs бой "<A>" "<B>" '<те же поля JSON>'`. Замыслы: line, shieldwall, volley, rush, flank, reserve, feint, night, storm, bombard, starve, mine, sally, hold, trap, gauge, board, fireships, naval-line.
+- `{"type":"relation","other":"<страна>","kind":"war|hostile|tension|truce|neutral|trade|alliance|vassal","base":-40,"add":["trade"],"remove":[],"note":"…"}` — изменить отношения с другой страной (договоры: trade, debt, tribute, marriage, passage, defense, truce, border). Объявление войны, союз, мир — через решение власти (тема war), а после принятия — это действие.
+- `{"type":"trade","good":"grain","qty":3000}` — купить (qty > 0) или продать (qty < 0) на бирже Каяи по цене дня, комиссия 4 %; `"kind":"contract","months":3` — договор поставки (qty в месяц). Продавать только излишек, покупать — если хватает казны. Правила — docs/впи-рынок-и-дипломатия.md.
+- `{"type":"market","good":"grain","mult":1.5,"days":200,"note":"…"}` — потрясение рынка (блокада, скупка, сожжённые амбары) — только если приказ реально двигает рынок.
 - `{"type":"law","text":"…"}` — новый закон в текст законов. `{"type":"note","text":"…"}` — запись без изменений.
 
 ## Правила

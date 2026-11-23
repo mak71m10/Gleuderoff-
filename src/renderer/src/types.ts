@@ -641,6 +641,10 @@ export interface WorldData {
   vpiLog?: { id: string; date: WorldDate; at: string; state: string; title: string; order: string; verdict: string; public: string; changes: string[] }[]
   /** ВПИ: текущая дата игры */
   vpi?: { date?: WorldDate }
+  /** дипломатия: отношения пар стран на даты (diplomacy.ts) */
+  relations?: import('./diplomacy').Relation[]
+  /** живой рынок: потрясения мастера (неурожай, блокада, рудник) — market.ts */
+  market?: { shocks: import('./market').MarketShock[]; trades?: import('./market').MarketTrade[] }
   name: string
   calendar: Calendar
   maps: MapDef[]

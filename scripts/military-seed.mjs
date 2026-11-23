@@ -381,6 +381,6 @@ for (const st of W.states) {
   const graft = { ...g0, rate }
   b.military = { ladder, law, templates, companies, formations, roots, graft, ...(b.military?.measures ? { measures: b.military.measures } : {}), ...(b.military?.navy ? { navy: b.military.navy } : {}) }
 }
-W.version = Math.max(W.version ?? 0, 66)
+W.version = Math.max(W.version ?? 0, 67)
 writeFileSync(WF + '.tmp', JSON.stringify(W, null, 1)); renameSync(WF + '.tmp', WF)
 console.log(`войска: рот ${totalCompanies}, людей ${totalMen.toLocaleString('ru-RU')}`)
