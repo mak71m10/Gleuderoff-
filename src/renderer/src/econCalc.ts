@@ -54,7 +54,9 @@ const BUILD_OUT: Record<string, Partial<Record<Good, number>>> = {
 /** подать с 1000 человек роли за ход при «обычных» податях, марки */
 const TAX: Record<Role, number> = { feeders: 1.1, makers: 4.5, rulers: 7, servants: 0, learned: 2, unfree: 0.2 }
 export const TAX_MULT: Record<string, number> = { 'лёгкие': 0.6, 'обычные': 1, 'тяжёлые': 1.5, 'разорительные': 2.2 }
-export const TAX_CONTENT: Record<string, number> = { 'лёгкие': 8, 'обычные': 0, 'тяжёлые': -10, 'разорительные': -22 }
+/** какую долю жалованья казна платит войскам вне постоянного войска — по уровню сбора из закона */
+export const LEVEL_PAY: Record<string, number> = { 'мир': 0.3, 'сбор': 0.7, 'великий сбор': 1, 'всеобщий призыв': 1.15 }
+export const TAX_CONTENT:Record<string, number> = { 'лёгкие': 8, 'обычные': 0, 'тяжёлые': -10, 'разорительные': -22 }
 
 // ---------- события и их след в экономике ----------
 type Kind = 'war' | 'raid' | 'unrest' | 'disaster' | 'boom' | 'deal'
@@ -274,15 +276,23 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   const ADMIN: Record<string, number> = { orcish: 0.35, nordic: 0.65, eluin: 0.65, elven: 0.75, dark: 0.5, zlatay: 0.8, desert: 0.85 }
   const nAreas = share.size
   expense.push({ name: 'Содержание областей', amount: Math.round((nAreas * 12 + pop * 0.0008) * (ADMIN[cult] ?? 1)), note: `${nAreas} областей: наместники, суды, дороги, стража` })
-  expense.push({ name: 'Двор и канцелярия', amount: Math.round(40 + taxSum * 0.18) })
+  expense.push({ name: 'Двор и канцелярия', amount: Math.round(Math.min(40, 10 + taxSum * 0.15) + taxSum * 0.18) })
   expense.push({ name: 'Сбор податей', amount: Math.round(taxSum * 0.08), note: 'сборщики, откупщики, потери в дороге' })
   // войско: если у страны есть роты (военная система) — люди и содержание из них, иначе из текста армии
   const mil = st.base.military
-  let milMen = 0, milCost = 0
-  if (mil) { const tpl = new Map(mil.templates.map((t) => [t.id, t])); for (const c of mil.companies) { milMen += c.men; milCost += companyStats(c, tpl.get(c.t)).cost } }
+  let milMen = 0, milCost = 0, standing = 0
+  if (mil) {
+    const tpl = new Map(mil.templates.map((t) => [t.id, t])); for (const c of mil.companies) { milMen += c.men; milCost += companyStats(c, tpl.get(c.t)).cost }
+    // постоянное войско (доля населения по закону) получает полное жалованье; остальные — ополчение, дружины и сеньоры
+    // по домам: в мирное время казне они стоят долю (оружие, сборы, кормовые), при сборе — почти полностью
+    standing = Math.min(milMen, Math.round(pop * mil.law.standing))
+    const atHome = (LEVEL_PAY[mil.law.level] ?? 0.3) * (cult === 'orcish' ? 0.5 : 1)
+    const war = cond.army > 1.2 ? 1 : 0
+    milCost *= (standing + (milMen - standing) * (war ? Math.max(atHome, 0.8) : atHome)) / Math.max(1, milMen)
+  }
   const soldiers = Math.round((mil ? milMen : armySize(st.base.army)) * Math.min(2, cond.army))
   const ships = shipCount(st.base.navy)
-  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: Math.round((mil ? milCost : soldiers * 0.045) * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${mil ? `, ${mil.companies.length} рот` : ''}` })
+  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: Math.round((mil ? milCost : soldiers * 0.045) * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${mil ? `, ${mil.companies.length} рот; на жалованье ${standing.toLocaleString('ru-RU')}, остальные — ${mil.law.level === 'мир' ? 'по домам' : mil.law.level}` : ''}` })
   if (ships) expense.push({ name: 'Флот', amount: Math.round(ships * 4), note: `≈ ${ships} кораблей` })
   if (nb) expense.push({ name: 'Постройки и мануфактуры', amount: nb * 6, note: `${nb} построек` })
   for (const d of e.debts) expense.push({ name: `Проценты: ${d.to}`, amount: Math.round(d.sum * d.rate), note: `долговая печать на ${Math.round(d.sum).toLocaleString('ru-RU')} мар., срок ${d.due} г.` })

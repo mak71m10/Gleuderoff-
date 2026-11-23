@@ -71,6 +71,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
   const workers = (rep?.byRole.feeders ?? 0) + (rep?.byRole.makers ?? 0)
   const canCall = Math.round(workers * law.levy * k + (law.nobles ? (rep?.byRole.rulers ?? 0) * 0.3 : 0) + (law.unfree ? (rep?.byRole.unfree ?? 0) * law.levy * 2 * k : 0))
   const share = rep?.pop ? (100 * calc.men) / rep.pop : 0
+  const paid = rep?.expense.find((l) => l.name.startsWith('Армия'))?.amount
   const goodsList = (Object.entries(calc.goods) as [Good, number][]).filter(([, v]) => v > 0.5).sort((a, b) => b[1] * GOOD[b[0]].price - a[1] * GOOD[a[0]].price)
 
   return (
@@ -79,7 +80,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
         <div className="ew-tile"><span>Под знамёнами</span><b>{fmtPeople(calc.men)}</b><i>{m.companies.length} рот · {share.toFixed(1).replace('.', ',')} % жителей</i></div>
         <div className="ew-tile"><span>Сила войска</span><b>{powerWord(calc.power)}</b><i>{calc.power.toLocaleString('ru-RU')} очков</i></div>
         <div className="ew-tile"><span>Можно призвать</span><b>{fmtPeople(canCall)}</b><i>при уровне «{law.level}»</i></div>
-        <div className="ew-tile"><span>Содержание</span><b>{fmtMarks(calc.cost)}</b><i>за ход{rep ? ` · казна ${rep.net >= 0 ? '+' : ''}${fmtMarks(rep.net)}` : ''}</i></div>
+        <div className="ew-tile"><span>Содержание</span><b>{fmtMarks(paid ?? calc.cost)}</b><i>за ход{paid != null ? ` (всё войско на жалованье — ${fmtMarks(calc.cost)})` : ''}{rep ? ` · казна ${rep.net >= 0 ? '+' : ''}${fmtMarks(rep.net)}` : ''}</i></div>
         <div className="ew-tile"><span>Уставов</span><b>{m.templates.length}</b><i>{m.templates.filter((t) => t.unique).length} своих родов войск</i></div>
         <div className="ew-tile"><span>Лестница</span><b className="small">{[m.ladder.company, m.ladder.battalion, m.ladder.regiment].join(' → ')}</b><i>{[m.ladder.corps, m.ladder.army].join(' → ')}</i></div>
       </div>
