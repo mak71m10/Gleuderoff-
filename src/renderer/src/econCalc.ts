@@ -10,7 +10,7 @@
  */
 import { GOOD, GOODS, type Good, type Role } from './economy'
 import { ownerAt } from './provinces'
-import { companyStats } from './military'
+import { armyLedger, type Ledger } from './armyLedger'
 import { toParts } from './calendar'
 import type { AdminRegion, Entry, Province, WorldData, WorldDate, WorldState } from './types'
 
@@ -54,8 +54,6 @@ const BUILD_OUT: Record<string, Partial<Record<Good, number>>> = {
 /** подать с 1000 человек роли за ход при «обычных» податях, марки */
 const TAX: Record<Role, number> = { feeders: 1.1, makers: 4.5, rulers: 7, servants: 0, learned: 2, unfree: 0.2 }
 export const TAX_MULT: Record<string, number> = { 'лёгкие': 0.6, 'обычные': 1, 'тяжёлые': 1.5, 'разорительные': 2.2 }
-/** какую долю жалованья казна платит войскам вне постоянного войска — по уровню сбора из закона */
-export const LEVEL_PAY: Record<string, number> = { 'мир': 0.3, 'сбор': 0.7, 'великий сбор': 1, 'всеобщий призыв': 1.15 }
 export const TAX_CONTENT:Record<string, number> = { 'лёгкие': 8, 'обычные': 0, 'тяжёлые': -10, 'разорительные': -22 }
 
 // ---------- события и их след в экономике ----------
@@ -141,6 +139,8 @@ export interface EconReport {
   net: number
   treasury: number
   soldiers: number
+  /** казна войска: статьи, утечки, меры (если у страны есть роты) */
+  ledger?: Ledger
   ships: number
   content: Partial<Record<Role, number>>
   events: EconEvent[]
@@ -202,7 +202,7 @@ export function worldReports(world: WorldData, date: WorldDate): Map<string, Eco
   for (const st of world.states) {
     const provs = owned.get(st.id)
     if (!st.base.econ || !provs?.length) continue
-    reports.set(st.id, one(world, st, provs, owned, areaById, areaPop, year, month, S))
+    reports.set(st.id, one(world, st, provs, owned, areaById, areaPop, year, month, S, date))
   }
   trade(world, reports, owned)
   cache.set(date, reports)
@@ -210,7 +210,7 @@ export function worldReports(world: WorldData, date: WorldDate): Map<string, Eco
   return reports
 }
 
-function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<string, Province[]>, areaById: Map<string, AdminRegion>, areaPop: Map<string, number>, year: number, month: number, S: (typeof SEASONS)[number]): EconReport {
+function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<string, Province[]>, areaById: Map<string, AdminRegion>, areaPop: Map<string, number>, year: number, month: number, S: (typeof SEASONS)[number], date: WorldDate): EconReport {
   const e = st.base.econ!
   const cond = condition(world, st, year)
   const tech = st.base.tech?.levels
@@ -280,19 +280,16 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   expense.push({ name: 'Сбор податей', amount: Math.round(taxSum * 0.08), note: 'сборщики, откупщики, потери в дороге' })
   // войско: если у страны есть роты (военная система) — люди и содержание из них, иначе из текста армии
   const mil = st.base.military
-  let milMen = 0, milCost = 0, standing = 0
-  if (mil) {
-    const tpl = new Map(mil.templates.map((t) => [t.id, t])); for (const c of mil.companies) { milMen += c.men; milCost += companyStats(c, tpl.get(c.t)).cost }
-    // постоянное войско (доля населения по закону) получает полное жалованье; остальные — ополчение, дружины и сеньоры
-    // по домам: в мирное время казне они стоят долю (оружие, сборы, кормовые), при сборе — почти полностью
-    standing = Math.min(milMen, Math.round(pop * mil.law.standing))
-    const atHome = (LEVEL_PAY[mil.law.level] ?? 0.3) * (cult === 'orcish' ? 0.5 : 1)
-    const war = cond.army > 1.2 ? 1 : 0
-    milCost *= (standing + (milMen - standing) * (war ? Math.max(atHome, 0.8) : atHome)) / Math.max(1, milMen)
+  // казна войска (armyLedger.ts): статьи, утечки, меры; без рот — по тексту армии
+  const ledger: Ledger | undefined = mil ? armyLedger(world, st, mil, { date, pop, cult, war: cond.army > 1.2, provs, byRole }) : undefined
+  const milMen = ledger?.men ?? 0
+  if (ledger) {
+    for (const l of ledger.income) income.push({ name: l.name, amount: l.amount, note: l.note })
+    for (const [r, v] of Object.entries(ledger.content) as [Role, number][]) if (content[r] != null) content[r] = Math.max(0, Math.min(100, content[r]! + v))
   }
   const soldiers = Math.round((mil ? milMen : armySize(st.base.army)) * Math.min(2, cond.army))
   const ships = shipCount(st.base.navy)
-  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: Math.round((mil ? milCost : soldiers * 0.045) * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${mil ? `, ${mil.companies.length} рот; на жалованье ${standing.toLocaleString('ru-RU')}, остальные — ${mil.law.level === 'мир' ? 'по домам' : mil.law.level}` : ''}` })
+  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: ledger ? ledger.total : Math.round(soldiers * 0.045 * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${ledger ? `, ${mil!.companies.length} рот; на жалованье ${ledger.standing.toLocaleString('ru-RU')}, остальные — ${mil!.law.level === 'мир' ? 'по домам' : mil!.law.level}` : ''}` })
   if (ships) expense.push({ name: 'Флот', amount: Math.round(ships * 4), note: `≈ ${ships} кораблей` })
   if (nb) expense.push({ name: 'Постройки и мануфактуры', amount: nb * 6, note: `${nb} построек` })
   for (const d of e.debts) expense.push({ name: `Проценты: ${d.to}`, amount: Math.round(d.sum * d.rate), note: `долговая печать на ${Math.round(d.sum).toLocaleString('ru-RU')} мар., срок ${d.due} г.` })
@@ -307,7 +304,7 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   return {
     year, month, season: S, pop, byRole, byRace, production, consumption,
     food: { stock: stockNow, need, produced, yearPct: Math.round((100 * yearAvg) / Math.max(1, need)), months, kinds },
-    income, expense, net, treasury, soldiers, ships, content, events: cond.active, provinces: provs.length, areas: nAreas, neighbors: [...neighbors], trade: []
+    income, expense, net, treasury, ledger, soldiers, ships, content, events: cond.active, provinces: provs.length, areas: nAreas, neighbors: [...neighbors], trade: []
   }
 }
 
@@ -373,5 +370,5 @@ export function foodByMonth(world: WorldData, st: WorldState, date: WorldDate): 
   for (const p of world.provinces ?? []) { areaPop.set(p.areaId, (areaPop.get(p.areaId) ?? 0) + (p.pop ?? 0)); const o = ownerAt(p, d0); if (o) (owned.get(o) ?? owned.set(o, []).get(o)!).push(p) }
   const provs = owned.get(st.id)
   if (!provs || !st.base.econ) return SEASONS.map(() => 0)
-  return SEASONS.map((S, m) => { const r = one(world, st, provs, owned, areaById, areaPop, y, m, S); return Math.round((100 * r.food.produced) / Math.max(1, r.food.need)) })
+  return SEASONS.map((S, m) => { const r = one(world, st, provs, owned, areaById, areaPop, y, m, S, date); return Math.round((100 * r.food.produced) / Math.max(1, r.food.need)) })
 }

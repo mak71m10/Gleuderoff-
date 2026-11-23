@@ -766,6 +766,56 @@ export function MapView() {
     return () => clearTimeout(glide)
   }, [world.armies, date, layers.armies, mapDef.id])
 
+  // --- места базирования войск выбранной страны (военная система, base.military): знамя на области базы ---
+  const baseLayer = useRef<L.LayerGroup | null>(null)
+  const selStateId = selection?.type === 'state' ? selection.id : null
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    if (!map.getPane('armies')) map.createPane('armies').style.zIndex = '640'
+    baseLayer.current?.remove()
+    baseLayer.current = null
+    const st = selStateId ? world.states.find((s) => s.id === selStateId) : undefined
+    const mil = st?.base.military
+    if (!mil || !mapDef.provinceMap || !layers.armies) return
+    const layer = L.layerGroup([], { pane: 'armies' }).addTo(map)
+    baseLayer.current = layer
+    const fById = new Map(mil.formations.map((f) => [f.id, f]))
+    const menOf = new Map(mil.companies.map((c) => [c.id, c.men]))
+    const men = (id: string): number => { const f = fById.get(id); if (!f) return 0; return (f.companies ?? []).reduce((s, c) => s + (menOf.get(c) ?? 0), 0) + f.children.reduce((s, c) => s + men(c), 0) }
+    const byProv = new Map<number, { id: string; name: string; men: number; level: string }[]>()
+    const parentOf = new Map<string, string>()
+    for (const f of mil.formations) for (const ch of f.children) parentOf.set(ch, f.id)
+    for (const f of mil.formations) if (f.base != null && f.level !== 'battalion') (byProv.get(f.base) ?? byProv.set(f.base, []).get(f.base)!).push({ id: f.id, name: f.name, men: men(f.id), level: f.level })
+    const provById = new Map((world.provinces ?? []).map((p) => [p.id, p]))
+    const color = st!.base.color || '#b08840'
+    // гарнизоны батальонов — малые точки без подписи
+    for (const f of mil.formations) {
+      if (f.level !== 'battalion' || f.base == null || byProv.has(f.base)) continue
+      const p = provById.get(f.base)
+      if (!p) continue
+      const parent = mil.formations.find((x) => x.children.includes(f.id))
+      L.marker([-p.y, p.x], { pane: 'armies', title: `${p.name}: гарнизон — ${f.name}${parent ? `, ${parent.name}` : ''} (${men(f.id).toLocaleString('ru-RU')})`, icon: L.divIcon({ className: 'army-wrap army-base-wrap', iconSize: [0, 0], html: `<div class="army-post" style="--c:${color}"></div>` }) }).addTo(layer)
+    }
+    for (const [pid, list] of byProv) {
+      const p = provById.get(pid)
+      if (!p) continue
+      list.sort((a, b) => b.men - a.men)
+      // численность места — без двойного счёта: полк внутри армии, стоящей там же, не прибавляется
+      const here = new Set(list.map((x) => x.id))
+      const inside = (id: string): boolean => { let p = parentOf.get(id); while (p) { if (here.has(p)) return true; p = parentOf.get(p) } return false }
+      const total = list.filter((x) => !inside(x.id)).reduce((s, x) => s + x.men, 0)
+      const main = list.find((x) => x.level === 'army') ?? list[0]
+      // подписи — только у армий и корпусов; полки — малые знамёна с подсказкой, чтобы не налезали
+      const big = list.some((x) => x.level === 'army' || x.level === 'corps')
+      const label = big ? `<div class="army-name">${escapeHtml(main.name)}${list.length > 1 ? ` +${list.length - 1}` : ''}<small>${total.toLocaleString('ru-RU')} чел.</small></div>` : ''
+      const html = `<div class="army army-base${big ? '' : ' army-base-small'}" style="--c:${color}"><div class="army-banner"></div>${label}</div>`
+      const title = `${p.name}: ${list.map((x) => `${x.name} (${x.men.toLocaleString('ru-RU')})`).join(', ')}`
+      L.marker([-p.y, p.x], { pane: 'armies', title, icon: L.divIcon({ className: 'army-wrap army-base-wrap', iconSize: [0, 0], html }) }).addTo(layer)
+    }
+    return () => { layer.remove(); if (baseLayer.current === layer) baseLayer.current = null }
+  }, [selStateId, world.states, world.provinces, mapDef.id, mapDef.provinceMap, layers.armies])
+
   // --- объёмные поселения ---
   const settleLayer = useRef<InstanceType<typeof SettlementRenderer> | null>(null)
   useEffect(() => {

@@ -2851,3 +2851,41 @@ button.pw-chip:hover { background: var(--panel-2); }
   .mil-tree-list { max-height: 40vh; }
   .mil-law { grid-template-columns: 1fr; }
 }
+
+/* ---- «Казна войска» (Army.tsx → Treasury) ---- */
+.mil-money { display: flex; flex-direction: column; gap: 12px; }
+.mil-leak-tile { border-color: #b0503a !important; }
+.mil-led { display: grid; grid-template-columns: 190px 1fr 90px; gap: 2px 10px; align-items: center; font-size: 13px; padding: 3px 0; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+.mil-led b { text-align: right; }
+.mil-led em { grid-column: 1 / -1; font-style: normal; font-size: 11px; color: var(--muted); }
+.mil-led.inc b { color: #9fd08a; }
+.mil-led-bar { display: flex; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .06); overflow: hidden; }
+.mil-led-bar i { display: block; height: 100%; background: linear-gradient(90deg, #a08040, var(--gold)); }
+.mil-led-bar i.neg { background: #5a9a50; }
+.mil-led-bar i.leak { background: repeating-linear-gradient(45deg, #b0503a 0 4px, #7a3020 4px 8px); }
+.mil-leak { padding: 8px 10px; border-radius: 6px; background: rgba(176, 80, 58, .1); border-left: 3px solid #b0503a; font-size: 13px; line-height: 1.5; }
+.mil-base { display: grid; grid-template-columns: 1.4fr .6fr 1.4fr .8fr; gap: 8px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+.mil-measures { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.mil-measure { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; }
+.mil-measure.on { border-color: var(--gold); }
+.mil-measure p { margin: 0; line-height: 1.4; }
+.mil-measure-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.mil-measure-head b { font-family: var(--serif); font-size: 15px; color: var(--gold-2); font-weight: normal; }
+.mil-measure-head em { margin-left: auto; font-style: normal; font-size: 12px; }
+.mil-measure-head em.up { color: #9fd08a; }
+.mil-measure-head em.down { color: #e08a6a; }
+.mil-measures-on { display: flex; flex-direction: column; gap: 4px; }
+.mil-measure-on { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 13px; padding: 4px 8px; border-radius: 6px; background: var(--bg-2); opacity: .6; }
+.mil-measure-on.on { opacity: 1; border-left: 3px solid var(--gold); }
+.mil-measure-on i { font-style: normal; color: var(--muted); font-size: 12px; }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .mil-led { grid-template-columns: 130px 1fr 70px; }
+  .mil-base { grid-template-columns: 1fr 1fr; }
+}
+/* места базирования войск выбранной страны (MapView → baseLayer) */
+.army-base .army-banner { transform: scale(.8); transform-origin: 50% 100%; }
+.army-base .army-name { font-size: 12px; font-weight: 600; }
+.army-base .army-name small { display: block; font-family: var(--sans, sans-serif); font-weight: 400; font-size: 11px; color: #e8d9a8; }
+.army-wrap.army-base-wrap { pointer-events: auto; }
+.army-base-small .army-banner { transform: scale(.55); }
+.army-post { position: relative; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--c); border: 1.5px solid #e8d9a8; box-shadow: 0 0 4px rgba(0,0,0,.8); }

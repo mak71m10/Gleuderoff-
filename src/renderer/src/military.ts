@@ -377,29 +377,46 @@ export interface StateMilitary {
   formations: Formation[]
   /** корни дерева (армии и отдельные полки) */
   roots: string[]
+  /** утечки на войске — видит только мастер (пока не было ревизии) */
+  graft?: Graft
+  /** меры по бюджету войска (военные поселения, постой, ревизия…) — действуют с даты */
+  measures?: Measure[]
 }
+export interface Graft { rate: number; who: string; through: string; note?: string }
+export type MeasureKind = 'settle' | 'billet' | 'scutage' | 'provincial' | 'audit' | 'staffcut'
+export interface Measure { id: string; kind: MeasureKind; from: number; to?: number; scope?: string[]; note?: string }
+/** статьи ведомости роты: жалованье, кормовые и фураж, снаряжение и починка, припасы (порох, стрелы, реагенты) */
+export interface CostSplit { pay: number; feed: number; gear: number; supply: number }
 
 // ---------- расчёт ----------
 export const COST_SCALE = 0.35
-export function companyStats(c: Company, tpl: CompanyTemplate | undefined): { stats: Required<Mods>; cost: number; goods: Partial<Record<Good, number>>; parts: { name: string; mods: Mods }[] } {
+export function companyStats(c: Company, tpl: CompanyTemplate | undefined): { stats: Required<Mods>; cost: number; split: CostSplit; goods: Partial<Record<Good, number>>; parts: { name: string; mods: Mods }[] } {
   const arm = ARM[tpl?.arm ?? 'line'] ?? ARM.line
   const s = { ...arm.base }
   let cost = arm.cost
+  // жалованье и кормовые — от рода войск (у конницы и зверей корма больше); детали — снаряжение или припасы
+  const feedK = arm.role === 'horse' ? 0.5 : arm.key === 'mages' ? 0.15 : 0.35
+  const sp: CostSplit = { pay: arm.cost * (1 - feedK), feed: arm.cost * feedK, gear: 0, supply: 0 }
+  const SUP = /powder|reagents|saltpetre/
   const goods: Partial<Record<Good, number>> = { ...arm.goods }
   const parts: { name: string; mods: Mods }[] = []
   const add = (name: string, m: Mods | undefined, k = 1): void => { if (!m) return; parts.push({ name, mods: m }); for (const [key, v] of Object.entries(m) as [Stat, number][]) s[key] += v * k }
-  for (const [, pid] of Object.entries(tpl?.parts ?? {})) { const p = PART[pid!]; if (!p) continue; add(p.name, p.mods); cost += p.cost; for (const [g, v] of Object.entries(p.goods ?? {}) as [Good, number][]) goods[g] = (goods[g] ?? 0) + v }
-  for (const kid of tpl?.kit ?? []) { const k = KITS[kid]; if (k) { add(k.name, k.mods); cost += k.cost } }
-  const q = QUALITY.find((x) => x.id === c.quality); if (q) { add(`Снаряжение: ${q.name.toLowerCase()}`, q.mods); cost += q.cost }
+  for (const [, pid] of Object.entries(tpl?.parts ?? {})) { const p = PART[pid!]; if (!p) continue; add(p.name, p.mods); cost += p.cost; if (p.slot === 'mount') sp.feed += p.cost; else if (p.slot === 'training' || p.slot === 'formation' || p.slot === 'banner') sp.pay += p.cost; else if (p.slot === 'train' || SUP.test(Object.keys(p.goods ?? {}).join())) sp.supply += p.cost; else sp.gear += p.cost; for (const [g, v] of Object.entries(p.goods ?? {}) as [Good, number][]) goods[g] = (goods[g] ?? 0) + v }
+  for (const kid of tpl?.kit ?? []) { const k = KITS[kid]; if (k) { add(k.name, k.mods); cost += k.cost; if (k.cost > 0) { if (k.magic) sp.supply += k.cost; else sp.gear += k.cost } } }
+  const q = QUALITY.find((x) => x.id === c.quality); if (q) { add(`Снаряжение: ${q.name.toLowerCase()}`, q.mods); cost += q.cost; sp.gear += q.cost }
   add(`Народ: ${c.race}`, RACE_MODS[c.race])
   if (c.region && REGION_KINDS[c.region]) add(`Край: ${REGION_KINDS[c.region].name}`, REGION_KINDS[c.region].mods)
   for (const t of c.traits) { const tr = TRAIT[t]; if (tr) { add(`Черта: ${tr.name}`, tr.mods); if (t === 'thrifty') cost *= 0.9; if (t === 'greed') cost *= 1.15 } }
+  // отрицательные детали (дешевле) срезают снаряжение; итог статей сводим к cost
+  const raw = sp.pay + sp.feed + Math.max(0, sp.gear) + sp.supply
+  const kk = (cost * (c.men / Math.max(1, arm.men)) * COST_SCALE) / Math.max(0.01, raw)
+  const split: CostSplit = { pay: sp.pay * kk, feed: sp.feed * kk, gear: Math.max(0, sp.gear) * kk, supply: sp.supply * kk }
   // опыт: каждые 10 очков — +1 дух и дисциплина (до +3)
   const xp = Math.min(3, Math.floor(c.xp / 10)); if (xp) add('Опыт боёв', { mor: xp, dis: xp })
   for (const k of Object.keys(s) as Stat[]) s[k] = Math.max(0, Math.min(20, Math.round(s[k])))
   const men = c.men / Math.max(1, arm.men)
   // COST_SCALE: марки на роту за ход сведены с бюджетом страны (econCalc.ts берёт содержание армии из рот)
-  return { stats: s, cost: Math.round(cost * men * COST_SCALE * 10) / 10, goods: Object.fromEntries(Object.entries(goods).map(([g, v]) => [g, Math.round(v! * men * 10) / 10])), parts }
+  return { stats: s, cost: Math.round(cost * men * COST_SCALE * 10) / 10, split, goods: Object.fromEntries(Object.entries(goods).map(([g, v]) => [g, Math.round(v! * men * 10) / 10])), parts }
 }
 
 /** сила роты одним числом (для сводок): взвешенные характеристики × люди */

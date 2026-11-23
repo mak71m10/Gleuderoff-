@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../store'
-import { stateReport } from '../econCalc'
+import { provincesOf, stateReport, type EconReport } from '../econCalc'
+import { armyLedger, MEASURES, measureOn, type Ledger } from '../armyLedger'
+import { formatDate } from '../calendar'
 import { GOOD, fmtMarks, fmtPeople, type Good } from '../economy'
 import {
   ARM, ARMS, KIT, KITS, PARTS, PART, QUALITY, REGION_KINDS, SLOTS, STATS, TRAIT, TRAITS, companyPower, companyStats,
-  type Company, type CompanyTemplate, type Formation, type Mods, type Slot, type Stat, type StateMilitary
+  type Company, type CompanyTemplate, type Formation, type MeasureKind, type Mods, type Slot, type Stat, type StateMilitary
 } from '../military'
 import type { WorldState } from '../types'
 
@@ -21,17 +23,18 @@ const modsText = (m: Mods): string => Object.entries(m).filter(([, v]) => v).map
 /** Вкладка «Армия»: сводка и призыв, дерево войск со схемой построения и карточками рот, конструктор уставов */
 export function ArmyView({ st }: { st: WorldState }) {
   const m = st.base.military
-  const [tab, setTab] = useState<'sum' | 'tree' | 'designer'>('sum')
+  const [tab, setTab] = useState<'sum' | 'tree' | 'money' | 'designer'>('sum')
   if (!m) return <p className="ew-muted">У страны пока нет войска.</p>
   return (
     <div className="mil">
       <div className="mil-tabs">
-        {([['sum', 'Сводка'], ['tree', 'Войска'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
+        {([['sum', 'Сводка'], ['tree', 'Войска'], ['money', 'Казна войска'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
           <button key={k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>{n}</button>
         ))}
       </div>
       {tab === 'sum' && <Summary st={st} m={m} onOpen={() => setTab('tree')} />}
       {tab === 'tree' && <Tree st={st} m={m} />}
+      {tab === 'money' && <Treasury st={st} m={m} />}
       {tab === 'designer' && <Designer st={st} m={m} />}
     </div>
   )
@@ -410,6 +413,143 @@ function Designer({ st, m }: { st: WorldState; m: StateMilitary }) {
         )}
         <p className="ew-muted small">Каждая рота по уставу ещё получает своё: народ, край набора, качество снаряжения, черты и опыт.</p>
       </div>
+    </div>
+  )
+}
+
+// ---------------- казна войска: ведомость, утечки, меры ----------------
+/** пересчитать ведомость с другим войском (для предпросмотра мер) — те же условия, что в отчёте экономики */
+function ledgerWith(world: Parameters<typeof provincesOf>[0], st: WorldState, mil: StateMilitary, date: number, rep: EconReport): Ledger {
+  const provs = provincesOf(world, st.id, date)
+  const cc: Record<string, number> = {}
+  for (const p of provs) cc[p.culture] = (cc[p.culture] ?? 0) + 1
+  const cult = Object.entries(cc).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'imperial'
+  return armyLedger(world, st, mil, { date, pop: rep.pop, cult, war: rep.expense.some((l) => l.name.includes('военное время')), provs, byRole: rep.byRole })
+}
+
+function Treasury({ st, m }: { st: WorldState; m: StateMilitary }) {
+  const world = useStore((s) => s.world!)
+  const date = useStore((s) => s.date)
+  const master = useStore((s) => s.masterMode)
+  const edit = useEditMilitary(st)
+  const rep = useMemo(() => stateReport(world, st, date), [world, st, date])
+  const L = rep?.ledger
+  const [scope, setScope] = useState<string>('')
+  const targets = m.formations.filter((f) => f.level !== 'battalion')
+  // сколько даст каждая мера, если принять её сейчас
+  const preview = useMemo(() => {
+    const out: Record<string, number> = {}
+    if (!rep || !L) return out
+    for (const k of Object.keys(MEASURES) as MeasureKind[]) {
+      if (k !== 'settle' && (m.measures ?? []).some((x) => x.kind === k && measureOn(x, date))) continue
+      const mil = { ...m, measures: [...(m.measures ?? []), { id: 'preview', kind: k, from: date - 600, scope: k === 'settle' ? [scope || m.roots[0]] : undefined }] }
+      const L2 = ledgerWith(world, st, mil, date, rep)
+      out[k] = Math.round(L.total - L2.total + L2.income.reduce((s, l) => s + l.amount, 0) - L.income.reduce((s, l) => s + l.amount, 0))
+    }
+    return out
+  }, [world, st, m, date, rep, L, scope])
+  if (!rep || !L) return <p className="ew-muted">Нет расчёта экономики на эту дату.</p>
+  const fName = new Map(m.formations.map((f) => [f.id, f.name]))
+  const showLeak = master || L.leak.revealed
+  const max = Math.max(...L.lines.map((l) => Math.abs(l.amount)), 1)
+  const adopt = (k: MeasureKind): void =>
+    edit((mm) => { mm.measures = [...(mm.measures ?? []), { id: `m${Date.now().toString(36)}`, kind: k, from: date, scope: k === 'settle' ? [scope || mm.roots[0]] : undefined }] })
+  const cancel = (id: string): void =>
+    edit((mm) => { const x = mm.measures?.find((y) => y.id === id); if (!x) return; if (x.from >= date) mm.measures = mm.measures!.filter((y) => y.id !== id); else x.to = date })
+  return (
+    <div className="mil-money">
+      <div className="ew-tiles">
+        <div className="ew-tile"><span>Войско стоит казне</span><b>{fmtMarks(L.total)}</b><i>за ход</i></div>
+        <div className="ew-tile"><span>На жалованье</span><b>{fmtPeople(L.standing)}</b><i>из {fmtPeople(L.men)}; остальным — {Math.round(L.atHome * 100)} % («{m.law.level}»)</i></div>
+        <div className="ew-tile"><span>Казна страны</span><b>{rep.net >= 0 ? '+' : ''}{fmtMarks(rep.net)}</b><i>за ход, со всеми расходами</i></div>
+        {showLeak && (
+          <div className="ew-tile mil-leak-tile">
+            <span>Утекает{master && !L.leak.revealed ? ' (видит мастер)' : ''}</span>
+            <b>{fmtMarks(L.leak.amount)}</b>
+            <i>{Math.round(L.leak.rate * 100)} % · {L.leak.audited ? 'идёт ревизия' : 'без ревизии'}</i>
+          </div>
+        )}
+      </div>
+
+      <section className="eco-sec">
+        <h4 className="ed-h4">Ведомость за ход</h4>
+        {L.lines.map((l) => (
+          <div key={l.key} className="mil-led">
+            <span>{l.name}</span>
+            <div className="mil-led-bar">
+              <i className={l.amount < 0 ? 'neg' : ''} style={{ width: `${(100 * Math.abs(l.amount)) / max}%` }} />
+              {showLeak && (L.leak.byLine[l.key] ?? 0) > 0.5 && <i className="leak" style={{ width: `${(100 * L.leak.byLine[l.key]) / max}%` }} />}
+            </div>
+            <b>{fmtMarks(l.amount)}</b>
+            {l.note && <em>{l.note}{showLeak && (L.leak.byLine[l.key] ?? 0) > 0.5 ? ` · из них утекает ${fmtMarks(L.leak.byLine[l.key])}` : ''}</em>}
+          </div>
+        ))}
+        {L.income.map((l) => (
+          <div key={l.key} className="mil-led inc"><span>{l.name}</span><div /><b>+{fmtMarks(l.amount)}</b>{l.note && <em>{l.note}</em>}</div>
+        ))}
+        {showLeak && (
+          <div className="mil-leak">
+            <b>Куда утекает:</b> {L.leak.through}. <b>Кто кормится:</b> {L.leak.who}.{L.leak.note ? ` ${L.leak.note}` : ''}
+            {!L.leak.revealed && <div className="ew-muted">Игрок этого не видит — только раздутые статьи. Ревизия откроет утечки.</div>}
+          </div>
+        )}
+      </section>
+
+      <section className="eco-sec">
+        <h4 className="ed-h4">Армии и места базирования</h4>
+        {L.armies.map((a) => (
+          <div key={a.id} className="mil-base">
+            <b>{a.name}</b>
+            <span>{fmtPeople(a.men)}</span>
+            <span>📍 {a.baseName ?? 'без базы'}{a.hops ? ` · ${a.hops} обл. от столицы` : ' · у столицы'}</span>
+            <span>{fmtMarks(a.total)} за ход</span>
+          </div>
+        ))}
+      </section>
+
+      <section className="eco-sec">
+        <h4 className="ed-h4">Меры по бюджету войска</h4>
+        <p className="ew-muted">
+          {master ? 'Мастер вводит меру с даты шкалы. Позже меры будут проходить через систему власти страны.' : 'Меры принимает власть страны; мастер вносит их в летопись.'}
+        </p>
+        {(m.measures ?? []).length > 0 && (
+          <div className="mil-measures-on">
+            {m.measures!.map((x) => (
+              <div key={x.id} className={`mil-measure-on${measureOn(x, date) ? ' on' : ''}`}>
+                <span>{MEASURES[x.kind].icon} {MEASURES[x.kind].name}{x.scope?.length ? `: ${x.scope.map((id) => fName.get(id) ?? id).join(', ')}` : ''}</span>
+                <i>
+                  с {formatDate(world.calendar, x.from)}{x.to != null ? ` по ${formatDate(world.calendar, x.to)}` : ''}
+                  {measureOn(x, date) ? ' · действует' : x.from > date ? ' · ещё не началась' : ' · закончилась'}
+                </i>
+                {master && measureOn(x, date) && <button className="link-btn" onClick={() => cancel(x.id)}>Отменить с этой даты</button>}
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="mil-measures">
+          {(Object.keys(MEASURES) as MeasureKind[]).map((k) => {
+            const d = MEASURES[k], gain = preview[k]
+            const on = k !== 'settle' && (m.measures ?? []).some((x) => x.kind === k && measureOn(x, date))
+            return (
+              <div key={k} className={`mil-measure${on ? ' on' : ''}`}>
+                <div className="mil-measure-head">
+                  <span>{d.icon}</span><b>{d.name}</b>
+                  {gain != null && <em className={gain >= 0 ? 'up' : 'down'}>{gain >= 0 ? '+' : ''}{fmtMarks(gain)} за ход</em>}
+                  {on && <em>действует</em>}
+                </div>
+                <p>{d.text}</p>
+                <p className="ew-muted">Цена: {d.price}</p>
+                {k === 'settle' && (
+                  <select className="ed-select" value={scope || m.roots[0]} onChange={(e) => setScope(e.target.value)}>
+                    {targets.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+                  </select>
+                )}
+                {master && !on && <button className="mil-go" onClick={() => adopt(k)}>Ввести с {formatDate(world.calendar, date)}</button>}
+              </div>
+            )
+          })}
+        </div>
+      </section>
     </div>
   )
 }
