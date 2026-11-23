@@ -3,6 +3,8 @@ import { useStore } from '../store'
 import { GOOD, GOODS, ROLES, fmtMarks, fmtPeople, type Role } from '../economy'
 import { SEASONS, TAX_MULT, foodByMonth, stateReport } from '../econCalc'
 import { TECH_LINES } from '../tech'
+import { decreeAt, taxesAt } from '../decisions'
+import { formatDate } from '../calendar'
 import type { WorldState } from '../types'
 
 const round = (v: number): string => Math.round(v).toLocaleString('ru-RU')
@@ -22,12 +24,13 @@ export function EconDashboard({ st, full }: { st: WorldState; full?: boolean }) 
   const mutate = useStore((s) => s.mutate)
   const r = useMemo(() => stateReport(world, st, date), [world, st, date])
   const e = st.base.econ
+  const taxNow = useMemo(() => taxesAt(st, date), [st, date])
   // продовольствие по месяцам этого года
   const months = useMemo(() => foodByMonth(world, st, date), [world, st, date])
   if (!e || !r) return <p className="ew-muted">На эту дату у страны нет земли — экономики нет.</p>
 
   const setTax = (role: Role, level: string): void =>
-    mutate((w) => { const s = w.states.find((x) => x.id === st.id); if (s?.base.econ) s.base.econ.taxes[role] = level as never })
+    mutate((w) => { const s = w.states.find((x) => x.id === st.id); if (s?.base.econ) decreeAt(s, { kind: 'tax', role, level }, date) })
   const incomeSum = r.income.reduce((x, l) => x + l.amount, 0), expenseSum = r.expense.reduce((x, l) => x + l.amount, 0)
   const avgContent = Math.round(Object.entries(r.content).reduce((s, [k, c]) => s + c! * (r.byRole[k as Role] ?? 0), 0) / Math.max(1, r.pop))
   const debt = e.debts.reduce((s, d) => s + d.sum, 0)
@@ -81,6 +84,14 @@ export function EconDashboard({ st, full }: { st: WorldState; full?: boolean }) 
           <div className={`ew-net ${r.net < 0 ? 'neg' : 'pos'}`}>Итог хода: {r.net >= 0 ? '+' : ''}{fmtMarks(r.net)}{r.net < 0 && r.treasury > 0 ? ` — казны хватит на ${Math.floor(r.treasury / -r.net)} ходов` : ''}</div>
         </section>
 
+        {(e.journal?.length ?? 0) > 0 && (
+          <section className="ew-sec">
+            <h3>Журнал казны</h3>
+            <p className="ew-muted small">Начальная казна {fmtMarks(e.treasury)} + записи до этой даты: итоги ходов, сделки, займы, набор.</p>
+            {e.journal!.filter((x) => x.date <= date).slice(-12).reverse().map((x, i) => <div key={i} className="ew-bl"><span>{formatDate(world.calendar, x.date)} · {x.note}</span><b className={x.amount < 0 ? 'neg' : 'pos'}>{x.amount >= 0 ? '+' : ''}{fmtMarks(x.amount)}</b></div>)}
+          </section>
+        )}
+
         <section className="ew-sec">
           <h3>Сословия и подати</h3>
           <table className="ew-table">
@@ -92,7 +103,7 @@ export function EconDashboard({ st, full }: { st: WorldState; full?: boolean }) 
                   <tr key={x.key} title={x.does}>
                     <td><b>{e.estates[x.key]}</b><div className="ew-muted small">{x.name}</div></td>
                     <td>{fmtPeople(r.byRole[x.key]!)}</td>
-                    <td>{master ? <select className="ed-select" value={e.taxes[x.key] ?? 'обычные'} onChange={(ev) => setTax(x.key, ev.target.value)}>{LEVELS.map((l) => <option key={l}>{l}</option>)}</select> : e.taxes[x.key] ?? 'обычные'}</td>
+                    <td>{master ? <select className="ed-select" value={taxNow[x.key] ?? 'обычные'} title="С этой даты (распоряжением; прошлое не меняется)" onChange={(ev) => setTax(x.key, ev.target.value)}>{LEVELS.map((l) => <option key={l}>{l}</option>)}</select> : taxNow[x.key] ?? 'обычные'}</td>
                     <td>{roleTax(x.key) ? `+${fmtMarks(roleTax(x.key))}` : '—'}</td>
                     <td className={c < e.threshold ? 'bad' : ''}><div className="ed-content"><i style={{ width: `${c}%` }} className={c < e.threshold ? 'bad' : ''} /><em style={{ left: `${e.threshold}%` }} /></div>{c} · {word(c)}</td>
                   </tr>

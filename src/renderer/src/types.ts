@@ -640,7 +640,7 @@ export interface WorldData {
   /** ВПИ: приказы игроков и вердикты (scripts/vpi.mjs внести) */
   vpiLog?: { id: string; date: WorldDate; at: string; state: string; title: string; order: string; verdict: string; public: string; changes: string[] }[]
   /** ВПИ: текущая дата игры */
-  vpi?: { date?: WorldDate }
+  vpi?: { date?: WorldDate; lastTurn?: WorldDate }
   /** дипломатия: отношения пар стран на даты (diplomacy.ts) */
   relations?: import('./diplomacy').Relation[]
   /** живой рынок: потрясения мастера (неурожай, блокада, рудник) — market.ts */

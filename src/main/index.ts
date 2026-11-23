@@ -1094,6 +1094,26 @@ async function migrateWorld(dir: string): Promise<void> {
     // v67: дипломатия ВПИ — отношения пар стран из лора, вассалитета и границ (diplomacy.ts); если своих ещё нет
     if (!user.relations?.length && def.relations) user.relations = structuredClone(def.relations)
   }
+  if ((user.version ?? 1) < 68) {
+    // v68: ревизия противоречий (scripts/fix-revision.mts) — технологии под лорные рода войск и корабли (только вверх),
+    // эскадры не у моря — в приморские области, долг банку Лиги Векселя, голод по расчёту — в беды страны
+    const ds = new Map<string, Json>((def.states ?? []).map((st: Json) => [st.id, st]))
+    for (const st of user.states ?? []) {
+      const d = ds.get(st.id)
+      if (!d) continue
+      const lv = st.base?.tech?.levels, dl = d.base?.tech?.levels
+      if (lv && dl) for (const k of Object.keys(dl)) if ((lv[k] ?? 0) < dl[k]) lv[k] = dl[k]
+      const nv = st.base?.military?.navy, dn = d.base?.military?.navy
+      if (nv && dn) {
+        const sq = new Map<string, Json>(dn.squadrons.map((x: Json) => [x.id, x])), fl = new Map<string, Json>(dn.fleets.map((x: Json) => [x.id, x]))
+        for (const q of nv.squadrons) { const x = sq.get(q.id); if (x && x.base !== q.base) q.base = x.base }
+        for (const q of nv.fleets) { const x = fl.get(q.id); if (x && x.base !== q.base) q.base = x.base }
+      }
+      for (const db of st.base?.econ?.debts ?? []) if (db.to === 'Банк Гольдах') db.to = 'Банк Гольдах (Лига Векселя, Тиррит)'
+      const tr: string[] | undefined = st.base?.econ?.troubles
+      if (tr) for (const line of d.base?.econ?.troubles ?? []) if (!tr.includes(line) && /хлеб/.test(line) && /нужд/.test(line)) tr.push(line)
+    }
+  }
   // v11–v12: перерисована подложка (пашни, лес, берега, дороги, тени гор) — новые плитки уже скопированы вместе с maps выше
   // v15: портреты из стартового мира — тем записям лора, у которых своей картинки нет
   const defImages = new Map<string, string>(def.entries.filter((e: Json) => e.base?.image).map((e: Json) => [e.id, e.base.image]))

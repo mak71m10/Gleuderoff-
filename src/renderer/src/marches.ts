@@ -74,10 +74,11 @@ export function planMarch(world: WorldData, stateId: string, mil: StateMilitary,
   const month = Math.min(4, toParts(world.calendar, date).month)
   const S = SEASON[month]
   const sp = armySpeed(mil, ids)
-  const edge = (a: Province, b: Province): { days: number; km: number; how: string; river?: string } | null => {
+  const edge = (a: Province, b: Province, mm = month): { days: number; km: number; how: string; river?: string } | null => {
+    const S = SEASON[mm]
     const km = Math.hypot(a.x - b.x, a.y - b.y) * KM_PER_UNIT
     const link = a.links?.[b.id]
-    const closedPass = month === 0 && (b.terrain === 4 || b.terrain === 5) && link !== 'p'
+    const closedPass = mm === 0 && (b.terrain === 4 || b.terrain === 5) && link !== 'p'
     if (closedPass) return null
     let speed: number, how: string
     if (link && ROAD[link]) {
@@ -122,20 +123,24 @@ export function planMarch(world: WorldData, stateId: string, mil: StateMilitary,
   const steps: MarchStep[] = []
   const foreign = new Set<string>()
   let days = 0, km = 0, lossRate = 0, rivers = 0
+  const later = new Set<string>()
   for (let i = 1; i < path.length; i++) {
     const a = prov.get(path[i - 1])!, b = prov.get(path[i])!
-    const e = edge(a, b)!
+    // сезон — на день этого перехода (путь может перейти в следующий месяц)
+    const mm = Math.min(4, toParts(world.calendar, date + Math.round(days * (7 / 6))).month)
+    if (mm !== month) later.add(SEASON[mm].name)
+    const e = edge(a, b, mm) ?? edge(a, b)!
     const owner = ownerAt(b, date)
     const fname = owner && owner !== stateId ? world.states.find((s) => s.id === owner)?.base.name : undefined
     if (fname) foreign.add(fname)
     if (e.river) rivers++
     steps.push({ from: a, to: b, days: e.days, km: e.km, how: e.how, river: e.river, foreign: fname })
     days += e.days; km += e.km
-    lossRate += e.days * (ATTRITION[b.terrain] ?? 0.0006) * S.loss * (fname ? 1.5 : 1)
+    lossRate += e.days * (ATTRITION[b.terrain] ?? 0.0006) * SEASON[mm].loss * (fname ? 1.5 : 1)
   }
   // день отдыха на шесть дней пути
   const total = Math.ceil(days * (7 / 6))
   const grain = (men * 1.1 * total) / 1000 // ≈ 1,1 кг хлеба и корма на человека в день
   const marks = (perTurnCost / 100) * total * 1.5 // походное жалованье и подвоз — полуторное содержание
-  return { ok: true, steps, days: total, km: Math.round(km), arrive: date + total, speedK: sp.k, speedWhy: sp.why, grain: Math.round(grain), marks: Math.round(marks), losses: Math.round(men * Math.min(0.5, lossRate)), foreign: [...foreign], rivers, season: S.name, seasonNote: S.note, closed: [] }
+  return { ok: true, steps, days: total, km: Math.round(km), arrive: date + total, speedK: sp.k, speedWhy: sp.why, grain: Math.round(grain), marks: Math.round(marks), losses: Math.round(men * Math.min(0.5, lossRate)), foreign: [...foreign], rivers, season: later.size ? `${S.name}, в пути — ${[...later].join(', ')}` : S.name, seasonNote: S.note, closed: [] }
 }

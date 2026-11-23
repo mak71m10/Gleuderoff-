@@ -57,7 +57,12 @@ export function DecisionsView({ st }: { st: WorldState }) {
   const list = [...(st.base.decisions ?? [])].sort((a, b) => b.proposed - a.proposed)
   const setStatus = (id: string, status: Decision['status']): void => mutate((w) => { const d = w.states.find((x) => x.id === st.id)?.base.decisions?.find((x) => x.id === id); if (d) d.status = status })
   const remove = (id: string): void => mutate((w) => { const s = w.states.find((x) => x.id === st.id); if (s?.base.decisions) s.base.decisions = s.base.decisions.filter((x) => x.id !== id) })
-  const roll = (d: Decision): void => { const f = forecast(world, st, d, d.due); setStatus(d.id, Math.random() < f.chance ? 'принято' : 'отклонено') }
+  // указ проходит всегда: бросок решает, будет ли сопротивление
+  const roll = (d: Decision): void => {
+    const f = forecast(world, st, d, d.due), ok = Math.random() < f.chance
+    if (f.decree) mutate((w) => { const x = w.states.find((s) => s.id === st.id)?.base.decisions?.find((y) => y.id === d.id); if (x) { x.status = 'принято'; x.resisted = !ok } })
+    else setStatus(d.id, ok ? 'принято' : 'отклонено')
+  }
 
   return (
     <div className="dec">
@@ -136,7 +141,7 @@ export function DecisionsView({ st }: { st: WorldState }) {
               <div className="dec-item-head">
                 <span>{TOPICS[d.topic].icon}</span>
                 <b>{d.title}</b>
-                <em>{d.status}{live ? ' · действует' : d.status === 'принято' ? ' · вступит в силу' : ''}</em>
+                <em>{d.status}{live ? ' · действует' : d.status === 'принято' ? ' · вступит в силу' : ''}{d.resisted ? ' · встретил сопротивление' : ''}</em>
               </div>
               <div className="ew-muted">
                 {d.body} · внесено {formatDate(world.calendar, d.proposed)} · решится {formatDate(world.calendar, d.due)}

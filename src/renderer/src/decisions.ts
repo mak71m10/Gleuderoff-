@@ -34,6 +34,8 @@ export interface Decision {
   /** прогноз на момент внесения — словами */
   forecast?: string
   note?: string
+  /** указ прошёл, но встретил сопротивление (ропот, саботаж, отказ знати) — что именно, решает мастер */
+  resisted?: boolean
 }
 
 export type BodyKind = 'vote' | 'mechanism' | 'council' | 'assembly' | 'decree'
@@ -134,8 +136,10 @@ function weights(leg: Legislature, d: Decision): { w: number[]; main: boolean } 
   return { w, main }
 }
 
-export interface Forecast { chance: number; word: string; yes?: number; no?: number; abstain?: number; text: string; against: string[] }
+export interface Forecast { chance: number; word: string; decree?: boolean; yes?: number; no?: number; abstain?: number; text: string; against: string[] }
 const word = (c: number): string => (c >= 0.75 ? 'почти наверняка пройдёт' : c >= 0.55 ? 'скорее пройдёт' : c >= 0.4 ? 'спорно' : c >= 0.2 ? 'скорее провалится' : 'почти наверняка провалится')
+
+const decreeWord = (c: number): string => (c >= 0.75 ? 'пройдёт тихо' : c >= 0.55 ? 'пройдёт, возможен ропот' : c >= 0.35 ? 'пройдёт, но жди сопротивления' : 'пройдёт, будет саботаж или бунт')
 
 export function forecast(world: WorldData, st: WorldState, d: Decision, date: WorldDate): Forecast {
   const body = decideProfile(world, st)[d.topic]
@@ -181,6 +185,8 @@ export function forecast(world: WorldData, st: WorldState, d: Decision, date: Wo
   if (a.kind === 'level' && dir.army > 0) c -= 0.08
   if (d.topic === 'war') c -= 0.1
   c = Math.max(0.05, Math.min(0.95, c))
+  // указ правитель отдаёт сам — он проходит всегда; шанс здесь — шанс обойтись без сопротивления
+  if (body.kind === 'decree') return { chance: c, decree: true, word: decreeWord(c), text: `${body.name} — ${kindWord(body.kind)}: ${body.how}. Указ пройдёт; шанс — что без сопротивления`, against: [...new Set(against)] }
   return { chance: c, word: word(c), text: `${body.name} — ${kindWord(body.kind)}: ${body.how}`, against: [...new Set(against)] }
 }
 
@@ -209,4 +215,13 @@ export function actTitle(a: Act, st: WorldState, fName: (id: string) => string):
   if (a.kind === 'tax') return `Подати для «${st.base.econ?.estates?.[a.role] ?? a.role}» — ${a.level}`
   if (a.kind === 'level') return `Уровень сбора — ${a.level}`
   return a.text
+}
+
+/** распоряжение мастера / указ с даты: принятое решение (прошлое не меняется); st — черновик */
+export function decreeAt(st: WorldState, act: Act, date: WorldDate, body = 'распоряжение мастера'): void {
+  const d = (st.base.decisions ??= [])
+  // то же распоряжение в тот же день — заменить
+  const same = d.findIndex((x) => x.status === 'принято' && x.due === date && x.proposed === date && x.act.kind === act.kind && (act.kind !== 'tax' || (x.act as { role?: string }).role === act.role))
+  const rec: Decision = { id: `d${Date.now().toString(36)}`, topic: act.kind === 'level' ? 'levy' : 'tax', title: actTitle(act, st, (x) => x), act, proposed: date, due: date, body, status: 'принято' }
+  if (same >= 0) d[same] = rec; else d.push(rec)
 }

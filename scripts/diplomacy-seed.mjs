@@ -82,7 +82,7 @@ for (const p of W.provinces) { const o = owner(p); if (!liveIds.has(o)) continue
 for (const [k, n] of borders) if (!rel.has(k)) { const [a, b] = k.split('|'); add(a, b, 'neutral', 0, '', [], 'auto') }
 
 W.relations = [...rel.values()].map(({ n, ...r }) => ({ ...r, from: W.calendar.present - 500 * 3 }))
-W.version = Math.max(W.version ?? 0, 67)
+W.version = Math.max(W.version ?? 0, 68)
 writeFileSync(WF + '.tmp', JSON.stringify(W, null, 1)); renameSync(WF + '.tmp', WF)
 const by = {}; for (const r of W.relations) by[r.kind] = (by[r.kind] ?? 0) + 1
 console.log(`отношения: ${W.relations.length} пар (из лора — упоминаний ${fromLore}); по видам:`, by)

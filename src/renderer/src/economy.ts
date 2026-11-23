@@ -80,6 +80,17 @@ export interface StateEcon {
   history: EconHistoryRow[]
   /** особые экономические механики страны: свои доходы и расходы за ход (пошлины Семи ворот, десятина, набеги…) */
   special?: { name: string; kind: 'income' | 'expense'; amount: number; text: string }[]
+  /** журнал казны с начала игры: итоги месяцев («Провести ход»), сделки, займы, набор, разовые доходы и расходы — казна на дату = treasury + записи до даты */
+  journal?: TreasuryEntry[]
+  /** убитые (бой, поход) с даты — убывают из кормильцев */
+  deaths?: { date: number; n: number; note?: string }[]
+  /** хлеб, взятый из амбаров (поход) — меры, с даты на год */
+  drawn?: { date: number; qty: number; note?: string }[]
+}
+export interface TreasuryEntry { date: number; amount: number; note: string; kind: 'turn' | 'deal' | 'debt' | 'order' | 'other' }
+/** записать деньги в журнал казны (с даты) */
+export function journalAdd(e: StateEcon, date: number, amount: number, note: string, kind: TreasuryEntry['kind'] = 'other'): void {
+  ;(e.journal ??= []).push({ date, amount: Math.round(amount), note, kind })
 }
 
 /** «12 мар. 5 сер.» — сумма в марках словами монет */

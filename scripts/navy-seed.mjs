@@ -71,6 +71,6 @@ for (const st of W.states) {
   b.military.navy = { fleets, squadrons }
   states++
 }
-W.version = Math.max(W.version ?? 0, 67)
+W.version = Math.max(W.version ?? 0, 68)
 writeFileSync(WF + '.tmp', JSON.stringify(W, null, 1)); renameSync(WF + '.tmp', WF)
 console.log(`флот: стран ${states}, кораблей ${ships}`)

@@ -9,6 +9,7 @@ import { Timeline } from './components/Timeline'
 import { StateCard } from './components/StateCard'
 import { BattleView } from './components/Battle'
 import { MarketView } from './components/Market'
+import { TurnButton } from './components/Turn'
 import { CodexView, StatesView } from './components/Codex'
 import { SettingsView } from './components/Settings'
 import { Icon, type IconName } from './components/Icon'
@@ -87,6 +88,7 @@ export default function App() {
           ))}
         </div>
         <div className="nav-bottom">
+          <TurnButton />
           <div className="undo-row">
             <button onClick={undo} disabled={!canUndo} title="Отменить (Ctrl+Z)">
               <Icon name="undo" size={16} />

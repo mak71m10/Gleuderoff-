@@ -48,6 +48,7 @@ import { Icon, type IconName } from './Icon'
 import { TechView } from './Tech'
 import { EconomyView } from './Economy'
 import { ArmyView } from './Army'
+import { treasuryAt } from '../econCalc'
 import { DecisionsView } from './Decisions'
 import { VpiLogView } from './VpiLog'
 import { DiplomacyView } from './Diplomacy'
@@ -192,7 +193,7 @@ function StateCardBody({ id }: { id: string }) {
       </header>
 
       <div className="sc-stats">
-        <Stat icon="coins" label="Казна" value={f.econ ? fmtMarks(f.econ.treasury) : f.treasury} />
+        <Stat icon="coins" label="Казна" value={f.econ ? fmtMarks(treasuryAt(world, st, date)) : f.treasury} />
         <Stat
           icon="pin"
           label="Столица"

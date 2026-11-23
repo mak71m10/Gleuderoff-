@@ -3,7 +3,7 @@ import { useStore } from '../store'
 import { formatDate } from '../calendar'
 import { fmtMarks, fmtPeople } from '../economy'
 import { stateReport } from '../econCalc'
-import { companiesUnder } from '../orders'
+import { companiesUnder, recordMarch } from '../orders'
 import { planMarch } from '../marches'
 import type { StateMilitary } from '../military'
 import type { WorldState } from '../types'
@@ -55,7 +55,14 @@ export function MarchView({ st, m }: { st: WorldState; m: StateMilitary }) {
     let t = 0
     const wp = [{ x: plan.steps[0].from.x, y: plan.steps[0].from.y, date }]
     for (const s of plan.steps) { t += s.days * (7 / 6); wp.push({ x: s.to.x, y: s.to.y, date: date + Math.round(t) }) }
-    mutate((w) => { (w.armies ??= []).push({ id: `march-${Date.now().toString(36)}`, name: f.name, mapId: wm?.id ?? 'world', stateId: st.id, color: st.base.color, waypoints: wp }) })
+    mutate((w) => {
+      (w.armies ??= []).push({ id: `march-${Date.now().toString(36)}`, name: f.name, mapId: wm?.id ?? 'world', stateId: st.id, color: st.base.color, waypoints: wp })
+      // база соединения — новая область с дня прибытия (до того армия числится на старом месте)
+      const ff = w.states.find((x) => x.id === st.id)?.base.military?.formations.find((x) => x.id === f.id)
+      if (ff && dest != null) (ff.moves ??= []).push({ date: plan.arrive, base: dest, note: 'поход' })
+      const sw = w.states.find((x) => x.id === st.id)
+      if (sw?.base.military) recordMarch(sw.base.military, sw.base.econ, date, ids, plan, `поход «${f.name}»`)
+    })
   }
   const marches = (world.armies ?? []).filter((a) => a.stateId === st.id && a.id.startsWith('march-'))
   const removeMarch = (id: string): void => mutate((w) => { w.armies = (w.armies ?? []).filter((a) => a.id !== id) })

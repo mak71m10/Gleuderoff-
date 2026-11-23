@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../store'
 import { provincesOf, stateReport, type EconReport } from '../econCalc'
-import { armyLedger, MEASURES, measureOn, type Ledger } from '../armyLedger'
+import { armyLedger, callable, LEVY_FACTOR, recruitRoom, MEASURES, measureOn, type Ledger } from '../armyLedger'
 import { formatDate } from '../calendar'
-import { actTitle, levelAt } from '../decisions'
+import { actTitle, decreeAt, levelAt } from '../decisions'
 import { DecisionsView, useProposeDecision } from './Decisions'
 import { NavyView } from './Navy'
 import { MarchView } from './March'
 import { Designer } from './Designer'
-import { companiesUnder, companyAt, orderActive, orderEnd, rearmCost, rearmDays, trainCost } from '../orders'
+import { companiesUnder, companyAt, milAt, orderActive, orderEnd, rearmCost, rearmDays, trainCost } from '../orders'
 import { GOOD, fmtMarks, fmtPeople, type Good } from '../economy'
 import {
   ARM, ARMS, KIT, KITS, PARTS, PART, QUALITY, REGION_KINDS, SLOTS, STATS, TRAIT, TRAITS, companyPower, companyStats,
@@ -21,14 +21,14 @@ const PLACES: { key: Place; name: string }[] = [
   { key: 'van', name: 'Авангард' }, { key: 'left', name: 'Левый фланг' }, { key: 'center', name: 'Центр' },
   { key: 'right', name: 'Правый фланг' }, { key: 'reserve', name: 'Резерв' }, { key: 'train', name: 'Обоз' }
 ]
-const LEVY_FACTOR: Record<string, number> = { 'мир': 0.25, 'сбор': 0.5, 'великий сбор': 1, 'всеобщий призыв': 1.8 }
 const powerWord = (p: number): string => (p < 300 ? 'слабое войско' : p < 1500 ? 'малое войско' : p < 5000 ? 'крепкое войско' : p < 15000 ? 'сильное войско' : 'великая сила')
 const sign = (v: number): string => (v > 0 ? `+${v}` : `${v}`)
 const modsText = (m: Mods): string => Object.entries(m).filter(([, v]) => v).map(([k, v]) => `${sign(v as number)} ${STATS.find((s) => s.key === k)!.name.toLowerCase()}`).join(', ')
 
 /** Вкладка «Армия»: сводка и призыв, дерево войск со схемой построения и карточками рот, конструктор уставов */
 export function ArmyView({ st }: { st: WorldState }) {
-  const m = st.base.military
+  const date = useStore((s) => s.date)
+  const m = milAt(st.base.military, date)
   const [tab, setTab] = useState<'sum' | 'tree' | 'navy' | 'march' | 'money' | 'decide' | 'orders' | 'designer'>('sum')
   if (!m) return <p className="ew-muted">У страны пока нет войска.</p>
   return (
@@ -59,6 +59,7 @@ function useEditMilitary(st: WorldState) {
 // ---------------- сводка ----------------
 function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: () => void }) {
   const world = useStore((s) => s.world!)
+  const mutate = useStore((s) => s.mutate)
   const date = useStore((s) => s.date)
   const master = useStore((s) => s.masterMode)
   const edit = useEditMilitary(st)
@@ -81,9 +82,8 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
   const rep = useMemo(() => stateReport(world, st, date), [world, st, date])
   const law = m.law
   const level = levelAt(st, date)
-  const k = LEVY_FACTOR[level] ?? 0.25
-  const workers = (rep?.byRole.feeders ?? 0) + (rep?.byRole.makers ?? 0)
-  const canCall = Math.round(workers * law.levy * k + (law.nobles ? (rep?.byRole.rulers ?? 0) * 0.3 : 0) + (law.unfree ? (rep?.byRole.unfree ?? 0) * law.levy * 2 * k : 0))
+  const canCall = callable(law, level, rep?.byRole ?? {})
+  const room = rep?.ledger ? recruitRoom(rep.ledger, law, level, rep.pop, rep.byRole) : 0
   const share = rep?.pop ? (100 * calc.men) / rep.pop : 0
   const paid = rep?.expense.find((l) => l.name.startsWith('Армия'))?.amount
   const goodsList = (Object.entries(calc.goods) as [Good, number][]).filter(([, v]) => v > 0.5).sort((a, b) => b[1] * GOOD[b[0]].price - a[1] * GOOD[a[0]].price)
@@ -93,7 +93,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
       <div className="ew-tiles">
         <div className="ew-tile"><span>Под знамёнами</span><b>{fmtPeople(calc.men)}</b><i>{m.companies.length} рот · {share.toFixed(1).replace('.', ',')} % жителей</i></div>
         <div className="ew-tile"><span>Сила войска</span><b>{powerWord(calc.power)}</b><i>{calc.power.toLocaleString('ru-RU')} очков</i></div>
-        <div className="ew-tile"><span>Можно призвать</span><b>{fmtPeople(canCall)}</b><i>при уровне «{level}»</i></div>
+        <div className="ew-tile"><span>Можно призвать</span><b>{fmtPeople(canCall)}</b><i>при уровне «{level}» · ещё набрать: {room > 0 ? fmtPeople(room) : 'некого'}</i></div>
         <div className="ew-tile"><span>Содержание</span><b>{fmtMarks(paid ?? calc.cost)}</b><i>за ход{paid != null ? ` (всё войско на жалованье — ${fmtMarks(calc.cost)})` : ''}{rep ? ` · казна ${rep.net >= 0 ? '+' : ''}${fmtMarks(rep.net)}` : ''}</i></div>
         <div className="ew-tile"><span>Уставов</span><b>{m.templates.length}</b><i>{m.templates.filter((t) => t.unique).length} своих родов войск</i></div>
         <div className="ew-tile"><span>Лестница</span><b className="small">{[m.ladder.company, m.ladder.battalion, m.ladder.regiment].join(' → ')}</b><i>{[m.ladder.corps, m.ladder.army].join(' → ')}</i></div>
@@ -114,7 +114,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
           <h4 className="ed-h4">Уровень сбора</h4>
           <div className="mil-levels">
             {Object.keys(LEVY_FACTOR).map((l) => (
-              <button key={l} className={l === law.level ? 'active' : ''} disabled={!master} onClick={() => edit((mm) => { mm.law.level = l as StateMilitary['law']['level'] })}>{l}</button>
+              <button key={l} className={l === level ? 'active' : ''} disabled={!master} title="С этой даты (распоряжением; прошлое не меняется)" onClick={() => mutate((w) => { const s = w.states.find((x) => x.id === st.id); if (s) decreeAt(s, { kind: 'level', level: l }, date) })}>{l}</button>
             ))}
           </div>
           <p className="ew-muted small">Выше уровень — больше людей под знамёнами, но меньше рабочих в экономике и ниже довольство кормильцев.</p>
@@ -137,6 +137,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
             <div key={q.id} className="ew-row"><span>{q.name}</span><div className="ew-bar gold"><i style={{ width: `${(100 * calc.byQ[q.id]) / Math.max(1, calc.men)}%` }} /></div><span className="ew-num">{Math.round((100 * calc.byQ[q.id]) / Math.max(1, calc.men))} %</span></div>
           ))}
           <h4 className="ed-h4">Товары на содержание за ход</h4>
+          <p className="ew-muted small">Хлеб солдат уже входит в общую нужду страны (солдаты — её жители); здесь — сколько уходит на войско. {rep?.away ? `От работы оторвано ${fmtPeople(rep.away)} — дома осталось ${Math.round((rep.work ?? 1) * 100)} % рабочих рук: выпуск и подати кормильцев и мастеров ниже.` : ''}</p>
           <div className="chip-list">{goodsList.map(([g, v]) => <span key={g} className="chip">{GOOD[g].icon} {GOOD[g].name.toLowerCase()} {Math.round(v)}</span>)}</div>
         </section>
 

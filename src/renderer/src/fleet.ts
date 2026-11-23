@@ -73,6 +73,10 @@ export interface Squadron {
   lore?: string; note?: string
   /** торговые суда, что выходят на войну по найму: в мирное время казне почти ничего не стоят */
   merchant?: boolean
+  /** спущена / распущена с даты */
+  from?: number; to?: number
+  /** с даты — столько кораблей (потери, постройка) */
+  changes?: { date: number; count: number; note?: string }[]
 }
 export interface Fleet { id: string; name: string; squadrons: string[]; base?: number; cmd?: { name: string; trait: string }; lore?: string; note?: string }
 export interface StateNavy { fleets: Fleet[]; squadrons: Squadron[] }

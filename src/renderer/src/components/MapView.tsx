@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { milAt } from '../orders'
 import L from 'leaflet'
 import { useStore, applyTemporal, uid } from '../store'
 import { existsAt, placeVisible, regionOwner, resolve } from '../temporal'
@@ -794,7 +795,7 @@ export function MapView() {
     baseLayer.current?.remove()
     baseLayer.current = null
     const st = selStateId ? world.states.find((s) => s.id === selStateId) : undefined
-    const mil = st?.base.military
+    const mil = milAt(st?.base.military, date)
     if (!mil || !mapDef.provinceMap || !layers.armies) return
     const layer = L.layerGroup([], { pane: 'armies' }).addTo(map)
     baseLayer.current = layer

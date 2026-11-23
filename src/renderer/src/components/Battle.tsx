@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { milAt, recordBattle } from '../orders'
 import { useStore } from '../store'
 import { formatDate } from '../calendar'
 import { fmtPeople } from '../economy'
@@ -11,7 +12,8 @@ const emptySide = (): SideInput => ({ stateId: '', name: '', formations: [], squ
 /** одна сторона: страна, войска или эскадры, замысел, ролевые поправки */
 function SidePanel({ title, side, kind, onChange, states }: { title: string; side: SideInput; kind: BattleKind; onChange: (s: SideInput) => void; states: WorldState[] }) {
   const st = states.find((s) => s.id === side.stateId)
-  const m = st?.base.military
+  const date = useStore((s) => s.date)
+  const m = milAt(st?.base.military, date)
   const navy = m?.navy as StateNavy | undefined
   const [rpText, setRpText] = useState('')
   const [rpVal, setRpVal] = useState(10)
@@ -75,12 +77,25 @@ export function BattleView() {
   const ready = !!stA && !!stB && (kind === 'naval' ? a.squadrons.length && b.squadrons.length : a.formations.length && b.formations.length)
   const res = useMemo(() => {
     if (!ready) return null
-    const fa = sideForce(stA!.base.military, stA!.base.military?.navy as StateNavy, a, date), fb = sideForce(stB!.base.military, stB!.base.military?.navy as StateNavy, b, date)
+    const fa = sideForce(milAt(stA!.base.military, date), milAt(stA!.base.military, date)?.navy as StateNavy, a, date), fb = sideForce(milAt(stB!.base.military, date), milAt(stB!.base.military, date)?.navy as StateNavy, b, date)
     return { fa, fb, r: fight(inp, fa, fb) }
   }, [ready, stA, stB, a, b, date, kind, terrain, weather, fort, river, seed]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const prov = (q: string) => { const s = q.trim().toLowerCase(); if (!s) return undefined; return (world.provinces ?? []).find((p) => p.name.toLowerCase() === s) ?? (world.provinces ?? []).find((p) => p.name.toLowerCase().includes(s)) }
   const placeProv = prov(place)
+  // укрепления по поселению в этой области: крепость/замок — 3, столица — городские стены (2), башня — частокол (1)
+  const fortHint = useMemo(() => {
+    if (!placeProv) return null
+    const near = [placeProv, ...(placeProv.neighbors ?? []).map((id) => (world.provinces ?? []).find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => !!p)]
+    const LV: Record<string, number> = { castle: 3, capital: 2, tower: 1 }
+    let best: { lv: number; name: string } | null = null
+    for (const pl of world.places) {
+      const lv = LV[pl.base.type as string]; if (!lv || (pl.from != null && pl.from > date) || (pl.to != null && pl.to <= date)) continue
+      const own = near.reduce((b, p) => ((p.x - pl.x) ** 2 + (p.y - pl.y) ** 2 < (b.x - pl.x) ** 2 + (b.y - pl.y) ** 2 ? p : b))
+      if (own.id === placeProv.id && (!best || lv > best.lv)) best = { lv, name: pl.base.name }
+    }
+    return best
+  }, [placeProv, world.provinces, world.places, date])
   const confirm = (): void => {
     if (!res) return
     const { r } = res
@@ -90,9 +105,7 @@ export function BattleView() {
         const s = w.states.find((x) => x.id === side.stateId)
         const mil = s?.base.military
         if (!mil) continue
-        for (const c of mil.companies) { const loss = sr.byUnit.get(c.id); if (loss) { c.men = Math.max(5, c.men - loss); c.xp += won ? 3 : 1 } }
-        const nv = mil.navy
-        if (nv && sr.shipsLost) { let left = sr.shipsLost; for (const q of nv.squadrons) { if (!side.squadrons.includes(q.id) || left <= 0) continue; const k = Math.min(q.count, Math.ceil((sr.shipsLost * q.count) / Math.max(1, sr.ships))); q.count -= Math.min(k, left); left -= k } }
+        recordBattle(mil, date, sr.byUnit, won, side.squadrons, sr.shipsLost, sr.ships, `${KINDS[kind].name}: ${a.name} — ${b.name}`, s?.base.econ, sr.dead)
       }
       if (placeProv) (w.places ??= []).push({ id: `battle-${Date.now().toString(36)}`, mapId: w.maps.find((x) => x.kind === 'world')?.id ?? 'world', x: placeProv.x, y: placeProv.y, base: { name: `Битва — ${placeProv.name}`, type: 'battle', stateId: '', population: '', ruler: '', image: '', description: desc } as never, history: [], from: date, to: date + 1000 } as never)
       for (const side of [a, b]) (w.vpiLog ??= []).push({ id: `b${Date.now().toString(36)}${side === a ? 'a' : 'b'}`, date, at: new Date().toISOString(), state: side.name, title: `${KINDS[kind].name}: ${a.name} — ${b.name}`, order: '', verdict: desc, public: `${r.word}. Потери: ${a.name} — ${r.a.lost}, ${b.name} — ${r.b.lost}.`, changes: [] })
@@ -122,6 +135,7 @@ export function BattleView() {
           {kind !== 'naval' && <label className="bt-field"><span>Местность</span><select className="ed-select" value={terrain} onChange={(e) => setTerrain(Number(e.target.value))}>{Object.entries(TERRAINS).map(([k, t]) => <option key={k} value={k}>{t.name}</option>)}</select></label>}
           <label className="bt-field"><span>Погода</span><select className="ed-select" value={weather} onChange={(e) => setWeather(e.target.value)}>{Object.keys(WEATHER).map((k) => <option key={k}>{k}</option>)}</select></label>
           {kind !== 'naval' && <label className="bt-field"><span>Укрепления защитника</span><select className="ed-select" value={inp.fort} onChange={(e) => setFort(Number(e.target.value))}>{FORT.map((f, i) => <option key={i} value={i}>{f}</option>)}</select></label>}
+          {kind !== 'naval' && fortHint && fortHint.lv !== inp.fort && <button className="link-btn" onClick={() => setFort(fortHint.lv)}>По поселению: {FORT[fortHint.lv]} ({fortHint.name})</button>}
           {kind === 'crossing' && <label className="bt-field"><span>Река</span><select className="ed-select" value={inp.river} onChange={(e) => setRiver(Number(e.target.value))}>{['—', 'речка', 'река', 'большая река'].map((f, i) => <option key={i} value={i}>{f}</option>)}</select></label>}
           <div className="bt-dice">
             <button className="mil-go" onClick={() => setSeed(1 + Math.floor(Math.random() * 1e9))}>🎲 Бросить кости</button>

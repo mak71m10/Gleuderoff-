@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../store'
 import { formatDate } from '../calendar'
-import { GOOD, GOODS, fmtMarks, type Good } from '../economy'
-import { marketAt } from '../econCalc'
+import { GOOD, GOODS, fmtMarks, journalAdd, type Good } from '../economy'
+import { marketAt, sellable, treasuryAt } from '../econCalc'
 import { KAYA_FEE, MONTH, dealSum, type MarketShock, type MarketTrade } from '../market'
 
 const TICKER: Record<Good, string> = { grain: 'ХЛБ', fish: 'РЫБ', cattle: 'СКТ', wood: 'ЛЕС', stone: 'КМН', iron: 'ЖЛЗ', copper: 'МДЬ', silver: 'СРБ', salt: 'СОЛ', coal: 'УГЛ', saltpetre: 'СЛТ', furs: 'МЕХ', horses: 'КОН', cloth: 'ТКН', tools: 'ИНС', arms: 'ОРЖ', powder: 'ПРХ', wine: 'ВИН', luxury: 'РСК', reagents: 'РЕА' }
@@ -71,13 +71,16 @@ export function MarketView() {
   const sum = dealSum(qtySigned, cur.price)
   const impact = Math.max(0.6, Math.min(1.6, 1 + (qtySigned / Math.max(1, cur.supply)) * 1.5 * (kind === 'deal' ? 1 : 0.5)))
   const st = states.find((s) => s.id === who)
+  const cash = st ? treasuryAt(world, st, date) : 0
+  // продать можно только излишек этого хода
+  const canSell = st && side === 'sell' ? sellable(world, st.id, sel, date) : Infinity
   const doTrade = (): void => {
     if (!st) return
     const t: MarketTrade = { id: `t${Date.now().toString(36)}`, stateId: st.id, good: sel, qty: qtySigned, price: cur.price, date, kind, ...(kind === 'contract' ? { months } : {}) }
     mutate((w) => {
       ;((w.market ??= { shocks: [] }).trades ??= []).push(t)
       const s = w.states.find((x) => x.id === st.id)
-      if (kind === 'deal' && s?.base.econ) s.base.econ.treasury += qtySigned > 0 ? -sum : sum
+      if (kind === 'deal' && s?.base.econ) journalAdd(s.base.econ, date, qtySigned > 0 ? -sum : sum, `биржа: ${side === 'buy' ? 'покупка' : 'продажа'} ${qty} «${GOOD[sel].name}»`, 'deal')
       ;(w.vpiLog ??= []).push({ id: `v${Date.now().toString(36)}`, date, at: new Date().toISOString(), state: st.base.name, title: `Биржа Каяи: ${side === 'buy' ? 'покупка' : 'продажа'} ${GOOD[sel].name.toLowerCase()}`, order: '', verdict: '', public: `${st.base.name} ${side === 'buy' ? 'купила' : 'продала'} ${qty} «${GOOD[sel].name}» по ${num(cur.price)}${kind === 'contract' ? ` — договор на ${months} мес.` : ''}.`, changes: [] })
     })
     setMsg(`${st.base.name}: ${side === 'buy' ? 'куплено' : 'продано'} ${qty} «${GOOD[sel].name}» по ${num(cur.price)} — ${fmtMarks(sum)}${kind === "contract" ? " в месяц" : ""}`)
@@ -149,9 +152,10 @@ export function MarketView() {
               <div className="bx-est">
                 <span>{side === 'buy' ? 'Заплатит' : 'Получит'}: <b>{fmtMarks(sum)}</b>{kind === 'contract' ? ' в месяц' : ''}</span>
                 <span>Цена сдвинется: <b className={impact >= 1 ? 'up' : 'down'}>×{impact.toFixed(2).replace('.', ',')}</b></span>
-                {st && kind === 'deal' && side === 'buy' && (st.base.econ?.treasury ?? 0) < sum && <span className="down">В казне только {fmtMarks(st.base.econ?.treasury ?? 0)}</span>}
+                {st && kind === 'deal' && side === 'buy' && cash < sum && <span className="down">В казне только {fmtMarks(cash)}</span>}
+                {st && side === 'sell' && <span className={qty > canSell ? 'down' : ''}>Излишек на продажу: {canSell.toLocaleString('ru-RU')}</span>}
               </div>
-              <button className="eco-open" disabled={!st || (kind === 'deal' && side === 'buy' && (st?.base.econ?.treasury ?? 0) < sum)} onClick={doTrade}>Провести через конторы Каяи</button>
+              <button className="eco-open" disabled={!st || (kind === 'deal' && side === 'buy' && cash < sum) || (side === 'sell' && qty > canSell)} onClick={doTrade}>Провести через конторы Каяи</button>
               {msg && <p className="mil-state">✔ {msg}</p>}
             </div>
           )}

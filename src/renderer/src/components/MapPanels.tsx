@@ -51,7 +51,7 @@ export function StatePanel({ id }: { id: string }) {
       <div className="mp-facts">
         {capital && <div><span>Столица</span><b>{resolve(capital, date).name}</b></div>}
         {rep && <div><span>Население</span><b>{fmtPeople(rep.pop)}</b></div>}
-        {e && <div><span>Казна</span><b>{fmtMarks(e.treasury)}</b>{rep && <i className={rep.net < 0 ? 'neg' : 'pos'}>{rep.net >= 0 ? '+' : ''}{fmtMarks(rep.net)} за ход</i>}</div>}
+        {e && <div><span>Казна</span><b>{fmtMarks(rep?.treasury ?? e.treasury)}</b>{rep && <i className={rep.net < 0 ? 'neg' : 'pos'}>{rep.net >= 0 ? '+' : ''}{fmtMarks(rep.net)} за ход</i>}</div>}
         {rep && <div><span>Продовольствие</span><b className={foodPct < 100 ? 'neg' : ''}>{foodPct >= 100 ? 'хватает' : `своего ${foodPct} %`}</b></div>}
         {rep && <div><span>Войско</span><b>{armyWord(rep.soldiers)}</b>{rep.soldiers > 0 && <i>≈ {rep.soldiers.toLocaleString('ru-RU')}</i>}</div>}
         {e && <div><span>Монета</span><b>{e.coin.name}</b></div>}

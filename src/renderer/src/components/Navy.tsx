@@ -75,6 +75,7 @@ export function NavyView({ st, m }: { st: WorldState; m: StateMilitary }) {
   const world = useStore((s) => s.world!)
   const master = useStore((s) => s.masterMode)
   const mutate = useStore((s) => s.mutate)
+  const date = useStore((s) => s.date)
   const navy = m.navy
   const prov = useMemo(() => new Map((world.provinces ?? []).map((p) => [p.id, p])), [world.provinces])
   const sum = useMemo(() => {
@@ -128,7 +129,7 @@ export function NavyView({ st, m }: { st: WorldState; m: StateMilitary }) {
                     <div className="ew-muted small">{t.note}. Капитан: {s.cmd.name} ({s.cmd.trait}).</div>
                     {master && (
                       <div className="mil-edit">
-                        <label>Кораблей <input type="number" min={0} max={999} value={s.count} onChange={(e) => edit(id, (x) => { x.count = Math.max(0, Number(e.target.value) || 0) })} /></label>
+                        <label>Кораблей <input type="number" min={0} max={999} value={s.count} title="С этой даты (прошлое не меняется)" onChange={(e) => edit(id, (x) => { const n = Math.max(0, Number(e.target.value) || 0); const ch = (x.changes ??= []); const i = ch.findIndex((c) => c.date === date); if (i >= 0) ch[i].count = n; else ch.push({ date, count: n, note: 'мастер' }) })} /></label>
                         <select value={s.arm} onChange={(e) => edit(id, (x) => { x.arm = e.target.value })}>{Object.entries(ARMAMENT).map(([k, a]) => <option key={k} value={k}>{a.name}</option>)}</select>
                         <select value={s.crew} onChange={(e) => edit(id, (x) => { x.crew = e.target.value })}>{Object.entries(CREW).map(([k, c]) => <option key={k} value={k}>{c.name}</option>)}</select>
                         <select value={s.ship} onChange={(e) => edit(id, (x) => { x.ship = e.target.value })}>{SHIPS.map((x) => <option key={x.key} value={x.key}>{x.name}</option>)}</select>

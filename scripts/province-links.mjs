@@ -68,7 +68,7 @@ for (const p of W.provinces) {
   const m = links.get(p.id)
   if (m?.size) { p.links = Object.fromEntries(m); withLinks++ } else delete p.links
 }
-W.version = Math.max(W.version ?? 0, 67)
+W.version = Math.max(W.version ?? 0, 68)
 writeFileSync(WF + '.tmp', JSON.stringify(W, null, 1)); renameSync(WF + '.tmp', WF)
 const all = [...links.values()].flatMap((m) => [...m.values()])
 const cnt = (re) => all.filter((c) => re.test(c)).length / 2

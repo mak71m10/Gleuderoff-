@@ -355,6 +355,10 @@ export interface Company {
   men: number; xp: number
   colors: [string, string]
   history?: { year: number; text: string }[]
+  /** набрана с даты / распущена с даты (без них — была всегда) */
+  from?: number; to?: number
+  /** потери (бой, поход, болезни) и опыт с даты: men на дату = men − потери до даты */
+  losses?: { date: number; n: number; xp?: number; note?: string }[]
 }
 /** Соединение: батальон, полк, корпус, армия (дерево) */
 export interface Formation {
@@ -367,6 +371,10 @@ export interface Formation {
   base?: number
   lore?: string
   colors?: [string, string]
+  /** создано / распущено с даты */
+  from?: number; to?: number
+  /** переходы: с даты база — новая область (поход) */
+  moves?: { date: number; base: number; note?: string }[]
 }
 export interface StateMilitary {
   /** названия ступеней в стране */

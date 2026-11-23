@@ -8,6 +8,8 @@ import type { Province, WorldData, WorldDate, WorldState } from './types'
 
 const YEAR = 500
 /** какую долю жалованья и кормовых казна платит войскам вне постоянного войска — по уровню сбора */
+/** доля ополчения, что можно призвать, по уровню сбора */
+export const LEVY_FACTOR: Record<string, number> = { 'мир': 0.25, 'сбор': 0.5, 'великий сбор': 1, 'всеобщий призыв': 1.8 }
 export const LEVEL_PAY: Record<string, number> = { 'мир': 0.3, 'сбор': 0.7, 'великий сбор': 1, 'всеобщий призыв': 1.15 }
 /** оклады ставки на соединение за ход */
 const STAFF: Record<string, number> = { battalion: 0, regiment: 0.8, corps: 3, army: 9 }
@@ -27,6 +29,8 @@ export interface Ledger {
   total: number
   men: number
   standing: number
+  /** оторваны от работы: постоянное войско + призванные по уровню сбора (их поля и мастерские стоят) */
+  away: number
   /** доля жалованья для тех, кто не в постоянном войске */
   atHome: number
   /** уровень сбора на дату (закон или решение власти) */
@@ -46,7 +50,8 @@ export const measureOn = (m: Measure, date: WorldDate): boolean => m.from <= dat
 
 function capitalProvince(world: WorldData, st: WorldState, provs: Province[]): Province | undefined {
   const pl = world.places.find((p) => p.id === st.base.capitalId)
-  if (!pl) return provs[0]
+  // столица не указана в лоре — расчёт ведётся от самой людной своей области
+  if (!pl) return provs.reduce<Province | undefined>((b, p) => (!b || (p.pop ?? 0) > (b.pop ?? 0) ? p : b), undefined)
   let best: Province | undefined, d = Infinity
   for (const p of provs) { const dd = (p.x - pl.x) ** 2 + (p.y - pl.y) ** 2; if (dd < d) { d = dd; best = p } }
   return best
@@ -166,8 +171,21 @@ export function armyLedger(world: WorldData, st: WorldState, mil: StateMilitary,
   if (has('scutage')) addC('rulers', -6)
   const leakAmt = Object.values(byLine).reduce((s, v) => s + v, 0)
   return {
-    lines, total: Math.round(total), men, standing, atHome, level,
+    lines, total: Math.round(total), men, standing, away: Math.round(standing + (men - standing) * Math.min(1, atHome)), atHome, level,
     leak: { rate, amount: Math.round(leakAmt), byLine, who: g.who, through: g.through, note: g.note, revealed: audits.length > 0, audited },
     income, content, active, armies: armies.sort((x, y) => y.men - x.men)
   }
+}
+
+/** «Можно призвать» по закону и уровню сбора: ополчение из кормильцев и мастеров, знать с дружинами, несвободные */
+export function callable(law: StateMilitary['law'], level: string, byRole: Partial<Record<Role, number>>): number {
+  const k = LEVY_FACTOR[level] ?? 0.25
+  const workers = (byRole.feeders ?? 0) + (byRole.makers ?? 0)
+  return Math.round(workers * law.levy * k + (law.nobles ? (byRole.rulers ?? 0) * 0.3 : 0) + (law.unfree ? (byRole.unfree ?? 0) * law.levy * 2 * k : 0))
+}
+/** сколько ещё можно набрать в списки: постоянное войско по закону + весь призыв (не меньше «великого сбора») − уже под знамёнами.
+ *  Набранные сверх постоянного войска в мирное время сидят по домам (ополчение), из работы их забирает уровень сбора. */
+export function recruitRoom(L: Ledger, law: StateMilitary['law'], level: string, pop: number, byRole: Partial<Record<Role, number>>): number {
+  const lv = (LEVY_FACTOR[level] ?? 0) >= 1 ? level : 'великий сбор'
+  return Math.round(pop * law.standing + callable(law, lv, byRole) - L.men)
 }

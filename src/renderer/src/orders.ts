@@ -3,6 +3,8 @@
 // после — по новому; учения добавляют опыт, когда закончатся.
 import { ARM, companyStats, type Company, type CompanyTemplate, type Formation, type Mods, type Order, type Stat, type StateMilitary } from './military'
 import type { WorldDate } from './types'
+import type { StateEcon } from './economy'
+import { journalAdd } from './economy'
 
 export const DAY_MONTH = 100
 /** срок перевооружения: не меньше полумесяца, дальше — по тому, что поменялось */
@@ -75,4 +77,89 @@ export function companyAt(mil: StateMilitary, c: Company, date: WorldDate) {
   const r = companyStats({ ...c, xp }, tpl)
   if (rearm) for (const [k, v] of Object.entries(REARM_PENALTY) as [Stat, number][]) r.stats[k] = Math.max(0, r.stats[k] + v)
   return { ...r, tpl, xp, rearm, train }
+}
+
+// ---------- армия на дату (docs/ревизия-противоречий.md, п. А) ----------
+// Правки войска — записями с датой: набор (from), роспуск (to), потери и опыт боя (losses), переходы (moves), число кораблей (changes).
+// milAt собирает войско таким, каким оно было на дату; id рот и соединений те же, правки — по id в исходных данных.
+const alive = (x: { from?: number; to?: number }, date: WorldDate): boolean => (x.from == null || x.from <= date) && (x.to == null || date < x.to)
+const milCache = new WeakMap<StateMilitary, Map<number, StateMilitary>>()
+export function milAt(mil: StateMilitary, date: WorldDate): StateMilitary
+export function milAt(mil: StateMilitary | undefined, date: WorldDate): StateMilitary | undefined
+export function milAt(mil: StateMilitary | undefined, date: WorldDate): StateMilitary | undefined {
+  if (!mil) return mil
+  let per = milCache.get(mil)
+  if (!per) milCache.set(mil, (per = new Map()))
+  const hit = per.get(date)
+  if (hit) return hit
+  const companies: Company[] = []
+  for (const c of mil.companies) {
+    if (!alive(c, date)) continue
+    const ls = (c.losses ?? []).filter((l) => l.date <= date)
+    if (!ls.length) { companies.push(c); continue }
+    const men = c.men - ls.reduce((s, l) => s + l.n, 0)
+    if (men > 0) companies.push({ ...c, men, xp: c.xp + ls.reduce((s, l) => s + (l.xp ?? 0), 0) })
+  }
+  const cIds = new Set(companies.map((c) => c.id))
+  const fAlive = mil.formations.filter((f) => alive(f, date))
+  const fIds = new Set(fAlive.map((f) => f.id))
+  const formations = fAlive.map((f) => {
+    const mv = (f.moves ?? []).filter((x) => x.date <= date).sort((a, b) => a.date - b.date).pop()
+    const comp = f.companies?.filter((id) => cIds.has(id))
+    const ch = f.children.filter((id) => fIds.has(id))
+    return mv || comp?.length !== f.companies?.length || ch.length !== f.children.length ? { ...f, base: mv ? mv.base : f.base, companies: comp, children: ch } : f
+  })
+  let navy = mil.navy
+  if (navy && navy.squadrons.some((s) => s.from != null || s.to != null || s.changes?.length)) {
+    const sq = navy.squadrons.filter((s) => alive(s, date)).map((s) => { const ch = (s.changes ?? []).filter((x) => x.date <= date).sort((a, b) => a.date - b.date).pop(); return ch ? { ...s, count: ch.count } : s }).filter((s) => s.count > 0)
+    const ids = new Set(sq.map((s) => s.id))
+    navy = { ...navy, squadrons: sq, fleets: navy.fleets.map((f) => ({ ...f, squadrons: f.squadrons.filter((id) => ids.has(id)) })) }
+  }
+  const out: StateMilitary = { ...mil, companies, formations, roots: mil.roots.filter((id) => fIds.has(id)), navy }
+  if (per.size > 16) per.clear()
+  per.set(date, out)
+  return out
+}
+
+/** внести итог боя записями с датой: потери и опыт рот, потерянные корабли эскадр; mil — исходные данные (черновик) */
+export function recordBattle(mil: StateMilitary, date: WorldDate, byUnit: Map<string, number>, won: boolean, squadrons: string[], shipsLost: number, ships: number, note: string, econ?: StateEcon, dead = 0): void {
+  if (econ && dead > 0) (econ.deaths ??= []).push({ date, n: Math.round(dead), note })
+  const now = milAt(mil, date)
+  const menNow = new Map(now.companies.map((c) => [c.id, c.men]))
+  for (const c of mil.companies) {
+    const loss = byUnit.get(c.id)
+    if (!loss) continue
+    const left = (menNow.get(c.id) ?? c.men) - loss
+    // опыт — тем, кто выжил ротой (хотя бы треть); разбитые роты опыта не набирают
+    const xp = left >= (menNow.get(c.id) ?? c.men) / 3 ? (won ? 3 : 1) : 0
+    ;(c.losses ??= []).push({ date, n: Math.min(loss, (menNow.get(c.id) ?? c.men) - 5), xp, note })
+  }
+  if (mil.navy && shipsLost) {
+    let left = shipsLost
+    for (const q of mil.navy.squadrons) {
+      if (!squadrons.includes(q.id) || left <= 0) continue
+      const cur = now.navy?.squadrons.find((s) => s.id === q.id)?.count ?? q.count
+      const k = Math.min(cur, left, Math.ceil((shipsLost * cur) / Math.max(1, ships)))
+      ;(q.changes ??= []).push({ date, count: cur - k, note })
+      left -= k
+    }
+  }
+}
+
+/** внести поход: потери в пути (больные, отставшие, дезертиры) — по ротам пропорционально, умершие — из населения,
+ *  хлеб — из амбаров (половина расчётного: остальное солдаты съели бы и дома), надбавка походного жалованья и подвоза — в журнал казны */
+export function recordMarch(mil: StateMilitary, econ: StateEcon | undefined, date: WorldDate, ids: string[], plan: { losses: number; grain: number; marks: number; arrive: number }, note: string): void {
+  const now = milAt(mil, date)
+  const men = new Map(now.companies.map((c) => [c.id, c.men]))
+  const total = ids.reduce((s, id) => s + (men.get(id) ?? 0), 0)
+  if (plan.losses > 0 && total > 0) for (const c of mil.companies) {
+    if (!ids.includes(c.id)) continue
+    const n = Math.min((men.get(c.id) ?? c.men) - 5, Math.round((plan.losses * (men.get(c.id) ?? 0)) / total))
+    if (n > 0) (c.losses ??= []).push({ date: plan.arrive, n, note })
+  }
+  if (!econ) return
+  if (plan.losses > 0) (econ.deaths ??= []).push({ date: plan.arrive, n: Math.round(plan.losses * 0.4), note })
+  if (plan.grain > 0) (econ.drawn ??= []).push({ date, qty: Math.round((plan.grain / 2.2) * 0.5), note })
+  // обычное содержание уже в бюджете хода; поход стоит полуторного — надбавка (треть расчёта) разово
+  if (plan.marks > 0) journalAdd(econ, date, -Math.round(plan.marks / 3), `надбавка похода: ${note}`, 'order')
 }
