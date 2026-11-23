@@ -72,6 +72,17 @@ export const BASIC = {
     tpl('ballistarii', 'Центурия баллистариев', 'siege', { weapon: 'ballista', armor: 'gambeson', training: 'trained', formation: 'close', banner: 'company', train: 'full' }, ['sappertools']),
     tpl('levy', 'Ополчение податных дворов', 'line', { weapon: 'spear', armor: 'gambeson', shield: 'round', training: 'levy', formation: 'close', banner: 'company', train: 'normal' })
   ],
+  // феодальные королевства и графства имперской культуры (кроме самой Империи с её легионами)
+  feudal: [
+    tpl('spearmen', 'Копейщики', 'line', { weapon: 'spear', armor: 'gambeson', shield: 'kite', training: 'trained', formation: 'close', banner: 'house', train: 'normal' }),
+    tpl('swordsmen', 'Мечники в кольчугах', 'line', { weapon: 'sword', armor: 'mail', shield: 'kite', training: 'veteran', formation: 'close', banner: 'house', train: 'normal' }),
+    tpl('halberdiers', 'Алебардщики', 'line', { weapon: 'halberd', armor: 'brigandine', shield: 'noshield', training: 'trained', formation: 'close', banner: 'company', train: 'normal' }, ['drums']),
+    tpl('bowmen', 'Лучники', 'archers', { weapon: 'longbow', armor: 'gambeson', shield: 'noshield', training: 'trained', formation: 'volley', banner: 'company', train: 'normal' }),
+    tpl('crossbows', 'Арбалетчики', 'xbow', { weapon: 'xbow', armor: 'gambeson', shield: 'pavise', training: 'trained', formation: 'volley', banner: 'company', train: 'normal' }),
+    tpl('menatarms', 'Конные латники', 'heavycav', { weapon: 'warlance', armor: 'plate', shield: 'kite', mount: 'warhorse', training: 'veteran', formation: 'charge', banner: 'house', train: 'full' }),
+    tpl('sergeants', 'Конные сержанты', 'lightcav', { weapon: 'lance', armor: 'mail', shield: 'kite', mount: 'riding', training: 'trained', formation: 'charge', banner: 'company', train: 'normal' }),
+    tpl('levy', 'Ополчение', 'line', { weapon: 'spear', armor: 'gambeson', shield: 'round', training: 'levy', formation: 'close', banner: 'company', train: 'normal' })
+  ],
   nordic: [
     tpl('karls', 'Сотня карлов', 'line', { weapon: 'axe', armor: 'mail', shield: 'round', training: 'trained', formation: 'shieldwall', banner: 'house', train: 'light' }, ['horns']),
     tpl('huscarls', 'Хускарлы', 'line', { weapon: 'daneaxe', armor: 'mail', shield: 'round', training: 'veteran', formation: 'wedge', banner: 'house', train: 'light' }, ['horns']),

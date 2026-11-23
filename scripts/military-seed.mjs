@@ -42,7 +42,8 @@ for (const st of W.states) {
   const law = { ...(LAW_STATE[name] ?? LAW[cult] ?? LAW.imperial), level: 'мир' }
   const tech = b.tech?.levels ?? {}
   const ok = (t) => { const req = { guns: { powder: 3 }, cannon: { powder: 3 }, mages: { magic: 3 }, templars: { magic: 2 } }[t.arm] ?? {}; return Object.entries(req).every(([k, v]) => (tech[k] ?? 0) >= v) }
-  const basic = (BASIC[cult] ?? BASIC.imperial).filter(ok)
+  const basicSet = cult === 'imperial' && !['Империя', 'Ноксворд', 'Ятаган'].includes(name) ? 'feudal' : cult
+  const basic = (BASIC[basicSet] ?? BASIC.imperial).filter(ok)
   const unique = (UNIQUE[name] ?? []).filter((t) => ok(t) || t.unique)
   const templates = [...basic, ...unique].map((t) => ({ ...t, id: `${t.id}` }))
   const tById = new Map(templates.map((t) => [t.id, t]))

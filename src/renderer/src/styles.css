@@ -2772,3 +2772,82 @@ button.pw-chip:hover { background: var(--panel-2); }
   .ed-grid, .ed-full .ed-grid { grid-template-columns: 1fr; } .ed .ew-tiles, .ed-full .ew-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .eco { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---- вкладка «Армия» (Army.tsx) ---- */
+.mil { display: flex; flex-direction: column; gap: 12px; }
+.mil-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.mil-tabs button, .mil-levels button { padding: 6px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text-2); cursor: pointer; font-size: 14px; }
+.mil-tabs button.active, .mil-levels button.active { border-color: var(--gold); color: var(--gold-2); background: var(--panel); }
+.mil-levels { display: flex; gap: 6px; flex-wrap: wrap; }
+.mil-levels button:disabled { cursor: default; }
+.mil-law { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 13px; margin-top: 6px; }
+.mil-best { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+.mil-chip-ico { font-size: 16px; text-align: center; }
+.mil-go { margin-top: 10px; }
+.mil-tree { display: grid; grid-template-columns: minmax(260px, 34%) 1fr; gap: 12px; align-items: start; }
+.mil-tree-list { max-height: 70vh; overflow: auto; border: 1px solid var(--line); border-radius: 8px; padding: 4px 0; background: var(--bg-2); }
+.mil-node { display: flex; align-items: center; gap: 6px; padding: 3px 6px; font-size: 13px; }
+.mil-node.sel { background: var(--panel); outline: 1px solid var(--gold-dim); }
+.mil-node.lvl-army .mil-node-name { font-family: var(--serif); font-size: 16px; color: var(--gold-2); }
+.mil-node.lvl-corps .mil-node-name, .mil-node.lvl-regiment .mil-node-name { font-weight: 600; }
+.mil-node.lvl-company { color: var(--text-2); }
+.mil-twisty { width: 16px; background: none; border: 0; color: var(--muted); cursor: pointer; padding: 0; }
+.mil-node-name { flex: 1; text-align: left; background: none; border: 0; color: inherit; cursor: pointer; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mil-node-men { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.mil-flag { width: 14px; height: 10px; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(0, 0, 0, .4); }
+.mil-flag.big { width: 42px; height: 30px; border-radius: 3px; }
+.mil-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-2); }
+.mil-card-head { display: flex; gap: 12px; align-items: center; }
+.mil-card-head h3 { margin: 0; font-family: var(--serif); font-weight: normal; font-size: 20px; color: var(--gold-2); }
+.mil-lore { margin: 0; color: var(--text-2); font-style: italic; }
+.mil-scheme { display: grid; grid-template-columns: 1fr 1.4fr 1fr; grid-template-areas: "van van van" "left center right" "reserve reserve train"; gap: 8px; }
+.mil-zone { min-height: 70px; border: 1px dashed var(--line); border-radius: 8px; padding: 6px; background: rgba(255, 255, 255, .02); display: flex; flex-direction: column; gap: 4px; }
+.mil-zone.can { border-color: var(--gold); cursor: pointer; }
+.z-van { grid-area: van; } .z-left { grid-area: left; } .z-center { grid-area: center; } .z-right { grid-area: right; } .z-reserve { grid-area: reserve; } .z-train { grid-area: train; }
+.mil-zone-name { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.mil-zone-units { display: flex; flex-wrap: wrap; gap: 5px; }
+.mil-unit { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 5px; padding: 4px 8px; border-radius: 5px; background: var(--panel); border: 1px solid var(--line); cursor: grab; font-size: 12px; max-width: 220px; }
+.mil-unit span { grid-row: span 2; font-size: 16px; align-self: center; }
+.mil-unit b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mil-unit i { font-style: normal; color: var(--muted); }
+.mil-unit.held { outline: 2px solid var(--gold); }
+.mil-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mil-stats { display: flex; flex-direction: column; gap: 3px; }
+.mil-stat { display: grid; grid-template-columns: 96px 1fr 52px; gap: 8px; align-items: center; font-size: 13px; }
+.mil-stat-bar { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+.mil-stat-bar i { display: block; height: 100%; background: linear-gradient(90deg, #a08040, var(--gold)); }
+.mil-stat b { text-align: right; }
+.mil-stat em { font-style: normal; font-size: 11px; }
+.mil-stat em.up { color: #9fd08a; } .mil-stat em.down { color: #e08a6a; }
+.mil-cost { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+.mil-parts { margin: 0; padding: 0; list-style: none; font-size: 12px; }
+.mil-parts li { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; border-bottom: 1px dotted rgba(255, 255, 255, .06); }
+.mil-parts i { font-style: normal; color: var(--muted); text-align: right; }
+.mil-trait.good { border-color: #5a9a50; color: #b8e0a8; }
+.mil-trait.bad { border-color: #b0503a; color: #f0b49c; }
+.mil-trait button { background: none; border: 0; color: inherit; cursor: pointer; margin-left: 4px; }
+.mil-edit { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.mil-edit select, .mil-edit input, .mil-edit-row select, .mil-name, .mil-slot select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 4px 6px; font-size: 13px; }
+.mil-edit input { width: 70px; }
+.mil-designer { display: grid; grid-template-columns: 220px 1fr 300px; gap: 12px; align-items: start; }
+.mil-tpl-list { display: flex; flex-direction: column; gap: 3px; max-height: 70vh; overflow: auto; }
+.mil-tpl-list button { display: grid; grid-template-columns: 22px 1fr auto; gap: 6px; align-items: center; text-align: left; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; background: var(--bg-2); color: var(--text); cursor: pointer; font-size: 13px; }
+.mil-tpl-list button.sel { border-color: var(--gold); }
+.mil-tpl-list i { font-style: normal; font-size: 11px; color: var(--gold-2); }
+.mil-tpl-edit, .mil-tpl-preview { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-2); }
+.mil-edit-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.mil-name { flex: 1; min-width: 180px; font-family: var(--serif); font-size: 17px; }
+.mil-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mil-slot { display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+.mil-slot span { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.mil-slot i { font-style: normal; font-size: 12px; color: var(--text-2); }
+.mil-kit { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 4px; }
+.mil-kit-item { font-size: 12px; padding: 3px 6px; border-radius: 5px; border: 1px solid var(--line); display: flex; gap: 5px; align-items: center; cursor: pointer; }
+.mil-kit-item.on { border-color: var(--gold); background: var(--panel); }
+.mil-kit-item.locked { opacity: .45; cursor: default; }
+@media (max-width: 1100px) { .mil-designer { grid-template-columns: 200px 1fr; } .mil-tpl-preview { grid-column: 1 / -1; } }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .mil-tree, .mil-designer, .mil-card-grid, .mil-slots { grid-template-columns: 1fr; }
+  .mil-tree-list { max-height: 40vh; }
+  .mil-law { grid-template-columns: 1fr; }
+}

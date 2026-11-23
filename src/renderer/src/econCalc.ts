@@ -10,6 +10,7 @@
  */
 import { GOOD, GOODS, type Good, type Role } from './economy'
 import { ownerAt } from './provinces'
+import { companyStats } from './military'
 import { toParts } from './calendar'
 import type { AdminRegion, Entry, Province, WorldData, WorldDate, WorldState } from './types'
 
@@ -275,9 +276,13 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   expense.push({ name: 'Содержание областей', amount: Math.round((nAreas * 12 + pop * 0.0008) * (ADMIN[cult] ?? 1)), note: `${nAreas} областей: наместники, суды, дороги, стража` })
   expense.push({ name: 'Двор и канцелярия', amount: Math.round(40 + taxSum * 0.18) })
   expense.push({ name: 'Сбор податей', amount: Math.round(taxSum * 0.08), note: 'сборщики, откупщики, потери в дороге' })
-  const soldiers = Math.round(armySize(st.base.army) * Math.min(2, cond.army))
+  // войско: если у страны есть роты (военная система) — люди и содержание из них, иначе из текста армии
+  const mil = st.base.military
+  let milMen = 0, milCost = 0
+  if (mil) { const tpl = new Map(mil.templates.map((t) => [t.id, t])); for (const c of mil.companies) { milMen += c.men; milCost += companyStats(c, tpl.get(c.t)).cost } }
+  const soldiers = Math.round((mil ? milMen : armySize(st.base.army)) * Math.min(2, cond.army))
   const ships = shipCount(st.base.navy)
-  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: Math.round(soldiers * 0.045 * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек` })
+  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: Math.round((mil ? milCost : soldiers * 0.045) * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${mil ? `, ${mil.companies.length} рот` : ''}` })
   if (ships) expense.push({ name: 'Флот', amount: Math.round(ships * 4), note: `≈ ${ships} кораблей` })
   if (nb) expense.push({ name: 'Постройки и мануфактуры', amount: nb * 6, note: `${nb} построек` })
   for (const d of e.debts) expense.push({ name: `Проценты: ${d.to}`, amount: Math.round(d.sum * d.rate), note: `долговая печать на ${Math.round(d.sum).toLocaleString('ru-RU')} мар., срок ${d.due} г.` })

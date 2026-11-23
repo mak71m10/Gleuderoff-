@@ -380,6 +380,7 @@ export interface StateMilitary {
 }
 
 // ---------- расчёт ----------
+export const COST_SCALE = 0.35
 export function companyStats(c: Company, tpl: CompanyTemplate | undefined): { stats: Required<Mods>; cost: number; goods: Partial<Record<Good, number>>; parts: { name: string; mods: Mods }[] } {
   const arm = ARM[tpl?.arm ?? 'line'] ?? ARM.line
   const s = { ...arm.base }
@@ -397,7 +398,8 @@ export function companyStats(c: Company, tpl: CompanyTemplate | undefined): { st
   const xp = Math.min(3, Math.floor(c.xp / 10)); if (xp) add('Опыт боёв', { mor: xp, dis: xp })
   for (const k of Object.keys(s) as Stat[]) s[k] = Math.max(0, Math.min(20, Math.round(s[k])))
   const men = c.men / Math.max(1, arm.men)
-  return { stats: s, cost: Math.round(cost * men * 10) / 10, goods: Object.fromEntries(Object.entries(goods).map(([g, v]) => [g, Math.round(v! * men * 10) / 10])), parts }
+  // COST_SCALE: марки на роту за ход сведены с бюджетом страны (econCalc.ts берёт содержание армии из рот)
+  return { stats: s, cost: Math.round(cost * men * COST_SCALE * 10) / 10, goods: Object.fromEntries(Object.entries(goods).map(([g, v]) => [g, Math.round(v! * men * 10) / 10])), parts }
 }
 
 /** сила роты одним числом (для сводок): взвешенные характеристики × люди */

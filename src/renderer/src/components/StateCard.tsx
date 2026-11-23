@@ -47,6 +47,7 @@ import { CoatOfArms, Flag, HeraldryEditor, defaultHeraldry } from './Heraldry'
 import { Icon, type IconName } from './Icon'
 import { TechView } from './Tech'
 import { EconomyView } from './Economy'
+import { ArmyView } from './Army'
 import { fmtMarks } from '../economy'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
 
@@ -515,12 +516,7 @@ function StateCardBody({ id }: { id: string }) {
 
         {tab === 'economy' && <EconomyView st={st} />}
 
-        {tab === 'military' && (
-          <div className="sc-side sc-army">
-            <TextField label="Численность армии" multiline rows={3} value={f.army} onChange={(army) => set({ army })} className={mark('army')} />
-            <TextField label="Флот" multiline rows={2} value={f.navy} onChange={(navy) => set({ navy })} className={mark('navy')} />
-          </div>
-        )}
+        {tab === 'military' && <ArmyView st={st} />}
 
         {tab === 'power' && (
           <div className="sc-part" data-title="Фракции и парламент">
