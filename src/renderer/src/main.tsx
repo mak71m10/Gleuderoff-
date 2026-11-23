@@ -49,7 +49,8 @@ if (!window.api) {
       return true
     },
     importImage: async () => null,
-    openWorldFolder: async () => ''
+    openWorldFolder: async () => '',
+    onWorldExternal: () => {}
   }
 }
 

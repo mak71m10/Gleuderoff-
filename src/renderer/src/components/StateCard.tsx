@@ -49,6 +49,7 @@ import { TechView } from './Tech'
 import { EconomyView } from './Economy'
 import { ArmyView } from './Army'
 import { DecisionsView } from './Decisions'
+import { VpiLogView } from './VpiLog'
 import { fmtMarks } from '../economy'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
 
@@ -258,6 +259,7 @@ function StateCardBody({ id }: { id: string }) {
       </nav>
 
       <div className="sc-content">
+        {tab === 'overview' && <VpiLogView st={st} />}
         {tab === 'overview' && (
           <div className="sc-cols">
             <div className="parchment">

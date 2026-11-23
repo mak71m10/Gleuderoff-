@@ -54,6 +54,8 @@ interface Store {
   editMode: EditMode
   /** Режим правки вершин выбранного участка */
   vertexEdit: boolean
+  /** когда мир последний раз перечитан после правок снаружи (вердикты) */
+  externalAt: number
   /** путь похода на карте (калькулятор похода) */
   routePreview: { points: [number, number][]; color: string; label: string } | null
   setRoutePreview: (r: { points: [number, number][]; color: string; label: string } | null) => void
@@ -110,6 +112,7 @@ function loadLayers(): Layers {
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | undefined
+let externalHooked = false
 
 export const useStore = create<Store>((set, get) => {
   const scheduleSave = (): void => {
@@ -141,6 +144,7 @@ export const useStore = create<Store>((set, get) => {
     layers: loadLayers(),
     editMode: 'base',
     vertexEdit: false,
+    externalAt: 0,
     routePreview: null,
     setRoutePreview: (routePreview) => set({ routePreview }),
     mapMode: 'political',
@@ -156,6 +160,15 @@ export const useStore = create<Store>((set, get) => {
       const world = data as WorldData
       const worldMap = world.maps.find((m) => m.kind === 'world') ?? world.maps[0]
       set({ world, worldDir: dir, date: world.calendar.present, mapId: worldMap?.id ?? '' })
+      // вердикты ВПИ правят файл мира снаружи: перечитываем, сохраняя дату и вид; несохранённое своё не теряем — правки снаружи главнее
+      if (!externalHooked) {
+        externalHooked = true
+        window.api.onWorldExternal?.(async () => {
+          clearTimeout(saveTimer)
+          const res = await window.api.loadWorld()
+          set({ world: res.data as WorldData, past: [], future: [], saveState: 'saved', externalAt: Date.now() })
+        })
+      }
     },
 
     mutate: (fn, opts) => {

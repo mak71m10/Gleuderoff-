@@ -3026,3 +3026,16 @@ button.pw-chip:hover { background: var(--panel-2); }
 /* кнопки действий ВПИ (учения, меры, поход, решения) */
 .mil-go { padding: 6px 12px; border-radius: 7px; border: 1px solid var(--gold-dim); background: var(--panel); color: var(--gold-2); font-size: 13px; cursor: pointer; text-align: left; }
 .mil-go:hover { border-color: var(--gold); background: rgba(216, 176, 64, .1); }
+
+/* ---- ВПИ: приказы и вердикты (VpiLog.tsx), уведомление о правках снаружи ---- */
+.vpi-log { margin: 4px 0 12px; padding: 10px 12px; border: 1px solid var(--gold-dim); border-radius: 10px; background: var(--bg-2); display: flex; flex-direction: column; gap: 6px; }
+.vpi-log h3 { margin: 0 0 2px; font-family: var(--serif); font-weight: normal; color: var(--gold-2); font-size: 18px; }
+.vpi-item { padding: 6px 8px; border-radius: 6px; background: var(--panel); border-left: 3px solid var(--gold); }
+.vpi-head { display: flex; gap: 10px; align-items: baseline; width: 100%; background: none; border: 0; color: var(--text); cursor: pointer; text-align: left; padding: 0; }
+.vpi-head span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.vpi-head b { flex: 1; font-weight: 600; font-size: 14px; }
+.vpi-public { margin: 4px 0 0; font-size: 13px; color: var(--text-2); }
+.vpi-body { font-size: 13px; line-height: 1.5; }
+.vpi-body p { margin: 6px 0 0; }
+.vpi-body ul { margin: 6px 0 0; padding-left: 18px; }
+.external-note { position: fixed; z-index: 3000; right: 16px; bottom: 70px; padding: 10px 14px; border-radius: 8px; background: var(--panel); border: 1px solid var(--gold); color: var(--gold-2); box-shadow: 0 4px 14px rgba(0,0,0,.5); font-size: 14px; }

@@ -124,6 +124,16 @@ export default function App() {
         <Timeline />
       </main>
       <StateCard />
+      <ExternalNote />
     </div>
   )
+}
+
+/** уведомление: мир перечитан после правок снаружи (вердикты ВПИ) */
+function ExternalNote() {
+  const at = useStore((s) => s.externalAt)
+  const [shown, setShown] = useState(0)
+  useEffect(() => { if (!at) return; setShown(at); const t = setTimeout(() => setShown(0), 7000); return () => clearTimeout(t) }, [at])
+  if (!shown) return null
+  return <div className="external-note">📜 Мир обновлён: внесены вердикты по приказам</div>
 }

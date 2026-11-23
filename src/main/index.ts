@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, net, protocol, shell } from 'electron'
 import { join, basename, extname, normalize, sep } from 'path'
 import { pathToFileURL } from 'url'
-import { promises as fs, existsSync } from 'fs'
+import { promises as fs, existsSync, watchFile } from 'fs'
 
 // Файлы мира отдаются рендереру через схему world://asset/<относительный путь>
 protocol.registerSchemesAsPrivileged([
@@ -1262,6 +1262,13 @@ app.whenReady().then(async () => {
     return net.fetch(pathToFileURL(full).toString())
   })
 
+  // мир правят и снаружи (вердикты ВПИ: scripts/vpi/apply.mjs) — тогда окно перечитывает его, а не затирает своим сохранением
+  let lastOwnWrite = 0
+  watchFile(join(dir, 'world.json'), { interval: 1500 }, (cur, prev) => {
+    if (cur.mtimeMs === prev.mtimeMs || Date.now() - lastOwnWrite < 4000) return
+    for (const w of BrowserWindow.getAllWindows()) w.webContents.send('world:external')
+  })
+
   ipcMain.handle('world:load', async () => {
     const raw = await fs.readFile(join(dir, 'world.json'), 'utf8')
     return { dir, data: JSON.parse(raw) }
@@ -1269,8 +1276,10 @@ app.whenReady().then(async () => {
 
   ipcMain.handle('world:save', async (_e, data: unknown) => {
     const tmp = join(dir, 'world.json.tmp')
+    lastOwnWrite = Date.now()
     await fs.writeFile(tmp, JSON.stringify(data, null, 1), 'utf8')
     await fs.rename(tmp, join(dir, 'world.json'))
+    lastOwnWrite = Date.now()
     return true
   })
 
