@@ -5,6 +5,7 @@
 // качество снаряжения по технологиям, черты, командир, цвета. Пишет states[].base.military.
 // node scripts/military-seed.mjs
 import { readFileSync, writeFileSync, renameSync } from 'fs'
+import { ARMY_LORE } from './lore/army-lore.mjs'
 import { LADDER, LADDER_STATE, LAW, LAW_STATE, BASIC, UNIQUE, NAMES, CMD_TRAITS, ORDINAL, EPITHETS, TEMPLATE_RACE, GRAFT, GRAFT_STATE, EXTRA_FORCE } from './lore/military.mjs'
 
 const WF = 'resources/default-world/world.json'
@@ -37,7 +38,8 @@ for (const st of W.states) {
   const b = st.base, name = b.name
   const cc = {}; for (const p of provs) cc[p.culture] = (cc[p.culture] ?? 0) + 1
   const cult = Object.entries(cc).sort((x, y) => y[1] - x[1])[0][0]
-  const ladderArr = LADDER_STATE[name] ?? LADDER[cult] ?? LADDER.imperial
+  const AL = ARMY_LORE[name]
+  const ladderArr = AL?.ladder ?? LADDER_STATE[name] ?? LADDER[cult] ?? LADDER.imperial
   const ladder = Object.fromEntries(LEVELS.map((l, i) => [l, ladderArr[i]]))
   const law = { ...(LAW_STATE[name] ?? LAW[cult] ?? LAW.imperial), level: b.military?.law?.level ?? 'мир' }
   // место базирования армий — область у столицы
@@ -115,6 +117,7 @@ for (const st of W.states) {
       if (t.unique) w = kind === 'guard' ? 6 : 0.7
       else if (kind === 'guard') w *= 0.2
       if (t.parts.training === 'levy') w = kind === 'levy' ? 8 : 0.8
+      else if (kind === 'levy') w *= 0.08
       pairs.push([t, w])
     }
     return pairs
@@ -141,9 +144,25 @@ for (const st of W.states) {
     if (childrenOf(e.id).length) continue // зонтик — ниже
     const men = Math.min(14000, sizeOf(e.base.props?.members) || 1500)
     const kind = /гвард|стража|орден|братств/i.test(`${e.base.props?.type} ${e.base.name}`) ? 'guard' : /ополчен/i.test(e.base.name) ? 'levy' : 'line'
+    const parent = e.base.links?.overlord && byId.has(e.base.links.overlord) ? e.base.links.overlord : null
+    const parts = AL?.split?.[e.base.name]
+    if (parts?.length) {
+      const per = Math.round(men / parts.length)
+      for (const nm of parts) {
+        const k2 = /стража|гвард/i.test(nm) ? 'guard' : /ополчен|дымы|сотни/i.test(nm) ? 'levy' : kind === 'guard' && parts.length > 1 ? 'line' : kind
+        const r = regiment(nm, per, k2, e.id); r.parent = parent; if (parts.length > 1) r.group = e.base.name; regiments.push(r)
+      }
+      loreMen += men
+      continue
+    }
     const r = regiment(e.base.name, men, kind, e.id)
-    r.parent = e.base.links?.overlord && byId.has(e.base.links.overlord) ? e.base.links.overlord : null
+    r.parent = parent
     regiments.push(r); loreMen += men
+  }
+  // полки из лора страны (дома, этты, кланы, Очаги, ополчения — ARMY_LORE.units)
+  for (const u of AL?.units ?? []) {
+    if (regiments.some((r) => r.name === u.name)) continue
+    const r = regiment(u.name, u.men, u.kind, undefined); r.parent = null; regiments.push(r); loreMen += u.men
   }
   // страны без войска в лоре: стража и ополчение по их устройству (EXTRA_FORCE)
   if (!regiments.length) for (const x of EXTRA_FORCE[name] ?? []) { const r = regiment(x.name, x.men, x.kind, undefined); r.parent = null; regiments.push(r); loreMen += x.men }
@@ -152,7 +171,7 @@ for (const st of W.states) {
   const umbrella = mine.filter((e) => childrenOf(e.id).length).reduce((s, e) => s + sizeOf(e.base.props?.members), 0)
   const RATE = { orcish: 0.07, nordic: 0.02, dark: 0.03, church: 0.004, zlatay: 0.012 }
   // если в лоре есть общее войско (зонтик) — его численность главнее текста армии (там бывает и запас)
-  const target = Math.min(150000, umbrella ? Math.max(umbrella, loreMen) : Math.max(armySize(b.army), loreMen, Math.round(pop * (RATE[cult] ?? 0.006))))
+  const target = AL?.exact ? loreMen : Math.min(150000, umbrella ? Math.max(umbrella, loreMen) : Math.max(armySize(b.army), loreMen, Math.round(pop * (RATE[cult] ?? 0.006))))
   const mainUmbrella = mine.filter((e) => childrenOf(e.id).length).sort((x, y) => sizeOf(y.base.props?.members) - sizeOf(x.base.props?.members))[0]
   // добор полками: в большой стране полков больше, чтобы стоять по разным городам
   const want = Math.max(1, Math.min(8, Math.round(provs.length / 12)))
@@ -260,16 +279,35 @@ for (const st of W.states) {
     }
   }
 
+  // разделённые организации лора: их полки — в корпус с именем организации
+  const wrap = (list) => {
+    const out = [], seen = new Map()
+    for (const r of list) {
+      if (!r.group) { out.push(r); continue }
+      let c = seen.get(r.group)
+      if (!c) { c = { id: `f${++fn}`, level: 'corps', name: r.group, children: [], cmd: cmd(), lore: r.lore, colors: colors(), base: r.base }; formations.push(c); seen.set(r.group, c); out.push(c) }
+      c.children.push(r.id)
+      const b = provById.get(r.base), cb = provById.get(c.base)
+      if (b && (!cb || rank(b) > rank(cb))) c.base = b.id
+    }
+    return out
+  }
+
   // корпуса и армии: зонтики лора — армии со своими полками (база — столица);
   // остальные полки — корпуса по сторонам света от столицы
   for (const e of mine.filter((x) => childrenOf(x.id).length)) {
     const kids = regiments.filter((r) => r.parent === e.id)
-    const a = { id: `f${++fn}`, level: 'army', name: e.base.name, children: kids.map((r) => r.id), cmd: cmd(), lore: e.id, colors: colors(), base: capProv?.id ?? pick(provs).id }
+    const a = { id: `f${++fn}`, level: 'army', name: e.base.name, children: wrap(kids).map((r) => r.id), cmd: cmd(), lore: e.id, colors: colors(), base: capProv?.id ?? pick(provs).id }
     formations.push(a); roots.push(a.id)
     for (const r of kids) r.parent = 'done'
   }
-  const free = regiments.filter((r) => r.parent !== 'done')
-  if (free.length > 3) {
+  const units = wrap(regiments.filter((r) => r.parent !== 'done'))
+  const gcorps = units.filter((u) => u.level === 'corps')
+  const free = units.filter((u) => u.level === 'regiment')
+  if (units.length > 3) {
+    let corps = free
+    if (free.length > 3) {
+    corps = []
     const word = ladder.corps.split(' ')[0]
     const g = /[оеё]$/.test(word) ? 'ое' : /[ая]$/.test(word) ? 'ая' : 'ый'
     const adj = (stem) => stem + (g === 'ый' && /(Южн|Восточн|Северн|Западн|Столичн)$/.test(stem) ? 'ый' : g)
@@ -301,7 +339,6 @@ for (const st of W.states) {
       groupsArr[bj].push(groupsArr[i][0]); groupsArr[i] = []
     }
     groupsArr.forEach((g, i) => { if (!g.length) return; const key = sectorOfC(cent[i]); (groups.get(key) ?? groups.set(key, []).get(key)).push(...g) })
-    const corps = []
     for (const [k, list] of groups) {
       const parts = []
       const step = Math.ceil(list.length / Math.ceil(list.length / 5))
@@ -313,10 +350,29 @@ for (const st of W.states) {
         formations.push(c); corps.push(c)
       })
     }
-    const a = { id: `f${++fn}`, level: 'army', name: `${ladder.army[0].toUpperCase()}${ladder.army.slice(1)} — ${name}`, children: corps.map((c) => c.id), cmd: cmd(), colors: colors(), base: capProv?.id ?? pick(provs).id }
+    }
+    const a = { id: `f${++fn}`, level: 'army', name: AL?.armyName ?? `${ladder.army[0].toUpperCase()}${ladder.army.slice(1)} — ${name}`, children: [...gcorps, ...corps].map((c) => c.id), cmd: cmd(), colors: colors(), base: capProv?.id ?? pick(provs).id }
     formations.push(a); roots.push(a.id)
-  } else roots.push(...free.map((r) => r.id))
-  for (const f of formations) { delete f.parent; delete f.kind; if (f.base == null) delete f.base }
+  } else roots.push(...units.map((r) => r.id))
+  // полководцы из лора: названные в ARMY_LORE.cmd и те, чей титул называет соединение («Капитан Горной стражи», «Легат XI легиона»)
+  const chars = W.entries.filter((e) => e.kind === 'character' && (e.base.tags ?? []).includes(name))
+  const titleOf = (e) => String(e.base.props?.title ?? e.base.title ?? '')
+  const usedCmd = new Set()
+  const setCmd = (f, e) => { f.cmd = { name: e.base.name, trait: f.cmd?.trait ?? pick(CMD_TRAITS), entryId: e.id }; usedCmd.add(e.id) }
+  for (const [fname, cname] of Object.entries(AL?.cmd ?? {})) {
+    const e = chars.find((x) => x.base.name.includes(cname)) ?? W.entries.find((x) => x.kind === 'character' && x.base.name.includes(cname))
+    for (const f of formations.filter((x) => x.name === fname)) if (e) setCmd(f, e)
+  }
+  const closed = /\(\s*\d{3,4}\s*[–-]\s*\d{3,4}\s*\)/
+  for (const f of formations) {
+    if (f.level === 'battalion' || f.cmd?.entryId) continue
+    const words = f.name.split(/[\s«»—-]+/).filter((w) => w.length >= 5 && !/^[IVXL]+$/.test(w))
+    if (!words.length) continue
+    const stems = words.map((w) => w.toLowerCase().slice(0, Math.max(4, w.length - 3)))
+    const e = chars.find((x) => !usedCmd.has(x.id) && !closed.test(titleOf(x)) && /капитан|командир|легат|маршал|префект|магистр|воевод|генерал|сотник|страж/i.test(titleOf(x)) && stems.every((s) => titleOf(x).toLowerCase().includes(s)))
+    if (e) setCmd(f, e)
+  }
+  for (const f of formations) { delete f.parent; delete f.kind; delete f.group; if (f.base == null) delete f.base }
   // утечки: по лору или по культуре; шаткая страна и большое войско воруют больше
   const g0 = GRAFT_STATE[name] ?? GRAFT[cult] ?? GRAFT.imperial
   const men = companies.reduce((s, c) => s + c.men, 0)

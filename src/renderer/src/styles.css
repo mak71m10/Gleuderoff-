@@ -2970,3 +2970,59 @@ button.pw-chip:hover { background: var(--panel-2); }
 .mr-step i { grid-area: how; font-style: normal; color: var(--muted); font-size: 12px; }
 .mr-step em { grid-area: km; font-style: normal; color: var(--text-2); font-size: 12px; }
 .mr-step.foreign { border-left-color: #b0503a; }
+
+/* ---- конструктор уставов (Designer.tsx) ---- */
+.ds { display: grid; grid-template-columns: 210px minmax(0, 1fr) 260px; gap: 14px; align-items: start; }
+.ds-list { display: flex; flex-direction: column; gap: 3px; max-height: 78vh; overflow: auto; }
+.ds-list button { display: grid; grid-template-columns: 22px 1fr auto; gap: 6px; align-items: center; text-align: left; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; background: var(--bg-2); color: var(--text); cursor: pointer; font-size: 13px; }
+.ds-list button.sel { border-color: var(--gold); background: var(--panel); }
+.ds-list i { font-style: normal; font-size: 11px; color: var(--gold-2); }
+.ds-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ds-head { display: flex; gap: 8px; flex-wrap: wrap; }
+.ds-stage { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; padding: 12px; border-radius: 12px; border: 1px solid var(--line);
+  background: radial-gradient(ellipse at 50% 45%, rgba(216, 176, 64, .10), transparent 60%), linear-gradient(180deg, var(--bg-2), var(--panel)); }
+.ds-col { display: flex; flex-direction: column; gap: 6px; }
+.ds-slot { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0, 0, 0, .25); color: var(--text); cursor: pointer; text-align: left; min-height: 44px; }
+.ds-slot:hover { border-color: var(--gold-dim); }
+.ds-slot.sel { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+.ds-slot.changed { background: rgba(216, 176, 64, .12); }
+.ds-slot-ico { font-size: 22px; width: 30px; text-align: center; flex: none; }
+.ds-slot-text { display: flex; flex-direction: column; min-width: 0; }
+.ds-slot-text i { font-style: normal; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.ds-slot-text b { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ds-figure { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ds-soldier { filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .55)); }
+.ds-figure-cap { font-size: 12px; color: var(--text-2); }
+.ds-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; padding: 8px; border-radius: 10px; border: 1px solid var(--gold-dim); background: var(--bg-2); max-height: 46vh; overflow: auto; }
+.ds-card { display: grid; grid-template-columns: 30px 1fr; grid-template-areas: "ico name" "ico mods" "ico cost"; gap: 2px 6px; align-items: center; text-align: left; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; font-size: 12px; }
+.ds-card:hover:not(:disabled) { border-color: var(--gold-dim); }
+.ds-card.on { border-color: var(--gold); background: rgba(216, 176, 64, .14); }
+.ds-card.locked { opacity: .45; cursor: default; }
+.ds-card.magic .ds-card-ico { color: #9ad0ff; }
+.ds-card-ico { grid-area: ico; font-size: 20px; text-align: center; }
+.ds-card b { grid-area: name; font-weight: 600; font-size: 13px; }
+.ds-card i { grid-area: cost; font-style: normal; color: var(--muted); font-size: 11px; }
+.ds-mods { grid-area: mods; display: flex; flex-wrap: wrap; gap: 3px; }
+.ds-mod { font-size: 11px; padding: 0 5px; border-radius: 8px; background: rgba(255, 255, 255, .06); color: var(--text-2); }
+.ds-mod.up { color: #9fd08a; background: rgba(90, 154, 80, .15); }
+.ds-mod.down { color: #e08a6a; background: rgba(176, 80, 58, .15); }
+.ds-side { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-2); position: sticky; top: 8px; }
+.ds-radar { align-self: center; }
+.ds-radar-label { font-size: 9.5px; fill: var(--text-2); }
+.ds-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ds-sum div { display: flex; flex-direction: column; padding: 6px 8px; border-radius: 6px; background: var(--panel); }
+.ds-sum span { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.ds-sum b { font-family: var(--serif); font-size: 18px; color: var(--gold-2); font-weight: normal; }
+.ds-sum em { font-style: normal; font-size: 11px; color: var(--muted); }
+.ds-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+@media (max-width: 1200px) { .ds { grid-template-columns: 180px minmax(0, 1fr); } .ds-side { grid-column: 1 / -1; position: static; } }
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .ds { grid-template-columns: 1fr; }
+  .ds-list { flex-direction: row; overflow-x: auto; max-height: none; }
+  .ds-list button { flex: none; }
+  .ds-stage { grid-template-columns: 1fr 1fr; }
+  .ds-figure { grid-column: 1 / -1; order: -1; }
+}
+/* кнопки действий ВПИ (учения, меры, поход, решения) */
+.mil-go { padding: 6px 12px; border-radius: 7px; border: 1px solid var(--gold-dim); background: var(--panel); color: var(--gold-2); font-size: 13px; cursor: pointer; text-align: left; }
+.mil-go:hover { border-color: var(--gold); background: rgba(216, 176, 64, .1); }

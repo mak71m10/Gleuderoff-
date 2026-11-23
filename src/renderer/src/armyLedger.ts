@@ -88,6 +88,8 @@ export function armyLedger(world: WorldData, st: WorldState, mil: StateMilitary,
     const t = r.tpl ?? tpl.get(c.t)
     men += c.men
     const s = { ...r.split }
+    // ополчение в мирное время — по домам: жалованье и кормовые втрое меньше, снаряжение простое
+    if (t?.parts.training === 'levy' && !war) { s.pay *= 0.35; s.feed *= 0.35; s.gear *= 0.6 }
     if (settled.has(c.id)) s.pay *= 0.4
     if (has('scutage') && /правящ/.test(ARM[t?.arm ?? 'line']?.from ?? '')) { noble += s.pay + s.feed; s.pay *= 0.5; s.feed *= 0.5 }
     per.set(c.id, s)

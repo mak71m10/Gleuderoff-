@@ -7,6 +7,7 @@ import { actTitle, levelAt } from '../decisions'
 import { DecisionsView, useProposeDecision } from './Decisions'
 import { NavyView } from './Navy'
 import { MarchView } from './March'
+import { Designer } from './Designer'
 import { companiesUnder, companyAt, orderActive, orderEnd, rearmCost, rearmDays, trainCost } from '../orders'
 import { GOOD, fmtMarks, fmtPeople, type Good } from '../economy'
 import {
@@ -231,6 +232,8 @@ function FormationCard({ st, m, f, men, onPick }: { st: WorldState; m: StateMili
   const base = world.provinces?.find((p) => p.id === f.base)
   const lore = f.lore ? world.entries.find((e) => e.id === f.lore) : null
   const levelName = m.ladder[f.level as keyof typeof m.ladder] ?? LEVEL_WORD[f.level]
+  // полководец из лора — открыть его карточку
+  const openEntry = (id: string): void => { const e = world.entries.find((x) => x.id === id); useStore.getState().select({ type: 'entry', id }); useStore.getState().setView(e?.kind ?? 'character'); useStore.getState().openStateCard(null) }
   // для батальона — роты по местам; для крупных — дочерние части по местам (по умолчанию — по очереди)
   const units = f.companies?.length
     ? f.companies.map((id) => { const c = cById.get(id)!; const t = tpl.get(c.t); return { id, name: t?.name ?? c.name, sub: c.name, icon: ARM[t?.arm ?? 'line']?.icon ?? '🛡', men: c.men, company: true } })
@@ -246,7 +249,7 @@ function FormationCard({ st, m, f, men, onPick }: { st: WorldState; m: StateMili
         <span className="mil-flag big" style={{ background: `linear-gradient(90deg, ${f.colors?.[0] ?? st.base.color} 50%, ${f.colors?.[1] ?? '#ccc'} 50%)` }} />
         <div>
           <h3>{f.name}</h3>
-          <div className="ew-muted">{levelName} · {fmtPeople(men)}{f.cmd ? ` · командир ${f.cmd.name} (${f.cmd.trait})` : ''}{base ? ` · стоит в ${base.name}` : ''}</div>
+          <div className="ew-muted">{levelName} · {fmtPeople(men)}{f.cmd ? <> · командир {f.cmd.entryId ? <button className="link-btn" onClick={() => openEntry(f.cmd!.entryId!)}>{f.cmd.name}</button> : f.cmd.name} ({f.cmd.trait})</> : null}{base ? ` · стоит в ${base.name}` : ''}</div>
         </div>
       </div>
       {lore && <p className="mil-lore">{lore.base.summary || lore.base.title}</p>}
@@ -369,109 +372,6 @@ function CompanyCard({ st, m, c }: { st: WorldState; m: StateMilitary; c: Compan
             </div>
           )}
         </div>
-      </div>
-    </div>
-  )
-}
-
-// ---------------- конструктор уставов ----------------
-function Designer({ st, m, onOrders }: { st: WorldState; m: StateMilitary; onOrders: () => void }) {
-  const world = useStore((s) => s.world!)
-  const date = useStore((s) => s.date)
-  const master = useStore((s) => s.masterMode)
-  const edit = useEditMilitary(st)
-  const [id, setId] = useState(m.templates[0]?.id ?? '')
-  const saved = m.templates.find((t) => t.id === id)
-  const [draft, setDraft] = useState<CompanyTemplate | null>(saved ? structuredClone(saved) : null)
-  const tech = (st.base.tech?.levels ?? {}) as Record<string, number>
-  const pickT = (tid: string): void => { setId(tid); const t = m.templates.find((x) => x.id === tid); setDraft(t ? structuredClone(t) : null) }
-  if (!draft) return <p className="ew-muted">Нет уставов.</p>
-  const sample = (t: CompanyTemplate): Company => ({ id: 'sample', name: '', t: t.id, race: '', region: 'plain', quality: 'common', traits: [], cmd: { name: '', trait: '' }, men: ARM[t.arm]?.men ?? 120, xp: 0, colors: ['#000', '#fff'] })
-  const now = companyStats(sample(draft), draft), before = saved ? companyStats(sample(saved), saved) : now
-  const locked = (req?: Record<string, number>): string | null => { if (!req) return null; const miss = Object.entries(req).filter(([k, v]) => (tech[k] ?? 0) < v); return miss.length ? `нужно: ${miss.map(([k, v]) => `${k === 'powder' ? 'порох' : k === 'gear' ? 'шестерня' : k === 'magic' ? 'магия' : k} ${v}`).join(', ')}` : null }
-  const fits = (slot: Slot) => PARTS.filter((p) => p.slot === slot && (!p.for || p.for.includes(draft.arm)))
-  const save = (): void => { edit((mm) => { const i = mm.templates.findIndex((x) => x.id === draft.id); if (i >= 0) mm.templates[i] = structuredClone(draft); else mm.templates.push(structuredClone(draft)) }) }
-  const copy = (): void => { const n = { ...structuredClone(draft), id: `${draft.id}-${Date.now().toString(36)}`, name: `${draft.name} (новый)`, unique: false }; edit((mm) => { mm.templates.push(n) }); setId(n.id); setDraft(n) }
-  const users = m.companies.filter((c) => c.t === draft.id).length
-  const changed = !!saved && JSON.stringify({ a: saved.arm, p: saved.parts, k: saved.kit }) !== JSON.stringify({ a: draft.arm, p: draft.parts, k: draft.kit })
-  const days = saved && changed ? rearmDays(saved, draft) : 0
-  const price = saved && changed ? rearmCost(saved, draft, users) : 0
-  // перевооружение: устав меняется с даты шкалы, роты в переучке на срок; прежняя версия хранится в приказе
-  const rearm = (): void => {
-    if (!saved) return
-    edit((mm) => {
-      const i = mm.templates.findIndex((x) => x.id === draft.id)
-      mm.orders = [...(mm.orders ?? []), { id: `o${Date.now().toString(36)}`, kind: 'rearm', from: date, days, cost: price, template: draft.id, old: { arm: saved.arm, parts: structuredClone(saved.parts), kit: [...saved.kit], name: saved.name }, note: `${draft.name} (${users} рот)` }]
-      mm.templates[i] = structuredClone(draft)
-    })
-    onOrders()
-  }
-
-  return (
-    <div className="mil-designer">
-      <div className="mil-tpl-list">
-        {m.templates.map((t) => (
-          <button key={t.id} className={t.id === id ? 'sel' : ''} onClick={() => pickT(t.id)}>
-            <span>{ARM[t.arm]?.icon}</span><b>{t.name}</b>{t.unique && <i>своё</i>}
-          </button>
-        ))}
-      </div>
-      <div className="mil-tpl-edit">
-        <div className="mil-edit-row">
-          <input className="mil-name" value={draft.name} disabled={!master} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-          <select value={draft.arm} disabled={!master} onChange={(e) => setDraft({ ...draft, arm: e.target.value })}>
-            {ARMS.map((a) => { const l = locked(a.req); return <option key={a.key} value={a.key} disabled={!!l}>{a.icon} {a.name}{l ? ` (${l})` : ''}</option> })}
-          </select>
-        </div>
-        <p className="ew-muted small">{ARM[draft.arm]?.from && `Люди: ${ARM[draft.arm].from}. `}По этому уставу набрано рот: {users}. {draft.note}</p>
-        <div className="mil-slots">
-          {SLOTS.map((s) => {
-            const opts = fits(s.key)
-            if (!opts.length) return null
-            const cur = draft.parts[s.key]
-            const p = cur ? PART[cur] : null
-            return (
-              <label key={s.key} className="mil-slot">
-                <span>{s.name}</span>
-                <select value={cur ?? ''} disabled={!master} onChange={(e) => setDraft({ ...draft, parts: { ...draft.parts, [s.key]: e.target.value || undefined } })}>
-                  <option value="">—</option>
-                  {opts.map((o) => { const l = locked(o.req); return <option key={o.id} value={o.id} disabled={!!l}>{o.name}{l ? ` (${l})` : ''}</option> })}
-                </select>
-                {p && <i>{modsText(p.mods) || 'без изменений'}{p.cost ? ` · ${p.cost > 0 ? '+' : ''}${p.cost} мар.` : ''}{p.note ? ` · ${p.note}` : ''}</i>}
-              </label>
-            )
-          })}
-        </div>
-        <h4 className="ed-h4">Снаряжение, магия и вера</h4>
-        <div className="mil-kit">
-          {KIT.map((k) => {
-            const l = locked(k.req), on = draft.kit.includes(k.id)
-            return (
-              <label key={k.id} className={`mil-kit-item ${on ? 'on' : ''} ${l ? 'locked' : ''}`} title={`${modsText(k.mods)}${k.note ? ` · ${k.note}` : ''}${l ? ` · ${l}` : ''}`}>
-                <input type="checkbox" checked={on} disabled={!master || !!l} onChange={() => setDraft({ ...draft, kit: on ? draft.kit.filter((x) => x !== k.id) : [...draft.kit, k.id] })} />
-                {k.magic ? '✦ ' : ''}{k.name}
-              </label>
-            )
-          })}
-        </div>
-      </div>
-      <div className="mil-tpl-preview">
-        <h4 className="ed-h4">Рота по уставу (обычное снаряжение, без черт)</h4>
-        <StatBars stats={now.stats} base={saved ? before.stats : undefined} />
-        <div className="mil-cost">Сила <b>{companyPower(now.stats, ARM[draft.arm]?.men ?? 120)}</b> · содержание <b>{fmtMarks(now.cost)}</b> за ход{saved && now.cost !== before.cost ? ` (было ${fmtMarks(before.cost)})` : ''}</div>
-        <div className="chip-list">{Object.entries(now.goods).filter(([, v]) => v! > 0.05).map(([g, v]) => <span key={g} className="chip">{GOOD[g as Good].icon} {v}</span>)}</div>
-        {master && (
-          <div className="mil-edit-row">
-            {changed && users > 0 ? (
-              <button className="eco-open" onClick={rearm}>Перевооружить {users} рот: {days} дн., ≈ {fmtMarks(price)}</button>
-            ) : (
-              <button className="eco-open" onClick={save}>Сохранить устав</button>
-            )}
-            <button className="eco-open" onClick={copy}>Новый устав из этого</button>
-          </div>
-        )}
-        {changed && users > 0 && <p className="ew-muted small">Роты по уставу перейдут на новый с {formatDate(world.calendar, date)} и будут в переучке до {formatDate(world.calendar, date + days)}: пока слабее (дисциплина −3). {master && <button className="link-btn" onClick={save}>Исправить устав без переучки</button>}</p>}
-        <p className="ew-muted small">Каждая рота по уставу ещё получает своё: народ, край набора, качество снаряжения, черты и опыт.</p>
       </div>
     </div>
   )
