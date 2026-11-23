@@ -159,6 +159,7 @@ for (const st of W.states) {
   const size = Math.max(450, Math.min(3500, Math.ceil((target - loreMen) / want)))
   let gi = 0
   for (let men = loreMen; men < target - 300 && gi < 40; gi++) { const m = Math.max(300, Math.min(size, target - men)); const r = regiment(genericName(gi), m, gi % 5 === 4 ? 'levy' : 'line'); r.parent = mainUmbrella?.id ?? null; regiments.push(r); men += m }
+  if (!regiments.length) { const r = regiment(genericName(0), Math.max(400, target), 'line'); r.parent = null; regiments.push(r) }
 
   // каждый свой род войск страны набран хотя бы в одну роту: заменяем роту подходящего полка (гвардия — первой)
   const usedT = new Set(companies.map((c) => c.t))
@@ -228,6 +229,34 @@ for (const st of W.states) {
       const p = spare.shift()
       const bf = formations.find((f) => f.id === bid)
       bf.base = p.id; used.set(p.id, 1)
+    }
+  }
+
+  // войска по всей земле страны (как у Империи): крупные батальоны делятся, половина рот уходит гарнизоном в ближний свободный город;
+  // цель — около каждой шестой области, но не больше, чем есть городов и крепостей
+  {
+    const places = new Set(formations.map((f) => f.base).filter((x) => x != null))
+    const towns = provs.filter((p) => rank(p) >= 2)
+    const want = Math.min(towns.length, Math.max(3, Math.round(provs.length / 6)))
+    const parentOf = (id) => formations.find((f) => f.children.includes(id))
+    let guard = 0
+    while (places.size < want && guard++ < 200) {
+      const free = towns.filter((p) => !places.has(p.id))
+      if (!free.length) break
+      const bat = formations.filter((f) => f.level === 'battalion' && (f.companies?.length ?? 0) >= 2).sort((a, b) => b.companies.length - a.companies.length)[0]
+      if (!bat) break
+      const parent = parentOf(bat.id)
+      const home = provById.get(bat.base ?? parent?.base) ?? capP
+      free.sort((x, y) => (x.x - home.x) ** 2 + (x.y - home.y) ** 2 - ((y.x - home.x) ** 2 + (y.y - home.y) ** 2))
+      const to = free[0]
+      const moved = bat.companies.splice(Math.ceil(bat.companies.length / 2))
+      const slots = {}
+      for (const id of moved) { if (bat.slots?.[id]) slots[id] = bat.slots[id]; delete bat.slots?.[id] }
+      if (bat.base == null) bat.base = home.id
+      const nb = { id: `f${++fn}`, level: 'battalion', name: `${ORDINAL[(parent?.children.length ?? 0) % ORDINAL.length]} ${ladder.battalion}`, children: [], companies: moved, slots, cmd: cmd(), colors: colors(), base: to.id }
+      formations.push(nb)
+      parent?.children.push(nb.id)
+      places.add(to.id); places.add(bat.base)
     }
   }
 
