@@ -113,6 +113,8 @@ export interface StateFields {
   econ?: StateEcon
   /** Войско ВПИ: лестница, закон призыва, уставы рот, роты и соединения (docs/впи-армия.md) */
   military?: StateMilitary
+  /** решения власти: подати, набор, меры по войску, ревизия, устав, война (decisions.ts) */
+  decisions?: import('./decisions').Decision[]
 }
 
 export type FlagLayout =

@@ -48,6 +48,7 @@ import { Icon, type IconName } from './Icon'
 import { TechView } from './Tech'
 import { EconomyView } from './Economy'
 import { ArmyView } from './Army'
+import { DecisionsView } from './Decisions'
 import { fmtMarks } from '../economy'
 import type { Faction, StateFields, WorldData, WorldDate, WorldState } from '../types'
 
@@ -341,53 +342,13 @@ function StateCardBody({ id }: { id: string }) {
           </div>
         )}
 
+        {tab === 'power' && (
+          <details className="sc-decide">
+            <summary>⚖ Решения власти: подати, набор, бюджет войска, ревизия, война</summary>
+            <DecisionsView st={st} />
+          </details>
+        )}
         {tab === 'power' && legislatures.map((l) => <PowerButton key={l.id} legislature={l} title={l.town ? `${l.name} (${l.town})` : undefined} />)}
-        {/* органы власти, которые не парламент: Сабельная ставка, Совет Десяти графа и другие государственные органы */}
-        {tab === 'power' &&
-          organs.map((o) => {
-            const of = resolve(o, date)
-            const open = (id: string): void => {
-              const e = world.entries.find((x) => x.id === id)
-              select({ type: 'entry', id })
-              setView(e?.kind ?? 'character')
-              close(null)
-            }
-            return (
-              <section key={o.id} className="sc-organ">
-                <div className="sc-organ-head">
-                  <h3>{of.name}</h3>
-                  <button className="link-btn" onClick={() => open(o.id)}>Открыть карточку</button>
-                </div>
-                {of.summary && <p className="sc-organ-summary">{of.summary}</p>}
-                {of.stavka && <StavkaView data={of.stavka} onOpen={open} />}
-                {of.ting && <TingView data={of.ting} onOpen={open} />}
-                {of.brood && <BroodView data={of.brood} onOpen={open} />}
-                {of.vault && <VaultView data={of.vault} onOpen={open} />}
-                {of.heights && <HeightsView data={of.heights} onOpen={open} />}
-                {of.urn && <UrnView data={of.urn} onOpen={open} />}
-                {of.fleet && <FleetView data={of.fleet} onOpen={open} />}
-                {of.lantern && <LanternView data={of.lantern} onOpen={open} />}
-                {of.threshold && <ThresholdView data={of.threshold} onOpen={open} />}
-                {of.wall && <WallView data={of.wall} onOpen={open} />}
-                {of.auction && <AuctionView data={of.auction} onOpen={open} />}
-                {of.ridge && <RidgeView data={of.ridge} onOpen={open} />}
-                {of.pledge && <PledgeView data={of.pledge} onOpen={open} />}
-                {of.reserve && <ReserveView data={of.reserve} onOpen={open} />}
-                {of.star && <StarView data={of.star} onOpen={open} />}
-                {of.cart && <CartView data={of.cart} onOpen={open} />}
-                {of.ford && <FordsView data={of.ford} onOpen={open} />}
-                {of.willow && <WillowView data={of.willow} onOpen={open} />}
-                {of.ash && <AshView data={of.ash} onOpen={open} />}
-                {of.chalice && <ChaliceView data={of.chalice} onOpen={open} />}
-                {of.belt && <BeltView data={of.belt} onOpen={open} />}
-                {of.sentence && <SentenceView data={of.sentence} onOpen={open} />}
-                {of.silence && <SilenceView data={of.silence} onOpen={open} />}
-                {of.ledger && <LedgerView data={of.ledger} onOpen={open} />}
-                {of.keys && <KeysView data={of.keys} onOpen={open} />}
-                {of.advisors && of.advisors.length > 0 && <AdvisorsGrid advisors={of.advisors} onOpen={open} />}
-              </section>
-            )
-          })}
         {tab === 'power' && (
           <div className="sc-cols">
             <div className="sc-side">

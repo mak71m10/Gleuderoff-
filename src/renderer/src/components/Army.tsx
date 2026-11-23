@@ -3,6 +3,8 @@ import { useStore } from '../store'
 import { provincesOf, stateReport, type EconReport } from '../econCalc'
 import { armyLedger, MEASURES, measureOn, type Ledger } from '../armyLedger'
 import { formatDate } from '../calendar'
+import { actTitle, levelAt } from '../decisions'
+import { DecisionsView, useProposeDecision } from './Decisions'
 import { GOOD, fmtMarks, fmtPeople, type Good } from '../economy'
 import {
   ARM, ARMS, KIT, KITS, PARTS, PART, QUALITY, REGION_KINDS, SLOTS, STATS, TRAIT, TRAITS, companyPower, companyStats,
@@ -23,18 +25,19 @@ const modsText = (m: Mods): string => Object.entries(m).filter(([, v]) => v).map
 /** Вкладка «Армия»: сводка и призыв, дерево войск со схемой построения и карточками рот, конструктор уставов */
 export function ArmyView({ st }: { st: WorldState }) {
   const m = st.base.military
-  const [tab, setTab] = useState<'sum' | 'tree' | 'money' | 'designer'>('sum')
+  const [tab, setTab] = useState<'sum' | 'tree' | 'money' | 'decide' | 'designer'>('sum')
   if (!m) return <p className="ew-muted">У страны пока нет войска.</p>
   return (
     <div className="mil">
       <div className="mil-tabs">
-        {([['sum', 'Сводка'], ['tree', 'Войска'], ['money', 'Казна войска'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
+        {([['sum', 'Сводка'], ['tree', 'Войска'], ['money', 'Казна войска'], ['decide', 'Решения власти'], ['designer', 'Конструктор уставов']] as const).map(([k, n]) => (
           <button key={k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>{n}</button>
         ))}
       </div>
       {tab === 'sum' && <Summary st={st} m={m} onOpen={() => setTab('tree')} />}
       {tab === 'tree' && <Tree st={st} m={m} />}
-      {tab === 'money' && <Treasury st={st} m={m} />}
+      {tab === 'money' && <Treasury st={st} m={m} onDecide={() => setTab('decide')} />}
+      {tab === 'decide' && <DecisionsView st={st} />}
       {tab === 'designer' && <Designer st={st} m={m} />}
     </div>
   )
@@ -70,7 +73,8 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
   }, [m, tpl])
   const rep = useMemo(() => stateReport(world, st, date), [world, st, date])
   const law = m.law
-  const k = LEVY_FACTOR[law.level] ?? 0.25
+  const level = levelAt(st, date)
+  const k = LEVY_FACTOR[level] ?? 0.25
   const workers = (rep?.byRole.feeders ?? 0) + (rep?.byRole.makers ?? 0)
   const canCall = Math.round(workers * law.levy * k + (law.nobles ? (rep?.byRole.rulers ?? 0) * 0.3 : 0) + (law.unfree ? (rep?.byRole.unfree ?? 0) * law.levy * 2 * k : 0))
   const share = rep?.pop ? (100 * calc.men) / rep.pop : 0
@@ -82,7 +86,7 @@ function Summary({ st, m, onOpen }: { st: WorldState; m: StateMilitary; onOpen: 
       <div className="ew-tiles">
         <div className="ew-tile"><span>Под знамёнами</span><b>{fmtPeople(calc.men)}</b><i>{m.companies.length} рот · {share.toFixed(1).replace('.', ',')} % жителей</i></div>
         <div className="ew-tile"><span>Сила войска</span><b>{powerWord(calc.power)}</b><i>{calc.power.toLocaleString('ru-RU')} очков</i></div>
-        <div className="ew-tile"><span>Можно призвать</span><b>{fmtPeople(canCall)}</b><i>при уровне «{law.level}»</i></div>
+        <div className="ew-tile"><span>Можно призвать</span><b>{fmtPeople(canCall)}</b><i>при уровне «{level}»</i></div>
         <div className="ew-tile"><span>Содержание</span><b>{fmtMarks(paid ?? calc.cost)}</b><i>за ход{paid != null ? ` (всё войско на жалованье — ${fmtMarks(calc.cost)})` : ''}{rep ? ` · казна ${rep.net >= 0 ? '+' : ''}${fmtMarks(rep.net)}` : ''}</i></div>
         <div className="ew-tile"><span>Уставов</span><b>{m.templates.length}</b><i>{m.templates.filter((t) => t.unique).length} своих родов войск</i></div>
         <div className="ew-tile"><span>Лестница</span><b className="small">{[m.ladder.company, m.ladder.battalion, m.ladder.regiment].join(' → ')}</b><i>{[m.ladder.corps, m.ladder.army].join(' → ')}</i></div>
@@ -427,7 +431,8 @@ function ledgerWith(world: Parameters<typeof provincesOf>[0], st: WorldState, mi
   return armyLedger(world, st, mil, { date, pop: rep.pop, cult, war: rep.expense.some((l) => l.name.includes('военное время')), provs, byRole: rep.byRole })
 }
 
-function Treasury({ st, m }: { st: WorldState; m: StateMilitary }) {
+function Treasury({ st, m, onDecide }: { st: WorldState; m: StateMilitary; onDecide: () => void }) {
+  const propose = useProposeDecision(st)
   const world = useStore((s) => s.world!)
   const date = useStore((s) => s.date)
   const master = useStore((s) => s.masterMode)
@@ -460,7 +465,7 @@ function Treasury({ st, m }: { st: WorldState; m: StateMilitary }) {
     <div className="mil-money">
       <div className="ew-tiles">
         <div className="ew-tile"><span>Войско стоит казне</span><b>{fmtMarks(L.total)}</b><i>за ход</i></div>
-        <div className="ew-tile"><span>На жалованье</span><b>{fmtPeople(L.standing)}</b><i>из {fmtPeople(L.men)}; остальным — {Math.round(L.atHome * 100)} % («{m.law.level}»)</i></div>
+        <div className="ew-tile"><span>На жалованье</span><b>{fmtPeople(L.standing)}</b><i>из {fmtPeople(L.men)}; остальным — {Math.round(L.atHome * 100)} % («{L.level}»)</i></div>
         <div className="ew-tile"><span>Казна страны</span><b>{rep.net >= 0 ? '+' : ''}{fmtMarks(rep.net)}</b><i>за ход, со всеми расходами</i></div>
         {showLeak && (
           <div className="ew-tile mil-leak-tile">
@@ -510,7 +515,7 @@ function Treasury({ st, m }: { st: WorldState; m: StateMilitary }) {
       <section className="eco-sec">
         <h4 className="ed-h4">Меры по бюджету войска</h4>
         <p className="ew-muted">
-          {master ? 'Мастер вводит меру с даты шкалы. Позже меры будут проходить через систему власти страны.' : 'Меры принимает власть страны; мастер вносит их в летопись.'}
+          Меры принимает власть страны: «Внести на решение» — и решение пройдёт через неё (вкладка «Решения власти»). Мастер может и ввести меру сразу.
         </p>
         {(m.measures ?? []).length > 0 && (
           <div className="mil-measures-on">
@@ -544,7 +549,12 @@ function Treasury({ st, m }: { st: WorldState; m: StateMilitary }) {
                     {targets.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
                   </select>
                 )}
-                {master && !on && <button className="mil-go" onClick={() => adopt(k)}>Ввести с {formatDate(world.calendar, date)}</button>}
+                {master && !on && (
+                  <div className="dec-actions">
+                    <button className="mil-go" onClick={() => { const act = { kind: 'measure' as const, measure: k, scope: k === 'settle' ? [scope || m.roots[0]] : undefined }; propose(k === 'audit' ? 'audit' : 'budget', act, actTitle(act, st, (id) => fName.get(id) ?? id)); onDecide() }}>Внести на решение власти</button>
+                    <button className="link-btn" onClick={() => adopt(k)}>Ввести сразу с {formatDate(world.calendar, date)}</button>
+                  </div>
+                )}
               </div>
             )
           })}

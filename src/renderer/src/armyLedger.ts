@@ -2,6 +2,7 @@
 // Считается в econCalc.ts для строки «Армия» и показывается во вкладке «Армия» → «Казна войска».
 import { ARM, companyStats, type CostSplit, type Formation, type Graft, type Measure, type MeasureKind, type StateMilitary } from './military'
 import type { Role } from './economy'
+import { decisionMeasures, levelAt } from './decisions'
 import type { Province, WorldData, WorldDate, WorldState } from './types'
 
 const YEAR = 500
@@ -27,6 +28,8 @@ export interface Ledger {
   standing: number
   /** доля жалованья для тех, кто не в постоянном войске */
   atHome: number
+  /** уровень сбора на дату (закон или решение власти) */
+  level: string
   leak: { rate: number; amount: number; byLine: Record<string, number>; who: string; through: string; note?: string; revealed: boolean; audited: boolean }
   income: LedgerLine[]
   content: Partial<Record<Role, number>>
@@ -63,7 +66,10 @@ export function armyLedger(world: WorldData, st: WorldState, mil: StateMilitary,
   const tpl = new Map(mil.templates.map((t) => [t.id, t]))
   const fById = new Map(mil.formations.map((f) => [f.id, f]))
   const cById = new Map(mil.companies.map((c) => [c.id, c]))
-  const active = (mil.measures ?? []).filter((m) => measureOn(m, date))
+  // меры: введённые мастером и принятые решениями власти
+  const allMeasures = [...(mil.measures ?? []), ...decisionMeasures(st)]
+  const active = allMeasures.filter((m) => measureOn(m, date))
+  const level = levelAt(st, date)
   const has = (k: MeasureKind): Measure | undefined => active.find((m) => m.kind === k)
 
   // какие роты в каких корнях; поселения — по выбранным соединениям
@@ -85,14 +91,14 @@ export function armyLedger(world: WorldData, st: WorldState, mil: StateMilitary,
     per.set(c.id, s)
   }
   const standing = Math.min(men, Math.round(pop * mil.law.standing))
-  let atHome = (LEVEL_PAY[mil.law.level] ?? 0.3) * (cult === 'orcish' ? 0.5 : 1)
+  let atHome = (LEVEL_PAY[level] ?? 0.3) * (cult === 'orcish' ? 0.5 : 1)
   if (war) atHome = Math.max(atHome, 0.8)
   const k = (standing + (men - standing) * atHome) / Math.max(1, men)
   const gearK = 0.15 + 0.85 * k
 
   // утечки: ревизия режет вдвое на 4 года, после любой ревизии игрок видит строку
   const g = mil.graft ?? defaultGraft(cult)
-  const audits = (mil.measures ?? []).filter((m) => m.kind === 'audit' && m.from <= date)
+  const audits = allMeasures.filter((m) => m.kind === 'audit' && m.from <= date)
   const audited = audits.some((m) => date < m.from + 4 * YEAR)
   const rate = g.rate * (audited ? 0.5 : 1)
   const INFL: Record<string, number> = { pay: 0.6, feed: 1.5, gear: 1, supply: 0.8, train: 1 }
@@ -153,7 +159,7 @@ export function armyLedger(world: WorldData, st: WorldState, mil: StateMilitary,
   if (has('scutage')) addC('rulers', -6)
   const leakAmt = Object.values(byLine).reduce((s, v) => s + v, 0)
   return {
-    lines, total: Math.round(total), men, standing, atHome,
+    lines, total: Math.round(total), men, standing, atHome, level,
     leak: { rate, amount: Math.round(leakAmt), byLine, who: g.who, through: g.through, note: g.note, revealed: audits.length > 0, audited },
     income, content, active, armies: armies.sort((x, y) => y.men - x.men)
   }

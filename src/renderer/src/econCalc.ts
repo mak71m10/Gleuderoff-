@@ -11,6 +11,7 @@
 import { GOOD, GOODS, type Good, type Role } from './economy'
 import { ownerAt } from './provinces'
 import { armyLedger, type Ledger } from './armyLedger'
+import { taxesAt } from './decisions'
 import { toParts } from './calendar'
 import type { AdminRegion, Entry, Province, WorldData, WorldDate, WorldState } from './types'
 
@@ -257,14 +258,16 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   const deficit = need - produced
   const months = deficit > 0 ? stockNow / deficit : Infinity
 
-  const content = Object.fromEntries(Object.entries(contentW).map(([r, w]) => [r, Math.max(0, Math.min(100, Math.round(w! / Math.max(1, byRole[r as Role] ?? 1) + cond.content + (TAX_CONTENT[e.taxes[r as Role] ?? 'обычные'] ?? 0))))])) as Partial<Record<Role, number>>
+  // ставки податей на дату: исходные + принятые решения власти
+  const taxes = taxesAt(st, date)
+  const content = Object.fromEntries(Object.entries(contentW).map(([r, w]) => [r, Math.max(0, Math.min(100, Math.round(w! / Math.max(1, byRole[r as Role] ?? 1) + cond.content + (TAX_CONTENT[taxes[r as Role] ?? 'обычные'] ?? 0))))])) as Partial<Record<Role, number>>
 
   const income: Line[] = [], expense: Line[] = []
   let taxSum = 0
   for (const [role, n] of Object.entries(byRole) as [Role, number][]) {
-    const v = ((TAX[role] * n * (TAX_MULT[e.taxes[role] ?? 'обычные'] ?? 1) * cond.tax) / 1000) * (role === 'feeders' && month === 3 ? 1.6 : 1)
+    const v = ((TAX[role] * n * (TAX_MULT[taxes[role] ?? 'обычные'] ?? 1) * cond.tax) / 1000) * (role === 'feeders' && month === 3 ? 1.6 : 1)
     taxSum += v
-    if (v > 0.5) income.push({ name: `Подати: ${e.estates[role] ?? role}`, amount: Math.round(v), note: `${e.taxes[role] ?? 'обычные'}${role === 'feeders' && month === 3 ? ', подушная в Лаций' : ''}` })
+    if (v > 0.5) income.push({ name: `Подати: ${e.estates[role] ?? role}`, amount: Math.round(v), note: `${taxes[role] ?? 'обычные'}${role === 'feeders' && month === 3 ? ', подушная в Лаций' : ''}` })
   }
   const crown = ['silver', 'salt', 'copper', 'saltpetre'].reduce((s, g) => s + (production[g as Good] ?? 0) * GOOD[g as Good].price, 0) * 0.12
   if (crown > 1) income.push({ name: 'Коронные промыслы', amount: Math.round(crown), note: '12 % серебра, соли, меди, селитры' })
@@ -289,7 +292,7 @@ function one(world: WorldData, st: WorldState, provs: Province[], owned: Map<str
   }
   const soldiers = Math.round((mil ? milMen : armySize(st.base.army)) * Math.min(2, cond.army))
   const ships = shipCount(st.base.navy)
-  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: ledger ? ledger.total : Math.round(soldiers * 0.045 * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${ledger ? `, ${mil!.companies.length} рот; на жалованье ${ledger.standing.toLocaleString('ru-RU')}, остальные — ${mil!.law.level === 'мир' ? 'по домам' : mil!.law.level}` : ''}` })
+  if (soldiers) expense.push({ name: cond.army > 1.2 ? 'Армия (военное время)' : 'Армия', amount: ledger ? ledger.total : Math.round(soldiers * 0.045 * Math.max(1, cond.army * 0.8)), note: `≈ ${soldiers.toLocaleString('ru-RU')} человек${ledger ? `, ${mil!.companies.length} рот; на жалованье ${ledger.standing.toLocaleString('ru-RU')}, остальные — ${ledger.level === 'мир' ? 'по домам' : ledger.level}` : ''}` })
   if (ships) expense.push({ name: 'Флот', amount: Math.round(ships * 4), note: `≈ ${ships} кораблей` })
   if (nb) expense.push({ name: 'Постройки и мануфактуры', amount: nb * 6, note: `${nb} построек` })
   for (const d of e.debts) expense.push({ name: `Проценты: ${d.to}`, amount: Math.round(d.sum * d.rate), note: `долговая печать на ${Math.round(d.sum).toLocaleString('ru-RU')} мар., срок ${d.due} г.` })
